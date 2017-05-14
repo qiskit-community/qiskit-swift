@@ -1,0 +1,2 @@
+github "core-plot/core-plot"
+git "git@github.ibm.com:IBMQuantum/qiskit-sdk-swift-dev.git" "master"
