@@ -7,24 +7,26 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6947930A1EC912C600107CFB /* IBMQuantumExperienceResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694793091EC912C600107CFB /* IBMQuantumExperienceResults.swift */; };
+		694793161EC913D000107CFB /* QuantumProgram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6947930B1EC913D000107CFB /* QuantumProgram.swift */; };
+		694793171EC913D000107CFB /* Registers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6947930C1EC913D000107CFB /* Registers.swift */; };
+		694793181EC913D000107CFB /* Gate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6947930D1EC913D000107CFB /* Gate.swift */; };
+		694793191EC913D000107CFB /* QuantumCircuit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6947930E1EC913D000107CFB /* QuantumCircuit.swift */; };
+		6947931A1EC913D000107CFB /* Measure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6947930F1EC913D000107CFB /* Measure.swift */; };
+		6947931B1EC913D000107CFB /* Reset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694793101EC913D000107CFB /* Reset.swift */; };
+		6947931C1EC913D000107CFB /* Barrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694793111EC913D000107CFB /* Barrier.swift */; };
+		6947931D1EC913D000107CFB /* GateDecl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694793121EC913D000107CFB /* GateDecl.swift */; };
+		6947931E1EC913D000107CFB /* Include.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694793131EC913D000107CFB /* Include.swift */; };
+		6947931F1EC913D000107CFB /* Opaque.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694793141EC913D000107CFB /* Opaque.swift */; };
+		694793201EC913D000107CFB /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694793151EC913D000107CFB /* Comment.swift */; };
+		694793221EC9146F00107CFB /* Qconfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694793211EC9146F00107CFB /* Qconfig.swift */; };
 		DFBC4F6C1EC7384200027640 /* qiskit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFBC4F621EC7384100027640 /* qiskit.framework */; };
 		DFBC4F711EC7384200027640 /* QiskitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4F701EC7384200027640 /* QiskitTests.swift */; };
 		DFBC4FB81EC73BF800027640 /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4FA31EC73BF800027640 /* Credentials.swift */; };
 		DFBC4FB91EC73BF800027640 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4FA41EC73BF800027640 /* Request.swift */; };
 		DFBC4FBA1EC73BF800027640 /* qiskit.h in Headers */ = {isa = PBXBuildFile; fileRef = DFBC4FA51EC73BF800027640 /* qiskit.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DFBC4FD91EC73F8F00027640 /* QASM.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4FCB1EC73F8F00027640 /* QASM.swift */; };
-		DFBC4FDA1EC73F8F00027640 /* QBarrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4FCC1EC73F8F00027640 /* QBarrier.swift */; };
-		DFBC4FDB1EC73F8F00027640 /* QComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4FCD1EC73F8F00027640 /* QComment.swift */; };
-		DFBC4FDC1EC73F8F00027640 /* Qconfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4FCE1EC73F8F00027640 /* Qconfig.swift */; };
 		DFBC4FDD1EC73F8F00027640 /* QCX.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4FCF1EC73F8F00027640 /* QCX.swift */; };
-		DFBC4FDE1EC73F8F00027640 /* QGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4FD01EC73F8F00027640 /* QGate.swift */; };
-		DFBC4FDF1EC73F8F00027640 /* QGateDecl.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4FD11EC73F8F00027640 /* QGateDecl.swift */; };
 		DFBC4FE01EC73F8F00027640 /* QIf.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4FD21EC73F8F00027640 /* QIf.swift */; };
-		DFBC4FE11EC73F8F00027640 /* QInclude.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4FD31EC73F8F00027640 /* QInclude.swift */; };
-		DFBC4FE21EC73F8F00027640 /* QMeasure.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4FD41EC73F8F00027640 /* QMeasure.swift */; };
-		DFBC4FE31EC73F8F00027640 /* QOpaque.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4FD51EC73F8F00027640 /* QOpaque.swift */; };
-		DFBC4FE41EC73F8F00027640 /* QRegs.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4FD61EC73F8F00027640 /* QRegs.swift */; };
-		DFBC4FE51EC73F8F00027640 /* QReset.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4FD71EC73F8F00027640 /* QReset.swift */; };
 		DFBC4FE61EC73F8F00027640 /* QU.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4FD81EC73F8F00027640 /* QU.swift */; };
 		DFBC4FE81EC73F9C00027640 /* IBMQuantumExperience.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4FE71EC73F9C00027640 /* IBMQuantumExperience.swift */; };
 /* End PBXBuildFile section */
@@ -40,6 +42,19 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		694793091EC912C600107CFB /* IBMQuantumExperienceResults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IBMQuantumExperienceResults.swift; sourceTree = "<group>"; };
+		6947930B1EC913D000107CFB /* QuantumProgram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuantumProgram.swift; sourceTree = "<group>"; };
+		6947930C1EC913D000107CFB /* Registers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Registers.swift; sourceTree = "<group>"; };
+		6947930D1EC913D000107CFB /* Gate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Gate.swift; sourceTree = "<group>"; };
+		6947930E1EC913D000107CFB /* QuantumCircuit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuantumCircuit.swift; sourceTree = "<group>"; };
+		6947930F1EC913D000107CFB /* Measure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Measure.swift; sourceTree = "<group>"; };
+		694793101EC913D000107CFB /* Reset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reset.swift; sourceTree = "<group>"; };
+		694793111EC913D000107CFB /* Barrier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Barrier.swift; sourceTree = "<group>"; };
+		694793121EC913D000107CFB /* GateDecl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GateDecl.swift; sourceTree = "<group>"; };
+		694793131EC913D000107CFB /* Include.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Include.swift; sourceTree = "<group>"; };
+		694793141EC913D000107CFB /* Opaque.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Opaque.swift; sourceTree = "<group>"; };
+		694793151EC913D000107CFB /* Comment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
+		694793211EC9146F00107CFB /* Qconfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Qconfig.swift; sourceTree = "<group>"; };
 		DFBC4F621EC7384100027640 /* qiskit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = qiskit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFBC4F6B1EC7384200027640 /* qiskitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = qiskitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFBC4F701EC7384200027640 /* QiskitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QiskitTests.swift; sourceTree = "<group>"; };
@@ -48,19 +63,8 @@
 		DFBC4FA31EC73BF800027640 /* Credentials.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Credentials.swift; sourceTree = "<group>"; };
 		DFBC4FA41EC73BF800027640 /* Request.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 		DFBC4FA51EC73BF800027640 /* qiskit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qiskit.h; sourceTree = "<group>"; };
-		DFBC4FCB1EC73F8F00027640 /* QASM.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QASM.swift; sourceTree = "<group>"; };
-		DFBC4FCC1EC73F8F00027640 /* QBarrier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QBarrier.swift; sourceTree = "<group>"; };
-		DFBC4FCD1EC73F8F00027640 /* QComment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QComment.swift; sourceTree = "<group>"; };
-		DFBC4FCE1EC73F8F00027640 /* Qconfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Qconfig.swift; sourceTree = "<group>"; };
 		DFBC4FCF1EC73F8F00027640 /* QCX.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QCX.swift; sourceTree = "<group>"; };
-		DFBC4FD01EC73F8F00027640 /* QGate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QGate.swift; sourceTree = "<group>"; };
-		DFBC4FD11EC73F8F00027640 /* QGateDecl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QGateDecl.swift; sourceTree = "<group>"; };
 		DFBC4FD21EC73F8F00027640 /* QIf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QIf.swift; sourceTree = "<group>"; };
-		DFBC4FD31EC73F8F00027640 /* QInclude.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QInclude.swift; sourceTree = "<group>"; };
-		DFBC4FD41EC73F8F00027640 /* QMeasure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QMeasure.swift; sourceTree = "<group>"; };
-		DFBC4FD51EC73F8F00027640 /* QOpaque.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QOpaque.swift; sourceTree = "<group>"; };
-		DFBC4FD61EC73F8F00027640 /* QRegs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRegs.swift; sourceTree = "<group>"; };
-		DFBC4FD71EC73F8F00027640 /* QReset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QReset.swift; sourceTree = "<group>"; };
 		DFBC4FD81EC73F8F00027640 /* QU.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QU.swift; sourceTree = "<group>"; };
 		DFBC4FE71EC73F9C00027640 /* IBMQuantumExperience.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IBMQuantumExperience.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -126,7 +130,9 @@
 			isa = PBXGroup;
 			children = (
 				DFBC4FE71EC73F9C00027640 /* IBMQuantumExperience.swift */,
+				694793091EC912C600107CFB /* IBMQuantumExperienceResults.swift */,
 				DFBC4FA31EC73BF800027640 /* Credentials.swift */,
+				694793211EC9146F00107CFB /* Qconfig.swift */,
 				DFBC4FA41EC73BF800027640 /* Request.swift */,
 			);
 			path = internal;
@@ -135,20 +141,20 @@
 		DFBC4FCA1EC73F8F00027640 /* qasm */ = {
 			isa = PBXGroup;
 			children = (
-				DFBC4FCB1EC73F8F00027640 /* QASM.swift */,
-				DFBC4FCC1EC73F8F00027640 /* QBarrier.swift */,
-				DFBC4FCD1EC73F8F00027640 /* QComment.swift */,
-				DFBC4FCE1EC73F8F00027640 /* Qconfig.swift */,
+				694793111EC913D000107CFB /* Barrier.swift */,
+				694793151EC913D000107CFB /* Comment.swift */,
+				6947930D1EC913D000107CFB /* Gate.swift */,
+				694793121EC913D000107CFB /* GateDecl.swift */,
+				694793131EC913D000107CFB /* Include.swift */,
+				6947930F1EC913D000107CFB /* Measure.swift */,
+				694793141EC913D000107CFB /* Opaque.swift */,
 				DFBC4FCF1EC73F8F00027640 /* QCX.swift */,
-				DFBC4FD01EC73F8F00027640 /* QGate.swift */,
-				DFBC4FD11EC73F8F00027640 /* QGateDecl.swift */,
 				DFBC4FD21EC73F8F00027640 /* QIf.swift */,
-				DFBC4FD31EC73F8F00027640 /* QInclude.swift */,
-				DFBC4FD41EC73F8F00027640 /* QMeasure.swift */,
-				DFBC4FD51EC73F8F00027640 /* QOpaque.swift */,
-				DFBC4FD61EC73F8F00027640 /* QRegs.swift */,
-				DFBC4FD71EC73F8F00027640 /* QReset.swift */,
 				DFBC4FD81EC73F8F00027640 /* QU.swift */,
+				6947930E1EC913D000107CFB /* QuantumCircuit.swift */,
+				6947930B1EC913D000107CFB /* QuantumProgram.swift */,
+				6947930C1EC913D000107CFB /* Registers.swift */,
+				694793101EC913D000107CFB /* Reset.swift */,
 			);
 			path = qasm;
 			sourceTree = "<group>";
@@ -264,23 +270,25 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DFBC4FE41EC73F8F00027640 /* QRegs.swift in Sources */,
-				DFBC4FE51EC73F8F00027640 /* QReset.swift in Sources */,
-				DFBC4FE21EC73F8F00027640 /* QMeasure.swift in Sources */,
-				DFBC4FDE1EC73F8F00027640 /* QGate.swift in Sources */,
-				DFBC4FD91EC73F8F00027640 /* QASM.swift in Sources */,
-				DFBC4FDB1EC73F8F00027640 /* QComment.swift in Sources */,
-				DFBC4FDA1EC73F8F00027640 /* QBarrier.swift in Sources */,
+				6947931E1EC913D000107CFB /* Include.swift in Sources */,
+				694793171EC913D000107CFB /* Registers.swift in Sources */,
+				694793221EC9146F00107CFB /* Qconfig.swift in Sources */,
+				694793161EC913D000107CFB /* QuantumProgram.swift in Sources */,
 				DFBC4FDD1EC73F8F00027640 /* QCX.swift in Sources */,
-				DFBC4FDC1EC73F8F00027640 /* Qconfig.swift in Sources */,
+				694793201EC913D000107CFB /* Comment.swift in Sources */,
 				DFBC4FE61EC73F8F00027640 /* QU.swift in Sources */,
-				DFBC4FE11EC73F8F00027640 /* QInclude.swift in Sources */,
-				DFBC4FE31EC73F8F00027640 /* QOpaque.swift in Sources */,
-				DFBC4FDF1EC73F8F00027640 /* QGateDecl.swift in Sources */,
+				6947931D1EC913D000107CFB /* GateDecl.swift in Sources */,
+				6947931F1EC913D000107CFB /* Opaque.swift in Sources */,
+				694793191EC913D000107CFB /* QuantumCircuit.swift in Sources */,
 				DFBC4FB81EC73BF800027640 /* Credentials.swift in Sources */,
+				6947931B1EC913D000107CFB /* Reset.swift in Sources */,
+				694793181EC913D000107CFB /* Gate.swift in Sources */,
 				DFBC4FE81EC73F9C00027640 /* IBMQuantumExperience.swift in Sources */,
 				DFBC4FE01EC73F8F00027640 /* QIf.swift in Sources */,
+				6947931C1EC913D000107CFB /* Barrier.swift in Sources */,
 				DFBC4FB91EC73BF800027640 /* Request.swift in Sources */,
+				6947931A1EC913D000107CFB /* Measure.swift in Sources */,
+				6947930A1EC912C600107CFB /* IBMQuantumExperienceResults.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

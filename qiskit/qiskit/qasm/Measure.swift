@@ -1,6 +1,6 @@
 //
-//  QMeasure.swift
-//  qiskit
+//  Measure.swift
+//  qisswiftkit
 //
 //  Created by Manoel Marques on 4/28/17.
 //  Copyright © 2017 IBM. All rights reserved.
@@ -11,7 +11,7 @@ import Cocoa
 /**
  Measurement class
  */
-public final class QMeasure: Qqop {
+public final class Measure: Qop {
 
     public let argument1: QId
     public let argument2: QId

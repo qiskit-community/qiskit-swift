@@ -1,6 +1,6 @@
 //
-//  QReset.swift
-//  qiskit
+//  Reset.swift
+//  qisswiftkit
 //
 //  Created by Manoel Marques on 4/7/17.
 //  Copyright © 2017 IBM. All rights reserved.
@@ -11,7 +11,7 @@ import Cocoa
 /**
  Reset qubit|qreg
  */
-public final class QReset: Qqop {
+public final class Reset: Qop {
 
     public let argument: QId
 

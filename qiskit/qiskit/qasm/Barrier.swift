@@ -1,6 +1,6 @@
 //
-//  QBarrier.swift
-//  qiskit
+//  Barrier.swift
+//  qisswiftkit
 //
 //  Created by Manoel Marques on 4/12/17.
 //  Copyright © 2017 IBM. All rights reserved.
@@ -11,7 +11,7 @@ import Cocoa
 /**
  Quantum Barrier class
  */
-public final class QBarrier: QStatement {
+public final class Barrier: Statement {
 
     public let idList: [QId]
 

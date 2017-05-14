@@ -1,6 +1,6 @@
 //
 //  Qconfig.swift
-//  qiskit
+//  qisswiftkit
 //
 //  Created by Manoel Marques on 4/5/17.
 //  Copyright © 2017 IBM. All rights reserved.

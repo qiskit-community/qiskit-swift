@@ -1,6 +1,6 @@
 //
-//  QOpaque.swift
-//  qiskit
+//  Opaque.swift
+//  qisswiftkit
 //
 //  Created by Manoel Marques on 4/28/17.
 //  Copyright © 2017 IBM. All rights reserved.
@@ -11,7 +11,7 @@ import Cocoa
 /**
  QASM Opaque Gate class
  */
-public final class QOpaque: QId, QStatement {
+public final class Opaque: QId, Statement {
 
     public let idList1: [QId]
     public let idList2: [QId]

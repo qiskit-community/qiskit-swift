@@ -1,6 +1,6 @@
 //
-//  QGate.swift
-//  qiskit
+//  Gate.swift
+//  qisswiftkit
 //
 //  Created by Manoel Marques on 4/7/17.
 //  Copyright © 2017 IBM. All rights reserved.
@@ -11,12 +11,12 @@ import Cocoa
 /**
  Quantum Gate Declaration class
  */
-public final class QGateDecl: QStatement {
+public final class GateDecl: Statement {
 
     public let identifier: String
     public let idList1: [QId]
     public let idList2: [QId]
-    public var body: [QStatement] = []
+    public var body: [Statement] = []
 
     public init(_ identifier: String, _ idList1: [QId], _ idList2: [QId]) {
         self.identifier = identifier
@@ -46,7 +46,7 @@ public final class QGateDecl: QStatement {
         text.append("\n{")
         for statement in self.body {
             text.append("\n  \(statement.description)")
-            if statement is QComment || statement is QGateDecl {
+            if statement is Comment || statement is GateDecl {
                 continue
             }
             text.append(";")
@@ -55,22 +55,22 @@ public final class QGateDecl: QStatement {
         return text
     }
 
-    public func append(_ statement: QStatement) -> QGateDecl {
+    public func append(_ statement: Statement) -> GateDecl {
         self.body.append(statement)
         return self
     }
 
-    public func append(contentsOf: [QStatement]) -> QGateDecl {
+    public func append(contentsOf: [Statement]) -> GateDecl {
         self.body.append(contentsOf: contentsOf)
         return self
     }
 
-    public static func + (left: QGateDecl, right: QStatement) -> QGateDecl {
-        let gateDecl = QGateDecl(left.identifier, left.idList1, left.idList2)
+    public static func + (left: GateDecl, right: Statement) -> GateDecl {
+        let gateDecl = GateDecl(left.identifier, left.idList1, left.idList2)
         return gateDecl.append(contentsOf: left.body).append(right)
     }
 
-    public static func += (left: inout QGateDecl, right: QStatement) {
+    public static func += (left: inout GateDecl, right: Statement) {
         left.body.append(right)
     }
 }

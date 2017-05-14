@@ -1,6 +1,6 @@
 //
 //  QU.swift
-//  qiskit
+//  qisswiftkit
 //
 //  Created by Manoel Marques on 4/28/17.
 //  Copyright © 2017 IBM. All rights reserved.
@@ -11,7 +11,7 @@ import Cocoa
 /**
  Built-in Single Qubit Gate class
  */
-public final class QU: Quop {
+public final class QU: Uop {
 
     public let expList: [String]
     public let argument: QId

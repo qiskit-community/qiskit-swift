@@ -1,6 +1,6 @@
 //
-//  QRegs.swift
-//  qiskit
+//  Registers.swift
+//  qisswiftkit
 //
 //  Created by Manoel Marques on 4/12/17.
 //  Copyright © 2017 IBM. All rights reserved.
@@ -11,7 +11,7 @@ import Cocoa
 /**
  Quantum or Classical Bit class
  */
-public final class Qbit: QId, QDecl {
+public final class Qbit: QId, Decl {
 
     public override var identifier: String { return "\(super.identifier)[\(self.index)]" }
     public let index: Int
@@ -29,7 +29,7 @@ public final class Qbit: QId, QDecl {
 /**
  Qubits Register class
  */
-public final class Qqreg: QId, QDecl {
+public final class QuantumRegister: QId, Decl {
 
     public let size: Int
 
@@ -55,7 +55,7 @@ public final class Qqreg: QId, QDecl {
 /**
  Bits Register class
  */
-public final class Qcreg: QId, QDecl {
+public final class ClassicalRegister: QId, Decl {
 
     public let size: Int
 

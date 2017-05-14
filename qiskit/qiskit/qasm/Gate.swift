@@ -1,6 +1,6 @@
 //
-//  QGate.swift
-//  qiskit
+//  Gate.swift
+//  qisswiftkit
 //
 //  Created by Manoel Marques on 4/28/17.
 //  Copyright © 2017 IBM. All rights reserved.
@@ -11,7 +11,7 @@ import Cocoa
 /**
  User Defined Gate class
  */
-public final class QGate: Quop {
+public final class Gate: Uop {
 
     public let identifier: String
     public let expList: [String]

@@ -1,6 +1,6 @@
 //
 //  QCX.swift
-//  qiskit
+//  qisswiftkit
 //
 //  Created by Manoel Marques on 4/7/17.
 //  Copyright © 2017 IBM. All rights reserved.
@@ -11,7 +11,7 @@ import Cocoa
 /**
  Built-in CNOT Gate class
  */
-public final class QCX: Quop {
+public final class QCX: Uop {
 
     public let argument1: QId
     public let argument2: QId
