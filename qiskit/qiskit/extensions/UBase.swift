@@ -1,5 +1,5 @@
 //
-//  QU.swift
+//  UBase.swift
 //  qisswiftkit
 //
 //  Created by Manoel Marques on 4/28/17.
@@ -11,7 +11,7 @@ import Cocoa
 /**
  Built-in Single Qubit Gate class
  */
-public final class QU: Uop {
+public final class UBase: Uop {
 
     public let expList: [String]
     public let argument: QId

@@ -35,4 +35,5 @@ Cartfile.resolved
 Carthage/
 
 ## MISC
+.swiftlint.yml
 *~

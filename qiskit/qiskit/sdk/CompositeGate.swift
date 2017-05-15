@@ -1,5 +1,5 @@
 //
-//  Gate.swift
+//  CompositeGate.swift
 //  qisswiftkit
 //
 //  Created by Manoel Marques on 4/7/17.
@@ -9,9 +9,9 @@
 import Cocoa
 
 /**
- Quantum Gate Declaration class
+ Composite gate, a sequence of unitary gates.
  */
-public final class GateDecl: Statement {
+public final class CompositeGate: Statement {
 
     public let identifier: String
     public let idList1: [QId]
@@ -46,7 +46,7 @@ public final class GateDecl: Statement {
         text.append("\n{")
         for statement in self.body {
             text.append("\n  \(statement.description)")
-            if statement is Comment || statement is GateDecl {
+            if statement is Comment || statement is CompositeGate {
                 continue
             }
             text.append(";")
@@ -55,22 +55,22 @@ public final class GateDecl: Statement {
         return text
     }
 
-    public func append(_ statement: Statement) -> GateDecl {
+    public func append(_ statement: Statement) -> CompositeGate {
         self.body.append(statement)
         return self
     }
 
-    public func append(contentsOf: [Statement]) -> GateDecl {
+    public func append(contentsOf: [Statement]) -> CompositeGate {
         self.body.append(contentsOf: contentsOf)
         return self
     }
 
-    public static func + (left: GateDecl, right: Statement) -> GateDecl {
-        let gateDecl = GateDecl(left.identifier, left.idList1, left.idList2)
+    public static func + (left: CompositeGate, right: Statement) -> CompositeGate {
+        let gateDecl = CompositeGate(left.identifier, left.idList1, left.idList2)
         return gateDecl.append(contentsOf: left.body).append(right)
     }
 
-    public static func += (left: inout GateDecl, right: Statement) {
+    public static func += (left: inout CompositeGate, right: Statement) {
         left.body.append(right)
     }
 }

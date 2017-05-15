@@ -1,5 +1,5 @@
 //
-//  QCX.swift
+//  CX.swift
 //  qisswiftkit
 //
 //  Created by Manoel Marques on 4/7/17.
@@ -9,9 +9,9 @@
 import Cocoa
 
 /**
- Built-in CNOT Gate class
+ controlled-NOT gate.
  */
-public final class QCX: Uop {
+public final class CnotGate: Uop {
 
     public let argument1: QId
     public let argument2: QId
