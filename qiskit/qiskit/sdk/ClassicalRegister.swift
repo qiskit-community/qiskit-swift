@@ -13,15 +13,6 @@ import Cocoa
  */
 public final class ClassicalRegister: Register, Decl {
 
-    public subscript(index: Int) -> Qbit {
-        get {
-            if index < 0 || index >= size {
-                fatalError("Index out of range")
-            }
-            return Qbit(self.identifier, index)
-        }
-    }
-
     public override init(_ identifier: String, _ size: Int) throws {
         try super.init(identifier, size)
     }

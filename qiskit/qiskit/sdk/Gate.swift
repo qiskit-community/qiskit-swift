@@ -11,7 +11,7 @@ import Cocoa
 /**
  User Defined Gate class
  */
-public final class Gate: Instruction, Uop {
+public class Gate: Instruction, Uop {
 
     public let expList: [String]
     public let anyList: [QId]

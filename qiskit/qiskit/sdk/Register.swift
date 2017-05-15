@@ -31,6 +31,15 @@ public class Register: QId {
     public let name:String
     public let size:Int
 
+    public subscript(index: Int) -> Qbit {
+        get {
+            if index < 0 || index >= self.size {
+                fatalError("Index out of range")
+            }
+            return Qbit(self.identifier, index)
+        }
+    }
+
     /**
      Create a new generic register.
      */

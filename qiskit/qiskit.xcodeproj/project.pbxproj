@@ -26,6 +26,7 @@
 		69D3108B1ECA182000B3E752 /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D310871ECA182000B3E752 /* Credentials.swift */; };
 		69D3108D1ECA18B800B3E752 /* Measure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D3108C1ECA18B800B3E752 /* Measure.swift */; };
 		69D3108F1ECA192000B3E752 /* Instruction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D3108E1ECA192000B3E752 /* Instruction.swift */; };
+		69DBD7301ECA48BE0099CB1D /* CCX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DBD72F1ECA48BE0099CB1D /* CCX.swift */; };
 		69E3354F1ECA1B8D0027271D /* Register.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E3354E1ECA1B8D0027271D /* Register.swift */; };
 		69E335511ECA1BC00027271D /* QuantumRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E335501ECA1BC00027271D /* QuantumRegister.swift */; };
 		69E335531ECA1BD20027271D /* ClassicalRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E335521ECA1BD20027271D /* ClassicalRegister.swift */; };
@@ -64,6 +65,7 @@
 		69D310871ECA182000B3E752 /* Credentials.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Credentials.swift; path = qiskit/network/Credentials.swift; sourceTree = SOURCE_ROOT; };
 		69D3108C1ECA18B800B3E752 /* Measure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Measure.swift; path = sdk/Measure.swift; sourceTree = "<group>"; };
 		69D3108E1ECA192000B3E752 /* Instruction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Instruction.swift; path = sdk/Instruction.swift; sourceTree = "<group>"; };
+		69DBD72F1ECA48BE0099CB1D /* CCX.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CCX.swift; path = extensions/CCX.swift; sourceTree = "<group>"; };
 		69E3354E1ECA1B8D0027271D /* Register.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Register.swift; path = sdk/Register.swift; sourceTree = "<group>"; };
 		69E335501ECA1BC00027271D /* QuantumRegister.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QuantumRegister.swift; path = sdk/QuantumRegister.swift; sourceTree = "<group>"; };
 		69E335521ECA1BD20027271D /* ClassicalRegister.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ClassicalRegister.swift; path = sdk/ClassicalRegister.swift; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 			children = (
 				693A9F411ECA363D00112AC9 /* Barrier.swift */,
 				693A9F431ECA366000112AC9 /* CX.swift */,
+				69DBD72F1ECA48BE0099CB1D /* CCX.swift */,
 				693A9F451ECA369500112AC9 /* UBase.swift */,
 			);
 			name = extensions;
@@ -342,6 +345,7 @@
 				69D3108B1ECA182000B3E752 /* Credentials.swift in Sources */,
 				6974E5951ECA1EF300D1AE97 /* QISKitException.swift in Sources */,
 				69D3107D1ECA180500B3E752 /* QIf.swift in Sources */,
+				69DBD7301ECA48BE0099CB1D /* CCX.swift in Sources */,
 				69E3354F1ECA1B8D0027271D /* Register.swift in Sources */,
 				69E335511ECA1BC00027271D /* QuantumRegister.swift in Sources */,
 				69D3108A1ECA182000B3E752 /* IBMQuantumExperienceResults.swift in Sources */,

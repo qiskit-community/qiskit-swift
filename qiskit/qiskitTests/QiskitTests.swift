@@ -181,23 +181,29 @@ class QiskitTests: XCTestCase {
         }
     }
 
+    /**
+     Majority gate.
+     */
+    private class func majority(_ p: inout QuantumCircuit, _ a: Qbit, _ b:Qbit, _ c:Qbit) throws {
+        p += CnotGate(c, b)
+        p += CnotGate(c, a)
+        p += try Gate("ccx",[],[],nil, [], [a, b, c])
+    }
+
+    /**
+     Majority gate.
+     */
+    private class func unmajority(_ p: inout QuantumCircuit, _ a: Qbit, _ b:Qbit, _ c:Qbit) throws {
+        p += try Gate("ccx",[],[],nil, [], [a, b, c])
+        p += CnotGate(c, a)
+        p += CnotGate(a, b)
+    }
+
     func testRippleCarryAdder() {
         do {
             let str: String =
                 "OPENQASM 2.0;\n" +
                     "include \"qelib1.inc\";\n" +
-                    "gate majority a,b,c\n" +
-                    "{\n" +
-                    "  cx c,b;\n" +
-                    "  cx c,a;\n" +
-                    "  ccx a,b,c;\n" +
-                    "}\n" +
-                    "gate unmaj a,b,c\n" +
-                    "{\n" +
-                    "  ccx a,b,c;\n" +
-                    "  cx c,a;\n" +
-                    "  cx a,b;\n" +
-                    "}\n" +
                     "qreg cin[1];\n" +
                     "qreg a[4];\n" +
                     "qreg b[4];\n" +
@@ -207,36 +213,39 @@ class QiskitTests: XCTestCase {
                     "x a[0];\n" +
                     "x b;\n" +
                     "// add a to b, storing result in b\n" +
-                    "majority cin[0],b[0],a[0];\n" +
-                    "majority a[0],b[1],a[1];\n" +
-                    "majority a[1],b[2],a[2];\n" +
-                    "majority a[2],b[3],a[3];\n" +
+                    "cx a[0],b[0];\n" +
+                    "cx a[0],cin[0];\n" +
+                    "ccx cin[0],b[0],a[0];\n" +
+                    "cx a[1],b[1];\n" +
+                    "cx a[1],a[0];\n" +
+                    "ccx a[0],b[1],a[1];\n" +
+                    "cx a[2],b[2];\n" +
+                    "cx a[2],a[1];\n" +
+                    "ccx a[1],b[2],a[2];\n" +
+                    "cx a[3],b[3];\n" +
+                    "cx a[3],a[2];\n" +
+                    "ccx a[2],b[3],a[3];\n" +
                     "cx a[3],cout[0];\n" +
-                    "unmaj a[2],b[3],a[3];\n" +
-                    "unmaj a[1],b[2],a[2];\n" +
-                    "unmaj a[0],b[1],a[1];\n" +
-                    "unmaj cin[0],b[0],a[0];\n" +
+                    "ccx a[2],b[3],a[3];\n" +
+                    "cx a[3],a[2];\n" +
+                    "cx a[2],b[3];\n" +
+                    "ccx a[1],b[2],a[2];\n" +
+                    "cx a[2],a[1];\n" +
+                    "cx a[1],b[2];\n" +
+                    "ccx a[0],b[1],a[1];\n" +
+                    "cx a[1],a[0];\n" +
+                    "cx a[0],b[1];\n" +
+                    "ccx cin[0],b[0],a[0];\n" +
+                    "cx a[0],cin[0];\n" +
+                    "cx cin[0],b[0];\n" +
                     "measure b[0] -> ans[0];\n" +
                     "measure b[1] -> ans[1];\n" +
                     "measure b[2] -> ans[2];\n" +
                     "measure b[3] -> ans[3];\n" +
-            "measure cout[0] -> ans[4];"
+                    "measure cout[0] -> ans[4];"
 
-            let aId = QId("a")
-            let bId = QId("b")
-            let c = QId("c")
             var circuit = QuantumCircuit()
             circuit += Include("qelib1.inc")
-            var compositeGate = CompositeGate("majority", [], [aId, bId, c])
-            compositeGate += CnotGate(c, bId)
-            compositeGate += CnotGate(c, aId)
-            compositeGate += try Gate("ccx",[],[],nil, [], [aId, bId, c])
-            circuit += compositeGate
-            compositeGate = CompositeGate("unmaj", [], [aId, bId, c])
-            compositeGate += try Gate("ccx",[],[],nil, [], [aId, bId, c])
-            compositeGate += CnotGate(c, aId)
-            compositeGate += CnotGate(aId, bId)
-            circuit += compositeGate
             let cin = try QuantumRegister("cin", 1)
             let a = try QuantumRegister("a", 4)
             let b = try QuantumRegister("b", 4)
@@ -251,19 +260,18 @@ class QiskitTests: XCTestCase {
             circuit += try Gate("x",[],[],nil, [], [a[0]])
             circuit += try Gate("x",[],[],nil, [], [b])
             circuit += Comment("add a to b, storing result in b")
-            circuit += try Gate("majority",[],[],nil, [], [cin[0], b[0], a[0]])
-            circuit += try Gate("majority",[],[],nil, [], [a[0], b[1], a[1]])
-            circuit += try Gate("majority",[],[],nil, [], [a[1], b[2], a[2]])
-            circuit += try Gate("majority",[],[],nil, [], [a[2], b[3], a[3]])
+            try QiskitTests.majority(&circuit, cin[0], b[0], a[0])
+            for j in 0..<3 {
+                try QiskitTests.majority(&circuit, a[j], b[j + 1], a[j + 1])
+            }
             circuit += CnotGate(a[3], cout[0])
-            circuit += try Gate("unmaj",[],[],nil, [], [a[2], b[3], a[3]])
-            circuit += try Gate("unmaj",[],[],nil, [], [a[1], b[2], a[2]])
-            circuit += try Gate("unmaj",[],[],nil, [], [a[0], b[1], a[1]])
-            circuit += try Gate("unmaj",[],[],nil, [], [cin[0], b[0], a[0]])
-            circuit += Measure(b[0], ans[0])
-            circuit += Measure(b[1], ans[1])
-            circuit += Measure(b[2], ans[2])
-            circuit += Measure(b[3], ans[3])
+            for j in (0..<3).reversed() {
+                try QiskitTests.unmajority(&circuit, a[j], b[j + 1], a[j + 1])
+            }
+            try QiskitTests.unmajority(&circuit, cin[0], b[0], a[0])
+            for j in 0..<4 {
+                circuit += Measure(b[j], ans[j])  // Measure the output register
+            }
             circuit += Measure(cout[0], ans[4])
 
             print(circuit.description)

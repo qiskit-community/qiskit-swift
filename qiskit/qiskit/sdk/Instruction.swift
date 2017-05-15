@@ -15,7 +15,7 @@ public class Instruction {
 
     public let name: String
     private let param: [AnyObject]
-    private let arg: [(Register,Int)]
+    internal let arg: [(Register,Int)]
     private let circuit: QuantumCircuit?
     private var control: (ClassicalRegister, Int)? = nil
 
