@@ -11,50 +11,14 @@ import Cocoa
 /**
  User Defined Gate class
  */
-public class Gate: Instruction, Uop {
+public class Gate: Instruction {
 
-    public let expList: [String]
-    public let anyList: [QId]
-
-    /**
-     Create a new Unitary Gate.
-
-     - parameter name: instruction name string
-     - parameter param: list of real parameters
-     - parameter arg: list of pairs (Register, index)
-     - parameter circuit: QuantumCircuit or CompositeGate containing this gate
-     */
-    public init(_ name: String, _ param: [AnyObject], _ arg: [(Register,Int)], _ circuit: QuantumCircuit? = nil, _ expList: [String], _ anyList: [QId]) throws {
-        for (register,_) in arg {
-            if !(register is QuantumRegister) {
-                throw QISKitException.notqreg
-            }
-        }
-        self.expList = expList
-        self.anyList = anyList
-        super.init(name, param, arg, circuit)
+    internal init(_ name: String, _ params: [Double], _ qargs: [QuantumRegister]) {
+        super.init(name, params, qargs)
     }
-
-    public var description: String {
-        var text = "\(self.name)"
-        if !self.expList.isEmpty {
-            text.append("(")
-            for i in 0..<self.expList.count {
-                if i > 0 {
-                    text.append(",")
-                }
-                text.append("\(self.expList[i])")
-            }
-            text.append(")")
-        }
-        text.append(" ")
-        for i in 0..<self.anyList.count {
-            if i > 0 {
-                text.append(",")
-            }
-            text.append("\(self.anyList[i].identifier)")
-        }
-        return text
+    
+    internal init(_ name: String, _ params: [Double], _ qargs: [QuantumRegisterTuple]) {
+        super.init(name, params, qargs)
     }
 
     /**

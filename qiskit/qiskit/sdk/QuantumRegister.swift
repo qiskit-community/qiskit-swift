@@ -11,13 +11,28 @@ import Cocoa
 /**
  Qubits Register class
  */
-public final class QuantumRegister: Register, Decl {
+public final class QuantumRegister: Register {
 
-    public override init(_ identifier: String, _ size: Int) throws {
-        try super.init(identifier, size)
+    public subscript(index: Int) -> QuantumRegisterTuple {
+        get {
+            if index < 0 || index >= self.size {
+                fatalError("Index out of range")
+            }
+            return QuantumRegisterTuple(self, index)
+        }
     }
 
-    public var description: String {
-        return "qreg \(self.identifier)[\(self.size)]"
+    public override init(_ name: String, _ size: Int) throws {
+        try super.init(name, size)
+    }
+
+    public override var description: String {
+        return "qreg \(self.name)[\(self.size)]"
+    }
+}
+
+public final class QuantumRegisterTuple: RegisterTuple {
+    internal init(_ register: QuantumRegister, _ index: Int) {
+        super.init(register,index)
     }
 }

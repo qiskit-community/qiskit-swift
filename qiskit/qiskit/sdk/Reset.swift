@@ -9,17 +9,19 @@
 import Cocoa
 
 /**
- Reset qubit|qreg
+ Qubit reset
  */
-public final class Reset: Qop {
+public final class Reset: Instruction {
 
-    public let argument: QId
-
-    public init(_ argument: QId) {
-        self.argument = argument
+    public init(_ qreg: QuantumRegister) {
+        super.init("reset", [], [qreg])
     }
 
-    public var description: String {
-        return "reset \(self.argument.identifier)"
+    public init(_ qubit: QuantumRegisterTuple) {
+        super.init("reset", [], [qubit])
+    }
+
+    public override var description: String {
+        return "\(name) \(self.args[0].identifier)"
     }
 }

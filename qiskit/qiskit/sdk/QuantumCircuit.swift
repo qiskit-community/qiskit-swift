@@ -8,73 +8,72 @@
 
 import Cocoa
 
-public protocol QInstruction: CustomStringConvertible {
-}
-
-public protocol Statement: QInstruction {
-}
-
-public protocol Decl: Statement {
-}
-
-public protocol Qop: Statement {
-}
-
-public protocol Uop: Qop {
-}
-
-public class QId {
-
-    public var identifier: String { return self.ident }
-    private let ident: String
-
-    public init(_ identifier: String) {
-        self.ident = identifier
-    }
-}
-
 public final class QuantumCircuit: CustomStringConvertible {
 
-    public let majorVersion: Int = 2
-    public let minorVersion: Int = 0
-    public var header: String {
-        return "OPENQASM \(self.majorVersion).\(self.minorVersion);"
+    private let majorVersion: Int = 2
+    private let minorVersion: Int = 0
+    private var header: String {
+        return "OPENQASM \(self.majorVersion).\(self.minorVersion);\ninclude \"qelib1.inc\";"
     }
-    public var instructions: [QInstruction] = []
-    private var regs: [String:Register] = [:]
+    private var instructions: [Instruction] = []
+    private var regNames: Set<String> = []
+    private var regs: [Register] = []
 
-    public init() {
+    public init(_ regs: [Register]) throws {
+        try self.add(regs)
     }
+
+    private init() {
+    }
+
 
     public var description: String {
         var text = self.header
+        for register in self.regs {
+            text.append("\n\(register.description);")
+        }
         for instruction in self.instructions {
-            text.append("\n\(instruction.description)")
-            if instruction is Comment || instruction is CompositeGate {
-                continue
-            }
-            text.append(";")
+            text.append("\n\(instruction.description);")
         }
         return text
     }
 
-    public func append(_ instruction: QInstruction) -> QuantumCircuit {
+    /**
+     Add registers.
+     */
+    public func add(_ regs: [Register]) throws {
+        for register in regs {
+            if self.regNames.contains(register.name) {
+                throw QISKitException.regexists(name: register.name)
+            }
+            self.regs.append(register)
+            self.regNames.insert(register.name)
+        }
+    }
+
+    public func append(_ instruction: Instruction) -> QuantumCircuit {
         self.instructions.append(instruction)
+        instruction.circuit = self
         return self
     }
 
-    public func append(contentsOf: [QInstruction]) -> QuantumCircuit {
+    public func append(contentsOf: [Instruction]) -> QuantumCircuit {
         self.instructions.append(contentsOf: contentsOf)
+        for instruction in contentsOf {
+            instruction.circuit = self
+        }
         return self
     }
 
-    public static func + (left: QuantumCircuit, right: QInstruction) -> QuantumCircuit {
+    public static func + (left: QuantumCircuit, right: Instruction) -> QuantumCircuit {
         let qasm = QuantumCircuit()
+        qasm.regs = left.regs
+        right.circuit = qasm
         return qasm.append(contentsOf: left.instructions).append(right)
     }
 
-    public static func += (left: inout QuantumCircuit, right: QInstruction) {
-        left.instructions.append(right)
+    public static func += (left: inout QuantumCircuit, right: Instruction) {
+        let _ = left.append(right)
     }
 
     /**
@@ -82,10 +81,10 @@ public final class QuantumCircuit: CustomStringConvertible {
      Return True or False.
      */
     func has_register(_ register: Register) -> Bool {
-        if let registers = self.regs[register.name] {
-            if registers.size == register.size {
-                if ((register is QuantumRegister && registers is QuantumRegister) ||
-                    (register is ClassicalRegister && registers is ClassicalRegister)) {
+        for reg in self.regs {
+            if reg.name == register.name && reg.size == register.size {
+                if ((register is QuantumRegister && reg is QuantumRegister) ||
+                    (register is ClassicalRegister && reg is ClassicalRegister)) {
                     return true
                 }
             }

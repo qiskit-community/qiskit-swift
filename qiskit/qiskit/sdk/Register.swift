@@ -8,36 +8,35 @@
 
 import Cocoa
 
-/**
- Quantum or Classical Bit class
- */
-public final class Qbit: QId, Decl {
+public protocol RegisterArgument {
+    var identifier: String { get }
+}
 
-    public override var identifier: String { return "\(super.identifier)[\(self.index)]" }
-    public let index: Int
+public class RegisterTuple: RegisterArgument {
+    internal let register: Register
+    internal let index: Int
 
-    init(_ identifier: String, _ index: Int) {
-        self.index = index
-        super.init(identifier)
+    public var identifier: String {
+        return "\(self.register.name)[\(self.index)]"
     }
 
-    public var description: String {
-        return "\(self.identifier)[\(self.index)]"
+    internal init(_ register: Register, _ index: Int) {
+        self.register = register
+        self.index = index
     }
 }
 
-public class Register: QId {
+public class Register: RegisterArgument {
 
     public let name:String
     public let size:Int
 
-    public subscript(index: Int) -> Qbit {
-        get {
-            if index < 0 || index >= self.size {
-                fatalError("Index out of range")
-            }
-            return Qbit(self.identifier, index)
-        }
+    public var identifier: String {
+        return self.name
+    }
+
+    public var description: String {
+        return ""
     }
 
     /**
@@ -60,6 +59,5 @@ public class Register: QId {
         }
         self.name = name
         self.size = size
-        super.init(name)
     }
 }

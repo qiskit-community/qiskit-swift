@@ -11,66 +11,44 @@ import Cocoa
 /**
  Composite gate, a sequence of unitary gates.
  */
-public final class CompositeGate: Statement {
+public final class CompositeGate: Gate {
 
-    public let identifier: String
-    public let idList1: [QId]
-    public let idList2: [QId]
-    public var body: [Statement] = []
+    private var data: [Instruction] = []  // gate sequence defining the composite unitary
+    private var inverse_flag = false
 
-    public init(_ identifier: String, _ idList1: [QId], _ idList2: [QId]) {
-        self.identifier = identifier
-        self.idList1 = idList1
-        self.idList2 = idList2
+    public override init(_ name: String, _ params: [Double], _ args: [QuantumRegisterTuple]) {
+        super.init(name, params, args)
     }
 
-    public var description: String {
-        var text = "gate \(self.identifier)"
-        if !self.idList1.isEmpty {
-            text.append("(")
-            for i in 0..<self.idList1.count {
-                if i > 0 {
-                    text.append(",")
-                }
-                text.append("\(self.idList1[i].identifier)")
-            }
-            text.append(")")
+    public override var description: String {
+        var text = ""
+        for statement in self.data {
+            text.append("\n\(statement.description);")
         }
-        text.append(" ")
-        for i in 0..<self.idList2.count {
-            if i > 0 {
-                text.append(",")
-            }
-            text.append("\(self.idList2[i].identifier)")
-        }
-        text.append("\n{")
-        for statement in self.body {
-            text.append("\n  \(statement.description)")
-            if statement is Comment || statement is CompositeGate {
-                continue
-            }
-            text.append(";")
-        }
-        text.append("\n}")
         return text
     }
 
-    public func append(_ statement: Statement) -> CompositeGate {
-        self.body.append(statement)
+    public func append(_ instruction: Instruction) -> CompositeGate {
+        self.data.append(instruction)
+        instruction.circuit = self.circuit
         return self
     }
 
-    public func append(contentsOf: [Statement]) -> CompositeGate {
-        self.body.append(contentsOf: contentsOf)
+    public func append(contentsOf: [Instruction]) -> CompositeGate {
+        self.data.append(contentsOf: contentsOf)
+        for instruction in contentsOf {
+            instruction.circuit = self.circuit
+        }
         return self
     }
 
-    public static func + (left: CompositeGate, right: Statement) -> CompositeGate {
-        let gateDecl = CompositeGate(left.identifier, left.idList1, left.idList2)
-        return gateDecl.append(contentsOf: left.body).append(right)
+    public static func + (left: CompositeGate, right: Instruction) -> CompositeGate {
+        let gate = CompositeGate(left.name, left.params, left.args as! [QuantumRegisterTuple])
+        gate.circuit = left.circuit
+        return gate.append(contentsOf: left.data).append(right)
     }
 
-    public static func += (left: inout CompositeGate, right: Statement) {
-        left.body.append(right)
+    public static func += (left: inout CompositeGate, right: Instruction) {
+        let _ = left.append(right)
     }
 }

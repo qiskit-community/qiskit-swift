@@ -14,6 +14,7 @@ import Cocoa
 public enum QISKitException: Error, CustomStringConvertible {
 
     case intructionCircuitNil
+    case regexists(name: String)
     case controlValueNegative
     case notcreg
     case regNotInCircuit(name: String)
@@ -22,13 +23,15 @@ public enum QISKitException: Error, CustomStringConvertible {
     case controlregnotfound(name: String)
     case inversenotimpl
     case controlnotimpl
-    case notqreg
+    case not3params
     case internalError(error: Error)
 
     public var description: String {
         switch self {
         case .intructionCircuitNil():
             return "Instruction's circuit not assigned"
+        case .regexists(let name):
+            return "register '\(name)'already exists"
         case .controlValueNegative():
             return "control value should be non-negative"
         case .notcreg():
@@ -45,8 +48,8 @@ public enum QISKitException: Error, CustomStringConvertible {
             return "control not implemented"
         case .controlnotimpl():
             return "control not implemented"
-        case .notqreg():
-            return "argument not QuantumRegister"
+        case .not3params():
+            return "Expected 3 parameters."
         case .internalError(let error):
             return error.localizedDescription
         }

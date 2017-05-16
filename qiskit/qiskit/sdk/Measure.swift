@@ -9,20 +9,19 @@
 import Cocoa
 
 /**
- Measurement class
+ Quantum measurement in the computational basis.
  */
-public final class Measure: Qop {
+public final class Measure: Instruction {
 
-    public let argument1: QId
-    public let argument2: QId
-
-    public init(_ argument1: QId, _ argument2: QId) {
-        self.argument1 = argument1
-        self.argument2 = argument2
-
+    public init(_ qreg: QuantumRegister, _ creg: ClassicalRegister) {
+        super.init("reset", [], [qreg, creg])
     }
 
-    public var description: String {
-        return "measure \(self.argument1.identifier) -> \(self.argument2.identifier)"
+    public init(_ qubit: QuantumRegisterTuple, _ bit: ClassicalRegisterTuple) {
+        super.init("measure", [], [qubit,bit])
+    }
+
+    public override var description: String {
+        return "\(name) \(self.args[0].identifier) -> \(self.args[1].identifier)"
     }
 }

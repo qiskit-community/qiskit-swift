@@ -11,29 +11,26 @@ import Cocoa
 /**
  Built-in Single Qubit Gate class
  */
-public final class UBase: Uop {
+public final class UBase: Gate {
 
-    public let expList: [String]
-    public let argument: QId
-
-    public init(_ expList: [String], _ argument: QId) {
-        self.expList = expList
-        self.argument = argument
-
+    public init(_ params: [Double], _ qreg: QuantumRegister) throws {
+        if params.count != 3 {
+            throw QISKitException.not3params
+        }
+        super.init("U", params, [qreg])
     }
 
-    public var description: String {
-        var text = "u("
-        for i in 0..<self.expList.count {
-            if i > 0 {
-                text.append(",")
-            }
-            text.append("\(self.expList[i])")
+    public init(_ params: [Double], _ qubit: QuantumRegisterTuple) throws {
+        if params.count != 3 {
+            throw QISKitException.not3params
         }
-        text.append(")")
-        if !self.argument.identifier.isEmpty {
-            text.append(" \(self.argument.identifier)")
-        }
-        return text
+        super.init("U", params, [qubit])
+    }
+
+    public override var description: String {
+        let theta = String(format:"%.15f",self.params[0])
+        let phi = String(format:"%.15f",self.params[1])
+        let lamb = String(format:"%.15f",self.params[2])
+        return self._qasmif("\(name)(\(theta),\(phi),\(lamb)) \(self.args[0].identifier)")
     }
 }

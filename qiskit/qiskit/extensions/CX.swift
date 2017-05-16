@@ -11,18 +11,17 @@ import Cocoa
 /**
  controlled-NOT gate.
  */
-public final class CnotGate: Uop {
+public final class CnotGate: Gate {
 
-    public let argument1: QId
-    public let argument2: QId
-
-    public init(_ argument1: QId, _ argument2: QId) {
-        self.argument1 = argument1
-        self.argument2 = argument2
-
+    public init(_ ctl: QuantumRegister, _ tgt: QuantumRegister) {
+        super.init("cx", [], [ctl, tgt])
     }
 
-    public var description: String {
-        return "cx \(self.argument1.identifier),\(self.argument2.identifier)"
+    public init(_ ctl: QuantumRegisterTuple,_ tgt: QuantumRegisterTuple) {
+        super.init("cx", [], [ctl,tgt])
+    }
+
+    public override var description: String {
+        return self._qasmif("\(name) \(self.args[0].identifier),\(self.args[1].identifier)")
     }
 }
