@@ -60,12 +60,7 @@ class QiskitTests: XCTestCase {
                 .append(Measure(q[4], c[4]))
             print(circuit.description)
             XCTAssertEqual(str, circuit.description)
-            /*
-            var compile = QuantumProgram.QASMCompile()
-            compile.backend = "simulator"
-            let config = try Qconfig(apiToken: QiskitTests.APItoken, url: QiskitTests.TESTURL)
-            self.runJob(QuantumProgram(config, compile, circuit))
-            */
+            //try self.runJob(circuit,"simulator")
         } catch let error {
             XCTFail("\(error)")
         }
@@ -92,12 +87,7 @@ class QiskitTests: XCTestCase {
                  Measure(q[2], c[1])])
             print(circuit.description)
             XCTAssertEqual(str, circuit.description)
-    /*
-            var compile = QuantumProgram.QASMCompile()
-                compile.backend = "simulator"
-                let config = try Qconfig(apiToken: QiskitTests.APItoken, url: QiskitTests.TESTURL)
-                self.runJob(QuantumProgram(config, compile, circuit))
-        */
+            //try self.runJob(circuit,"simulator")
         } catch let error {
         XCTFail("\(error)")
         }
@@ -124,12 +114,7 @@ class QiskitTests: XCTestCase {
                 + Measure(q[2], c[1])
             print(circuit.description)
             XCTAssertEqual(str, circuit.description)
-            /*
-                var compile = QuantumProgram.QASMCompile()
-                compile.backend = "simulator"
-                let config = try Qconfig(apiToken: QiskitTests.APItoken, url: QiskitTests.TESTURL)
-                self.runJob(QuantumProgram(config, compile, circuit))
-             */
+            //try self.runJob(circuit,"simulator")
         } catch let error {
             XCTFail("\(error)")
         }
@@ -246,12 +231,7 @@ class QiskitTests: XCTestCase {
 
             print(circuit.description)
             XCTAssertEqual(str, circuit.description)
-        /*
-            var compile = QuantumProgram.QASMCompile()
-            compile.backend = "simulator"
-            let config = try Qconfig(apiToken: QiskitTests.APItoken, url: QiskitTests.TESTURL)
-            self.runJob(QuantumProgram(config, compile, circuit))
-        */
+            //try self.runJob(circuit,"simulator")
          } catch let error {
             XCTFail("\(error)")
          }
@@ -315,18 +295,18 @@ class QiskitTests: XCTestCase {
 
             print(circuit.description)
             XCTAssertEqual(str, circuit.description)
-            /*
-                var compile = QuantumProgram.QASMCompile()
-                compile.backend = "simulator"
-                let config = try Qconfig(apiToken: QiskitTests.APItoken, url: QiskitTests.TESTURL)
-                self.runJob(QuantumProgram(config, compile, circuit))
-             */
+            //try self.runJob(circuit,"simulator")
          } catch let error {
             XCTFail("\(error)")
          }
     }
 
-    private func runJob(_ program: QuantumProgram) {
+    private func runJob(_ circuit: QuantumCircuit, _ backend: String) throws {
+        var compile = QuantumProgram.QASMCompile()
+        compile.backend = backend
+        let config = try Qconfig(apiToken: QiskitTests.APItoken, url: QiskitTests.TESTURL)
+        let program = QuantumProgram(config, compile, circuit)
+
         let asyncExpectation = self.expectation(description: "runJob")
         program.run { (result, error) in
             if error != nil {

@@ -32,7 +32,7 @@ public final class ClassicalRegister: Register {
 }
 
 public final class ClassicalRegisterTuple: RegisterTuple {
-    internal init(_ register: ClassicalRegister, _ index: Int) {
+    init(_ register: ClassicalRegister, _ index: Int) {
         super.init(register,index)
     }
 }

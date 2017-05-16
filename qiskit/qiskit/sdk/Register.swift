@@ -13,14 +13,14 @@ public protocol RegisterArgument {
 }
 
 public class RegisterTuple: RegisterArgument {
-    internal let register: Register
-    internal let index: Int
+    let register: Register
+    let index: Int
 
     public var identifier: String {
         return "\(self.register.name)[\(self.index)]"
     }
 
-    internal init(_ register: Register, _ index: Int) {
+    init(_ register: Register, _ index: Int) {
         self.register = register
         self.index = index
     }

@@ -9,51 +9,6 @@
 import Cocoa
 
 /**
- Quantum Experience Exceptions
- */
-public enum IBMQuantumExperienceError: Error, CustomStringConvertible {
-
-    case invalidURL(url: String)
-    case nullResponse(url: String)
-    case invalidHTTPResponse(response: URLResponse)
-    case httpError(url: String, status: Int, msg: String)
-    case nullResponseData(url: String)
-    case missingTokenId
-    case missingJobId
-    case missingExecutionId
-    case missingStatus
-    case timeout
-    case internalError(error: Error)
-
-    public var description: String {
-        switch self {
-        case .invalidURL(let url):
-            return url
-        case .nullResponse(let url):
-            return url
-        case .invalidHTTPResponse(let response):
-            return response.description
-        case .httpError(let url, let status, let msg):
-            return "\(url) Http status: \(status); \(msg)"
-        case .nullResponseData(let url):
-            return url
-        case .missingTokenId():
-            return "Missing TokenId"
-        case .missingJobId():
-            return "Missing JobId"
-        case .missingExecutionId():
-            return "Missing ExecutionId"
-        case .missingStatus():
-            return "Missing Status"
-        case .timeout():
-            return "Timeout"
-        case .internalError(let error):
-            return error.localizedDescription
-        }
-    }
-}
-
-/**
  Quantum Experience REST Access API
  */
 public final class IBMQuantumExperience {
@@ -71,7 +26,7 @@ public final class IBMQuantumExperience {
         self.request = Request(self.credentials)
     }
 
-    private func checkCredentials(request: Request, responseHandler: @escaping ((_:Error?) -> Void)) {
+    private func checkCredentials(request: Request, responseHandler: @escaping ((_:IBMQuantumExperienceError?) -> Void)) {
         if self.credentials.token == nil {
             self.credentials.obtainToken(request: request) { (error) -> Void in
                 responseHandler(error)
@@ -91,7 +46,7 @@ public final class IBMQuantumExperience {
      - parameter responseHandler: Closure to be called upon completion
      */
     public func runJob(qasms: [String], backend: String, shots: Int, maxCredits: Int,
-                       responseHandler: @escaping ((_:RunJobResult?, _:Error?) -> Void)) {
+                       responseHandler: @escaping ((_:RunJobResult?, _:IBMQuantumExperienceError?) -> Void)) {
 
         self.checkCredentials(request: self.request) { (error) -> Void in
             if error != nil {
@@ -128,7 +83,7 @@ public final class IBMQuantumExperience {
      - parameter jobId: job identifier
      - parameter responseHandler: Closure to be called upon completion
      */
-    public func getJob(jobId: String, responseHandler: @escaping ((_:GetJobResult?, _:Error?) -> Void)) {
+    public func getJob(jobId: String, responseHandler: @escaping ((_:GetJobResult?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.request) { (error) -> Void in
             if error != nil {
                 DispatchQueue.main.async {
@@ -157,7 +112,7 @@ public final class IBMQuantumExperience {
      */
     public func runJobToCompletion(qasms: [String], backend: String, shots: Int, maxCredits: Int,
                                    wait: Int = 5, timeout: Int = 60,
-                                   responseHandler: @escaping ((_:GetJobResult?, _:Error?) -> Void)) {
+                                   responseHandler: @escaping ((_:GetJobResult?, _:IBMQuantumExperienceError?) -> Void)) {
         self.runJob(qasms: qasms, backend: backend, shots: shots, maxCredits: maxCredits) { (out, error) in
             if error != nil {
                 responseHandler(nil, error)
@@ -193,12 +148,12 @@ public final class IBMQuantumExperience {
      - parameter responseHandler: Closure to be called upon completion
      */
     public func waitForJob(_ jobId: String, _ wait: Int, _ timeout: Int,
-                           _ responseHandler: @escaping ((_:GetJobResult?, _:Error?) -> Void)) {
+                           _ responseHandler: @escaping ((_:GetJobResult?, _:IBMQuantumExperienceError?) -> Void)) {
         self.waitForJob(jobId, wait, timeout, 0, responseHandler)
     }
 
     private func waitForJob(_ jobId: String, _ wait: Int, _ timeout: Int, _ elapsed: Int,
-                            _ responseHandler: @escaping ((_:GetJobResult?, _:Error?) -> Void)) {
+                            _ responseHandler: @escaping ((_:GetJobResult?, _:IBMQuantumExperienceError?) -> Void)) {
         self.getJob(jobId: jobId) { (result, error) -> Void in
             if error != nil {
                 responseHandler(result, error)
@@ -233,7 +188,7 @@ public final class IBMQuantumExperience {
      - parameter responseHandler: Closure to be called upon completion
      */
     public func getExecution(_ idExecution: String,
-                             responseHandler: @escaping ((_:GetExecutionResult?, _:Error?) -> Void)) {
+                             responseHandler: @escaping ((_:GetExecutionResult?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.request) { (error) -> Void in
             if error != nil {
                 DispatchQueue.main.async {
@@ -280,7 +235,7 @@ public final class IBMQuantumExperience {
      - parameter responseHandler: Closure to be called upon completion
      */
     public func getResultFromExecution(_ idExecution: String,
-                                       responseHandler: @escaping ((_:GetExecutionResult.Result?, _:Error?) -> Void)) {
+                                       responseHandler: @escaping ((_:GetExecutionResult.Result?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.request) { (error) -> Void in
             if error != nil {
                 DispatchQueue.main.async {
@@ -309,7 +264,7 @@ public final class IBMQuantumExperience {
      - parameter idCode: code identifier
      - parameter responseHandler: Closure to be called upon completion
      */
-    private func getCode(_ idCode: String, responseHandler: @escaping ((_:[String:AnyObject], _:Error?) -> Void)) {
+    private func getCode(_ idCode: String, responseHandler: @escaping ((_:[String:AnyObject], _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.request) { (error) -> Void in
             if error != nil {
                 DispatchQueue.main.async {
@@ -353,7 +308,7 @@ public final class IBMQuantumExperience {
      - parameter responseHandler: Closure to be called upon completion
      */
     public func runExperiment(qasm: String, backend: String, shots: Int, name: String? = nil, timeout: Int = 60,
-                              responseHandler: @escaping ((_:RunExperimentResult?, _:Error?) -> Void)) {
+                              responseHandler: @escaping ((_:RunExperimentResult?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.request) { (error) -> Void in
             if error != nil {
                 DispatchQueue.main.async {
@@ -432,7 +387,7 @@ public final class IBMQuantumExperience {
 
     private func getCompleteResultFromExecution(_ idExecution: String, _ timeOut: Int,
                                                 responseHandler:
-                                                @escaping ((_:GetExecutionResult.Result?, _:Error?) -> Void)) {
+                                                @escaping ((_:GetExecutionResult.Result?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.request) { (error) -> Void in
             if error != nil {
                 DispatchQueue.main.async {
@@ -466,7 +421,7 @@ public final class IBMQuantumExperience {
      - parameter responseHandler: Closure to be called upon completion
      */
     public func getImageCode(_ idCode: String,
-                             responseHandler: @escaping ((_:[String:AnyObject]?, _:Error?) -> Void)) {
+                             responseHandler: @escaping ((_:[String:AnyObject]?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.request) { (error) -> Void in
             if error != nil {
                 DispatchQueue.main.async {
@@ -487,5 +442,4 @@ public final class IBMQuantumExperience {
             }
         }
     }
-
 }

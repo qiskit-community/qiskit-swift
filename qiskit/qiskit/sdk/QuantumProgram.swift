@@ -8,7 +8,7 @@
 
 import Cocoa
 
-public final class QuantumProgram: CustomStringConvertible {
+public final class QuantumProgram {
 
     public struct QASMCompile {
         public var backend: String = "simulator"
@@ -17,15 +17,9 @@ public final class QuantumProgram: CustomStringConvertible {
     }
 
     public var compile: QASMCompile
-    public var circuits: [String:QuantumCircuit] = [:]
+    private var circuits: [String:QuantumCircuit] = [:]
     private let api: IBMQuantumExperience
 
-    public var description: String {
-        if let circuit = self.circuits["name"] {
-            return circuit.description
-        }
-        return ""
-    }
 
     /**
      Creates Quantum Program object with a given configuration.
@@ -36,7 +30,11 @@ public final class QuantumProgram: CustomStringConvertible {
     public init(_ config: Qconfig, _ compile: QASMCompile, _ circuit: QuantumCircuit) {
         self.api = IBMQuantumExperience(config: config)
         self.compile = compile
-        self.circuits["name"] = circuit
+        self.circuits[circuit.name] = circuit
+    }
+
+    public func circuit(_ name: String) -> QuantumCircuit? {
+        return self.circuits[name]
     }
 
     /**
@@ -47,8 +45,13 @@ public final class QuantumProgram: CustomStringConvertible {
      - parameter responseHandler: Closure to be called upon completion
      */
     public func run(_ wait: Int = 5, _ timeout: Int = 60,
-                    _ responseHandler: @escaping ((_:GetJobResult?, _:Error?) -> Void)) {
-        self.api.runJobToCompletion(qasms: [self.description], backend: self.compile.backend,
+                    _ responseHandler: @escaping ((_:GetJobResult?, _:IBMQuantumExperienceError?) -> Void)) {
+
+        var qasms: [String] = []
+        for (_,circuit) in self.circuits {
+            qasms.append("\(circuit.description)\n")
+        }
+        self.api.runJobToCompletion(qasms: qasms, backend: self.compile.backend,
                                                    shots: self.compile.shots, maxCredits: self.compile.maxCredits,
                                                    wait: wait, timeout: timeout, responseHandler: responseHandler)
     }

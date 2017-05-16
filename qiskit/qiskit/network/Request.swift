@@ -28,7 +28,7 @@ final class Request {
     }
 
     func post(path: String, params: String = "", data: [String : AnyObject] = [:],
-              responseHandler: @escaping ((_:[String:AnyObject], _:Error?) -> Void)) {
+              responseHandler: @escaping ((_:[String:AnyObject], _:IBMQuantumExperienceError?) -> Void)) {
         self.postInternal(path: path, params: params, data: data) { (json, error) in
             if error != nil {
                 if case IBMQuantumExperienceError.httpError(_, let status, _) = error! {
@@ -47,7 +47,7 @@ final class Request {
     }
 
     func postInternal(path: String, params: String = "", data: [String : AnyObject] = [:],
-                      responseHandler: @escaping ((_:[String:AnyObject], _:Error?) -> Void)) {
+                      responseHandler: @escaping ((_:[String:AnyObject], _:IBMQuantumExperienceError?) -> Void)) {
         guard let token = self.credential.token else {
             responseHandler([:], IBMQuantumExperienceError.missingTokenId)
             return
@@ -62,7 +62,7 @@ final class Request {
     }
 
     func postInternal(url: URL, data: [String : AnyObject] = [:],
-                      responseHandler: @escaping ((_:[String:AnyObject], _:Error?) -> Void)) {
+                      responseHandler: @escaping ((_:[String:AnyObject], _:IBMQuantumExperienceError?) -> Void)) {
         print(url.absoluteString)
         var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData,
                                  timeoutInterval: Request.CONNTIMEOUT)
@@ -128,7 +128,7 @@ final class Request {
     }
 
     func get(path: String, params: String = "",
-             responseHandler: @escaping ((_:[String:AnyObject], _:Error?) -> Void)) {
+             responseHandler: @escaping ((_:[String:AnyObject], _:IBMQuantumExperienceError?) -> Void)) {
         self.getInternal(path: path, params: params) { (json, error) in
             if error != nil {
                 if case IBMQuantumExperienceError.httpError(_, let status, _) = error! {
@@ -147,7 +147,7 @@ final class Request {
     }
 
     private func getInternal(path: String, params: String = "",
-                             responseHandler: @escaping ((_:[String:AnyObject], _:Error?) -> Void)) {
+                             responseHandler: @escaping ((_:[String:AnyObject], _:IBMQuantumExperienceError?) -> Void)) {
         guard let token = self.credential.token else {
             responseHandler([:], IBMQuantumExperienceError.missingTokenId)
             return

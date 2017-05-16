@@ -32,7 +32,7 @@ public final class QuantumRegister: Register {
 }
 
 public final class QuantumRegisterTuple: RegisterTuple {
-    internal init(_ register: QuantumRegister, _ index: Int) {
+    init(_ register: QuantumRegister, _ index: Int) {
         super.init(register,index)
     }
 }

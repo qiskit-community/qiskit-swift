@@ -13,11 +13,11 @@ import Cocoa
  */
 public class Gate: Instruction {
 
-    internal init(_ name: String, _ params: [Double], _ qargs: [QuantumRegister]) {
+    init(_ name: String, _ params: [Double], _ qargs: [QuantumRegister]) {
         super.init(name, params, qargs)
     }
     
-    internal init(_ name: String, _ params: [Double], _ qargs: [QuantumRegisterTuple]) {
+    init(_ name: String, _ params: [Double], _ qargs: [QuantumRegisterTuple]) {
         super.init(name, params, qargs)
     }
 

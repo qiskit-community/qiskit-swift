@@ -20,7 +20,7 @@ final class Credentials {
         self.config = config
     }
 
-    func obtainToken(request: Request, responseHandler: @escaping ((_:Error?) -> Void)) {
+    func obtainToken(request: Request, responseHandler: @escaping ((_:IBMQuantumExperienceError?) -> Void)) {
         let path = "users/loginWithToken"
         guard let url = URL(string: path, relativeTo: self.config.url) else {
             responseHandler(IBMQuantumExperienceError.invalidURL(url: "\(self.config.url.description)/\(path)"))

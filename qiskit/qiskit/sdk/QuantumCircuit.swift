@@ -18,6 +18,7 @@ public final class QuantumCircuit: CustomStringConvertible {
     private var instructions: [Instruction] = []
     private var regNames: Set<String> = []
     private var regs: [Register] = []
+    public let name: String = "qasm"
 
     public init(_ regs: [Register]) throws {
         try self.add(regs)
