@@ -10,10 +10,13 @@ import Cocoa
 
 public final class QuantumProgram {
 
-    public struct QASMCompile {
+    public final class QASMCompile {
         public var backend: String = "simulator"
         public var maxCredits: Int = 3
         public var shots: Int = 1024
+
+        public init() {
+        }
     }
 
     public var compile: QASMCompile
