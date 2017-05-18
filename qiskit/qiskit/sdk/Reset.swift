@@ -24,4 +24,11 @@ public final class Reset: Instruction {
     public override var description: String {
         return "\(name) \(self.args[0].identifier)"
     }
+
+    /**
+     Reapply this gate to corresponding qubits in circ.
+     */
+    public func reapply(circ: QuantumCircuit) {
+       // self._modifiers(circ.reset(self.arg[0]))
+    }
 }

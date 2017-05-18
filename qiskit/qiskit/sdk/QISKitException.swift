@@ -24,6 +24,10 @@ public enum QISKitException: Error, CustomStringConvertible {
     case inversenotimpl
     case controlnotimpl
     case not3params
+    case notqubitgate(qubit: QuantumRegisterTuple)
+    case duplicatequbits
+    case regindexrange
+    case circuitsnotcompatible
     case internalError(error: Error)
 
     public var description: String {
@@ -50,6 +54,14 @@ public enum QISKitException: Error, CustomStringConvertible {
             return "control not implemented"
         case .not3params():
             return "Expected 3 parameters."
+        case .notqubitgate(let qubit):
+            return "qubit '\(qubit.identifier)' not argument of gate."
+        case .duplicatequbits():
+            return "duplicate qubit arguments"
+        case .regindexrange():
+            return "register index out of range"
+        case .circuitsnotcompatible():
+            return "circuits are not compatible"
         case .internalError(let error):
             return error.localizedDescription
         }

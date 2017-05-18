@@ -21,17 +21,16 @@ public final class ClassicalRegister: Register {
             return ClassicalRegisterTuple(self, index)
         }
     }
-
-    public override init(_ name: String, _ size: Int) throws {
-        try super.init(name, size)
-    }
-
+    
     public override var description: String {
         return "creg \(self.name)[\(self.size)]"
     }
 }
 
 public final class ClassicalRegisterTuple: RegisterTuple {
+    public override var register: ClassicalRegister {
+        return super.register as! ClassicalRegister
+    }
     init(_ register: ClassicalRegister, _ index: Int) {
         super.init(register,index)
     }

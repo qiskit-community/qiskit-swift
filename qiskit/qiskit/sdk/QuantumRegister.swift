@@ -22,16 +22,15 @@ public final class QuantumRegister: Register {
         }
     }
 
-    public override init(_ name: String, _ size: Int) throws {
-        try super.init(name, size)
-    }
-
     public override var description: String {
         return "qreg \(self.name)[\(self.size)]"
     }
 }
 
 public final class QuantumRegisterTuple: RegisterTuple {
+    public override var register: QuantumRegister {
+        return super.register as! QuantumRegister
+    }
     init(_ register: QuantumRegister, _ index: Int) {
         super.init(register,index)
     }

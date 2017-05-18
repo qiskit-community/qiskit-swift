@@ -13,15 +13,18 @@ public protocol RegisterArgument {
 }
 
 public class RegisterTuple: RegisterArgument {
-    let register: Register
-    let index: Int
+    public var  register: Register {
+        return self._register
+    }
+    public let index: Int
+    private let _register: Register
 
     public var identifier: String {
         return "\(self.register.name)[\(self.index)]"
     }
 
     init(_ register: Register, _ index: Int) {
-        self.register = register
+        self._register = register
         self.index = index
     }
 }
@@ -59,5 +62,14 @@ public class Register: RegisterArgument {
         }
         self.name = name
         self.size = size
+    }
+
+    /**
+     Check that i is a valid index.
+     */
+    public func check_range(_ i: Int) throws {
+        if i < 0 || i >= self.size {
+            throw QISKitException.regindexrange
+        }
     }
 }

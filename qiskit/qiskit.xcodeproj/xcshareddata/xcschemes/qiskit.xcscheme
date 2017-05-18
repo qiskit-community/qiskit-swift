@@ -52,6 +52,7 @@
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "QUANTUM_TOKEN"
+            value = ""
             isEnabled = "YES">
          </EnvironmentVariable>
       </EnvironmentVariables>

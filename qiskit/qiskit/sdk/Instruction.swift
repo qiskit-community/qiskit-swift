@@ -20,7 +20,7 @@ public class Instruction: CustomStringConvertible {
     private var control: (ClassicalRegister, Int)? = nil
 
     public var description: String {
-        return ""
+        preconditionFailure("description not implemented")
     }
 
     /**
@@ -31,6 +31,9 @@ public class Instruction: CustomStringConvertible {
      - parameter arg: list InstructionArgument
      */
     public init(_ name: String, _ params: [Double], _ args: [RegisterArgument]) {
+        if type(of: self) == Instruction.self {
+            fatalError("Abstract class instantiation.")
+        }
         self.name = name
         self.params = params
         self.args = args
@@ -59,7 +62,7 @@ public class Instruction: CustomStringConvertible {
     /**
      Apply any modifiers of this instruction to another one.
      */
-    func _modifiers(gate: Gate) throws {
+    public func _modifiers(_ gate: Gate) throws {
         if self.control != nil {
             try self.check_circuit()
             if !gate.circuit!.has_register(self.control!.0) {
@@ -72,11 +75,14 @@ public class Instruction: CustomStringConvertible {
     /**
      Print an if statement if needed.
      */
-    func _qasmif(_ string: String) -> String {
-        //TODO: validate is the var String is correct
+    public func _qasmif(_ string: String) -> String {
         if self.control == nil {
             return string
         }
         return "if(\(self.control!.0.name)==\(self.control!.1)) \(string)"
+    }
+
+    public func reapply(_ circ: QuantumCircuit) {
+        preconditionFailure("reapply not implemented")
     }
 }

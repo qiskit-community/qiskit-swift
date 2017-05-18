@@ -31,7 +31,7 @@ public final class QuantumCircuit: CustomStringConvertible {
 
     public let header: QuantumCircuitHeader
     public let name: String = "qasm"
-    private var instructions: [Instruction] = []
+    private var data: [Instruction] = []
     private var regNames: Set<String> = []
     private var regs: [Register] = []
 
@@ -49,7 +49,7 @@ public final class QuantumCircuit: CustomStringConvertible {
         for register in self.regs {
             text.append("\n\(register.description);")
         }
-        for instruction in self.instructions {
+        for instruction in self.data {
             text.append("\n\(instruction.description);")
         }
         return text
@@ -69,13 +69,13 @@ public final class QuantumCircuit: CustomStringConvertible {
     }
 
     public func append(_ instruction: Instruction) -> QuantumCircuit {
-        self.instructions.append(instruction)
+        self.data.append(instruction)
         instruction.circuit = self
         return self
     }
 
     public func append(contentsOf: [Instruction]) -> QuantumCircuit {
-        self.instructions.append(contentsOf: contentsOf)
+        self.data.append(contentsOf: contentsOf)
         for instruction in contentsOf {
             instruction.circuit = self
         }
@@ -103,16 +103,75 @@ public final class QuantumCircuit: CustomStringConvertible {
     }
 
     /**
-     Raise exception if r is not in this circuit or not creg.
+     Append rhs to self if self contains rhs's registers.
+     Return self + rhs as a new object.
      */
-    func check_creg(_ register: Register) throws {
-        if register is ClassicalRegister {
+    public func combine(rhs: QuantumCircuit) throws -> QuantumCircuit {
+        for register in rhs.regs {
             if !self.has_register(register) {
-                throw QISKitException.regNotInCircuit(name: register.name)
+                throw QISKitException.circuitsnotcompatible
             }
         }
-        else {
-            throw QISKitException.notcreg
+        let circuit = try QuantumCircuit(rhs.regs, rhs.header)
+        for instruction in rhs.data {
+            instruction.reapply(circuit)
+        }
+        return circuit
+    }
+
+    /**
+     Append rhs to self if self contains rhs's registers.
+     Return self + rhs as a new object.
+     */
+    public func extend(rhs: QuantumCircuit) throws -> QuantumCircuit {
+        for register in rhs.regs {
+            if !self.has_register(register) {
+                throw QISKitException.circuitsnotcompatible
+            }
+        }
+        for instruction in rhs.data {
+            instruction.reapply(self)
+        }
+        return self
+    }
+
+    /**
+     Raise exception if r is not in this circuit or not qreg.
+     */
+    public func _check_qreg(_ register: QuantumRegister) throws {
+        if !self.has_register(register) {
+            throw QISKitException.regNotInCircuit(name: register.name)
         }
     }
+
+    /**
+     Raise exception if q is not in this circuit or invalid format.
+     */
+    public func _check_qubit(_ qubit: QuantumRegisterTuple) throws {
+        try self._check_qreg(qubit.register)
+        try qubit.register.check_range(qubit.index)
+    }
+
+    /**
+     Raise exception if r is not in this circuit or not creg.
+     */
+    public func _check_creg(_ register: ClassicalRegister) throws {
+        if !self.has_register(register) {
+            throw QISKitException.regNotInCircuit(name: register.name)
+        }
+    }
+
+    /**
+     Reset q.
+     */
+ /*   public func reset(quantum_register: RegisterArgument) {
+        if quantum_register is QuantumRegister {
+            instructions = InstructionSet()
+            for sizes in range(quantum_register.size):
+                instructions.add(self.reset((quantum_register, sizes)))
+
+            return instructions
+        }
+        self._check_qubit(quantum_register as QuantumRegisterTuple)
+        return self._attach(Reset(quantum_register, self))*/
 }
