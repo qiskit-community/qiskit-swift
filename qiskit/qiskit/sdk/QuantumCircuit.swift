@@ -8,28 +8,44 @@
 
 import Cocoa
 
+public class QuantumCircuitHeader {
+
+    public var name: String {
+        return "OPENQASM"
+    }
+    public var majorVersion: Int {
+        return 2
+    }
+    public var minorVersion: Int {
+        return 0
+    }
+    public var value: String {
+        return "\(self.name) \(self.majorVersion).\(self.minorVersion);"
+    }
+
+    public init() {
+    }
+}
+
 public final class QuantumCircuit: CustomStringConvertible {
 
-    private let majorVersion: Int = 2
-    private let minorVersion: Int = 0
-    private var header: String {
-        return "OPENQASM \(self.majorVersion).\(self.minorVersion);\ninclude \"qelib1.inc\";"
-    }
+    public let header: QuantumCircuitHeader
+    public let name: String = "qasm"
     private var instructions: [Instruction] = []
     private var regNames: Set<String> = []
     private var regs: [Register] = []
-    public let name: String = "qasm"
 
-    public init(_ regs: [Register]) throws {
+    public init(_ regs: [Register], _ header: QuantumCircuitHeader = QuantumCircuitHeader()) throws {
+        self.header = header
         try self.add(regs)
     }
 
     private init() {
+        self.header = QuantumCircuitHeader()
     }
 
-
     public var description: String {
-        var text = self.header
+        var text = self.header.value
         for register in self.regs {
             text.append("\n\(register.description);")
         }
@@ -64,13 +80,6 @@ public final class QuantumCircuit: CustomStringConvertible {
             instruction.circuit = self
         }
         return self
-    }
-
-    public static func + (left: QuantumCircuit, right: Instruction) -> QuantumCircuit {
-        let qasm = QuantumCircuit()
-        qasm.regs = left.regs
-        right.circuit = qasm
-        return qasm.append(contentsOf: left.instructions).append(right)
     }
 
     public static func += (left: inout QuantumCircuit, right: Instruction) {

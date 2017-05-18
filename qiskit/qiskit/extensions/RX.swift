@@ -1,20 +1,20 @@
 //
-//  U1.swift
+//  RX.swift
 //  qiskit
 //
-//  Created by Manoel Marques on 5/15/17.
+//  Created by Manoel Marques on 5/17/17.
 //  Copyright © 2017 IBM. All rights reserved.
 //
 
 import Cocoa
 
 /**
- Diagonal single qubit gate
+ rotation around the x-axis
  */
-public final class U1Gate: Gate {
+public final class RXGate: Gate {
 
     public init(_ theta: Double, _ qubit: QuantumRegisterTuple) {
-        super.init("u1", [theta], [qubit])
+        super.init("rx", [theta], [qubit])
     }
 
     public override var description: String {
@@ -22,3 +22,4 @@ public final class U1Gate: Gate {
         return self._qasmif("\(name)(\(theta)) \(self.args[0].identifier)")
     }
 }
+

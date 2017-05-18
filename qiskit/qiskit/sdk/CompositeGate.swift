@@ -11,12 +11,16 @@ import Cocoa
 /**
  Composite gate, a sequence of unitary gates.
  */
-public final class CompositeGate: Gate {
+public class CompositeGate: Gate {
 
     private var data: [Instruction] = []  // gate sequence defining the composite unitary
     private var inverse_flag = false
 
-    public override init(_ name: String, _ params: [Double], _ args: [QuantumRegisterTuple]) {
+    override init(_ name: String, _ params: [Double], _ qargs: [QuantumRegister]) {
+        super.init(name, params, qargs)
+    }
+
+    override init(_ name: String, _ params: [Double], _ args: [QuantumRegisterTuple]) {
         super.init(name, params, args)
     }
 
@@ -40,12 +44,6 @@ public final class CompositeGate: Gate {
             instruction.circuit = self.circuit
         }
         return self
-    }
-
-    public static func + (left: CompositeGate, right: Instruction) -> CompositeGate {
-        let gate = CompositeGate(left.name, left.params, left.args as! [QuantumRegisterTuple])
-        gate.circuit = left.circuit
-        return gate.append(contentsOf: left.data).append(right)
     }
 
     public static func += (left: inout CompositeGate, right: Instruction) {

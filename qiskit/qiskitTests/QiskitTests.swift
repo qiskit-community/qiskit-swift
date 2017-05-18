@@ -58,7 +58,7 @@ class QiskitTests: XCTestCase {
                 .append(Measure(q[2], c[2]))
                 .append(Measure(q[3], c[3]))
                 .append(Measure(q[4], c[4]))
-            print(circuit.description)
+
             XCTAssertEqual(str, circuit.description)
             //try self.runJob(circuit,"simulator")
         } catch let error {
@@ -85,7 +85,7 @@ class QiskitTests: XCTestCase {
                  CnotGate(q[0], q[2]),
                  Measure(q[0], c[0]),
                  Measure(q[2], c[1])])
-            print(circuit.description)
+
             XCTAssertEqual(str, circuit.description)
             //try self.runJob(circuit,"simulator")
         } catch let error {
@@ -107,39 +107,12 @@ class QiskitTests: XCTestCase {
 
             let q = try QuantumRegister("q", 3)
             let c = try ClassicalRegister("c", 2)
-            let circuit = try QuantumCircuit([q,c])
-                + HGate(q[0])
-                + CnotGate(q[0], q[2])
-                + Measure(q[0], c[0])
-                + Measure(q[2], c[1])
-            print(circuit.description)
-            XCTAssertEqual(str, circuit.description)
-            //try self.runJob(circuit,"simulator")
-        } catch let error {
-            XCTFail("\(error)")
-        }
-    }
-
-    func testMakeBell3() {
-        do {
-            let str: String =
-                "OPENQASM 2.0;\n" +
-                    "include \"qelib1.inc\";\n" +
-                    "qreg q[3];\n" +
-                    "creg c[2];\n" +
-                    "h q[0];\n" +
-                    "cx q[0],q[2];\n" +
-                    "measure q[0] -> c[0];\n" +
-            "measure q[2] -> c[1];"
-
-            let q = try QuantumRegister("q", 3)
-            let c = try ClassicalRegister("c", 2)
             var circuit = try QuantumCircuit([q,c])
             circuit += HGate(q[0])
             circuit += CnotGate(q[0], q[2])
             circuit += Measure(q[0], c[0])
             circuit += Measure(q[2], c[1])
-            print(circuit.description)
+
             XCTAssertEqual(str, circuit.description)
         } catch let error {
             XCTFail("\(error)")
@@ -229,7 +202,6 @@ class QiskitTests: XCTestCase {
             }
             circuit += Measure(cout[0], ans[4])
 
-            print(circuit.description)
             XCTAssertEqual(str, circuit.description)
             //try self.runJob(circuit,"simulator")
          } catch let error {
@@ -293,7 +265,6 @@ class QiskitTests: XCTestCase {
             circuit += HGate(q[3])
             circuit += Measure(q[3], c3[0])
 
-            print(circuit.description)
             XCTAssertEqual(str, circuit.description)
             //try self.runJob(circuit,"simulator")
          } catch let error {

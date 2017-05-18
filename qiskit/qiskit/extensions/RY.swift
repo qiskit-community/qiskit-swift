@@ -1,20 +1,20 @@
 //
-//  U1.swift
+//  RY.swift
 //  qiskit
 //
-//  Created by Manoel Marques on 5/15/17.
+//  Created by Manoel Marques on 5/17/17.
 //  Copyright © 2017 IBM. All rights reserved.
 //
 
 import Cocoa
 
 /**
- Diagonal single qubit gate
+ rotation around the y-axis
  */
-public final class U1Gate: Gate {
+public final class RYGate: Gate {
 
     public init(_ theta: Double, _ qubit: QuantumRegisterTuple) {
-        super.init("u1", [theta], [qubit])
+        super.init("ry", [theta], [qubit])
     }
 
     public override var description: String {
