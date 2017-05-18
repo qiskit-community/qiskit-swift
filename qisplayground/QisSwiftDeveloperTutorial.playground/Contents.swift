@@ -3,7 +3,7 @@
 
 [https://github.ibm.com/IBMQuantum/qiskit-sdk-swift-dev]: https://github.ibm.com/IBMQuantum/qiskit-sdk-swift-dev "IBM Swift SDK"
  
- ## Getting Started with the QISKit Swift AP
+ ## Getting Started with the QISKit Swift API
  The Official API Client to use **IBM Quantum Experience in Swift**.
  The latest version of this playground is available on [https://github.ibm.com/IBMQuantum/qiskit-sdk-swift-dev].
  For more information about how to use the Quantum Experience consult the Quantum Experience tutorials or check-out the community.
@@ -30,6 +30,7 @@ Manoel Marques, Joe Ligman, Ismael Faro, Jay M. Gambetta
 */
 
 /*:
+ [https://github.ibm.com/IBMQuantum/qiskit-sdk-swift-dev]: https://github.ibm.com/IBMQuantum/qiskit-sdk-swift-dev "qiskit swift sdk"
  ## Installation
  If you have not yet installed the Swift interface to the web API of the Quantum Experience you can install it using Carthage. Alternatively you can install it by cloning the following git repository [https://github.ibm.com/IBMQuantum/qiskit-sdk-swift-dev].
 */
@@ -44,7 +45,9 @@ import PlaygroundSupport
 import XCPlayground
 
 /*:
-Before we can start running experiments on the Quantum Experience, the API needs to be configured with your personal APItoken. This is done by setting variables in the Qconfig API for accessing the Quantum Experience. You can begin by replacing "None" with your personal access token which you can obtain from the Quantum Experience web site under the Accounts button.
+[Quantum Experience web site]: https://www.research.ibm.com/ibm-q/ "IBM Quantum Experience"
+ Before we can start running experiments on the Quantum Experience, the API needs to be configured with your personal APItoken. This is done by setting variables in the Qconfig API for accessing the Quantum Experience. You can begin by replacing "None" with your personal access token which you can obtain from the
+ [Quantum Experience web site] under the Accounts button.
  */
 var testurl = "https://quantumexperience.ng.bluemix.net/api/"
 var apitoken = "None"
