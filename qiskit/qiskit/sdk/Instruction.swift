@@ -59,6 +59,10 @@ public class Instruction: CustomStringConvertible {
         return self
     }
 
+    public func q_if(_ qregs:[QuantumRegister]) -> Instruction {
+        preconditionFailure("q_if not implemented")
+    }
+
     /**
      Apply any modifiers of this instruction to another one.
      */
@@ -80,6 +84,10 @@ public class Instruction: CustomStringConvertible {
             return string
         }
         return "if(\(self.control!.0.name)==\(self.control!.1)) \(string)"
+    }
+
+    public func inverse() -> Instruction {
+        preconditionFailure("inverse not implemented")
     }
 
     public func reapply(_ circ: QuantumCircuit) {

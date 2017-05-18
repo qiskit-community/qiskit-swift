@@ -30,14 +30,14 @@ public class Gate: Instruction {
     /**
      Invert this gate.
      */
-    public func inverse() throws -> Gate {
-         throw QISKitException.inversenotimpl
+    public override func inverse() -> Gate {
+        preconditionFailure("inverse not implemented")
     }
 
     /**
      Add controls to this gate.
      */
-    public func q_if(_ qregs:[QuantumRegister]) throws -> Gate {
-        throw QISKitException.controlnotimpl
+    public override func q_if(_ qregs:[QuantumRegister]) -> Gate {
+        preconditionFailure("q_if not implemented")
     }
 }

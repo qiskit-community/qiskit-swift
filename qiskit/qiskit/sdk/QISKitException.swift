@@ -21,8 +21,6 @@ public enum QISKitException: Error, CustomStringConvertible {
     case regname
     case regsize
     case controlregnotfound(name: String)
-    case inversenotimpl
-    case controlnotimpl
     case not3params
     case notqubitgate(qubit: QuantumRegisterTuple)
     case duplicatequbits
@@ -48,10 +46,6 @@ public enum QISKitException: Error, CustomStringConvertible {
              return "register size must be positive"
         case .controlregnotfound(let name):
             return "control register \(name) not found"
-        case .inversenotimpl():
-            return "control not implemented"
-        case .controlnotimpl():
-            return "control not implemented"
         case .not3params():
             return "Expected 3 parameters."
         case .notqubitgate(let qubit):

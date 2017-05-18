@@ -51,7 +51,7 @@ public class CompositeGate: Gate {
      */
     public override func _modifiers(_ gate: Gate) throws {
         if self.inverse_flag {
-            _ = try gate.inverse()
+            _ = gate.inverse()
         }
         try super._modifiers(gate)
     }
@@ -117,10 +117,10 @@ public class CompositeGate: Gate {
     /**
      Invert this gate.
      */
-    public override func inverse() throws -> Gate {
+    public override func inverse() -> Gate {
         var array:[Gate] = []
         for gate in self.data.reversed() {
-            array.append(try gate.inverse())
+            array.append(gate.inverse())
         }
         self.data = array
         self.inverse_flag = !self.inverse_flag
@@ -130,10 +130,10 @@ public class CompositeGate: Gate {
     /**
      Add controls to this gate.
      */
-    public func q_if(qregs:[QuantumRegister]) throws -> CompositeGate {
+    public func q_if(qregs:[QuantumRegister]) -> CompositeGate {
         var array:[Gate] = []
         for gate in self.data {
-            array.append(try gate.q_if(qregs))
+            array.append(gate.q_if(qregs))
         }
         self.data = array
         return self
