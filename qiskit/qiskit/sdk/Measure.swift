@@ -13,12 +13,12 @@ import Cocoa
  */
 public final class Measure: Instruction {
 
-    public init(_ qreg: QuantumRegister, _ creg: ClassicalRegister) {
-        super.init("reset", [], [qreg, creg])
+    public init(_ qreg: QuantumRegister, _ creg: ClassicalRegister, _ circuit: QuantumCircuit? = nil) {
+        super.init("reset", [], [qreg, creg], circuit)
     }
 
-    public init(_ qubit: QuantumRegisterTuple, _ bit: ClassicalRegisterTuple) {
-        super.init("measure", [], [qubit,bit])
+    public init(_ qubit: QuantumRegisterTuple, _ bit: ClassicalRegisterTuple, _ circuit: QuantumCircuit? = nil) {
+        super.init("measure", [], [qubit,bit], circuit)
     }
 
     public override var description: String {

@@ -13,12 +13,12 @@ import Cocoa
  */
 public final class ToffoliGate: Gate {
 
-    public init(_ ctl1: QuantumRegister, _ ctl2: QuantumRegister, _ tgt:QuantumRegister) {
-        super.init("ccx", [], [ctl1, ctl2, tgt])
+    public init(_ ctl1: QuantumRegister, _ ctl2: QuantumRegister, _ tgt:QuantumRegister, _ circuit: QuantumCircuit? = nil) {
+        super.init("ccx", [], [ctl1, ctl2, tgt], circuit)
     }
 
-    public init(_ ctl1:QuantumRegisterTuple, _ ctl2:QuantumRegisterTuple, _ tgt:QuantumRegisterTuple) {
-        super.init("ccx", [], [ctl1, ctl2, tgt])
+    public init(_ ctl1:QuantumRegisterTuple, _ ctl2:QuantumRegisterTuple, _ tgt:QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) {
+        super.init("ccx", [], [ctl1, ctl2, tgt], circuit)
     }
 
     public override var description: String {

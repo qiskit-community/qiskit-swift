@@ -16,18 +16,18 @@ public class CompositeGate: Gate {
     private var data: [Gate] = []  // gate sequence defining the composite unitary
     private var inverse_flag = false
 
-    public override init(_ name: String, _ params: [Double], _ qargs: [QuantumRegister]) {
+    public override init(_ name: String, _ params: [Double], _ qargs: [QuantumRegister], _ circuit: QuantumCircuit?) {
         if type(of: self) == Instruction.self {
             fatalError("Abstract class instantiation.")
         }
-        super.init(name, params, qargs)
+        super.init(name, params, qargs, circuit)
     }
 
-    public override init(_ name: String, _ params: [Double], _ args: [QuantumRegisterTuple]) {
+    public override init(_ name: String, _ params: [Double], _ qargs: [QuantumRegisterTuple], _ circuit: QuantumCircuit?) {
         if type(of: self) == Instruction.self {
             fatalError("Abstract class instantiation.")
         }
-        super.init(name, params, args)
+        super.init(name, params, qargs, circuit)
     }
 
     public override var description: String {
@@ -41,7 +41,7 @@ public class CompositeGate: Gate {
     /**
      Test if this gate's circuit has the register.
      */
-    public func has_register(register: Register) throws -> Bool {
+    public func has_register(_ register: Register) throws -> Bool {
         try self.check_circuit()
         return self.circuit!.has_register(register)
     }
@@ -49,7 +49,7 @@ public class CompositeGate: Gate {
     /**
      Apply any modifiers of this gate to another composite.
      */
-    public override func _modifiers(_ gate: Gate) throws {
+    public func _modifiers(_ gate: Gate) throws {
         if self.inverse_flag {
             _ = gate.inverse()
         }
@@ -67,7 +67,7 @@ public class CompositeGate: Gate {
     /**
      Raise exception if q is not an argument or not qreg in circuit.
      */
-    public func _check_qubit(qubit: QuantumRegisterTuple) throws {
+    public func _check_qubit(_ qubit: QuantumRegisterTuple) throws {
         try self.check_circuit()
         try self.circuit!._check_qubit(qubit)
         for arg in self.args {
@@ -92,26 +92,9 @@ public class CompositeGate: Gate {
     /**
      Raise exception if classical register is not in this gate's circuit.
      */
-    public func _check_creg(register: ClassicalRegister) throws {
+    public func _check_creg(_ register: ClassicalRegister) throws {
         try self.check_circuit()
         try self.circuit!._check_creg(register)
-    }
-
-    /**
-     Raise exception if list of qubits contains duplicates.
-     */
-    public func _check_dups(qubits: [QuantumRegisterTuple]) throws {
-        for qubit1 in qubits {
-            for qubit2 in qubits {
-                if qubit1 === qubit2 {
-                    continue
-                }
-                if qubit1.register.name == qubit2.register.name &&
-                    qubit1.index == qubit2.index {
-                    throw QISKitException.duplicatequbits
-                }
-            }
-        }
     }
 
     /**
@@ -130,7 +113,7 @@ public class CompositeGate: Gate {
     /**
      Add controls to this gate.
      */
-    public func q_if(qregs:[QuantumRegister]) -> CompositeGate {
+    public override func q_if(_ qregs:[QuantumRegister]) -> CompositeGate {
         var array:[Gate] = []
         for gate in self.data {
             array.append(gate.q_if(qregs))
@@ -154,14 +137,6 @@ public class CompositeGate: Gate {
     public func append(_ gate: Gate) -> CompositeGate {
         self.data.append(gate)
         gate.circuit = self.circuit
-        return self
-    }
-
-    public func append(contentsOf: [Gate]) -> CompositeGate {
-        self.data.append(contentsOf: contentsOf)
-        for gate in contentsOf {
-            gate.circuit = self.circuit
-        }
         return self
     }
 

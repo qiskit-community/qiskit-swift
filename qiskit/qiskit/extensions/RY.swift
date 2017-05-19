@@ -13,8 +13,8 @@ import Cocoa
  */
 public final class RYGate: Gate {
 
-    public init(_ theta: Double, _ qubit: QuantumRegisterTuple) {
-        super.init("ry", [theta], [qubit])
+    public init(_ theta: Double, _ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) {
+        super.init("ry", [theta], [qubit], circuit)
     }
 
     public override var description: String {

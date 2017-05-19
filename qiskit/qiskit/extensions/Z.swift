@@ -13,12 +13,12 @@ import Cocoa
  */
 public final class ZGate: Gate {
 
-    public init(_ qubit: QuantumRegister) {
-        super.init("z", [], [qubit])
+    public init(_ qubit: QuantumRegister, _ circuit: QuantumCircuit? = nil) {
+        super.init("z", [], [qubit], circuit)
     }
 
-    public init(_ qreg: QuantumRegisterTuple) {
-        super.init("z", [], [qreg])
+    public init(_ qreg: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) {
+        super.init("z", [], [qreg], circuit)
     }
 
     public override var description: String {

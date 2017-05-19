@@ -26,6 +26,7 @@ public enum QISKitException: Error, CustomStringConvertible {
     case duplicatequbits
     case regindexrange
     case circuitsnotcompatible
+    case noarguments
     case internalError(error: Error)
 
     public var description: String {
@@ -56,6 +57,8 @@ public enum QISKitException: Error, CustomStringConvertible {
             return "register index out of range"
         case .circuitsnotcompatible():
             return "circuits are not compatible"
+        case .noarguments():
+            return "no arguments passed"
         case .internalError(let error):
             return error.localizedDescription
         }

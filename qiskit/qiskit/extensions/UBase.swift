@@ -13,18 +13,18 @@ import Cocoa
  */
 public final class UBase: Gate {
 
-    public init(_ params: [Double], _ qreg: QuantumRegister) throws {
+    public init(_ params: [Double], _ qreg: QuantumRegister, _ circuit: QuantumCircuit? = nil) throws {
         if params.count != 3 {
             throw QISKitException.not3params
         }
-        super.init("U", params, [qreg])
+        super.init("U", params, [qreg], circuit)
     }
 
-    public init(_ params: [Double], _ qubit: QuantumRegisterTuple) throws {
+    public init(_ params: [Double], _ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) throws {
         if params.count != 3 {
             throw QISKitException.not3params
         }
-        super.init("U", params, [qubit])
+        super.init("U", params, [qubit], circuit)
     }
 
     public override var description: String {

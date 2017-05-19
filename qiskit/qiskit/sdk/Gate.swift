@@ -13,18 +13,18 @@ import Cocoa
  */
 public class Gate: Instruction {
 
-    public init(_ name: String, _ params: [Double], _ qargs: [QuantumRegister]) {
+    public init(_ name: String, _ params: [Double], _ qargs: [QuantumRegister], _ circuit: QuantumCircuit?) {
         if type(of: self) == Instruction.self {
             fatalError("Abstract class instantiation.")
         }
-        super.init(name, params, qargs)
+        super.init(name, params, qargs, circuit)
     }
     
-    public init(_ name: String, _ params: [Double], _ qargs: [QuantumRegisterTuple]) {
+    public init(_ name: String, _ params: [Double], _ qargs: [QuantumRegisterTuple], _ circuit: QuantumCircuit?) {
         if type(of: self) == Instruction.self {
             fatalError("Abstract class instantiation.")
         }
-        super.init(name, params, qargs)
+        super.init(name, params, qargs, circuit)
     }
 
     /**

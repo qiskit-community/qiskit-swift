@@ -30,13 +30,14 @@ public class Instruction: CustomStringConvertible {
      - parameter param: list of real parameters
      - parameter arg: list InstructionArgument
      */
-    public init(_ name: String, _ params: [Double], _ args: [RegisterArgument]) {
+    public init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
         if type(of: self) == Instruction.self {
             fatalError("Abstract class instantiation.")
         }
         self.name = name
         self.params = params
         self.args = args
+        self.circuit = circuit
     }
 
     /**
@@ -66,13 +67,13 @@ public class Instruction: CustomStringConvertible {
     /**
      Apply any modifiers of this instruction to another one.
      */
-    public func _modifiers(_ gate: Gate) throws {
+    public func _modifiers(_ instruction: Instruction) throws {
         if self.control != nil {
             try self.check_circuit()
-            if !gate.circuit!.has_register(self.control!.0) {
+            if !instruction.circuit!.has_register(self.control!.0) {
                 throw QISKitException.controlregnotfound(name: self.control!.0.name)
             }
-            let _ = try gate.c_if(self.control!.0, self.control!.1)
+            let _ = try instruction.c_if(self.control!.0, self.control!.1)
         }
     }
 
@@ -90,7 +91,7 @@ public class Instruction: CustomStringConvertible {
         preconditionFailure("inverse not implemented")
     }
 
-    public func reapply(_ circ: QuantumCircuit) {
+    public func reapply(_ circ: QuantumCircuit) throws {
         preconditionFailure("reapply not implemented")
     }
 }

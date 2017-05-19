@@ -13,8 +13,8 @@ import Cocoa
  */
 public final class TGate: CompositeGate {
 
-    public init(_ qubit: QuantumRegisterTuple) {
-        super.init("t", [], [qubit])
-        _ = self.append(U1Gate(Double.pi/4.0,qubit))
+    public init(_ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) {
+        super.init("t", [], [qubit], circuit)
+        _ = self.append(U1Gate(Double.pi/4.0,qubit, circuit))
     }
 }

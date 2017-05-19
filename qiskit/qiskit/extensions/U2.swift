@@ -13,8 +13,8 @@ import Cocoa
  */
 public final class U2Gate: Gate {
 
-    public init(_ phi: Double, _ lam: Double, _ qubit: QuantumRegisterTuple) {
-        super.init("u2", [phi,lam], [qubit])
+    public init(_ phi: Double, _ lam: Double, _ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) {
+        super.init("u2", [phi,lam], [qubit], circuit)
     }
 
     public override var description: String {

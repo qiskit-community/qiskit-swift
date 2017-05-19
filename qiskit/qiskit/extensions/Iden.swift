@@ -13,8 +13,8 @@ import Cocoa
  */
 public final class IdGate: Gate {
 
-    public init(_ qubit: QuantumRegisterTuple) {
-        super.init("id", [], [qubit])
+    public init(_ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) {
+        super.init("id", [], [qubit], circuit)
     }
 
     public override var description: String {

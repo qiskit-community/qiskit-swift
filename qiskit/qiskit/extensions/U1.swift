@@ -13,8 +13,8 @@ import Cocoa
  */
 public final class U1Gate: Gate {
 
-    public init(_ theta: Double, _ qubit: QuantumRegisterTuple) {
-        super.init("u1", [theta], [qubit])
+    public init(_ theta: Double, _ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) {
+        super.init("u1", [theta], [qubit], circuit)
     }
 
     public override var description: String {

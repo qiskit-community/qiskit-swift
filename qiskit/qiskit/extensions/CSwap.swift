@@ -13,18 +13,11 @@ import Cocoa
  */
 public final class FredkinGate: CompositeGate {
 
-    public init(_ ctl: QuantumRegister, _ tgt1: QuantumRegister, _ tgt2: QuantumRegister) {
-        super.init("fredkin", [], [ctl, tgt1, tgt2])
-        _ = self.append(CnotGate(tgt2,tgt1))
-        _ = self.append(ToffoliGate(ctl,tgt1,tgt2))
-        _ = self.append(CnotGate(tgt2,tgt1))
-    }
-
-    public init(_ ctl: QuantumRegisterTuple,_ tgt1: QuantumRegisterTuple, _ tgt2: QuantumRegisterTuple) {
-        super.init("fredkin", [], [ctl,tgt1, tgt2])
-        _ = self.append(CnotGate(tgt2,tgt1))
-        _ = self.append(ToffoliGate(ctl,tgt1,tgt2))
-        _ = self.append(CnotGate(tgt2,tgt1))
+    public init(_ ctl: QuantumRegisterTuple,_ tgt1: QuantumRegisterTuple, _ tgt2: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) throws {
+        super.init("fredkin", [], [ctl,tgt1, tgt2], circuit)
+        _ = try self.cx(tgt2,tgt1)
+        _ = self.append(ToffoliGate(ctl,tgt1,tgt2, circuit))
+        _ = try self.cx(tgt2,tgt1)
     }
 
     public override var description: String {

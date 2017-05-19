@@ -80,36 +80,9 @@ class QiskitTests: XCTestCase {
 
             let q = try QuantumRegister("q", 3)
             let c = try ClassicalRegister("c", 2)
-            let circuit = try QuantumCircuit([q,c]).append(contentsOf:
-                [HGate(q[0]),
-                 CnotGate(q[0], q[2]),
-                 Measure(q[0], c[0]),
-                 Measure(q[2], c[1])])
-
-            XCTAssertEqual(str, circuit.description)
-            //try self.runJob(circuit,"simulator")
-        } catch let error {
-        XCTFail("\(error)")
-        }
-    }
-
-    func testMakeBell2() {
-        do {
-            let str: String =
-                "OPENQASM 2.0;\n" +
-                    "include \"qelib1.inc\";\n" +
-                    "qreg q[3];\n" +
-                    "creg c[2];\n" +
-                    "h q[0];\n" +
-                    "cx q[0],q[2];\n" +
-                    "measure q[0] -> c[0];\n" +
-            "measure q[2] -> c[1];"
-
-            let q = try QuantumRegister("q", 3)
-            let c = try ClassicalRegister("c", 2)
             var circuit = try QuantumCircuit([q,c])
             circuit += HGate(q[0])
-            circuit += CnotGate(q[0], q[2])
+            _ = try circuit.cx(q[0], q[2])
             circuit += Measure(q[0], c[0])
             circuit += Measure(q[2], c[1])
 
@@ -122,9 +95,9 @@ class QiskitTests: XCTestCase {
     /**
      Majority gate.
      */
-    private class func majority(_ p: inout QuantumCircuit, _ a: QuantumRegisterTuple, _ b:QuantumRegisterTuple, _ c:QuantumRegisterTuple) {
-        p += CnotGate(c, b)
-        p += CnotGate(c, a)
+    private class func majority(_ p: inout QuantumCircuit, _ a: QuantumRegisterTuple, _ b:QuantumRegisterTuple, _ c:QuantumRegisterTuple) throws {
+        _ = try p.cx(c, b)
+        _ = try p.cx(c, a)
         p += ToffoliGate(a, b, c)
     }
 
@@ -133,8 +106,8 @@ class QiskitTests: XCTestCase {
      */
     private class func unmajority(_ p: inout QuantumCircuit, _ a: QuantumRegisterTuple, _ b:QuantumRegisterTuple, _ c:QuantumRegisterTuple) throws {
         p += ToffoliGate(a, b, c)
-        p += CnotGate(c, a)
-        p += CnotGate(a, b)
+        _ = try p.cx(c, a)
+        _ = try p.cx(a, b)
     }
 
     func testRippleCarryAdder() {
@@ -188,11 +161,11 @@ class QiskitTests: XCTestCase {
             var circuit = try QuantumCircuit([cin,a,b,cout,ans])
             circuit += XGate(a[0])
             circuit += XGate(b)
-            QiskitTests.majority(&circuit, cin[0], b[0], a[0])
+            try QiskitTests.majority(&circuit, cin[0], b[0], a[0])
             for j in 0..<3 {
-                QiskitTests.majority(&circuit, a[j], b[j + 1], a[j + 1])
+                try QiskitTests.majority(&circuit, a[j], b[j + 1], a[j + 1])
             }
-            circuit += CnotGate(a[3], cout[0])
+            _ = try circuit.cx(a[3], cout[0])
             for j in (0..<3).reversed() {
                 try QiskitTests.unmajority(&circuit, a[j], b[j + 1], a[j + 1])
             }
@@ -226,7 +199,7 @@ class QiskitTests: XCTestCase {
                     "creg c2[1];\n" +
                     "creg c3[1];\n" +
                     "h q;\n" +
-                    "barrier q;\n" +
+                    "barrier q[0],q[1],q[2],q[3];\n" +
                     "h q[0];\n" +
                     "measure q[0] -> c0[0];\n" +
                     "if(c0==1) u1(\(piDiv2S)) q[1];\n" +
@@ -249,7 +222,7 @@ class QiskitTests: XCTestCase {
             let c3 = try ClassicalRegister("c3", 1)
             var circuit = try QuantumCircuit([q,c0,c1,c2,c3])
             circuit += HGate(q)
-            circuit += Barrier(q)
+            _ = try circuit.barrier([q])
             circuit += HGate(q[0])
             circuit += Measure(q[0], c0[0])
             circuit += try U1Gate(piDiv2, q[1]).c_if(c0, 1)

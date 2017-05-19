@@ -13,12 +13,12 @@ import Cocoa
  */
 public final class CXBase: Gate {
 
-    public init(_ ctl: QuantumRegister, _ tgt: QuantumRegister) {
-        super.init("CX", [], [ctl, tgt])
+    public init(_ ctl: QuantumRegister, _ tgt: QuantumRegister, _ circuit: QuantumCircuit? = nil) {
+        super.init("CX", [], [ctl, tgt], circuit)
     }
 
-    public init(_ ctl: QuantumRegisterTuple,_ tgt: QuantumRegisterTuple) {
-        super.init("CX", [], [ctl,tgt])
+    public init(_ ctl: QuantumRegisterTuple,_ tgt: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) {
+        super.init("CX", [], [ctl,tgt], circuit)
     }
 
     public override var description: String {

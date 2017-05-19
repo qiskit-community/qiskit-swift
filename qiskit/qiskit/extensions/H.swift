@@ -13,12 +13,12 @@ import Cocoa
  */
 public final class HGate: Gate {
 
-    public init(_ qubit: QuantumRegister) {
-        super.init("h", [], [qubit])
+    public init(_ qubit: QuantumRegister, _ circuit: QuantumCircuit? = nil) {
+        super.init("h", [], [qubit], circuit)
     }
 
-    public init(_ qreg: QuantumRegisterTuple) {
-        super.init("h", [], [qreg])
+    public init(_ qreg: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) {
+        super.init("h", [], [qreg], circuit)
     }
 
     public override var description: String {

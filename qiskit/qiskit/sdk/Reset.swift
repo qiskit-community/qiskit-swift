@@ -13,12 +13,12 @@ import Cocoa
  */
 public final class Reset: Instruction {
 
-    public init(_ qreg: QuantumRegister) {
-        super.init("reset", [], [qreg])
+    public init(_ qreg: QuantumRegister, _ circuit: QuantumCircuit? = nil) {
+        super.init("reset", [], [qreg], circuit)
     }
 
-    public init(_ qubit: QuantumRegisterTuple) {
-        super.init("reset", [], [qubit])
+    public init(_ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) {
+        super.init("reset", [], [qubit], circuit)
     }
 
     public override var description: String {

@@ -13,12 +13,12 @@ import Cocoa
  */
 public final class YGate: Gate {
 
-    public init(_ qubit: QuantumRegister) {
-        super.init("y", [], [qubit])
+    public init(_ qubit: QuantumRegister, _ circuit: QuantumCircuit? = nil) {
+        super.init("y", [], [qubit], circuit)
     }
 
-    public init(_ qreg: QuantumRegisterTuple) {
-        super.init("y", [], [qreg])
+    public init(_ qreg: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) {
+        super.init("y", [], [qreg], circuit)
     }
 
     public override var description: String {
