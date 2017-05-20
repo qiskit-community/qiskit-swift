@@ -95,17 +95,17 @@ class QiskitTests: XCTestCase {
     /**
      Majority gate.
      */
-    private class func majority(_ p: inout QuantumCircuit, _ a: QuantumRegisterTuple, _ b:QuantumRegisterTuple, _ c:QuantumRegisterTuple) throws {
+    private class func majority(_ p: QuantumCircuit, _ a: QuantumRegisterTuple, _ b:QuantumRegisterTuple, _ c:QuantumRegisterTuple) throws {
         _ = try p.cx(c, b)
         _ = try p.cx(c, a)
-        p += ToffoliGate(a, b, c)
+        _ = try p.ccx(a, b, c)
     }
 
     /**
      Majority gate.
      */
-    private class func unmajority(_ p: inout QuantumCircuit, _ a: QuantumRegisterTuple, _ b:QuantumRegisterTuple, _ c:QuantumRegisterTuple) throws {
-        p += ToffoliGate(a, b, c)
+    private class func unmajority(_ p: QuantumCircuit, _ a: QuantumRegisterTuple, _ b:QuantumRegisterTuple, _ c:QuantumRegisterTuple) throws {
+        _ = try p.ccx(a, b, c)
         _ = try p.cx(c, a)
         _ = try p.cx(a, b)
     }
@@ -161,15 +161,15 @@ class QiskitTests: XCTestCase {
             var circuit = try QuantumCircuit([cin,a,b,cout,ans])
             circuit += XGate(a[0])
             circuit += XGate(b)
-            try QiskitTests.majority(&circuit, cin[0], b[0], a[0])
+            try QiskitTests.majority(circuit, cin[0], b[0], a[0])
             for j in 0..<3 {
-                try QiskitTests.majority(&circuit, a[j], b[j + 1], a[j + 1])
+                try QiskitTests.majority(circuit, a[j], b[j + 1], a[j + 1])
             }
             _ = try circuit.cx(a[3], cout[0])
             for j in (0..<3).reversed() {
-                try QiskitTests.unmajority(&circuit, a[j], b[j + 1], a[j + 1])
+                try QiskitTests.unmajority(circuit, a[j], b[j + 1], a[j + 1])
             }
-            try QiskitTests.unmajority(&circuit, cin[0], b[0], a[0])
+            try QiskitTests.unmajority(circuit, cin[0], b[0], a[0])
             for j in 0..<4 {
                 circuit += Measure(b[j], ans[j])  // Measure the output register
             }
