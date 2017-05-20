@@ -39,7 +39,7 @@ public final class CXBase: Gate {
 extension QuantumCircuit {
 
     /**
-     Apply cx from ctl, tgt.
+     Apply CX from ctl, tgt.
      */
     public func cx_base(_ ctl: QuantumRegisterTuple, _ tgt: QuantumRegisterTuple) throws -> CXBase {
         try  self._check_qubit(ctl)
@@ -52,7 +52,7 @@ extension QuantumCircuit {
 extension CompositeGate {
 
     /**
-     Apply CNOT from ctl, tgt.
+     Apply CX from ctl, tgt.
      */
     public func cx_base(_ ctl: QuantumRegisterTuple, _ tgt: QuantumRegisterTuple) throws -> CXBase {
         try  self._check_qubit(ctl)

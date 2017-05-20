@@ -76,7 +76,7 @@ public final class QuantumCircuit: CustomStringConvertible {
         }
     }
 
-    public func append(_ instruction: Instruction) -> QuantumCircuit {
+    private func append(_ instruction: Instruction) -> QuantumCircuit {
         self.data.append(instruction)
         instruction.circuit = self
         return self

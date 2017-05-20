@@ -13,7 +13,7 @@ import Cocoa
  */
 public class CompositeGate: Gate {
 
-    private var data: [Gate] = []  // gate sequence defining the composite unitary
+    private(set) var data: [Gate] = []  // gate sequence defining the composite unitary
     private var inverse_flag = false
 
     public override init(_ name: String, _ params: [Double], _ qargs: [QuantumRegister], _ circuit: QuantumCircuit?) {
@@ -134,7 +134,7 @@ public class CompositeGate: Gate {
         return self
     }
 
-    public func append(_ gate: Gate) -> CompositeGate {
+    private func append(_ gate: Gate) -> CompositeGate {
         self.data.append(gate)
         gate.circuit = self.circuit
         return self

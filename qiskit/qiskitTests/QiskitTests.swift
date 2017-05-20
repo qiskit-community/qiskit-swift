@@ -49,15 +49,15 @@ class QiskitTests: XCTestCase {
             "measure q[4] -> c[4];"
             let q = try QuantumRegister("q", 5)
             let c = try ClassicalRegister("c", 5)
-            let circuit = try QuantumCircuit([q,c])
-                .append(XGate(q[0]))
-                .append(XGate(q[1]))
-                .append(HGate(q[2]))
-                .append(Measure(q[0], c[0]))
-                .append(Measure(q[1], c[1]))
-                .append(Measure(q[2], c[2]))
-                .append(Measure(q[3], c[3]))
-                .append(Measure(q[4], c[4]))
+            var circuit = try QuantumCircuit([q,c])
+            _ = try circuit.x(q[0])
+            _ = try circuit.x(q[1])
+            _ = try circuit.h(q[2])
+            circuit += Measure(q[0], c[0])
+            circuit += Measure(q[1], c[1])
+            circuit += Measure(q[2], c[2])
+            circuit += Measure(q[3], c[3])
+            circuit += Measure(q[4], c[4])
 
             XCTAssertEqual(str, circuit.description)
             //try self.runJob(circuit,"simulator")
@@ -81,7 +81,7 @@ class QiskitTests: XCTestCase {
             let q = try QuantumRegister("q", 3)
             let c = try ClassicalRegister("c", 2)
             var circuit = try QuantumCircuit([q,c])
-            circuit += HGate(q[0])
+            _ = try circuit.h(q[0])
             _ = try circuit.cx(q[0], q[2])
             circuit += Measure(q[0], c[0])
             circuit += Measure(q[2], c[1])
@@ -121,7 +121,10 @@ class QiskitTests: XCTestCase {
                     "qreg cout[1];\n" +
                     "creg ans[5];\n" +
                     "x a[0];\n" +
-                    "x b;\n" +
+                    "x b[0];\n" +
+                    "x b[1];\n" +
+                    "x b[2];\n" +
+                    "x b[3];\n" +
                     "cx a[0],b[0];\n" +
                     "cx a[0],cin[0];\n" +
                     "ccx cin[0],b[0],a[0];\n" +
@@ -159,8 +162,8 @@ class QiskitTests: XCTestCase {
             let cout = try QuantumRegister("cout", 1)
             let ans = try ClassicalRegister("ans", 5)
             var circuit = try QuantumCircuit([cin,a,b,cout,ans])
-            circuit += XGate(a[0])
-            circuit += XGate(b)
+            _ = try circuit.x(a[0])
+            _ = try circuit.x(b)
             try QiskitTests.majority(circuit, cin[0], b[0], a[0])
             for j in 0..<3 {
                 try QiskitTests.majority(circuit, a[j], b[j + 1], a[j + 1])
@@ -198,7 +201,10 @@ class QiskitTests: XCTestCase {
                     "creg c1[1];\n" +
                     "creg c2[1];\n" +
                     "creg c3[1];\n" +
-                    "h q;\n" +
+                    "h q[0];\n" +
+                    "h q[1];\n" +
+                    "h q[2];\n" +
+                    "h q[3];\n" +
                     "barrier q[0],q[1],q[2],q[3];\n" +
                     "h q[0];\n" +
                     "measure q[0] -> c0[0];\n" +
@@ -221,21 +227,21 @@ class QiskitTests: XCTestCase {
             let c2 = try ClassicalRegister("c2", 1)
             let c3 = try ClassicalRegister("c3", 1)
             var circuit = try QuantumCircuit([q,c0,c1,c2,c3])
-            circuit += HGate(q)
+            _ = try circuit.h(q)
             _ = try circuit.barrier([q])
-            circuit += HGate(q[0])
+            _ = try circuit.h(q[0])
             circuit += Measure(q[0], c0[0])
-            circuit += try U1Gate(piDiv2, q[1]).c_if(c0, 1)
-            circuit += HGate(q[1])
+            _ = try circuit.u1(piDiv2, q[1]).c_if(c0, 1)
+            _ = try circuit.h(q[1])
             circuit += Measure(q[1], c1[0])
-            circuit += try U1Gate(piDiv4, q[2]).c_if(c0, 1)
-            circuit += try U1Gate(piDiv2, q[2]).c_if(c1, 1)
-            circuit += HGate(q[2])
+            _ = try circuit.u1(piDiv4, q[2]).c_if(c0, 1)
+            _ = try circuit.u1(piDiv2, q[2]).c_if(c1, 1)
+            _ = try circuit.h(q[2])
             circuit += Measure(q[2], c2[0])
-            circuit += try U1Gate(piDiv8, q[3]).c_if(c0, 1)
-            circuit += try U1Gate(piDiv4, q[3]).c_if(c1, 1)
-            circuit += try U1Gate(piDiv2, q[3]).c_if(c2, 1)
-            circuit += HGate(q[3])
+            _ = try circuit.u1(piDiv8, q[3]).c_if(c0, 1)
+            _ = try circuit.u1(piDiv4, q[3]).c_if(c1, 1)
+            _ = try circuit.u1(piDiv2, q[3]).c_if(c2, 1)
+            _ = try circuit.h(q[3])
             circuit += Measure(q[3], c3[0])
 
             XCTAssertEqual(str, circuit.description)

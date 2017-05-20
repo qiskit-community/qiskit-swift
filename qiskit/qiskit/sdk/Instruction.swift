@@ -14,7 +14,7 @@ import Cocoa
 public class Instruction: CustomStringConvertible {
 
     let name: String
-    let params: [Double]
+    var params: [Double]
     let args: [RegisterArgument]
     var circuit: QuantumCircuit? = nil
     private var control: (ClassicalRegister, Int)? = nil
