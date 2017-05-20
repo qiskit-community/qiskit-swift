@@ -13,15 +13,19 @@ import Cocoa
  */
 public final class Measure: Instruction {
 
-    public init(_ qreg: QuantumRegister, _ creg: ClassicalRegister, _ circuit: QuantumCircuit? = nil) {
-        super.init("reset", [], [qreg, creg], circuit)
-    }
-
-    public init(_ qubit: QuantumRegisterTuple, _ bit: ClassicalRegisterTuple, _ circuit: QuantumCircuit? = nil) {
+    init(_ qubit: QuantumRegisterTuple, _ bit: ClassicalRegisterTuple, _ circuit: QuantumCircuit?) {
         super.init("measure", [], [qubit,bit], circuit)
     }
 
     public override var description: String {
         return "\(name) \(self.args[0].identifier) -> \(self.args[1].identifier)"
+    }
+
+    /**
+     Reapply this instruction to corresponding qubits in circ.
+     */
+    public override func reapply(_ circ: QuantumCircuit) throws {
+        try self._modifiers(circ.measure(self.args[0] as! QuantumRegisterTuple,
+                                     self.args[1] as! ClassicalRegisterTuple))
     }
 }

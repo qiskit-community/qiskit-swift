@@ -81,11 +81,11 @@ public final class QuantumCircuit: CustomStringConvertible {
         instruction.circuit = self
         return self
     }
-
+/*
     public static func += (left: inout QuantumCircuit, right: Instruction) {
         let _ = left.append(right)
     }
-
+*/
     /**
      Test if this circuit has the register r.
      Return True or False.
@@ -176,6 +176,16 @@ public final class QuantumCircuit: CustomStringConvertible {
                 }
             }
         }
+    }
+
+    /**
+     Measure quantum register into circuit (tuples).
+     */
+    public func measure(_ quantum_register: QuantumRegisterTuple, _ circuit: ClassicalRegisterTuple) throws -> Measure {
+        try self._check_qubit(quantum_register)
+        try self._check_creg(circuit.register)
+        try circuit.register.check_range(circuit.index)
+        return self._attach(Measure(quantum_register, circuit, self)) as! Measure
     }
 
     /**

@@ -139,8 +139,8 @@ public class CompositeGate: Gate {
         gate.circuit = self.circuit
         return self
     }
-
+/*
     public static func += (left: inout CompositeGate, right: Gate) {
         let _ = left.append(right)
-    }
+    }*/
 }
