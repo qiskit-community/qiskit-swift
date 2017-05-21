@@ -47,6 +47,11 @@
 		69E597AF1ECA980F00A321F5 /* X.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E597AE1ECA980F00A321F5 /* X.swift */; };
 		69E597B11ECA99B300A321F5 /* H.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E597B01ECA99B300A321F5 /* H.swift */; };
 		69FEC8381ECB37E0002324E2 /* IBMQuantumExperienceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69FEC8371ECB37E0002324E2 /* IBMQuantumExperienceError.swift */; };
+		DF79735A1ED0716C00C01457 /* QiskitParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7973591ED0716C00C01457 /* QiskitParserTests.swift */; };
+		DF79735D1ED071F600C01457 /* parser.ym in Sources */ = {isa = PBXBuildFile; fileRef = DF79735B1ED071F600C01457 /* parser.ym */; };
+		DF79735E1ED071F600C01457 /* tokenizer.lm in Sources */ = {isa = PBXBuildFile; fileRef = DF79735C1ED071F600C01457 /* tokenizer.lm */; };
+		DF7973611ED0747B00C01457 /* ParserBlocks.h in Headers */ = {isa = PBXBuildFile; fileRef = DF79735F1ED0747B00C01457 /* ParserBlocks.h */; };
+		DF7973621ED0747B00C01457 /* ParserBlocks.m in Sources */ = {isa = PBXBuildFile; fileRef = DF7973601ED0747B00C01457 /* ParserBlocks.m */; };
 		DFBC4F6C1EC7384200027640 /* qiskit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFBC4F621EC7384100027640 /* qiskit.framework */; };
 		DFBC4F711EC7384200027640 /* QiskitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4F701EC7384200027640 /* QiskitTests.swift */; };
 		DFBC4FBA1EC73BF800027640 /* qiskit.h in Headers */ = {isa = PBXBuildFile; fileRef = DFBC4FA51EC73BF800027640 /* qiskit.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -103,6 +108,13 @@
 		69E597AE1ECA980F00A321F5 /* X.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = X.swift; path = extensions/X.swift; sourceTree = "<group>"; };
 		69E597B01ECA99B300A321F5 /* H.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = H.swift; path = extensions/H.swift; sourceTree = "<group>"; };
 		69FEC8371ECB37E0002324E2 /* IBMQuantumExperienceError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IBMQuantumExperienceError.swift; path = qiskit/network/IBMQuantumExperienceError.swift; sourceTree = SOURCE_ROOT; };
+		DF7973591ED0716C00C01457 /* QiskitParserTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QiskitParserTests.swift; sourceTree = "<group>"; };
+		DF79735B1ED071F600C01457 /* parser.ym */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; path = parser.ym; sourceTree = "<group>"; };
+		DF79735C1ED071F600C01457 /* tokenizer.lm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; path = tokenizer.lm; sourceTree = "<group>"; };
+		DF79735F1ED0747B00C01457 /* ParserBlocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserBlocks.h; sourceTree = "<group>"; };
+		DF7973601ED0747B00C01457 /* ParserBlocks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParserBlocks.m; sourceTree = "<group>"; };
+		DF7973671ED0808D00C01457 /* Parser-PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Parser-PrefixHeader.pch"; sourceTree = "<group>"; };
+		DF7973681ED083F600C01457 /* qiskitTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "qiskitTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		DFBC4F621EC7384100027640 /* qiskit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = qiskit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFBC4F6B1EC7384200027640 /* qiskitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = qiskitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFBC4F701EC7384200027640 /* QiskitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QiskitTests.swift; sourceTree = "<group>"; };
@@ -245,7 +257,9 @@
 			isa = PBXGroup;
 			children = (
 				DFBC4F701EC7384200027640 /* QiskitTests.swift */,
+				DF7973591ED0716C00C01457 /* QiskitParserTests.swift */,
 				DFBC4F721EC7384200027640 /* Info.plist */,
+				DF7973681ED083F600C01457 /* qiskitTests-Bridging-Header.h */,
 			);
 			path = qiskitTests;
 			sourceTree = "<group>";
@@ -267,6 +281,11 @@
 		DFBC4FCA1EC73F8F00027640 /* qasm */ = {
 			isa = PBXGroup;
 			children = (
+				DF79735B1ED071F600C01457 /* parser.ym */,
+				DF79735C1ED071F600C01457 /* tokenizer.lm */,
+				DF79735F1ED0747B00C01457 /* ParserBlocks.h */,
+				DF7973601ED0747B00C01457 /* ParserBlocks.m */,
+				DF7973671ED0808D00C01457 /* Parser-PrefixHeader.pch */,
 			);
 			path = qasm;
 			sourceTree = "<group>";
@@ -279,6 +298,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DFBC4FBA1EC73BF800027640 /* qiskit.h in Headers */,
+				DF7973611ED0747B00C01457 /* ParserBlocks.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -338,6 +358,7 @@
 					};
 					DFBC4F6A1EC7384200027640 = {
 						CreatedOnToolsVersion = 8.3.2;
+						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -386,6 +407,7 @@
 				69DE36231ECD1A1500EC4756 /* Header.swift in Sources */,
 				69E335531ECA1BD20027271D /* ClassicalRegister.swift in Sources */,
 				69D3107C1ECA180500B3E752 /* QuantumCircuit.swift in Sources */,
+				DF79735E1ED071F600C01457 /* tokenizer.lm in Sources */,
 				69D3108D1ECA18B800B3E752 /* Measure.swift in Sources */,
 				69D3107B1ECA180500B3E752 /* Gate.swift in Sources */,
 				693A9F421ECA363D00112AC9 /* Barrier.swift in Sources */,
@@ -401,6 +423,7 @@
 				69DBD7301ECA48BE0099CB1D /* CCX.swift in Sources */,
 				69E3354F1ECA1B8D0027271D /* Register.swift in Sources */,
 				69E335511ECA1BC00027271D /* QuantumRegister.swift in Sources */,
+				DF79735D1ED071F600C01457 /* parser.ym in Sources */,
 				69DE36211ECD198E00EC4756 /* Z.swift in Sources */,
 				69E597AB1ECA90A600A321F5 /* U1.swift in Sources */,
 				69DE36151ECD18D600EC4756 /* RZ.swift in Sources */,
@@ -419,6 +442,7 @@
 				69D310771ECA180500B3E752 /* QuantumProgram.swift in Sources */,
 				69E597B11ECA99B300A321F5 /* H.swift in Sources */,
 				69D310891ECA182000B3E752 /* IBMQuantumExperience.swift in Sources */,
+				DF7973621ED0747B00C01457 /* ParserBlocks.m in Sources */,
 				6913D0A21ECE41D6003C5FD3 /* InstructionSet.swift in Sources */,
 				69DE36131ECD18BE00EC4756 /* RY.swift in Sources */,
 				69FEC8381ECB37E0002324E2 /* IBMQuantumExperienceError.swift in Sources */,
@@ -430,6 +454,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DFBC4F711EC7384200027640 /* QiskitTests.swift in Sources */,
+				DF79735A1ED0716C00C01457 /* QiskitParserTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -553,12 +578,15 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "qiskit/qasm/Parser-PrefixHeader.pch";
 				INFOPLIST_FILE = qiskit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ibm.research.qiskit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
@@ -575,12 +603,15 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "qiskit/qasm/Parser-PrefixHeader.pch";
 				INFOPLIST_FILE = qiskit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ibm.research.qiskit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
@@ -589,11 +620,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = qiskitTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ibm.research.qiskitTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "qiskitTests/qiskitTests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -602,11 +637,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = qiskitTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ibm.research.qiskitTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "qiskitTests/qiskitTests-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;

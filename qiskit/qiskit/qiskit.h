@@ -6,6 +6,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
 //! Project version number for qiskit.
 FOUNDATION_EXPORT double qiskitVersionNumber;

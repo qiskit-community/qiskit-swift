@@ -1,0 +1,40 @@
+%{
+
+#import "ParserBlocks.h"
+
+int yylex(void);
+void yyerror(char *s);
+
+%}
+
+%union {
+    float     value;
+    __unsafe_unretained  NSString *identifier;
+}
+
+%token <value> INTEGER
+%token <value> FLOAT
+
+%token <identifier> IDENTIFIER
+
+%type <value> expr
+%type <value> number
+
+%left '+' '-'
+%left '*' '/'
+
+%%
+
+calc : expr { if (ParseSuccessBlock) ParseSuccessBlock($1); }
+
+expr : number { $$ = $1; }
+| expr '*' expr { $$ = $1 * $3; }
+| expr '/' expr { $$ = $1 / $3; }
+| expr '+' expr { $$ = $1 + $3; }
+| expr '-' expr { $$ = $1 - $3; }
+
+number : INTEGER { $$ = $1; }
+| FLOAT { $$ = $1; }
+| IDENTIFIER { if ([$1 isEqualToString:@"pi"]) $$ = M_PI; else $$ = 0.0;  }
+
+%%

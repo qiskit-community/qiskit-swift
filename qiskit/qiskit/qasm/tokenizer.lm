@@ -1,0 +1,34 @@
+%{
+
+#import "y.tab.h"
+#import "ParserBlocks.h"
+    
+void yyerror(char *s);
+
+%}
+
+%%
+
+[0-9]+\.[0-9]* { yylval.value = atof(yytext); return FLOAT; }
+
+[0-9]+ { yylval.value = atof(yytext); return INTEGER; }
+
+[a-zA-Z]+ { yylval.identifier = [NSString stringWithFormat:@"%s", yytext]; return IDENTIFIER; }
+
+[\n\t ] { }
+
+. { return yytext[0]; };
+
+%%
+
+int yywrap()
+{
+    return 1;
+}
+
+void yyerror(char *s)
+{
+    if (ParseFailBlock)
+        ParseFailBlock([NSString stringWithFormat:@"%s", s]);
+}
+
