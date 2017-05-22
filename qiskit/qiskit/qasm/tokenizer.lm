@@ -8,16 +8,129 @@ void yyerror(char *s);
 %}
 
 %%
+(([0-9]+|([0-9]+)?\.[0-9]+|[0-9]+\.)[eE][+-]?[0-9]+)|(([0-9]+)?\.[0-9]+|[0-9]+\.) {
+    float f = atof(yytext);
+    yylval.fvalue = f;
+    return REAL;
+}
 
-[0-9]+\.[0-9]* { yylval.value = atof(yytext); return FLOAT; }
+[1-9]+[0-9]*|0 {
+    int i = atoi(yytext);
+    yylval.ivalue = i;
+    return NNINTEGER;
+}
 
-[0-9]+ { yylval.value = atof(yytext); return INTEGER; }
+sin {
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return SIN;
+}
 
-[a-zA-Z]+ { yylval.identifier = [NSString stringWithFormat:@"%s", yytext]; return IDENTIFIER; }
+cos {
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return SIN;
+}
 
-[\n\t ] { }
+tan {
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return SIN;
+}
 
-. { return yytext[0]; };
+exp {
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return SIN;
+}
+
+ln {
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return SIN;
+}
+
+sqrt {
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return SIN;
+}
+
+
+qreg {
+    printf("Found a QREG\n");
+}
+
+creg {
+    printf("Found a Keyword %s\n", yytext );
+}
+
+gate {
+    printf("Found a GATE %s\n", yytext );
+}
+
+measure {
+    printf("Found a MEASURE %s\n", yytext );
+}
+
+if {
+    printf("Found a IF %s\n", yytext );
+}
+
+reset {
+    printf("Found a RESET %s\n", yytext );
+}
+
+assign {
+    printf("Found a ASSIGN %s\n", yytext );
+}
+
+matches {
+    printf("Found a MATCHES %s\n", yytext );
+}
+
+barrier {
+    printf("Found a BARRIER %s\n", yytext );
+}
+
+opaque {
+    printf("Found a OPAQUE %s\n", yytext );
+}
+
+\"([^\\\"]|\\.)*\" { 
+    printf("Found a STRING %s\n", yytext );
+}
+
+include {
+    printf("Found a INCLUDE %s\n", yytext );
+}
+
+OPENQASM {
+    printf("Found a MAGIC %s\n", yytext );
+}
+
+"//".*  {
+    printf("Found a comment\n");
+}
+
+CX {
+    printf("Found a CX %s\n", yytext );
+}
+
+U {
+    printf("Found a U %s\n", yytext );
+}
+
+[a-z][a-zA-Z0-9_]* {
+    printf("Found an ID %s\n", yytext);
+}
+
+\n+ {
+    printf("Found newline\n");
+}
+
+[ \t\r] {
+    printf("Found other white space\n");
+}
+
+. {
+    printf("Found unknown char %s\n", yytext);
+    return yytext[0];
+}
 
 %%
 
@@ -29,6 +142,6 @@ int yywrap()
 void yyerror(char *s)
 {
     if (ParseFailBlock)
-        ParseFailBlock([NSString stringWithFormat:@"%s", s]);
+    ParseFailBlock([NSString stringWithFormat:@"%s", s]);
 }
 

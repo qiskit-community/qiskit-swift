@@ -8,33 +8,61 @@ void yyerror(char *s);
 %}
 
 %union {
-    float     value;
-    __unsafe_unretained  NSString *identifier;
+    int ivalue;
+    float fvalue;
+    __unsafe_unretained NSString *svalue;
 }
 
-%token <value> INTEGER
-%token <value> FLOAT
+%token <svalue> ID
+%token <svalue> QREG
+%token <svalue> CREG
+%token <svalue> GATE
+%token <svalue> U
+%token <svalue> CX
+%token <svalue> BARRIER
+%token <svalue> OPAQUE
+%token <svalue> MEASURE
+%token <svalue> ASSIGN
+%token <svalue> RESET
+%token <svalue> MATCHES
+%token <svalue> IF
 
-%token <identifier> IDENTIFIER
+%token <svalue> SIN
+%token <svalue> COS
+%token <svalue> TAN
+%token <svalue> EXP
+%token <svalue> LN
+%token <svalue> SQRT
 
-%type <value> expr
-%type <value> number
+%token <fvalue> PI
+%token <fvalue> REAL
+%token <ivalue> NNINTEGER
+
+%type <fvalue> explist
+%type <fvalue> exp
+%type <fvalue> real
+%type <fvalue> nninteger
 
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' '^'
 
 %%
+uop : explist { if (ParseSuccessBlock) ParseSuccessBlock($1); }
 
-calc : expr { if (ParseSuccessBlock) ParseSuccessBlock($1); }
+explist : exp { $$ = $1; }
+| explist, exp
 
-expr : number { $$ = $1; }
-| expr '*' expr { $$ = $1 * $3; }
-| expr '/' expr { $$ = $1 / $3; }
-| expr '+' expr { $$ = $1 + $3; }
-| expr '-' expr { $$ = $1 - $3; }
+exp : exp '+' exp { $$ = $1 + $3; }
+| exp '-' exp { $$ = $1 - $3; }
+| exp '*' exp { $$ = $1 * $3; }
+| exp '/' exp { $$ = $1 / $3; }
+| exp '^' exp { $$ = pow ($1, $3); }
+| '-' exp { $$ = -$2; }
+| '(' exp ')' { $$ = $2; }
+| real { $$ = $1; }
+| nninteger { $$ = $1; }
 
-number : INTEGER { $$ = $1; }
-| FLOAT { $$ = $1; }
-| IDENTIFIER { if ([$1 isEqualToString:@"pi"]) $$ = M_PI; else $$ = 0.0;  }
+real : REAL { $$ = $1; }
+nninteger : NNINTEGER { $$ = $1; }
 
 %%
