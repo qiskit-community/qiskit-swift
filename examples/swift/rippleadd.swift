@@ -14,7 +14,7 @@ final class RippleAdder {
     private class func majority(_ p: QuantumCircuit,
                   _ a: QuantumRegisterTuple,
                   _ b:QuantumRegisterTuple,
-                  _ c:QuantumRegisterTuple) {
+                  _ c:QuantumRegisterTuple) throws {
         _ = try p.cx(c, b)
         _ = try p.cx(c, a)
         _ = try p.ccx(a, b, c)
