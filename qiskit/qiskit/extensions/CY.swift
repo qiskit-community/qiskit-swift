@@ -13,16 +13,51 @@ import Cocoa
  */
 public final class CyGate: Gate {
 
-    public init(_ ctl: QuantumRegister, _ tgt: QuantumRegister) {
-        super.init("cy", [], [ctl, tgt])
-    }
-
-    public init(_ ctl: QuantumRegisterTuple,_ tgt: QuantumRegisterTuple) {
-        super.init("cy", [], [ctl,tgt])
+    fileprivate init(_ ctl: QuantumRegisterTuple,_ tgt: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) {
+        super.init("cy", [], [ctl,tgt], circuit)
     }
 
     public override var description: String {
         return self._qasmif("\(name) \(self.args[0].identifier),\(self.args[1].identifier)")
     }
+
+    /**
+     Invert this gate.
+     */
+    public override func inverse() -> Gate {
+        return self
+    }
+
+    /**
+     Reapply this gate to corresponding qubits in circ.
+     */
+    public override func reapply(_ circ: QuantumCircuit) throws {
+        try self._modifiers(circ.cy(self.args[0] as! QuantumRegisterTuple, self.args[1] as! QuantumRegisterTuple))
+    }
 }
 
+extension QuantumCircuit {
+
+    /**
+     Apply CY to circuit.
+     */
+    public func cy(_ ctl: QuantumRegisterTuple, _ tgt: QuantumRegisterTuple) throws -> CyGate {
+        try  self._check_qubit(ctl)
+        try self._check_qubit(tgt)
+        try QuantumCircuit._check_dups([ctl, tgt])
+        return self._attach(CyGate(ctl, tgt, self)) as! CyGate
+    }
+}
+
+extension CompositeGate {
+
+    /**
+     Apply CY to circuit.
+     */
+    public func cy(_ ctl: QuantumRegisterTuple, _ tgt: QuantumRegisterTuple) throws -> CyGate {
+        try  self._check_qubit(ctl)
+        try self._check_qubit(tgt)
+        try QuantumCircuit._check_dups([ctl, tgt])
+        return self._attach(CyGate(ctl, tgt, self.circuit)) as! CyGate
+    }
+}

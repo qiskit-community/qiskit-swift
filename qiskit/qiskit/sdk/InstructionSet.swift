@@ -15,7 +15,7 @@ public final class InstructionSet {
     /**
      Add instruction to set.
      */
-    public func add(instruction: Instruction) {
+    public func add(_ instruction: Instruction) {
         self.instructions.append(instruction)
     }
 

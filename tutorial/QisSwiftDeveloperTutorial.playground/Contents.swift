@@ -77,14 +77,14 @@ let circuit = try QuantumCircuit([q,c])
  After you create the circuit with its registers you can add gates to manipulate the registers.
  - You can find extensive information about these gates and how use it into our [Quantum Experience User Guide]
 */
-    .append(XGate(q[0]))
-    .append(XGate(q[1]))
-    .append(HGate(q[2]))
-    .append(Measure(q[0], c[0]))
-    .append(Measure(q[1], c[1]))
-    .append(Measure(q[2], c[2]))
-    .append(Measure(q[3], c[3]))
-    .append(Measure(q[4], c[4]))
+    _ = try circuit.x(q[0])
+    _ = try circuit.x(q[1])
+    _ = try circuit.h(q[2])
+    _ = try circuit.measure(q[0], c[0])
+    _ = try circuit.measure(q[1], c[1])
+    _ = try circuit.measure(q[2], c[2])
+    _ = try circuit.measure(q[3], c[3])
+    _ = try circuit.measure(q[4], c[4])
 
 /*:
  ### Extracting Qasm
@@ -99,6 +99,7 @@ print(circuit.description)
  */
 do {
     var compile = QuantumProgram.QASMCompile()
+    compile.backend = "simulator"
     let config = try Qconfig(apiToken: apitoken, url: testurl)
     let program = QuantumProgram(config, compile, circuit)
     

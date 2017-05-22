@@ -33,14 +33,14 @@ public final class QuantumCircuit: CustomStringConvertible {
     public let name: String = "qasm"
     private var data: [Instruction] = []
     private var regNames: Set<String> = []
-    private var regs: [Register] = []
+    public private(set) var regs: [Register] = []
 
     public init(_ regs: [Register], _ header: QuantumCircuitHeader = QuantumCircuitHeader()) throws {
         self.header = header
         try self.add(regs)
     }
 
-    private init() {
+    public init() {
         self.header = QuantumCircuitHeader()
     }
 
@@ -56,6 +56,14 @@ public final class QuantumCircuit: CustomStringConvertible {
     }
 
     /**
+     Attach a instruction.
+     */
+    public func _attach(_ instruction: Instruction) -> Instruction {
+        self.data.append(instruction)
+        return instruction
+    }
+
+    /**
      Add registers.
      */
     public func add(_ regs: [Register]) throws {
@@ -68,24 +76,16 @@ public final class QuantumCircuit: CustomStringConvertible {
         }
     }
 
-    public func append(_ instruction: Instruction) -> QuantumCircuit {
+    private func append(_ instruction: Instruction) -> QuantumCircuit {
         self.data.append(instruction)
         instruction.circuit = self
         return self
     }
-
-    public func append(contentsOf: [Instruction]) -> QuantumCircuit {
-        self.data.append(contentsOf: contentsOf)
-        for instruction in contentsOf {
-            instruction.circuit = self
-        }
-        return self
-    }
-
+/*
     public static func += (left: inout QuantumCircuit, right: Instruction) {
         let _ = left.append(right)
     }
-
+*/
     /**
      Test if this circuit has the register r.
      Return True or False.
@@ -114,7 +114,7 @@ public final class QuantumCircuit: CustomStringConvertible {
         }
         let circuit = try QuantumCircuit(rhs.regs, rhs.header)
         for instruction in rhs.data {
-            instruction.reapply(circuit)
+            try instruction.reapply(circuit)
         }
         return circuit
     }
@@ -130,7 +130,7 @@ public final class QuantumCircuit: CustomStringConvertible {
             }
         }
         for instruction in rhs.data {
-            instruction.reapply(self)
+            try instruction.reapply(self)
         }
         return self
     }
@@ -159,6 +159,33 @@ public final class QuantumCircuit: CustomStringConvertible {
         if !self.has_register(register) {
             throw QISKitException.regNotInCircuit(name: register.name)
         }
+    }
+
+    /**
+     Raise exception if list of qubits contains duplicates.
+     */
+    public static func _check_dups(_ qubits: [QuantumRegisterTuple]) throws {
+        for qubit1 in qubits {
+            for qubit2 in qubits {
+                if qubit1 === qubit2 {
+                    continue
+                }
+                if qubit1.register.name == qubit2.register.name &&
+                    qubit1.index == qubit2.index {
+                    throw QISKitException.duplicatequbits
+                }
+            }
+        }
+    }
+
+    /**
+     Measure quantum register into circuit (tuples).
+     */
+    public func measure(_ quantum_register: QuantumRegisterTuple, _ circuit: ClassicalRegisterTuple) throws -> Measure {
+        try self._check_qubit(quantum_register)
+        try self._check_creg(circuit.register)
+        try circuit.register.check_range(circuit.index)
+        return self._attach(Measure(quantum_register, circuit, self)) as! Measure
     }
 
     /**

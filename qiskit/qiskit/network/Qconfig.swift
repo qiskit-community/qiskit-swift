@@ -16,16 +16,15 @@ public final class Qconfig {
     private static let BASEURL: String = "https://quantumexperience.ng.bluemix.net/api/"
 
     /// Target URL
-    public let url: URL
+    public var url: URL
     /// User API Token
-    public let apiToken: String
+    public var apiToken: String
 
-    public init(apiToken: String, url: String = BASEURL) throws {
+    public init(apiToken: String = "", url: String = BASEURL) throws {
         self.apiToken = apiToken
         guard let u = URL(string: url) else {
             throw IBMQuantumExperienceError.invalidURL(url: url)
         }
         self.url = u
     }
-
 }
