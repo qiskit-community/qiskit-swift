@@ -14,6 +14,11 @@
 		693A9F481ECA38D100112AC9 /* Qconfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693A9F471ECA38D100112AC9 /* Qconfig.swift */; };
 		6974E5951ECA1EF300D1AE97 /* QISKitException.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6974E5941ECA1EF300D1AE97 /* QISKitException.swift */; };
 		697BEDB11ED0844E00AB9A86 /* GatesTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697BEDB01ED0844E00AB9A86 /* GatesTools.swift */; };
+		697F259C1ED45BED0065B106 /* Circuit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697F259B1ED45BED0065B106 /* Circuit.swift */; };
+		697F259E1ED45DD90065B106 /* CircuitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697F259D1ED45DD90065B106 /* CircuitError.swift */; };
+		697F25A11ED48D240065B106 /* SwiftGraph.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 697F25A01ED48D240065B106 /* SwiftGraph.framework */; };
+		697F25A31ED49E160065B106 /* CircuitGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697F25A21ED49E160065B106 /* CircuitGraph.swift */; };
+		697F25A81ED4CCDD0065B106 /* SwiftGraph.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 697F25A01ED48D240065B106 /* SwiftGraph.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		69D310771ECA180500B3E752 /* QuantumProgram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D3106A1ECA180500B3E752 /* QuantumProgram.swift */; };
 		69D3107B1ECA180500B3E752 /* Gate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D3106E1ECA180500B3E752 /* Gate.swift */; };
 		69D3107C1ECA180500B3E752 /* QuantumCircuit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D3106F1ECA180500B3E752 /* QuantumCircuit.swift */; };
@@ -63,6 +68,19 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		697F25A71ED4CCC60065B106 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				697F25A81ED4CCDD0065B106 /* SwiftGraph.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		6913D0A11ECE41D6003C5FD3 /* InstructionSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = InstructionSet.swift; path = sdk/InstructionSet.swift; sourceTree = "<group>"; };
 		693A9F411ECA363D00112AC9 /* Barrier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Barrier.swift; path = extensions/Barrier.swift; sourceTree = "<group>"; };
@@ -71,6 +89,10 @@
 		693A9F471ECA38D100112AC9 /* Qconfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Qconfig.swift; path = qiskit/network/Qconfig.swift; sourceTree = SOURCE_ROOT; };
 		6974E5941ECA1EF300D1AE97 /* QISKitException.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QISKitException.swift; path = sdk/QISKitException.swift; sourceTree = "<group>"; };
 		697BEDB01ED0844E00AB9A86 /* GatesTools.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GatesTools.swift; path = extensions/GatesTools.swift; sourceTree = "<group>"; };
+		697F259B1ED45BED0065B106 /* Circuit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Circuit.swift; path = circuit/Circuit.swift; sourceTree = "<group>"; };
+		697F259D1ED45DD90065B106 /* CircuitError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CircuitError.swift; path = circuit/CircuitError.swift; sourceTree = "<group>"; };
+		697F25A01ED48D240065B106 /* SwiftGraph.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftGraph.framework; path = Carthage/Build/Mac/SwiftGraph.framework; sourceTree = "<group>"; };
+		697F25A21ED49E160065B106 /* CircuitGraph.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircuitGraph.swift; sourceTree = "<group>"; };
 		69D3106A1ECA180500B3E752 /* QuantumProgram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QuantumProgram.swift; path = sdk/QuantumProgram.swift; sourceTree = "<group>"; };
 		69D3106E1ECA180500B3E752 /* Gate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Gate.swift; path = sdk/Gate.swift; sourceTree = "<group>"; };
 		69D3106F1ECA180500B3E752 /* QuantumCircuit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QuantumCircuit.swift; path = sdk/QuantumCircuit.swift; sourceTree = "<group>"; };
@@ -118,6 +140,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				697F25A11ED48D240065B106 /* SwiftGraph.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,9 +155,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		697F259F1ED48D240065B106 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				697F25A01ED48D240065B106 /* SwiftGraph.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		69D310641ECA159C00B3E752 /* circuit */ = {
 			isa = PBXGroup;
 			children = (
+				697F259B1ED45BED0065B106 /* Circuit.swift */,
+				697F259D1ED45DD90065B106 /* CircuitError.swift */,
+				697F25A21ED49E160065B106 /* CircuitGraph.swift */,
 			);
 			name = circuit;
 			sourceTree = "<group>";
@@ -215,6 +249,7 @@
 				DFBC4F641EC7384100027640 /* qiskit */,
 				DFBC4F6F1EC7384200027640 /* qiskitTests */,
 				DFBC4F631EC7384100027640 /* Products */,
+				697F259F1ED48D240065B106 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -296,6 +331,7 @@
 				DFBC4F5E1EC7384100027640 /* Frameworks */,
 				DFBC4F5F1EC7384100027640 /* Headers */,
 				DFBC4F601EC7384100027640 /* Resources */,
+				697F25A71ED4CCC60065B106 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -387,12 +423,14 @@
 			files = (
 				69DE36191ECD191F00EC4756 /* T.swift in Sources */,
 				69DE36231ECD1A1500EC4756 /* Header.swift in Sources */,
+				697F25A31ED49E160065B106 /* CircuitGraph.swift in Sources */,
 				69E335531ECA1BD20027271D /* ClassicalRegister.swift in Sources */,
 				69D3107C1ECA180500B3E752 /* QuantumCircuit.swift in Sources */,
 				69D3108D1ECA18B800B3E752 /* Measure.swift in Sources */,
 				69D3107B1ECA180500B3E752 /* Gate.swift in Sources */,
 				693A9F421ECA363D00112AC9 /* Barrier.swift in Sources */,
 				69D310801ECA180500B3E752 /* CompositeGate.swift in Sources */,
+				697F259E1ED45DD90065B106 /* CircuitError.swift in Sources */,
 				69D3108F1ECA192000B3E752 /* Instruction.swift in Sources */,
 				69D3107E1ECA180500B3E752 /* Reset.swift in Sources */,
 				69DE361F1ECD197E00EC4756 /* Y.swift in Sources */,
@@ -412,6 +450,7 @@
 				69DE360D1ECD155000EC4756 /* CZ.swift in Sources */,
 				69D3108A1ECA182000B3E752 /* IBMQuantumExperienceResults.swift in Sources */,
 				69DE360F1ECD188000EC4756 /* Iden.swift in Sources */,
+				697F259C1ED45BED0065B106 /* Circuit.swift in Sources */,
 				697BEDB11ED0844E00AB9A86 /* GatesTools.swift in Sources */,
 				69E597AF1ECA980F00A321F5 /* X.swift in Sources */,
 				693A9F481ECA38D100112AC9 /* Qconfig.swift in Sources */,
@@ -556,6 +595,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = qiskit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -578,6 +621,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = qiskit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -594,6 +641,10 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				INFOPLIST_FILE = qiskitTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ibm.research.qiskitTests;
@@ -607,6 +658,10 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				INFOPLIST_FILE = qiskitTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ibm.research.qiskitTests;
