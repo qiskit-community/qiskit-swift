@@ -7,7 +7,6 @@
 //
 
 import Cocoa
-import SwiftGraph
 
 public struct HashableTuple<A:Hashable,B:Hashable> : Hashable, Equatable {
     public let one: A
@@ -25,6 +24,24 @@ public struct HashableTuple<A:Hashable,B:Hashable> : Hashable, Equatable {
 
     public static func ==<A:Hashable,B:Hashable>(lhs: HashableTuple<A,B>, rhs: HashableTuple<A,B>) -> Bool {
         return lhs.one == rhs.one && lhs.two == rhs.two
+    }
+}
+
+public final class CircuitVertexData {
+    public let name: HashableTuple<String,Int>
+    public let type: String
+
+    public init(_ name: HashableTuple<String,Int>, _ type: String) {
+        self.name = name
+        self.type = type
+    }
+}
+
+public final class CircuitEdgeData {
+    public let name: HashableTuple<String,Int>
+
+    public init(_ name: HashableTuple<String,Int>) {
+        self.name = name
     }
 }
 
@@ -65,6 +82,11 @@ public class Circuit {
     private var output_map: [HashableTuple<String,Int>:Int] = [:]
 
     /**
+     Running count of the total number of nodes
+     */
+    private var node_counter = 0
+
+    /**
      Map of named operations in this circuit and their signatures.
      The signature is an integer tuple (nq,nc,np) specifying the
      number of input qubits, input bits, and real parameters.
@@ -81,7 +103,7 @@ public class Circuit {
       Edges carry wire labels (reg,idx) and each operation has
       corresponding in- and out-edges with the same wire labels.
     */
-    private var multi_graph:CircuitGraph<GraphNode> = CircuitGraph<GraphNode>()
+    private var multi_graph:Graph<CircuitVertexData,CircuitEdgeData> = Graph<CircuitVertexData,CircuitEdgeData>(true)
 
     /**
       Map of qregs to sizes
@@ -158,12 +180,21 @@ public class Circuit {
             throw CircuitError.duplicatewire(tuple: name)
         }
         self.wire_type[name] = isClassical
-        self.input_map[name] = self.multi_graph.addVertex(GraphNode(name,"in"))
-        self.output_map[name] = self.multi_graph.addVertex(GraphNode(name,"out"))
+        self.node_counter += 1
+        self.input_map[name] = self.node_counter
+        self.node_counter += 1
+        self.output_map[name] = self.node_counter 
         let in_node: Int = self.input_map[name]!
         let out_node: Int = self.output_map[name]!
-        let edge = CircuitGraphEdge(u: in_node,v: out_node)
-        edge.array.append(CicuitGraphEdgeData(name))
-        self.multi_graph.addEdge(edge)
+        self.multi_graph.add_edge(in_node, out_node)
+        if let node = self.multi_graph.vertex(in_node) {
+            node.data = CircuitVertexData(name,"in")
+        }
+        if let node = self.multi_graph.vertex(out_node) {
+            node.data = CircuitVertexData(name,"out")
+        }
+        if let edge = self.multi_graph.edge(in_node,out_node) {
+            edge.data = CircuitEdgeData(name)
+        }
     }
 }

@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import qiskit
+import qiskit
 
 class QiskitTests: XCTestCase {
     

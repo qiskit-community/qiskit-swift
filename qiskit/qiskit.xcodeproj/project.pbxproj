@@ -12,13 +12,13 @@
 		693A9F441ECA366000112AC9 /* CX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693A9F431ECA366000112AC9 /* CX.swift */; };
 		693A9F461ECA369500112AC9 /* UBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693A9F451ECA369500112AC9 /* UBase.swift */; };
 		693A9F481ECA38D100112AC9 /* Qconfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693A9F471ECA38D100112AC9 /* Qconfig.swift */; };
+		693C93051ED5F05F00EA15B0 /* Graph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693C93041ED5F05F00EA15B0 /* Graph.swift */; };
+		693C93091ED5F0CC00EA15B0 /* GraphVertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693C93081ED5F0CC00EA15B0 /* GraphVertex.swift */; };
+		693C930D1ED5F12600EA15B0 /* GraphEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693C930C1ED5F12600EA15B0 /* GraphEdge.swift */; };
 		6974E5951ECA1EF300D1AE97 /* QISKitException.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6974E5941ECA1EF300D1AE97 /* QISKitException.swift */; };
 		697BEDB11ED0844E00AB9A86 /* GatesTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697BEDB01ED0844E00AB9A86 /* GatesTools.swift */; };
 		697F259C1ED45BED0065B106 /* Circuit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697F259B1ED45BED0065B106 /* Circuit.swift */; };
 		697F259E1ED45DD90065B106 /* CircuitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697F259D1ED45DD90065B106 /* CircuitError.swift */; };
-		697F25A11ED48D240065B106 /* SwiftGraph.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 697F25A01ED48D240065B106 /* SwiftGraph.framework */; };
-		697F25A31ED49E160065B106 /* CircuitGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697F25A21ED49E160065B106 /* CircuitGraph.swift */; };
-		697F25A81ED4CCDD0065B106 /* SwiftGraph.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 697F25A01ED48D240065B106 /* SwiftGraph.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		69D310771ECA180500B3E752 /* QuantumProgram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D3106A1ECA180500B3E752 /* QuantumProgram.swift */; };
 		69D3107B1ECA180500B3E752 /* Gate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D3106E1ECA180500B3E752 /* Gate.swift */; };
 		69D3107C1ECA180500B3E752 /* QuantumCircuit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D3106F1ECA180500B3E752 /* QuantumCircuit.swift */; };
@@ -68,31 +68,20 @@
 		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		697F25A71ED4CCC60065B106 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				697F25A81ED4CCDD0065B106 /* SwiftGraph.framework in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		6913D0A11ECE41D6003C5FD3 /* InstructionSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = InstructionSet.swift; path = sdk/InstructionSet.swift; sourceTree = "<group>"; };
 		693A9F411ECA363D00112AC9 /* Barrier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Barrier.swift; path = extensions/Barrier.swift; sourceTree = "<group>"; };
 		693A9F431ECA366000112AC9 /* CX.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CX.swift; path = extensions/CX.swift; sourceTree = "<group>"; };
 		693A9F451ECA369500112AC9 /* UBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UBase.swift; path = extensions/UBase.swift; sourceTree = "<group>"; };
 		693A9F471ECA38D100112AC9 /* Qconfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Qconfig.swift; path = qiskit/network/Qconfig.swift; sourceTree = SOURCE_ROOT; };
+		693C93041ED5F05F00EA15B0 /* Graph.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Graph.swift; path = graph/Graph.swift; sourceTree = "<group>"; };
+		693C93081ED5F0CC00EA15B0 /* GraphVertex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GraphVertex.swift; path = graph/GraphVertex.swift; sourceTree = "<group>"; };
+		693C930C1ED5F12600EA15B0 /* GraphEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GraphEdge.swift; path = graph/GraphEdge.swift; sourceTree = "<group>"; };
 		6974E5941ECA1EF300D1AE97 /* QISKitException.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QISKitException.swift; path = sdk/QISKitException.swift; sourceTree = "<group>"; };
 		697BEDB01ED0844E00AB9A86 /* GatesTools.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GatesTools.swift; path = extensions/GatesTools.swift; sourceTree = "<group>"; };
 		697F259B1ED45BED0065B106 /* Circuit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Circuit.swift; path = circuit/Circuit.swift; sourceTree = "<group>"; };
 		697F259D1ED45DD90065B106 /* CircuitError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CircuitError.swift; path = circuit/CircuitError.swift; sourceTree = "<group>"; };
 		697F25A01ED48D240065B106 /* SwiftGraph.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftGraph.framework; path = Carthage/Build/Mac/SwiftGraph.framework; sourceTree = "<group>"; };
-		697F25A21ED49E160065B106 /* CircuitGraph.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircuitGraph.swift; sourceTree = "<group>"; };
 		69D3106A1ECA180500B3E752 /* QuantumProgram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QuantumProgram.swift; path = sdk/QuantumProgram.swift; sourceTree = "<group>"; };
 		69D3106E1ECA180500B3E752 /* Gate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Gate.swift; path = sdk/Gate.swift; sourceTree = "<group>"; };
 		69D3106F1ECA180500B3E752 /* QuantumCircuit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QuantumCircuit.swift; path = sdk/QuantumCircuit.swift; sourceTree = "<group>"; };
@@ -140,7 +129,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				697F25A11ED48D240065B106 /* SwiftGraph.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -155,6 +143,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		693C93031ED5EFAE00EA15B0 /* graph */ = {
+			isa = PBXGroup;
+			children = (
+				693C930C1ED5F12600EA15B0 /* GraphEdge.swift */,
+				693C93041ED5F05F00EA15B0 /* Graph.swift */,
+				693C93081ED5F0CC00EA15B0 /* GraphVertex.swift */,
+			);
+			name = graph;
+			sourceTree = "<group>";
+		};
 		697F259F1ED48D240065B106 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -168,7 +166,6 @@
 			children = (
 				697F259B1ED45BED0065B106 /* Circuit.swift */,
 				697F259D1ED45DD90065B106 /* CircuitError.swift */,
-				697F25A21ED49E160065B106 /* CircuitGraph.swift */,
 			);
 			name = circuit;
 			sourceTree = "<group>";
@@ -265,6 +262,7 @@
 		DFBC4F641EC7384100027640 /* qiskit */ = {
 			isa = PBXGroup;
 			children = (
+				693C93031ED5EFAE00EA15B0 /* graph */,
 				69D310641ECA159C00B3E752 /* circuit */,
 				69D310651ECA15B200B3E752 /* extensions */,
 				69D310661ECA15CA00B3E752 /* mapper */,
@@ -331,7 +329,6 @@
 				DFBC4F5E1EC7384100027640 /* Frameworks */,
 				DFBC4F5F1EC7384100027640 /* Headers */,
 				DFBC4F601EC7384100027640 /* Resources */,
-				697F25A71ED4CCC60065B106 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -423,7 +420,6 @@
 			files = (
 				69DE36191ECD191F00EC4756 /* T.swift in Sources */,
 				69DE36231ECD1A1500EC4756 /* Header.swift in Sources */,
-				697F25A31ED49E160065B106 /* CircuitGraph.swift in Sources */,
 				69E335531ECA1BD20027271D /* ClassicalRegister.swift in Sources */,
 				69D3107C1ECA180500B3E752 /* QuantumCircuit.swift in Sources */,
 				69D3108D1ECA18B800B3E752 /* Measure.swift in Sources */,
@@ -435,6 +431,7 @@
 				69D3107E1ECA180500B3E752 /* Reset.swift in Sources */,
 				69DE361F1ECD197E00EC4756 /* Y.swift in Sources */,
 				693A9F461ECA369500112AC9 /* UBase.swift in Sources */,
+				693C93051ED5F05F00EA15B0 /* Graph.swift in Sources */,
 				69DE36171ECD190E00EC4756 /* S.swift in Sources */,
 				69DE361D1ECD195600EC4756 /* U3.swift in Sources */,
 				69D3108B1ECA182000B3E752 /* Credentials.swift in Sources */,
@@ -444,6 +441,7 @@
 				69E335511ECA1BC00027271D /* QuantumRegister.swift in Sources */,
 				69DE36211ECD198E00EC4756 /* Z.swift in Sources */,
 				69E597AB1ECA90A600A321F5 /* U1.swift in Sources */,
+				693C93091ED5F0CC00EA15B0 /* GraphVertex.swift in Sources */,
 				69DE36151ECD18D600EC4756 /* RZ.swift in Sources */,
 				69DE361B1ECD194600EC4756 /* U2.swift in Sources */,
 				69DE36091ECD152100EC4756 /* CXBase.swift in Sources */,
@@ -452,6 +450,7 @@
 				69DE360F1ECD188000EC4756 /* Iden.swift in Sources */,
 				697F259C1ED45BED0065B106 /* Circuit.swift in Sources */,
 				697BEDB11ED0844E00AB9A86 /* GatesTools.swift in Sources */,
+				693C930D1ED5F12600EA15B0 /* GraphEdge.swift in Sources */,
 				69E597AF1ECA980F00A321F5 /* X.swift in Sources */,
 				693A9F481ECA38D100112AC9 /* Qconfig.swift in Sources */,
 				693A9F441ECA366000112AC9 /* CX.swift in Sources */,
