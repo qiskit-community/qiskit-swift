@@ -28,7 +28,10 @@ public struct HashableTuple<A:Hashable,B:Hashable> : Hashable, Equatable {
 }
 
 public final class CircuitVertexData {
-    public let name: HashableTuple<String,Int>
+    public var name: HashableTuple<String,Int>
+    public var condition: HashableTuple<String,String>? = nil
+    public var qargs: [HashableTuple<String,String>] = []
+    public var cargs: [HashableTuple<String,String>] = []
     public let type: String
 
     public init(_ name: HashableTuple<String,Int>, _ type: String) {
@@ -38,7 +41,7 @@ public final class CircuitVertexData {
 }
 
 public final class CircuitEdgeData {
-    public let name: HashableTuple<String,Int>
+    public var name: HashableTuple<String,Int>
 
     public init(_ name: HashableTuple<String,Int>) {
         self.name = name
@@ -143,7 +146,90 @@ public class Circuit {
         }
         return array
     }
-    
+
+    /**
+     Rename a classical or quantum register throughout the circuit.
+     - parameter regname: existing register name string
+     - parameter newname: replacement register name string
+     */
+    public func rename_register(regname: String, newname: String) throws {
+        if regname == newname {
+            return
+        }
+        if self.qregs[newname] != nil || self.cregs[newname] != nil {
+            throw CircuitError.duplicateregister(name: newname)
+        }
+        if self.qregs[regname] == nil && self.cregs[regname] == nil {
+            throw CircuitError.noregister(name: newname)
+        }
+        var reg_size: Int = 0
+        if self.qregs[regname] != nil {
+            self.qregs[newname] = self.qregs[regname]
+            self.qregs.removeValue(forKey: regname)
+            reg_size = self.qregs[newname]!
+        }
+        var iscreg = false
+        if self.cregs[regname] != nil {
+            self.cregs[newname] = self.cregs[regname]
+            self.cregs.removeValue(forKey: regname)
+            reg_size = self.cregs[newname]!
+            iscreg = true
+        }
+        for i in 0..<reg_size {
+            let oldTuple = HashableTuple<String,Int>(regname, i)
+            let newTuple = HashableTuple<String,Int>(newname, i)
+            self.wire_type[newTuple] = iscreg
+            self.wire_type.removeValue(forKey: oldTuple)
+            self.input_map[newTuple] = self.input_map[oldTuple]
+            self.input_map.removeValue(forKey: oldTuple)
+            self.output_map[newTuple] = self.output_map[oldTuple]
+            self.output_map.removeValue(forKey: oldTuple)
+        }
+        // n node d = data
+        for node in self.multi_graph.vertexList {
+            guard let data = node.data else {
+                continue
+            }
+            if data.type == "in" || data.type == "out" {
+                if data.name.one == regname {
+                    data.name = HashableTuple<String,Int>(newname, data.name.two)
+                }
+            }
+            else if data.type == "op" {
+                var qa: [HashableTuple<String,String>] = []
+                for var a in data.qargs {
+                    if a.one == regname {
+                        a = HashableTuple<String,String>(newname, a.two)
+                    }
+                    qa.append(a)
+                }
+                data.qargs = qa
+                var ca: [HashableTuple<String,String>] = []
+                for var a in data.cargs {
+                    if a.one == regname {
+                        a = HashableTuple<String,String>(newname, a.two)
+                    }
+                    ca.append(a)
+                }
+                data.cargs = ca
+                if let condition = data.condition {
+                    if condition.one == regname {
+                        data.condition  = HashableTuple<String,String>(newname, condition.two)
+                    }
+                }
+            }
+        }
+        // eX = edge, d= data
+        for edge in self.multi_graph.edges {
+            guard let data = edge.data else {
+                continue
+            }
+            if data.name.one == regname {
+                data.name = HashableTuple<String,Int>(newname, data.name.two)
+            }
+        }
+    }
+
     /**
      Add all wires in a quantum register named name with size.
      */

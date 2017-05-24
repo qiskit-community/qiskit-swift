@@ -12,6 +12,11 @@ public class Graph<VertexDataType,EdgeDataType> {
 
     private var vertexMap: [Int:GraphVertex<VertexDataType,EdgeDataType>] = [:]
     public let isDirected: Bool
+    public private (set) var edges: [GraphEdge<EdgeDataType,VertexDataType>] = []
+
+    public var vertexList: [GraphVertex<VertexDataType,EdgeDataType>] {
+        return Array(self.vertexMap.values)
+    }
 
     public init(_ isDirected: Bool) {
         self.isDirected = isDirected
@@ -41,11 +46,13 @@ public class Graph<VertexDataType,EdgeDataType> {
         guard let neighbor = self.vertexMap[neighborIndex] else {
             return
         }
-        var edge = GraphEdge(neighbor,weight)
+        var edge = GraphEdge(source,neighbor,weight)
         source.neighborsMap[edge.neighbor.key] = edge
+        self.edges.append(edge)
         if !self.isDirected {
-            edge = GraphEdge(source,weight)
+            edge = GraphEdge(neighbor,source,weight)
             neighbor.neighborsMap[edge.neighbor.key] = edge
+            self.edges.append(edge)
         }
     }
 }

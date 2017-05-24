@@ -11,10 +11,12 @@ import Cocoa
 public final class GraphEdge<EdgeDataType,VertexDataType> {
 
     public var data: EdgeDataType? = nil
+    public let source: GraphVertex<VertexDataType,EdgeDataType>
     public let neighbor: GraphVertex<VertexDataType,EdgeDataType>
     public let weight: Int
 
-    init(_ neighbor: GraphVertex<VertexDataType,EdgeDataType>, _ weight: Int) {
+    init(_ source: GraphVertex<VertexDataType,EdgeDataType>, _ neighbor: GraphVertex<VertexDataType,EdgeDataType>, _ weight: Int) {
+        self.source = source
         self.neighbor = neighbor
         self.weight = weight
     }
