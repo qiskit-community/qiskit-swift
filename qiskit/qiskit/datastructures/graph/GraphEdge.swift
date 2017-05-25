@@ -8,7 +8,7 @@
 
 import Cocoa
 
-public final class GraphEdge<EdgeDataType,VertexDataType> {
+final class GraphEdge<EdgeDataType: NSCopying,VertexDataType: NSCopying> {
 
     public var data: EdgeDataType? = nil
     public let source: GraphVertex<VertexDataType,EdgeDataType>

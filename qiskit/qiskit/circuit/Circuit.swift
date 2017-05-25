@@ -8,43 +8,36 @@
 
 import Cocoa
 
-public struct HashableTuple<A:Hashable,B:Hashable> : Hashable, Equatable {
-    public let one: A
-    public let two: B
-
-    public init(_ one: A, _ two: B) {
-        self.one = one
-        self.two = two
-    }
-    public var hashValue : Int {
-        get {
-            return self.one.hashValue &* 31 &+ self.two.hashValue
-        }
-    }
-
-    public static func ==<A:Hashable,B:Hashable>(lhs: HashableTuple<A,B>, rhs: HashableTuple<A,B>) -> Bool {
-        return lhs.one == rhs.one && lhs.two == rhs.two
-    }
-}
-
-public final class CircuitVertexData {
+public final class CircuitVertexData: NSCopying {
     public var name: HashableTuple<String,Int>
+    public let type: String
     public var condition: HashableTuple<String,String>? = nil
     public var qargs: [HashableTuple<String,String>] = []
     public var cargs: [HashableTuple<String,String>] = []
-    public let type: String
 
     public init(_ name: HashableTuple<String,Int>, _ type: String) {
         self.name = name
         self.type = type
     }
+
+    public func copy(with zone: NSZone? = nil) -> Any {
+        let copy = CircuitVertexData(self.name, self.type)
+        copy.condition = self.condition
+        copy.qargs = self.qargs
+        copy.cargs = self.cargs
+        return copy
+    }
 }
 
-public final class CircuitEdgeData {
+public final class CircuitEdgeData: NSCopying {
     public var name: HashableTuple<String,Int>
 
     public init(_ name: HashableTuple<String,Int>) {
         self.name = name
+    }
+
+    public func copy(with zone: NSZone? = nil) -> Any {
+        return CircuitEdgeData(self.name)
     }
 }
 
@@ -66,7 +59,7 @@ public final class CircuitEdgeData {
  The nodes are connected by directed edges that correspond to qubits and
  bits.
  */
-public class Circuit {
+public class Circuit: NSCopying {
 
     /**
      Map from a wire's name (reg,idx) to a Bool that is True if the
@@ -95,7 +88,7 @@ public class Circuit {
      number of input qubits, input bits, and real parameters.
      The definition is external to the circuit object.
     */
-    //self.basis = {}
+    private var basis: [String: (Int,Int,Int)] = [:]
 
     /**
       Directed multigraph whose nodes are inputs, outputs, or operations.
@@ -121,18 +114,34 @@ public class Circuit {
     /**
      Map of user defined gates to ast nodes defining them
     */
-    //self.gates = {}
+    private var gates: [String:[String:AnyObject]] = [:]
 
     /**
      Output precision for printing floats
     */
-    //self.prec = 10
+    private var prec = 10
 
     /**
      Create an empty circuit
      */
     public init() {
 
+    }
+
+    public func copy(with zone: NSZone? = nil) -> Any {
+        let copy =  Circuit()
+        copy.wire_type = self.wire_type
+        copy.input_map = self.input_map
+        copy.output_map = self.output_map
+        copy.node_counter = self.node_counter
+        copy.basis = self.basis
+        copy.multi_graph = self.multi_graph.copy(with: zone) as! Graph<CircuitVertexData,CircuitEdgeData>
+        copy.qregs = self.qregs
+        copy.cregs = self.cregs
+        copy.gates = self.gates
+        copy.prec = self.prec
+        
+        return copy
     }
 
     /**
@@ -152,7 +161,7 @@ public class Circuit {
      - parameter regname: existing register name string
      - parameter newname: replacement register name string
      */
-    public func rename_register(regname: String, newname: String) throws {
+    public func rename_register(_ regname: String, _ newname: String) throws {
         if regname == newname {
             return
         }
@@ -231,6 +240,31 @@ public class Circuit {
     }
 
     /**
+     Remove all operation nodes with the given name
+     */
+    public func remove_all_ops_named(_ opname: String) throws {
+        let nlist = try self.get_named_nodes(opname)
+        for n in nlist {
+            self._remove_op_node(n)
+        }
+    }
+
+    /**
+     Return a deep copy of self
+     */
+    public func deepcopy() -> Circuit {
+        return self.copy(with: nil) as! Circuit
+    }
+
+    /**
+     Format a float f as a string with self.prec digits.
+     */
+    public func fs(_ number: Double) -> String {
+        let format = "%.\(self.prec)f"
+        return String(format:format,number)
+    }
+
+    /**
      Add all wires in a quantum register named name with size.
      */
     public func add_qreg(_ name: String, _ size: Int) throws {
@@ -282,5 +316,209 @@ public class Circuit {
         if let edge = self.multi_graph.edge(in_node,out_node) {
             edge.data = CircuitEdgeData(name)
         }
+    }
+
+    /**
+     Add an operation to the basis.
+     name is string label for operation
+     number_qubits is number of qubit arguments
+     number_classical is number of bit arguments
+     number_parameters is number of real parameters
+     The parameters (nq,nc,np) are ignored for the special case
+     when name = "barrier". The barrier instruction has a variable
+     number of qubit arguments.
+     */
+    public func add_basis_element(_ name: String, _ number_qubits: Int, _ number_classical: Int = 0, _ number_parameters: Int = 0) throws {
+        if self.basis[name] == nil {
+            self.basis[name] = (number_qubits,number_classical,number_parameters)
+        }
+        if let gateMap = self.gates[name] {
+            if number_classical != 0 {
+                throw CircuitError.gatematch
+            }
+            if let nParameters = gateMap["n_args"] as? NSNumber {
+                if nParameters.intValue != number_parameters {
+                    throw CircuitError.gatematch
+                }
+            }
+            if let nBits = gateMap["n_bits"] as? NSNumber {
+                if nBits.intValue != number_qubits {
+                    throw CircuitError.gatematch
+                }
+            }
+        }
+    }
+
+    /**
+     Add the definition of a gate.
+     gatedata is dict with fields:
+     "opaque" = True or False
+     "n_args" = number of real parameters
+     "n_bits" = number of qubits
+     "args"   = list of parameter names
+     "bits"   = list of qubit names
+     "body"   = GateBody AST node
+     */
+    public func add_gate_data(_ name: String, _ gateMap: [String: AnyObject]) throws {
+        if self.gates[name] == nil {
+            self.gates[name] = gateMap
+            if let basis = self.basis[name] {
+                if let nBits = gateMap["n_bits"] as? NSNumber {
+                    if nBits.intValue != basis.0 {
+                        throw CircuitError.gatematch
+                    }
+                }
+                if basis.1 != 0 {
+                    throw CircuitError.gatematch
+                }
+                if let nParameters = gateMap["n_args"] as? NSNumber {
+                    if nParameters.intValue != basis.2 {
+                        throw CircuitError.gatematch
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     Check the arguments against the data for this operation.
+     name is a string
+     qargs is a list of tuples like ("q",0)
+     cargs is a list of tuples like ("c",0)
+     params is a list of strings that represent floats
+     */
+    private func _check_basis_data(_ name: String, _ qargs: [(String,Int)], _ cargs: [(String,Int)], _ params: [String]) throws {
+        // Check that we have this operation
+        if self.basis[name] == nil {
+            throw CircuitError.nobasicop(name: name)
+        }
+        // Check the number of arguments matches the signature
+        if name != "barrier" {
+            if let basis = self.basis[name] {
+                if qargs.count != basis.0 {
+                    throw CircuitError.qbitsnumber(name: name)
+                }
+                if cargs.count != basis.1 {
+                    throw CircuitError.bitsnumber(name: name)
+                }
+                if params.count != basis.2 {
+                    throw CircuitError.paramsnumber(name: name)
+                }
+            }
+        }
+        else {
+            // "barrier" is a special case
+            if qargs.isEmpty {
+                throw CircuitError.qbitsnumber(name: name)
+            }
+            if !cargs.isEmpty {
+                throw CircuitError.bitsnumber(name: name)
+            }
+            if !params.isEmpty {
+                throw CircuitError.paramsnumber(name: name)
+            }
+        }
+    }
+
+    /**
+     Verify that the condition is valid.
+     name is a string used for error reporting
+     condition is either None or a tuple (string,int) giving (creg,value)
+     */
+    private func _check_condition(_ name: String, _ cond: (String,Int)?) throws {
+        // Verify creg exists
+        if let condition = cond {
+            if self.cregs[condition.0] != nil {
+                throw CircuitError.cregcondition(name: name)
+            }
+        }
+    }
+
+    /**
+     Check the values of a list of (qu)bit arguments.
+     For each element A of args, check that amap contains A and
+     self.wire_type[A] equals bval.
+     args is a list of (regname,idx) tuples
+     amap is a dictionary keyed on (regname,idx) tuples
+     bval is boolean
+     */
+    private func _check_bits(_ args: [HashableTuple<String,Int>], amap: [HashableTuple<String,Int>:AnyObject], bval: Bool) throws {
+        // Check for each wire
+        for q in args {
+            if amap[q] == nil {
+                throw CircuitError.bitnotfound(q: q)
+            }
+            if let wt = self.wire_type[q] {
+                if wt != bval {
+                    throw CircuitError.wiretype(bVal: bval, q: q)
+                }
+            }
+        }
+    }
+
+    /**
+     Return a list of "op" nodes with the given name.
+     */
+    public func get_named_nodes(_ name: String) throws -> [Int] {
+        if self.basis[name] == nil {
+            throw CircuitError.nobasicop(name: name)
+        }
+        var nlist: [Int] = []
+        // Iterate through the nodes of self in topological order
+        let ts = self.multi_graph.topological_sort()
+        for n in ts {
+            if let nd = self.multi_graph.vertex(n) {
+                if let data = nd.data {
+                    if data.type == "op" && data.name.one == name {
+                        nlist.append(n)
+                    }
+                }
+            }
+        }
+        return nlist
+    }
+
+    /**
+     Remove an operation node n.
+     Add edges from predecessors to successors.
+     */
+    public func _remove_op_node(_ n: Int) {
+        let (pred_map, succ_map) = self._make_pred_succ_maps(n)
+        self.multi_graph.remove_vertex(n)
+        for w in pred_map.keys {
+            guard let predIndex = pred_map[w] else {
+                continue
+            }
+            guard let succIndex = succ_map[w] else {
+                continue
+            }
+            self.multi_graph.add_edge(predIndex, succIndex)
+            if let edge = self.multi_graph.edge(predIndex,succIndex) {
+                edge.data = CircuitEdgeData(w)
+            }
+        }
+    }
+
+    /**
+     Return predecessor and successor dictionaries.
+     These map from wire names to predecessor and successor
+     nodes for the operation node n in self.multi_graph.
+     */
+    private func _make_pred_succ_maps(_ n: Int) -> ([HashableTuple<String,Int>:Int],[HashableTuple<String,Int>:Int]) {
+        var pred_map: [HashableTuple<String,Int>:Int] = [:]
+        var edges = self.multi_graph.in_edges_iter(n)
+        for edge in edges {
+            if let data = edge.data {
+                pred_map[data.name] = edge.source.key
+            }
+        }
+        var succ_map: [HashableTuple<String,Int>:Int] = [:]
+        edges = self.multi_graph.out_edges_iter(n)
+        for edge in edges {
+            if let data = edge.data {
+                succ_map[data.name] = edge.neighbor.key
+            }
+        }
+        return (pred_map, succ_map)
     }
 }
