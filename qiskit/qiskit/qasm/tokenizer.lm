@@ -20,6 +20,10 @@ void yyerror(char *s);
     return NNINTEGER;
 }
 
+pi {
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return PI;
+}
 
 sin {
     yylval.svalue = [NSString stringWithFormat:@"%s", yytext];

@@ -49,6 +49,9 @@
 @synthesize nnInteger = _nnInteger;
 @end
 
+@implementation NodePi: Node
+@synthesize pi = _pi;
+@end
 
 @implementation ParseTree
 
@@ -119,5 +122,13 @@
     node.nnInteger = value;
     return node;
 }
+
++(NodePi*) createPiNodeWithValue: (double) value {
+    NodePi *node = [[NodePi alloc] init];
+    node.nodeType = 'P';
+    node.pi = value;
+    return node;
+}
+
 
 @end
