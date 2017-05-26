@@ -8,5 +8,5 @@
 
 #import "ParserBlocks.h"
 
-void (^ParseSuccessBlock)(float value);
+void (^ParseSuccessBlock)(Node *node);
 void (^ParseFailBlock)(NSString *msg);

@@ -48,11 +48,16 @@
 		69E597AF1ECA980F00A321F5 /* X.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E597AE1ECA980F00A321F5 /* X.swift */; };
 		69E597B11ECA99B300A321F5 /* H.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E597B01ECA99B300A321F5 /* H.swift */; };
 		69FEC8381ECB37E0002324E2 /* IBMQuantumExperienceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69FEC8371ECB37E0002324E2 /* IBMQuantumExperienceError.swift */; };
-		DF79735A1ED0716C00C01457 /* QiskitParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7973591ED0716C00C01457 /* QiskitParserTests.swift */; };
 		DF79735D1ED071F600C01457 /* parser.ym in Sources */ = {isa = PBXBuildFile; fileRef = DF79735B1ED071F600C01457 /* parser.ym */; };
 		DF79735E1ED071F600C01457 /* tokenizer.lm in Sources */ = {isa = PBXBuildFile; fileRef = DF79735C1ED071F600C01457 /* tokenizer.lm */; };
 		DF7973611ED0747B00C01457 /* ParserBlocks.h in Headers */ = {isa = PBXBuildFile; fileRef = DF79735F1ED0747B00C01457 /* ParserBlocks.h */; };
 		DF7973621ED0747B00C01457 /* ParserBlocks.m in Sources */ = {isa = PBXBuildFile; fileRef = DF7973601ED0747B00C01457 /* ParserBlocks.m */; };
+		DF79736D1ED3398C00C01457 /* QiskitParserExpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF79736C1ED3398C00C01457 /* QiskitParserExpTests.swift */; };
+		DF79736F1ED339D100C01457 /* QiskitParserExpListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF79736E1ED339D100C01457 /* QiskitParserExpListTests.swift */; };
+		DF7973721ED3429D00C01457 /* ParseTree.h in Headers */ = {isa = PBXBuildFile; fileRef = DF7973701ED3429D00C01457 /* ParseTree.h */; };
+		DF7973731ED3429D00C01457 /* ParseTree.m in Sources */ = {isa = PBXBuildFile; fileRef = DF7973711ED3429D00C01457 /* ParseTree.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		DFA7844E1ED746E0002BB240 /* SymbolTable.h in Headers */ = {isa = PBXBuildFile; fileRef = DFA7844C1ED746E0002BB240 /* SymbolTable.h */; };
+		DFA7844F1ED746E0002BB240 /* SymbolTable.m in Sources */ = {isa = PBXBuildFile; fileRef = DFA7844D1ED746E0002BB240 /* SymbolTable.m */; };
 		DFBC4F6C1EC7384200027640 /* qiskit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFBC4F621EC7384100027640 /* qiskit.framework */; };
 		DFBC4F711EC7384200027640 /* QiskitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4F701EC7384200027640 /* QiskitTests.swift */; };
 		DFBC4FBA1EC73BF800027640 /* qiskit.h in Headers */ = {isa = PBXBuildFile; fileRef = DFBC4FA51EC73BF800027640 /* qiskit.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -110,13 +115,18 @@
 		69E597AE1ECA980F00A321F5 /* X.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = X.swift; path = extensions/X.swift; sourceTree = "<group>"; };
 		69E597B01ECA99B300A321F5 /* H.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = H.swift; path = extensions/H.swift; sourceTree = "<group>"; };
 		69FEC8371ECB37E0002324E2 /* IBMQuantumExperienceError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IBMQuantumExperienceError.swift; path = qiskit/network/IBMQuantumExperienceError.swift; sourceTree = SOURCE_ROOT; };
-		DF7973591ED0716C00C01457 /* QiskitParserTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QiskitParserTests.swift; sourceTree = "<group>"; };
 		DF79735B1ED071F600C01457 /* parser.ym */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; path = parser.ym; sourceTree = "<group>"; };
 		DF79735C1ED071F600C01457 /* tokenizer.lm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; path = tokenizer.lm; sourceTree = "<group>"; };
 		DF79735F1ED0747B00C01457 /* ParserBlocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserBlocks.h; sourceTree = "<group>"; };
 		DF7973601ED0747B00C01457 /* ParserBlocks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParserBlocks.m; sourceTree = "<group>"; };
 		DF7973671ED0808D00C01457 /* Parser-PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Parser-PrefixHeader.pch"; sourceTree = "<group>"; };
 		DF7973681ED083F600C01457 /* qiskitTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "qiskitTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		DF79736C1ED3398C00C01457 /* QiskitParserExpTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QiskitParserExpTests.swift; sourceTree = "<group>"; };
+		DF79736E1ED339D100C01457 /* QiskitParserExpListTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QiskitParserExpListTests.swift; sourceTree = "<group>"; };
+		DF7973701ED3429D00C01457 /* ParseTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParseTree.h; sourceTree = "<group>"; };
+		DF7973711ED3429D00C01457 /* ParseTree.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParseTree.m; sourceTree = "<group>"; };
+		DFA7844C1ED746E0002BB240 /* SymbolTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SymbolTable.h; sourceTree = "<group>"; };
+		DFA7844D1ED746E0002BB240 /* SymbolTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SymbolTable.m; sourceTree = "<group>"; };
 		DFBC4F621EC7384100027640 /* qiskit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = qiskit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFBC4F6B1EC7384200027640 /* qiskitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = qiskitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFBC4F701EC7384200027640 /* QiskitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QiskitTests.swift; sourceTree = "<group>"; };
@@ -260,7 +270,8 @@
 			isa = PBXGroup;
 			children = (
 				DFBC4F701EC7384200027640 /* QiskitTests.swift */,
-				DF7973591ED0716C00C01457 /* QiskitParserTests.swift */,
+				DF79736E1ED339D100C01457 /* QiskitParserExpListTests.swift */,
+				DF79736C1ED3398C00C01457 /* QiskitParserExpTests.swift */,
 				DFBC4F721EC7384200027640 /* Info.plist */,
 				DF7973681ED083F600C01457 /* qiskitTests-Bridging-Header.h */,
 			);
@@ -288,6 +299,10 @@
 				DF79735C1ED071F600C01457 /* tokenizer.lm */,
 				DF79735F1ED0747B00C01457 /* ParserBlocks.h */,
 				DF7973601ED0747B00C01457 /* ParserBlocks.m */,
+				DF7973701ED3429D00C01457 /* ParseTree.h */,
+				DF7973711ED3429D00C01457 /* ParseTree.m */,
+				DFA7844C1ED746E0002BB240 /* SymbolTable.h */,
+				DFA7844D1ED746E0002BB240 /* SymbolTable.m */,
 				DF7973671ED0808D00C01457 /* Parser-PrefixHeader.pch */,
 			);
 			path = qasm;
@@ -301,6 +316,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				DFBC4FBA1EC73BF800027640 /* qiskit.h in Headers */,
+				DFA7844E1ED746E0002BB240 /* SymbolTable.h in Headers */,
+				DF7973721ED3429D00C01457 /* ParseTree.h in Headers */,
 				DF7973611ED0747B00C01457 /* ParserBlocks.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -420,6 +437,7 @@
 				69DE361F1ECD197E00EC4756 /* Y.swift in Sources */,
 				693A9F461ECA369500112AC9 /* UBase.swift in Sources */,
 				69DE36171ECD190E00EC4756 /* S.swift in Sources */,
+				DF7973731ED3429D00C01457 /* ParseTree.m in Sources */,
 				69DE361D1ECD195600EC4756 /* U3.swift in Sources */,
 				69D3108B1ECA182000B3E752 /* Credentials.swift in Sources */,
 				6974E5951ECA1EF300D1AE97 /* QISKitException.swift in Sources */,
@@ -427,6 +445,7 @@
 				69E3354F1ECA1B8D0027271D /* Register.swift in Sources */,
 				69E335511ECA1BC00027271D /* QuantumRegister.swift in Sources */,
 				DF79735D1ED071F600C01457 /* parser.ym in Sources */,
+				DFA7844F1ED746E0002BB240 /* SymbolTable.m in Sources */,
 				69DE36211ECD198E00EC4756 /* Z.swift in Sources */,
 				69E597AB1ECA90A600A321F5 /* U1.swift in Sources */,
 				69DE36151ECD18D600EC4756 /* RZ.swift in Sources */,
@@ -458,7 +477,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				DFBC4F711EC7384200027640 /* QiskitTests.swift in Sources */,
-				DF79735A1ED0716C00C01457 /* QiskitParserTests.swift in Sources */,
+				DF79736F1ED339D100C01457 /* QiskitParserExpListTests.swift in Sources */,
+				DF79736D1ED3398C00C01457 /* QiskitParserExpTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

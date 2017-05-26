@@ -20,6 +20,7 @@ void yyerror(char *s);
     return NNINTEGER;
 }
 
+
 sin {
     yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
     return SIN;
@@ -27,27 +28,22 @@ sin {
 
 cos {
     yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
-    return SIN;
+    return COS;
 }
 
 tan {
     yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
-    return SIN;
+    return TAN;
 }
 
 exp {
     yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
-    return SIN;
+    return EXP;
 }
 
 ln {
     yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
-    return SIN;
-}
-
-sqrt {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
-    return SIN;
+    return LN;
 }
 
 

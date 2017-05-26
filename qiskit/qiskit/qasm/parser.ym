@@ -1,6 +1,7 @@
 %{
 
 #import "ParserBlocks.h"
+#import "ParseTree.h"
 
 int yylex(void);
 void yyerror(char *s);
@@ -11,6 +12,7 @@ void yyerror(char *s);
     int ivalue;
     float fvalue;
     __unsafe_unretained NSString *svalue;
+    __unsafe_unretained Node *node;
 }
 
 %token <svalue> ID
@@ -32,37 +34,39 @@ void yyerror(char *s);
 %token <svalue> TAN
 %token <svalue> EXP
 %token <svalue> LN
-%token <svalue> SQRT
 
 %token <fvalue> PI
 %token <fvalue> REAL
 %token <ivalue> NNINTEGER
 
-%type <fvalue> explist
-%type <fvalue> exp
-%type <fvalue> real
-%type <fvalue> nninteger
+%type <node> explist
+%type <node> exp
+%type <node> real
+%type <node> nninteger
 
+%left ','
+%right '='
 %left '+' '-'
-%left '*' '/' '^'
+%left '*' '/'
+%left '(' ')'
 
 %%
 uop : explist { if (ParseSuccessBlock) ParseSuccessBlock($1); }
 
-explist : exp { $$ = $1; }
-| explist, exp
+explist : exp
+| exp ',' explist { $$ = [ParseTree createNode: 'L' left: $1 right: $3];  }
 
-exp : exp '+' exp { $$ = $1 + $3; }
-| exp '-' exp { $$ = $1 - $3; }
-| exp '*' exp { $$ = $1 * $3; }
-| exp '/' exp { $$ = $1 / $3; }
-| exp '^' exp { $$ = pow ($1, $3); }
-| '-' exp { $$ = -$2; }
+exp : exp '+' exp { $$ = [ParseTree createNode: '+' left: $1 right: $3];  }
+| exp '-' exp { $$ = [ParseTree createNode: '-' left: $1 right: $3]; }
+| exp '*' exp { $$ =[ParseTree createNode: '*' left: $1 right: $3];  }
+| exp '/' exp { $$ = [ParseTree createNode: '/' left: $1 right: $3];  }
+| exp '^' exp { $$ = [ParseTree createNode: '^' left: $1 right: $3]; }
+| '-' exp %prec '-' { $$ = [ParseTree createNode: 'M' left: $2 right: nil]; }
 | '(' exp ')' { $$ = $2; }
 | real { $$ = $1; }
 | nninteger { $$ = $1; }
 
-real : REAL { $$ = $1; }
-nninteger : NNINTEGER { $$ = $1; }
+real : REAL { $$ = [ParseTree createRealNodeWithValue: $1]; }
+nninteger : NNINTEGER { $$ = [ParseTree createNNIntegerNodeWithValue: $1]; }
 
 %%
