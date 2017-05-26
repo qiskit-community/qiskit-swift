@@ -87,7 +87,6 @@
 		697BEDB01ED0844E00AB9A86 /* GatesTools.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GatesTools.swift; path = extensions/GatesTools.swift; sourceTree = "<group>"; };
 		697F259B1ED45BED0065B106 /* Circuit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Circuit.swift; path = circuit/Circuit.swift; sourceTree = "<group>"; };
 		697F259D1ED45DD90065B106 /* CircuitError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CircuitError.swift; path = circuit/CircuitError.swift; sourceTree = "<group>"; };
-		697F25A01ED48D240065B106 /* SwiftGraph.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftGraph.framework; path = Carthage/Build/Mac/SwiftGraph.framework; sourceTree = "<group>"; };
 		69D3106A1ECA180500B3E752 /* QuantumProgram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QuantumProgram.swift; path = sdk/QuantumProgram.swift; sourceTree = "<group>"; };
 		69D3106E1ECA180500B3E752 /* Gate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Gate.swift; path = sdk/Gate.swift; sourceTree = "<group>"; };
 		69D3106F1ECA180500B3E752 /* QuantumCircuit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QuantumCircuit.swift; path = sdk/QuantumCircuit.swift; sourceTree = "<group>"; };
@@ -167,14 +166,6 @@
 				695701391ED75C8B00C6CCAB /* HashableTuple.swift */,
 			);
 			name = "Data Structures";
-			sourceTree = "<group>";
-		};
-		697F259F1ED48D240065B106 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				697F25A01ED48D240065B106 /* SwiftGraph.framework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		69D310641ECA159C00B3E752 /* circuit */ = {
@@ -262,7 +253,6 @@
 				DFBC4F641EC7384100027640 /* qiskit */,
 				DFBC4F6F1EC7384200027640 /* qiskitTests */,
 				DFBC4F631EC7384100027640 /* Products */,
-				697F259F1ED48D240065B106 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
