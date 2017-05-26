@@ -73,11 +73,25 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
             neighbor = GraphVertex(neighborIndex)
             self.vertexList.append(neighbor!)
         }
-        var edge = GraphEdge(source!,neighbor!,weight)
-        edge.source.neighbors.append(edge)
+        var edge = self.edge(sourceIndex,neighborIndex)
+        if edge == nil {
+            edge = GraphEdge(source!,neighbor!,weight)
+            edge!.source.neighbors.append(edge!)
+        }
+        else {
+            edge!.data = nil
+            edge!.weight = weight
+        }
         if !self.isDirected {
-            edge = GraphEdge(neighbor!,source!,weight)
-            edge.source.neighbors.append(edge)
+            edge = self.edge(neighborIndex,sourceIndex)
+            if edge == nil {
+                edge = GraphEdge(neighbor!,source!,weight)
+                edge!.source.neighbors.append(edge!)
+            }
+            else {
+                edge!.data = nil
+                edge!.weight = weight
+            }
         }
     }
 
@@ -89,6 +103,13 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         for vertex in self.vertexList {
             if vertex.key != index {
                 newVertexList.append(vertex)
+                var newNeighborList: [GraphEdge<EdgeDataType,VertexDataType>] = []
+                for edge in vertex.neighbors {
+                    if edge.neighbor.key != index {
+                        newNeighborList.append(edge)
+                    }
+                }
+                vertex.neighbors = newNeighborList
             }
         }
         self.vertexList = newVertexList
