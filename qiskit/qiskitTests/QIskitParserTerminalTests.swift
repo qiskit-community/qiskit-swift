@@ -122,6 +122,40 @@ class QIskitParserTerminalTests: XCTestCase {
         })
     }
 
+    func testParserId() {
+        
+        let asyncExpectation = self.expectation(description: "parser")
+        
+        let buf: YY_BUFFER_STATE = yy_scan_string("theidtofind")
+        
+        ParseSuccessBlock = { (node: Node?) -> Void in
+            XCTAssertNotNil(node)
+            guard let idn = node as? NodeId else {
+                XCTFail("Id Node Type Expected!")
+                asyncExpectation.fulfill()
+                return
+            }
+            XCTAssertEqual("theidtofind", idn.s_id)
+            asyncExpectation.fulfill()
+        }
+        
+        ParseFailBlock = { (message: String?) -> Void in
+            if let msg = message {
+                XCTFail(msg)
+            } else {
+                XCTFail("Unknown Error")
+            }
+            asyncExpectation.fulfill()
+        }
+        
+        yyparse()
+        yy_delete_buffer(buf)
+        
+        self.waitForExpectations(timeout: 180, handler: { (error) in
+            XCTAssertNil(error, "Failure in parser")
+        })
+    }
+
 
 
 }

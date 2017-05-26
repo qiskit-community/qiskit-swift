@@ -53,6 +53,10 @@
 @synthesize pi = _pi;
 @end
 
+@implementation  NodeId: Node
+@synthesize s_id = _s_id;
+@end
+
 @implementation ParseTree
 
 +(Node*) createNode: (int) nodeType left: (Node*) leftOperand right: (Node*) rightOperand {
@@ -127,6 +131,13 @@
     NodePi *node = [[NodePi alloc] init];
     node.nodeType = 'P';
     node.pi = value;
+    return node;
+}
+
++(NodeId*) createIdNodeWithValue: (NSString*) value {
+    NodeId *node = [[NodeId alloc] init];
+    node.nodeType = 'D';
+    node.s_id = value;
     return node;
 }
 

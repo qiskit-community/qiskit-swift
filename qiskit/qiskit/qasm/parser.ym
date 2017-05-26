@@ -45,6 +45,7 @@ void yyerror(char *s);
 %type <node> real
 %type <node> nninteger
 %type <node> pi
+%type <node> id
 %type <svalue> unaryop
 
 %left ','
@@ -69,11 +70,13 @@ exp : exp '+' exp { $$ = [ParseTree createNode: '+' left: $1 right: $3];  }
 | '(' exp ')' { $$ = $2; }
 | real { $$ = $1; }
 | nninteger { $$ = $1; }
+| id { $$ = $1; }
 | pi { $$ = $1; }
 
 real : REAL { $$ = [ParseTree createRealNodeWithValue: $1]; }
 nninteger : NNINTEGER { $$ = [ParseTree createNNIntegerNodeWithValue: $1]; }
 pi : PI { $$ = [ParseTree createPiNodeWithValue: M_PI]; }
+id : ID { $$ = [ParseTree createIdNodeWithValue: $1]; }
 unaryop : SIN { $$ = $1; }
 | COS { $$ = $1; }
 | TAN { $$ = $1; }

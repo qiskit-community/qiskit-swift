@@ -66,6 +66,9 @@ typedef NS_ENUM(NSInteger, EqualityOperator) {
 @property double pi;
 @end
 
+@interface NodeId: Node
+@property (nonatomic, retain) NSString *s_id;
+@end
 
 @interface ParseTree : NSObject
 
@@ -79,4 +82,5 @@ typedef NS_ENUM(NSInteger, EqualityOperator) {
 +(NodeReal*) createRealNodeWithValue: (float) value;
 +(NodeNNInteger*) createNNIntegerNodeWithValue: (int) value;
 +(NodePi*) createPiNodeWithValue: (double) value;
++(NodeId*) createIdNodeWithValue: (NSString*) value;
 @end
