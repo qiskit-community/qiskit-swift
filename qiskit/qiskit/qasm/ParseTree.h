@@ -49,6 +49,11 @@ typedef NS_ENUM(NSInteger, EqualityOperator) {
 @property (nonatomic, retain) Node *value;
 @end
 
+@interface NodeUnaryOperator : Node
+@property (nonatomic, retain) NSString *uoperator;
+@property (nonatomic, retain) Node *value;
+@end
+
 @interface NodeReal: Node
 @property float real;
 @end
@@ -66,6 +71,7 @@ typedef NS_ENUM(NSInteger, EqualityOperator) {
 +(NodeSymbolRef*) createSymbolRefNode: (SymbolObject *) symbol;
 +(NodeIf*) createIfNode: (Node *) branch;
 +(NodeAssignment*) createAssigmentNode:(SymbolObject *) symbol withObject: (Node*) value;
++(NodeUnaryOperator*) createUnaryOpNode: (NSString*) unaryop withObject: (Node*) value;
 +(NodeReal*) createRealNodeWithValue: (float) value;
 +(NodeNNInteger*) createNNIntegerNodeWithValue: (int) value;
 @end

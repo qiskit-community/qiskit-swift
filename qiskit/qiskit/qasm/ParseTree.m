@@ -36,6 +36,11 @@
 @synthesize value = _value;
 @end
 
+@implementation NodeUnaryOperator : Node
+@synthesize uoperator = _uoperator;
+@synthesize value = _value;
+@end
+
 @implementation NodeReal: Node
 @synthesize real = _real;
 @end
@@ -89,6 +94,14 @@
     NodeAssignment *node = [[NodeAssignment alloc] init];
     node.nodeType = 'A';
     node.symbol = symbol;
+    node.value = value;
+    return node;
+}
+
++(NodeUnaryOperator*) createUnaryOpNode: (NSString*) unaryop withObject: (Node*) value {
+    NodeUnaryOperator *node = [[NodeUnaryOperator alloc] init];
+    node.nodeType = 'U';
+    node.uoperator = unaryop;
     node.value = value;
     return node;
 }

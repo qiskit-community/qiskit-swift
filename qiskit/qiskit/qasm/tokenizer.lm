@@ -46,6 +46,10 @@ ln {
     return LN;
 }
 
+sqrt {
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return SQRT;
+}
 
 qreg {
     printf("Found a QREG\n");

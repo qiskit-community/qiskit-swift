@@ -34,6 +34,7 @@ void yyerror(char *s);
 %token <svalue> TAN
 %token <svalue> EXP
 %token <svalue> LN
+%token <svalue> SQRT
 
 %token <fvalue> PI
 %token <fvalue> REAL
@@ -43,6 +44,7 @@ void yyerror(char *s);
 %type <node> exp
 %type <node> real
 %type <node> nninteger
+%type <svalue> unaryop
 
 %left ','
 %right '='
@@ -61,6 +63,7 @@ exp : exp '+' exp { $$ = [ParseTree createNode: '+' left: $1 right: $3];  }
 | exp '*' exp { $$ =[ParseTree createNode: '*' left: $1 right: $3];  }
 | exp '/' exp { $$ = [ParseTree createNode: '/' left: $1 right: $3];  }
 | exp '^' exp { $$ = [ParseTree createNode: '^' left: $1 right: $3]; }
+| unaryop '(' exp ')' { $$ = [ParseTree createUnaryOpNode: $1 withObject: $3]; }
 | '-' exp %prec '-' { $$ = [ParseTree createNode: 'M' left: $2 right: nil]; }
 | '(' exp ')' { $$ = $2; }
 | real { $$ = $1; }
@@ -68,5 +71,11 @@ exp : exp '+' exp { $$ = [ParseTree createNode: '+' left: $1 right: $3];  }
 
 real : REAL { $$ = [ParseTree createRealNodeWithValue: $1]; }
 nninteger : NNINTEGER { $$ = [ParseTree createNNIntegerNodeWithValue: $1]; }
+unaryop : SIN { $$ = $1; }
+| COS { $$ = $1; }
+| TAN { $$ = $1; }
+| EXP { $$ = $1; }
+| LN { $$ = $1; }
+| SQRT { $$ = $1; }
 
 %%
