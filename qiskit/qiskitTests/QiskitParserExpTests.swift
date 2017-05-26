@@ -28,7 +28,7 @@ class QiskitParserExpTests: XCTestCase {
         
         ParseSuccessBlock = { (node: Node?) -> Void in
             XCTAssertNotNil(node)
-            XCTAssertEqual(Character("+"), Character(UnicodeScalar(Int(node!.nodeType))!))
+            XCTAssertEqual(NodeType.N_ADD, node!.nodeType)
             asyncExpectation.fulfill()
         }
         
@@ -57,7 +57,7 @@ class QiskitParserExpTests: XCTestCase {
         
         ParseSuccessBlock = { (node: Node?) -> Void in
             XCTAssertNotNil(node)
-            XCTAssertEqual(Character("-"), Character(UnicodeScalar(Int(node!.nodeType))!))
+            XCTAssertEqual(NodeType.N_MINUS, node!.nodeType)
             asyncExpectation.fulfill()
         }
         
@@ -86,7 +86,7 @@ class QiskitParserExpTests: XCTestCase {
         
         ParseSuccessBlock = { (node: Node?) -> Void in
             XCTAssertNotNil(node)
-            XCTAssertEqual(Character("*"), Character(UnicodeScalar(Int(node!.nodeType))!))
+            XCTAssertEqual(NodeType.N_MULTIPLY, node!.nodeType)
             asyncExpectation.fulfill()
         }
         
@@ -115,7 +115,7 @@ class QiskitParserExpTests: XCTestCase {
         
         ParseSuccessBlock = { (node: Node?) -> Void in
             XCTAssertNotNil(node)
-            XCTAssertEqual(Character("/"), Character(UnicodeScalar(Int(node!.nodeType))!))
+            XCTAssertEqual(NodeType.N_DIVIDE, node!.nodeType)
             asyncExpectation.fulfill()
         }
         
@@ -144,7 +144,7 @@ class QiskitParserExpTests: XCTestCase {
         
         ParseSuccessBlock = { (node: Node?) -> Void in
             XCTAssertNotNil(node)
-            XCTAssertEqual(Character("U"), Character(UnicodeScalar(Int(node!.nodeType))!))
+            XCTAssertEqual(NodeType.N_UNARY, node!.nodeType)
             asyncExpectation.fulfill()
         }
         

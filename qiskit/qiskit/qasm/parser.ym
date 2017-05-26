@@ -40,12 +40,16 @@ void yyerror(char *s);
 %token <fvalue> REAL
 %token <ivalue> NNINTEGER
 
+%type <node> uop
+%type <node> argument
 %type <node> explist
 %type <node> exp
 %type <node> real
 %type <node> nninteger
 %type <node> pi
 %type <node> id
+%type <svalue> cx
+%type <svalue> u
 %type <svalue> unaryop
 
 %left ','
@@ -55,18 +59,26 @@ void yyerror(char *s);
 %left '(' ')'
 
 %%
-uop : explist { if (ParseSuccessBlock) ParseSuccessBlock($1); }
+qop : uop { if (ParseSuccessBlock) ParseSuccessBlock($1); }
+| argument { if (ParseSuccessBlock) ParseSuccessBlock($1); }
+| explist { if (ParseSuccessBlock) ParseSuccessBlock($1); }
+| exp { if (ParseSuccessBlock) ParseSuccessBlock($1); }
 
-explist : exp
-| exp ',' explist { $$ = [ParseTree createNode: 'L' left: $1 right: $3];  }
+uop : u '(' exp ')' argument { $$ = [ParseTree  createUOpNode: $1 object1: $3 object2: $5]; }
 
-exp : exp '+' exp { $$ = [ParseTree createNode: '+' left: $1 right: $3];  }
-| exp '-' exp { $$ = [ParseTree createNode: '-' left: $1 right: $3]; }
-| exp '*' exp { $$ = [ParseTree createNode: '*' left: $1 right: $3];  }
-| exp '/' exp { $$ = [ParseTree createNode: '/' left: $1 right: $3];  }
-| exp '^' exp { $$ = [ParseTree createNode: '^' left: $1 right: $3]; }
+argument : id { $$ = $1; }
+| id '[' nninteger ']' { $$ = [ParseTree createArgumentNode: $1 withObject: $3]; }
+
+explist : exp { $$ = $1;  }
+| exp ',' explist { $$ = [ParseTree createNode: N_EXPLIST left: $1 right: $3];  }
+
+exp : exp '+' exp { $$ = [ParseTree createNode: N_ADD left: $1 right: $3];  }
+| exp '-' exp { $$ = [ParseTree createNode: N_MINUS left: $1 right: $3]; }
+| exp '*' exp { $$ = [ParseTree createNode: N_MULTIPLY left: $1 right: $3];  }
+| exp '/' exp { $$ = [ParseTree createNode: N_DIVIDE left: $1 right: $3];  }
+| exp '^' exp { $$ = [ParseTree createNode: N_SQRT left: $1 right: $3]; }
 | unaryop '(' exp ')' { $$ = [ParseTree createUnaryOpNode: $1 withObject: $3]; }
-| '-' exp %prec '-' { $$ = [ParseTree createNode: 'M' left: $2 right: nil]; }
+| '-' exp %prec '-' { $$ = [ParseTree createNode: N_MINUS left: $2 right: nil]; }
 | '(' exp ')' { $$ = $2; }
 | real { $$ = $1; }
 | nninteger { $$ = $1; }
@@ -77,6 +89,8 @@ real : REAL { $$ = [ParseTree createRealNodeWithValue: $1]; }
 nninteger : NNINTEGER { $$ = [ParseTree createNNIntegerNodeWithValue: $1]; }
 pi : PI { $$ = [ParseTree createPiNodeWithValue: M_PI]; }
 id : ID { $$ = [ParseTree createIdNodeWithValue: $1]; }
+u : U { $$ = $1; }
+cx : CX { $$ = $1; }
 unaryop : SIN { $$ = $1; }
 | COS { $$ = $1; }
 | TAN { $$ = $1; }

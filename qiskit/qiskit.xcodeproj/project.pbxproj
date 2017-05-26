@@ -65,6 +65,7 @@
 		DF7F720A1ED7BC600055D210 /* QiskitParserExpListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7F72081ED7BC600055D210 /* QiskitParserExpListTests.swift */; };
 		DF7F720B1ED7BC600055D210 /* QiskitParserExpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7F72091ED7BC600055D210 /* QiskitParserExpTests.swift */; };
 		DF7F720D1ED863F50055D210 /* QIskitParserTerminalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7F720C1ED863F50055D210 /* QIskitParserTerminalTests.swift */; };
+		DF7F720F1ED86EDA0055D210 /* QiskitParserArgTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7F720E1ED86EDA0055D210 /* QiskitParserArgTests.swift */; };
 		DFA7844E1ED746E0002BB240 /* SymbolTable.h in Headers */ = {isa = PBXBuildFile; fileRef = DFA7844C1ED746E0002BB240 /* SymbolTable.h */; };
 		DFA7844F1ED746E0002BB240 /* SymbolTable.m in Sources */ = {isa = PBXBuildFile; fileRef = DFA7844D1ED746E0002BB240 /* SymbolTable.m */; };
 		DFBC4F6C1EC7384200027640 /* qiskit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFBC4F621EC7384100027640 /* qiskit.framework */; };
@@ -143,6 +144,7 @@
 		DF7F72081ED7BC600055D210 /* QiskitParserExpListTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QiskitParserExpListTests.swift; sourceTree = "<group>"; };
 		DF7F72091ED7BC600055D210 /* QiskitParserExpTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QiskitParserExpTests.swift; sourceTree = "<group>"; };
 		DF7F720C1ED863F50055D210 /* QIskitParserTerminalTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QIskitParserTerminalTests.swift; sourceTree = "<group>"; };
+		DF7F720E1ED86EDA0055D210 /* QiskitParserArgTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QiskitParserArgTests.swift; sourceTree = "<group>"; };
 		DFA7844C1ED746E0002BB240 /* SymbolTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SymbolTable.h; sourceTree = "<group>"; };
 		DFA7844D1ED746E0002BB240 /* SymbolTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SymbolTable.m; sourceTree = "<group>"; };
 		DFBC4F621EC7384100027640 /* qiskit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = qiskit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -312,6 +314,7 @@
 			children = (
 				DFBC4F701EC7384200027640 /* QiskitTests.swift */,
 				6957013B1ED75E9100C6CCAB /* GraphTests.swift */,
+				DF7F720E1ED86EDA0055D210 /* QiskitParserArgTests.swift */,
 				DF7F72081ED7BC600055D210 /* QiskitParserExpListTests.swift */,
 				DF7F72091ED7BC600055D210 /* QiskitParserExpTests.swift */,
 				DF7F720C1ED863F50055D210 /* QIskitParserTerminalTests.swift */,
@@ -528,6 +531,7 @@
 			files = (
 				6957013C1ED75E9100C6CCAB /* GraphTests.swift in Sources */,
 				DFBC4F711EC7384200027640 /* QiskitTests.swift in Sources */,
+				DF7F720F1ED86EDA0055D210 /* QiskitParserArgTests.swift in Sources */,
 				DF7F720A1ED7BC600055D210 /* QiskitParserExpListTests.swift in Sources */,
 				DF7F720D1ED863F50055D210 /* QIskitParserTerminalTests.swift in Sources */,
 				DF7F720B1ED7BC600055D210 /* QiskitParserExpTests.swift in Sources */,

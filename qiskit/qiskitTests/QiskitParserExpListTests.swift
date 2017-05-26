@@ -28,7 +28,7 @@ class QiskitParserExpListTests: XCTestCase {
         
         ParseSuccessBlock = { (node: Node?) -> Void in
             XCTAssertNotNil(node)
-            XCTAssertEqual(Character("L"), Character(UnicodeScalar(Int(node!.nodeType))!))
+            XCTAssertEqual(NodeType.N_EXPLIST, node!.nodeType)
             asyncExpectation.fulfill()
         }
         

@@ -112,11 +112,14 @@ OPENQASM {
 }
 
 CX {
-    printf("Found a CX %s\n", yytext );
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return CX;
 }
 
 U {
-    printf("Found a U %s\n", yytext );
+    printf("Found U\n");
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return U;
 }
 
 [a-z][a-zA-Z0-9_]* {
