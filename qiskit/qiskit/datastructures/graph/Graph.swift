@@ -29,19 +29,18 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
 
     public func copy(with zone: NSZone? = nil) -> Any {
         let copy = Graph(self.isDirected)
-        for edge in self.edges {
-            copy.add_edge(edge.source.key, edge.neighbor.key, edge.weight)
-            if let e = self.edge(edge.source.key, edge.neighbor.key) {
-                if let data = edge.data {
-                    e.data = data.copy(with: zone) as? EdgeDataType
-                }
-                if let data = edge.source.data {
-                    e.source.data = data.copy(with: zone) as? VertexDataType
-                }
-                if let data = edge.neighbor.data {
-                    e.neighbor.data = data.copy(with: zone) as? VertexDataType
-                }
+        for vertex in self.vertexList {
+            let v = copy.add_vertex(vertex.key)
+            if let data = vertex.data {
+                v.data = data.copy(with: zone) as? VertexDataType
             }
+        }
+        for edge in self.edges {
+            var d:EdgeDataType? = nil
+            if let data = edge.data {
+                d = data.copy(with: zone) as? EdgeDataType
+            }
+            copy.add_edge(edge.source.key, edge.neighbor.key, d, edge.weight)
         }
         return copy
     }
@@ -62,7 +61,16 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         return source.edge(neighborIndex)
     }
 
-    public func add_edge(_ sourceIndex: Int, _ neighborIndex: Int, _ weight: Int = 0) {
+    public func add_vertex(_ key: Int) -> GraphVertex<VertexDataType,EdgeDataType> {
+        var vertex = self.vertex(key)
+        if vertex == nil {
+            vertex = GraphVertex(key)
+            self.vertexList.append(vertex!)
+        }
+        return vertex!
+    }
+
+    public func add_edge(_ sourceIndex: Int, _ neighborIndex: Int, _ data: EdgeDataType? = nil, _ weight: Int = 0) {
         var source = self.vertex(sourceIndex)
         if source == nil {
             source = GraphVertex(sourceIndex)
@@ -76,22 +84,49 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         var edge = self.edge(sourceIndex,neighborIndex)
         if edge == nil {
             edge = GraphEdge(source!,neighbor!,weight)
+            edge!.data = data
             edge!.source.neighbors.append(edge!)
         }
         else {
-            edge!.data = nil
+            edge!.data = data
             edge!.weight = weight
         }
         if !self.isDirected {
             edge = self.edge(neighborIndex,sourceIndex)
             if edge == nil {
                 edge = GraphEdge(neighbor!,source!,weight)
+                edge!.data = data
                 edge!.source.neighbors.append(edge!)
             }
             else {
-                edge!.data = nil
+                edge!.data = data
                 edge!.weight = weight
             }
+        }
+    }
+
+    public func remove_edge(_ sourceIndex: Int, _ neighborIndex: Int) {
+        guard let source = self.vertex(sourceIndex) else {
+            return
+        }
+        var newNeighbors:[GraphEdge<EdgeDataType,VertexDataType>] = []
+        for edge in source.neighbors {
+            if edge.neighbor.key != neighborIndex {
+                newNeighbors.append(edge)
+            }
+        }
+        source.neighbors = newNeighbors
+        if !self.isDirected {
+            guard let neighbor = self.vertex(neighborIndex) else {
+                return
+            }
+            var newNeighbors:[GraphEdge<EdgeDataType,VertexDataType>] = []
+            for edge in neighbor.neighbors {
+                if edge.neighbor.key != sourceIndex {
+                    newNeighbors.append(edge)
+                }
+            }
+            neighbor.neighbors = newNeighbors
         }
     }
 
@@ -135,29 +170,120 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         return vertex.neighbors
     }
 
-    public func topological_sort() -> [Int] {
-        var stack = Stack<Int>()
+    public func topological_sort() -> [GraphVertex<VertexDataType,EdgeDataType>] {
+        var stack = Stack<GraphVertex<VertexDataType,EdgeDataType>>()
         var visited = Set<Int>()
-
         for vertex in self.vertexList {
             if !visited.contains(vertex.key) {
-                self.topologicalSortUtil(vertex, &visited, &stack)
+                Graph.topologicalSortUtil(vertex, &visited, &stack)
             }
         }
-        var vertexList: [Int] = []
+        var vertexList: [GraphVertex<VertexDataType,EdgeDataType>] = []
         while !stack.isEmpty {
             vertexList.append(stack.pop())
         }
         return vertexList
     }
 
-    private func topologicalSortUtil(_ vertex: GraphVertex<VertexDataType,EdgeDataType>, _ visited: inout Set<Int>, _ stack: inout Stack<Int>) {
+    private class func topologicalSortUtil(_ vertex: GraphVertex<VertexDataType,EdgeDataType>,
+                                           _ visited: inout Set<Int>,
+                                           _ stack: inout Stack<GraphVertex<VertexDataType,EdgeDataType>>) {
         visited.update(with: vertex.key)
         for edge in vertex.neighbors {
             if !visited.contains(edge.neighbor.key) {
                 self.topologicalSortUtil(edge.neighbor, &visited, &stack)
             }
         }
-        stack.push(vertex.key)
+        stack.push(vertex)
+    }
+
+    public func predecessors(_ key: Int) -> [GraphVertex<VertexDataType,EdgeDataType>] {
+        if self.vertex(key) == nil {
+            return []
+        }
+        var list: [GraphVertex<VertexDataType,EdgeDataType>] = []
+        for edge in self.edges {
+            if edge.neighbor.key == key {
+                list.append(edge.source)
+            }
+        }
+        return list
+    }
+
+    public func ancestors(_ key: Int) -> [GraphVertex<VertexDataType,EdgeDataType>] {
+        var list: [GraphVertex<VertexDataType,EdgeDataType>] = []
+        var visited = Set<Int>()
+        for vertex in self.vertexList {
+            if vertex.key == key {
+                continue
+            }
+            if visited.contains(vertex.key) {
+                continue
+            }
+            _ = Graph.ancestorsUtil(vertex, key, &visited, &list)
+        }
+        return list
+    }
+
+    private class func ancestorsUtil(_ vertex: GraphVertex<VertexDataType,EdgeDataType>,
+                                 _ key: Int,
+                                 _ visited: inout Set<Int>,
+                                 _ list: inout [GraphVertex<VertexDataType,EdgeDataType>]) -> Bool {
+        visited.update(with: vertex.key)
+        for edge in vertex.neighbors {
+            if visited.contains(edge.neighbor.key) {
+                continue
+            }
+            if edge.neighbor.key == key {
+                list.append(vertex)
+                return true
+            }
+            if Graph.ancestorsUtil(edge.neighbor, key, &visited, &list) {
+                list.append(vertex)
+                return true
+            }
+        }
+        return false
+    }
+
+    public func neighbors(_ key: Int) -> [GraphVertex<VertexDataType,EdgeDataType>] {
+        guard let vertex = self.vertex(key) else {
+            return []
+        }
+        var list: [GraphVertex<VertexDataType,EdgeDataType>] = []
+        for edge in vertex.neighbors {
+            list.append(edge.neighbor)
+        }
+        return list
+    }
+
+    public func successors(_ key: Int) -> [GraphVertex<VertexDataType,EdgeDataType>] {
+        return self.neighbors(key)
+    }
+
+    public func descendents(_ key: Int) -> [GraphVertex<VertexDataType,EdgeDataType>] {
+        guard let vertex = self.vertex(key) else {
+            return []
+        }
+        var list: [GraphVertex<VertexDataType,EdgeDataType>] = []
+        var visited = Set<Int>()
+        for edge in vertex.neighbors {
+            if !visited.contains(edge.neighbor.key) {
+                Graph.descendentsUtil(edge.neighbor, &visited, &list)
+            }
+        }
+        return list
+    }
+
+    private class func descendentsUtil(_ vertex: GraphVertex<VertexDataType,EdgeDataType>,
+                                      _ visited: inout Set<Int>,
+                                      _ list: inout [GraphVertex<VertexDataType,EdgeDataType>]) {
+        list.append(vertex)
+        visited.update(with: vertex.key)
+        for edge in vertex.neighbors {
+            if !visited.contains(edge.neighbor.key) {
+                Graph.descendentsUtil(edge.neighbor, &visited, &list)
+            }
+        }
     }
 }

@@ -55,6 +55,8 @@
 		69E597AB1ECA90A600A321F5 /* U1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E597AA1ECA90A600A321F5 /* U1.swift */; };
 		69E597AF1ECA980F00A321F5 /* X.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E597AE1ECA980F00A321F5 /* X.swift */; };
 		69E597B11ECA99B300A321F5 /* H.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E597B01ECA99B300A321F5 /* H.swift */; };
+		69EF51491EDC72BD0074AE42 /* CircuitVertexData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69EF51481EDC72BD0074AE42 /* CircuitVertexData.swift */; };
+		69EF514B1EDC72E10074AE42 /* CircuitEdgeData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69EF514A1EDC72E10074AE42 /* CircuitEdgeData.swift */; };
 		69FEC8381ECB37E0002324E2 /* IBMQuantumExperienceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69FEC8371ECB37E0002324E2 /* IBMQuantumExperienceError.swift */; };
 		DFBC4F6C1EC7384200027640 /* qiskit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFBC4F621EC7384100027640 /* qiskit.framework */; };
 		DFBC4F711EC7384200027640 /* QiskitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4F701EC7384200027640 /* QiskitTests.swift */; };
@@ -120,6 +122,8 @@
 		69E597AA1ECA90A600A321F5 /* U1.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = U1.swift; path = extensions/U1.swift; sourceTree = "<group>"; };
 		69E597AE1ECA980F00A321F5 /* X.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = X.swift; path = extensions/X.swift; sourceTree = "<group>"; };
 		69E597B01ECA99B300A321F5 /* H.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = H.swift; path = extensions/H.swift; sourceTree = "<group>"; };
+		69EF51481EDC72BD0074AE42 /* CircuitVertexData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CircuitVertexData.swift; path = circuit/CircuitVertexData.swift; sourceTree = "<group>"; };
+		69EF514A1EDC72E10074AE42 /* CircuitEdgeData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CircuitEdgeData.swift; path = circuit/CircuitEdgeData.swift; sourceTree = "<group>"; };
 		69FEC8371ECB37E0002324E2 /* IBMQuantumExperienceError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IBMQuantumExperienceError.swift; path = qiskit/network/IBMQuantumExperienceError.swift; sourceTree = SOURCE_ROOT; };
 		DFBC4F621EC7384100027640 /* qiskit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = qiskit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFBC4F6B1EC7384200027640 /* qiskitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = qiskitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -173,6 +177,8 @@
 			children = (
 				697F259B1ED45BED0065B106 /* Circuit.swift */,
 				697F259D1ED45DD90065B106 /* CircuitError.swift */,
+				69EF51481EDC72BD0074AE42 /* CircuitVertexData.swift */,
+				69EF514A1EDC72E10074AE42 /* CircuitEdgeData.swift */,
 			);
 			name = circuit;
 			sourceTree = "<group>";
@@ -431,6 +437,7 @@
 				69E335531ECA1BD20027271D /* ClassicalRegister.swift in Sources */,
 				69D3107C1ECA180500B3E752 /* QuantumCircuit.swift in Sources */,
 				69D3108D1ECA18B800B3E752 /* Measure.swift in Sources */,
+				69EF51491EDC72BD0074AE42 /* CircuitVertexData.swift in Sources */,
 				69D3107B1ECA180500B3E752 /* Gate.swift in Sources */,
 				693A9F421ECA363D00112AC9 /* Barrier.swift in Sources */,
 				69D310801ECA180500B3E752 /* CompositeGate.swift in Sources */,
@@ -458,6 +465,7 @@
 				69D3108A1ECA182000B3E752 /* IBMQuantumExperienceResults.swift in Sources */,
 				69DE360F1ECD188000EC4756 /* Iden.swift in Sources */,
 				697F259C1ED45BED0065B106 /* Circuit.swift in Sources */,
+				69EF514B1EDC72E10074AE42 /* CircuitEdgeData.swift in Sources */,
 				697BEDB11ED0844E00AB9A86 /* GatesTools.swift in Sources */,
 				69E597AF1ECA980F00A321F5 /* X.swift in Sources */,
 				693A9F481ECA38D100112AC9 /* Qconfig.swift in Sources */,

@@ -23,6 +23,7 @@ public enum CircuitError: Error, CustomStringConvertible {
     case cregcondition(name: String)
     case bitnotfound(q: HashableTuple<String,Int>)
     case wiretype(bVal: Bool, q: HashableTuple<String,Int>)
+    case incompatiblebasis
     case internalError(error: Error)
 
     public var description: String {
@@ -49,6 +50,8 @@ public enum CircuitError: Error, CustomStringConvertible {
             return "(qu)bit \(q.one)[\(q.two)] not found"
         case .wiretype(let bVal, let q):
             return "expected wire type \(bVal) for \(q.one)[\(q.two)]"
+        case .incompatiblebasis():
+            return "incompatible basis"
         case .internalError(let error):
             return error.localizedDescription
         }

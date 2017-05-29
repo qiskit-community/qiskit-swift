@@ -8,39 +8,6 @@
 
 import Foundation
 
-public final class CircuitVertexData: NSCopying {
-    public var name: HashableTuple<String,Int>
-    public let type: String
-    public var condition: HashableTuple<String,String>? = nil
-    public var qargs: [HashableTuple<String,String>] = []
-    public var cargs: [HashableTuple<String,String>] = []
-
-    public init(_ name: HashableTuple<String,Int>, _ type: String) {
-        self.name = name
-        self.type = type
-    }
-
-    public func copy(with zone: NSZone? = nil) -> Any {
-        let copy = CircuitVertexData(self.name, self.type)
-        copy.condition = self.condition
-        copy.qargs = self.qargs
-        copy.cargs = self.cargs
-        return copy
-    }
-}
-
-public final class CircuitEdgeData: NSCopying {
-    public var name: HashableTuple<String,Int>
-
-    public init(_ name: HashableTuple<String,Int>) {
-        self.name = name
-    }
-
-    public func copy(with zone: NSZone? = nil) -> Any {
-        return CircuitEdgeData(self.name)
-    }
-}
-
 /**
  Object to represent a quantum circuit as a directed acyclic graph.
  The nodes in the graph are either input/output nodes or operation nodes.
@@ -59,7 +26,7 @@ public final class CircuitEdgeData: NSCopying {
  The nodes are connected by directed edges that correspond to qubits and
  bits.
  */
-public class Circuit: NSCopying {
+final class Circuit: NSCopying {
 
     /**
      Map from a wire's name (reg,idx) to a Bool that is True if the
@@ -205,25 +172,25 @@ public class Circuit: NSCopying {
                 }
             }
             else if data.type == "op" {
-                var qa: [HashableTuple<String,String>] = []
+                var qa: [HashableTuple<String,Int>] = []
                 for var a in data.qargs {
                     if a.one == regname {
-                        a = HashableTuple<String,String>(newname, a.two)
+                        a = HashableTuple<String,Int>(newname, a.two)
                     }
                     qa.append(a)
                 }
                 data.qargs = qa
-                var ca: [HashableTuple<String,String>] = []
+                var ca: [HashableTuple<String,Int>] = []
                 for var a in data.cargs {
                     if a.one == regname {
-                        a = HashableTuple<String,String>(newname, a.two)
+                        a = HashableTuple<String,Int>(newname, a.two)
                     }
                     ca.append(a)
                 }
                 data.cargs = ca
                 if let condition = data.condition {
                     if condition.one == regname {
-                        data.condition  = HashableTuple<String,String>(newname, condition.two)
+                        data.condition  = HashableTuple<String,Int>(newname, condition.two)
                     }
                 }
             }
@@ -387,7 +354,10 @@ public class Circuit: NSCopying {
      cargs is a list of tuples like ("c",0)
      params is a list of strings that represent floats
      */
-    private func _check_basis_data(_ name: String, _ qargs: [(String,Int)], _ cargs: [(String,Int)], _ params: [String]) throws {
+    private func _check_basis_data(_ name: String,
+                                   _ qargs: [HashableTuple<String,Int>],
+                                   _ cargs: [HashableTuple<String,Int>],
+                                   _ params: [String]) throws {
         // Check that we have this operation
         if self.basis[name] == nil {
             throw CircuitError.nobasicop(name: name)
@@ -425,10 +395,10 @@ public class Circuit: NSCopying {
      name is a string used for error reporting
      condition is either None or a tuple (string,int) giving (creg,value)
      */
-    private func _check_condition(_ name: String, _ cond: (String,Int)?) throws {
+    private func _check_condition(_ name: String, _ cond: HashableTuple<String,Int>?) throws {
         // Verify creg exists
         if let condition = cond {
-            if self.cregs[condition.0] != nil {
+            if self.cregs[condition.one] != nil {
                 throw CircuitError.cregcondition(name: name)
             }
         }
@@ -442,7 +412,7 @@ public class Circuit: NSCopying {
      amap is a dictionary keyed on (regname,idx) tuples
      bval is boolean
      */
-    private func _check_bits(_ args: [HashableTuple<String,Int>], amap: [HashableTuple<String,Int>:AnyObject], bval: Bool) throws {
+    private func _check_bits(_ args: [HashableTuple<String,Int>], _ amap: [HashableTuple<String,Int>:Int], _ bval: Bool) throws {
         // Check for each wire
         for q in args {
             if amap[q] == nil {
@@ -457,6 +427,142 @@ public class Circuit: NSCopying {
     }
 
     /**
+     Return a list of bits (regname,idx) in the given condition.
+     cond is either None or a (regname,int) tuple specifying
+     a classical if condition.
+     */
+    private func _bits_in_condition(_ condition: HashableTuple<String,Int>?) -> [HashableTuple<String,Int>] {
+        var all_bits:[HashableTuple<String,Int>] = []
+        if let cond = condition {
+            if let size = self.cregs[cond.one] {
+                for j in 0..<size {
+                    all_bits.append(HashableTuple<String,Int>(cond.one,j))
+                }
+            }
+        }
+        return all_bits
+    }
+
+    /**
+     Add a new operation node to the graph and assign properties.
+     nname node name
+     nqargs quantum arguments
+     ncargs classical arguments
+     nparams parameters
+     ncondition classical condition (or None)
+     */
+    private func _add_op_node(_ nname: HashableTuple<String,Int>,
+                              _ nqargs: [HashableTuple<String,Int>],
+                              _ ncargs: [HashableTuple<String,Int>],
+                              _ nparams: [String],
+                              _ ncondition: HashableTuple<String,Int>?) {
+        // Add a new operation node to the graph
+        self.node_counter += 1
+        let node = self.multi_graph.add_vertex(self.node_counter)
+        // Update that operation node's data
+        node.data = CircuitVertexData(nname, "op")
+        node.data!.qargs = nqargs
+        node.data!.cargs = ncargs
+        node.data!.params = nparams
+        node.data!.condition = ncondition
+    }
+
+    /**
+     Apply an operation to the output of the circuit.
+     name is a string
+     qargs is a list of tuples like ("q",0)
+     cargs is a list of tuples like ("c",0)
+     params is a list of strings that represent floats
+     condition is either None or a tuple (string,int) giving (creg,value)
+     */
+    private func apply_operation_back(_ name: HashableTuple<String,Int>,
+                                      _ qargs: [HashableTuple<String,Int>],
+                                      _ cargs: [HashableTuple<String,Int>] = [],
+                                      _ params:[String] = [],
+                                      _ condition: HashableTuple<String,Int>?) throws {
+        var all_cbits = self._bits_in_condition(condition)
+        all_cbits.append(contentsOf: cargs)
+
+        try self._check_basis_data(name.one, qargs, cargs, params)
+        try self._check_condition(name.one, condition)
+        try self._check_bits(qargs, self.output_map, false)
+        try self._check_bits(all_cbits, self.output_map, true)
+
+        self._add_op_node(name, qargs, cargs, params, condition)
+        // Add new in-edges from predecessors of the output nodes to the
+        // operation node while deleting the old in-edges of the output nodes
+        // and adding new edges from the operation node to each output node
+        var al = qargs
+        al.append(contentsOf: all_cbits)
+        for q in al {
+            if let index = self.output_map[q] {
+                var ie = self.multi_graph.predecessors(index)
+                assert(ie.count == 1, "output node has multiple in-edges")
+                self.multi_graph.add_edge(ie[0].key, self.node_counter, CircuitEdgeData(q))
+                self.multi_graph.remove_edge(ie[0].key, index)
+                self.multi_graph.add_edge(self.node_counter, index, CircuitEdgeData(q))
+            }
+        }
+    }
+
+    /**
+     Apply an operation to the input of the circuit.
+     name is a string
+     qargs is a list of strings like "q[0]"
+     cargs is a list of strings like "c[0]"
+     params is a list of strings that represent floats
+     condition is either None or a tuple (string,int) giving (creg,value)
+     */
+    public func apply_operation_front(_ name: HashableTuple<String,Int>,
+                                      _ qargs: [HashableTuple<String,Int>],
+                                      _ cargs: [HashableTuple<String,Int>] = [],
+                                      _ params:[String] = [],
+                                      _ condition: HashableTuple<String,Int>?) throws {
+        var all_cbits = self._bits_in_condition(condition)
+        all_cbits.append(contentsOf: cargs)
+
+        try self._check_basis_data(name.one, qargs, cargs, params)
+        try self._check_condition(name.one, condition)
+        try self._check_bits(qargs, self.input_map, false)
+        try self._check_bits(all_cbits, self.input_map, true)
+
+        self._add_op_node(name, qargs, cargs, params, condition)
+        // Add new out-edges to successors of the input nodes from the
+        // operation node while deleting the old out-edges of the input nodes
+        // and adding new edges to the operation node from each input node
+        var al = qargs
+        al.append(contentsOf: all_cbits)
+        for q in al {
+            if let index = self.input_map[q] {
+                var ie = self.multi_graph.successors(index)
+                assert(ie.count == 1, "input node has multiple out-edges")
+                self.multi_graph.add_edge(self.node_counter, ie[0].key, CircuitEdgeData(q))
+                self.multi_graph.remove_edge(index, ie[0].key)
+                self.multi_graph.add_edge(index, self.node_counter, CircuitEdgeData(q))
+            }
+        }
+    }
+
+    /**
+     Return a new basis map.
+     The new basis is a copy of self.basis with
+     new elements of input_circuit.basis added.
+     input_circuit is a CircuitGraph
+     */
+    private func _make_union_basis(input_circuit: Circuit) throws -> [String: (Int,Int,Int)] {
+        var union_basis = self.basis
+        for (g, val) in input_circuit.basis {
+            if union_basis[g] == nil {
+                union_basis[g] = val
+            }
+            if union_basis[g]! != val {
+                throw CircuitError.incompatiblebasis
+            }
+        }
+        return union_basis
+    }
+
+    /**
      Return a list of "op" nodes with the given name.
      */
     public func get_named_nodes(_ name: String) throws -> [Int] {
@@ -466,12 +572,10 @@ public class Circuit: NSCopying {
         var nlist: [Int] = []
         // Iterate through the nodes of self in topological order
         let ts = self.multi_graph.topological_sort()
-        for n in ts {
-            if let nd = self.multi_graph.vertex(n) {
-                if let data = nd.data {
-                    if data.type == "op" && data.name.one == name {
-                        nlist.append(n)
-                    }
+        for nd in ts {
+            if let data = nd.data {
+                if data.type == "op" && data.name.one == name {
+                    nlist.append(nd.key)
                 }
             }
         }

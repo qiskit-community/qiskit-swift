@@ -30,14 +30,110 @@ class GraphTests: XCTestCase {
         g.add_edge(2, 3)
         g.add_edge(3, 1)
 
+        let str = GraphTests.formatList(g.topological_sort())
+        XCTAssertEqual(str, "4 5 0 2 3 1")
+    }
+
+    func testPredecessors() {
+        let g = Graph<NSString,NSString>(true)
+        g.add_edge(5, 2)
+        g.add_edge(5, 0)
+        g.add_edge(4, 0)
+        g.add_edge(4, 1)
+        g.add_edge(2, 3)
+        g.add_edge(3, 1)
+
+        var str = GraphTests.formatList(g.predecessors(0))
+        XCTAssertEqual(str, "5 4")
+        str = GraphTests.formatList(g.predecessors(1))
+        XCTAssertEqual(str, "4 3")
+        str = GraphTests.formatList(g.predecessors(2))
+        XCTAssertEqual(str, "5")
+        str = GraphTests.formatList(g.predecessors(3))
+        XCTAssertEqual(str, "2")
+        str = GraphTests.formatList(g.predecessors(4))
+        XCTAssertEqual(str, "")
+        str = GraphTests.formatList(g.predecessors(5))
+        XCTAssertEqual(str, "")
+    }
+
+    func testAncestors() {
+        let g = Graph<NSString,NSString>(true)
+        g.add_edge(5, 2)
+        g.add_edge(5, 0)
+        g.add_edge(4, 0)
+        g.add_edge(4, 1)
+        g.add_edge(2, 3)
+        g.add_edge(3, 1)
+
+        var str = GraphTests.formatList(g.ancestors(0))
+        XCTAssertEqual(str, "5 4")
+        str = GraphTests.formatList(g.ancestors(1))
+        XCTAssertEqual(str, "3 2 5 4")
+        str = GraphTests.formatList(g.ancestors(2))
+        XCTAssertEqual(str, "5")
+        str = GraphTests.formatList(g.ancestors(3))
+        XCTAssertEqual(str, "2 5")
+        str = GraphTests.formatList(g.ancestors(4))
+        XCTAssertEqual(str, "")
+        str = GraphTests.formatList(g.ancestors(5))
+        XCTAssertEqual(str, "")
+    }
+
+    func testSuccessors() {
+        let g = Graph<NSString,NSString>(true)
+        g.add_edge(5, 2)
+        g.add_edge(5, 0)
+        g.add_edge(4, 0)
+        g.add_edge(4, 1)
+        g.add_edge(2, 3)
+        g.add_edge(3, 1)
+
+        var str = GraphTests.formatList(g.successors(0))
+        XCTAssertEqual(str, "")
+        str = GraphTests.formatList(g.successors(1))
+        XCTAssertEqual(str, "")
+        str = GraphTests.formatList(g.successors(2))
+        XCTAssertEqual(str, "3")
+        str = GraphTests.formatList(g.successors(3))
+        XCTAssertEqual(str, "1")
+        str = GraphTests.formatList(g.successors(4))
+        XCTAssertEqual(str, "0 1")
+        str = GraphTests.formatList(g.successors(5))
+        XCTAssertEqual(str, "2 0")
+    }
+
+    func testDescendents() {
+        let g = Graph<NSString,NSString>(true)
+        g.add_edge(5, 2)
+        g.add_edge(5, 0)
+        g.add_edge(4, 0)
+        g.add_edge(4, 1)
+        g.add_edge(2, 3)
+        g.add_edge(3, 1)
+
+        var str = GraphTests.formatList(g.descendents(0))
+        XCTAssertEqual(str, "")
+        str = GraphTests.formatList(g.descendents(1))
+        XCTAssertEqual(str, "")
+        str = GraphTests.formatList(g.descendents(2))
+        XCTAssertEqual(str, "3 1")
+        str = GraphTests.formatList(g.descendents(3))
+        XCTAssertEqual(str, "1")
+        str = GraphTests.formatList(g.descendents(4))
+        XCTAssertEqual(str, "0 1")
+        str = GraphTests.formatList(g.descendents(5))
+        XCTAssertEqual(str, "2 3 1 0")
+    }
+
+    private class func formatList(_ list: [GraphVertex<NSString,NSString>]) -> String {
         var str = ""
-        let list = g.topological_sort()
-        for index in list {
+        for vertex in list {
             if !str.isEmpty {
                 str += " "
             }
-            str += "\(index)"
+            str += "\(vertex.key)"
         }
-        XCTAssertEqual(str, "4 5 0 2 3 1")
+        return str
     }
 }
