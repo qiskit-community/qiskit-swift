@@ -6,7 +6,7 @@
 //  Copyright © 2017 IBM. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
 /**
  S=diag(1,i) Clifford phase gate.

@@ -6,7 +6,7 @@
 //  Copyright © 2017 IBM. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
 final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying {
 

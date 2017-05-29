@@ -1,12 +1,12 @@
 //
 //  Barrier.swift
-//  qisswiftkit
+//  qiskit
 //
 //  Created by Manoel Marques on 4/12/17.
 //  Copyright © 2017 IBM. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
 /**
  Quantum Barrier class
