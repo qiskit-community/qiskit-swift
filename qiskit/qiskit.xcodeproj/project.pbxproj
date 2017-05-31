@@ -49,6 +49,7 @@
 		69DE361F1ECD197E00EC4756 /* Y.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DE361E1ECD197E00EC4756 /* Y.swift */; };
 		69DE36211ECD198E00EC4756 /* Z.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DE36201ECD198E00EC4756 /* Z.swift */; };
 		69DE36231ECD1A1500EC4756 /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DE36221ECD1A1500EC4756 /* Header.swift */; };
+		69E234321EDEE76200E47750 /* GateData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E234311EDEE76200E47750 /* GateData.swift */; };
 		69E3354F1ECA1B8D0027271D /* Register.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E3354E1ECA1B8D0027271D /* Register.swift */; };
 		69E335511ECA1BC00027271D /* QuantumRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E335501ECA1BC00027271D /* QuantumRegister.swift */; };
 		69E335531ECA1BD20027271D /* ClassicalRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E335521ECA1BD20027271D /* ClassicalRegister.swift */; };
@@ -116,6 +117,7 @@
 		69DE361E1ECD197E00EC4756 /* Y.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Y.swift; path = extensions/Y.swift; sourceTree = "<group>"; };
 		69DE36201ECD198E00EC4756 /* Z.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Z.swift; path = extensions/Z.swift; sourceTree = "<group>"; };
 		69DE36221ECD1A1500EC4756 /* Header.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Header.swift; path = extensions/Header.swift; sourceTree = "<group>"; };
+		69E234311EDEE76200E47750 /* GateData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GateData.swift; path = circuit/GateData.swift; sourceTree = "<group>"; };
 		69E3354E1ECA1B8D0027271D /* Register.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Register.swift; path = sdk/Register.swift; sourceTree = "<group>"; };
 		69E335501ECA1BC00027271D /* QuantumRegister.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QuantumRegister.swift; path = sdk/QuantumRegister.swift; sourceTree = "<group>"; };
 		69E335521ECA1BD20027271D /* ClassicalRegister.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ClassicalRegister.swift; path = sdk/ClassicalRegister.swift; sourceTree = "<group>"; };
@@ -179,6 +181,7 @@
 				697F259D1ED45DD90065B106 /* CircuitError.swift */,
 				69EF51481EDC72BD0074AE42 /* CircuitVertexData.swift */,
 				69EF514A1EDC72E10074AE42 /* CircuitEdgeData.swift */,
+				69E234311EDEE76200E47750 /* GateData.swift */,
 			);
 			name = circuit;
 			sourceTree = "<group>";
@@ -474,6 +477,7 @@
 				69DE36111ECD18AD00EC4756 /* RX.swift in Sources */,
 				69DE36071ECD150300EC4756 /* CSwap.swift in Sources */,
 				69D310881ECA182000B3E752 /* Request.swift in Sources */,
+				69E234321EDEE76200E47750 /* GateData.swift in Sources */,
 				69D310771ECA180500B3E752 /* QuantumProgram.swift in Sources */,
 				69E597B11ECA99B300A321F5 /* H.swift in Sources */,
 				69D310891ECA182000B3E752 /* IBMQuantumExperience.swift in Sources */,

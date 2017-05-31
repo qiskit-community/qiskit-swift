@@ -81,7 +81,7 @@ final class Circuit: NSCopying {
     /**
      Map of user defined gates to ast nodes defining them
     */
-    private var gates: [String:[String:AnyObject]] = [:]
+    private var gates: [String:GateData] = [:]
 
     /**
      Output precision for printing floats
@@ -167,8 +167,9 @@ final class Circuit: NSCopying {
                 continue
             }
             if data.type == "in" || data.type == "out" {
-                if data.name.one == regname {
-                    data.name = HashableTuple<String,Int>(newname, data.name.two)
+                let dataInOut = data as! CircuitVertexInOutData
+                if dataInOut.name.one == regname {
+                    dataInOut.name = HashableTuple<String,Int>(newname, dataInOut.name.two)
                 }
             }
             else if data.type == "op" {
@@ -275,10 +276,10 @@ final class Circuit: NSCopying {
         let out_node: Int = self.output_map[name]!
         self.multi_graph.add_edge(in_node, out_node)
         if let node = self.multi_graph.vertex(in_node) {
-            node.data = CircuitVertexData(name,"in")
+            node.data = CircuitVertexInData(name)
         }
         if let node = self.multi_graph.vertex(out_node) {
-            node.data = CircuitVertexData(name,"out")
+            node.data = CircuitVertexOutData(name)
         }
         if let edge = self.multi_graph.edge(in_node,out_node) {
             edge.data = CircuitEdgeData(name)
@@ -303,15 +304,11 @@ final class Circuit: NSCopying {
             if number_classical != 0 {
                 throw CircuitError.gatematch
             }
-            if let nParameters = gateMap["n_args"] as? NSNumber {
-                if nParameters.intValue != number_parameters {
-                    throw CircuitError.gatematch
-                }
+            if gateMap.n_args != number_parameters {
+                throw CircuitError.gatematch
             }
-            if let nBits = gateMap["n_bits"] as? NSNumber {
-                if nBits.intValue != number_qubits {
-                    throw CircuitError.gatematch
-                }
+            if gateMap.n_bits != number_qubits {
+                throw CircuitError.gatematch
             }
         }
     }
@@ -326,22 +323,18 @@ final class Circuit: NSCopying {
      "bits"   = list of qubit names
      "body"   = GateBody AST node
      */
-    public func add_gate_data(_ name: String, _ gateMap: [String: AnyObject]) throws {
+    public func add_gate_data(_ name: String, _ gateMap: GateData) throws {
         if self.gates[name] == nil {
             self.gates[name] = gateMap
             if let basis = self.basis[name] {
-                if let nBits = gateMap["n_bits"] as? NSNumber {
-                    if nBits.intValue != basis.0 {
-                        throw CircuitError.gatematch
-                    }
+                if gateMap.n_bits != basis.0 {
+                    throw CircuitError.gatematch
                 }
                 if basis.1 != 0 {
                     throw CircuitError.gatematch
                 }
-                if let nParameters = gateMap["n_args"] as? NSNumber {
-                    if nParameters.intValue != basis.2 {
-                        throw CircuitError.gatematch
-                    }
+                if gateMap.n_args != basis.2 {
+                    throw CircuitError.gatematch
                 }
             }
         }
@@ -451,7 +444,7 @@ final class Circuit: NSCopying {
      nparams parameters
      ncondition classical condition (or None)
      */
-    private func _add_op_node(_ nname: HashableTuple<String,Int>,
+    private func _add_op_node(_ nname: String,
                               _ nqargs: [HashableTuple<String,Int>],
                               _ ncargs: [HashableTuple<String,Int>],
                               _ nparams: [String],
@@ -460,7 +453,7 @@ final class Circuit: NSCopying {
         self.node_counter += 1
         let node = self.multi_graph.add_vertex(self.node_counter)
         // Update that operation node's data
-        node.data = CircuitVertexData(nname, "op")
+        node.data = CircuitVertexOpData(nname)
         node.data!.qargs = nqargs
         node.data!.cargs = ncargs
         node.data!.params = nparams
@@ -475,7 +468,7 @@ final class Circuit: NSCopying {
      params is a list of strings that represent floats
      condition is either None or a tuple (string,int) giving (creg,value)
      */
-    private func apply_operation_back(_ name: HashableTuple<String,Int>,
+    private func apply_operation_back(_ name: String,
                                       _ qargs: [HashableTuple<String,Int>],
                                       _ cargs: [HashableTuple<String,Int>] = [],
                                       _ params:[String] = [],
@@ -483,8 +476,8 @@ final class Circuit: NSCopying {
         var all_cbits = self._bits_in_condition(condition)
         all_cbits.append(contentsOf: cargs)
 
-        try self._check_basis_data(name.one, qargs, cargs, params)
-        try self._check_condition(name.one, condition)
+        try self._check_basis_data(name, qargs, cargs, params)
+        try self._check_condition(name, condition)
         try self._check_bits(qargs, self.output_map, false)
         try self._check_bits(all_cbits, self.output_map, true)
 
@@ -513,7 +506,7 @@ final class Circuit: NSCopying {
      params is a list of strings that represent floats
      condition is either None or a tuple (string,int) giving (creg,value)
      */
-    public func apply_operation_front(_ name: HashableTuple<String,Int>,
+    public func apply_operation_front(_ name: String,
                                       _ qargs: [HashableTuple<String,Int>],
                                       _ cargs: [HashableTuple<String,Int>] = [],
                                       _ params:[String] = [],
@@ -521,8 +514,8 @@ final class Circuit: NSCopying {
         var all_cbits = self._bits_in_condition(condition)
         all_cbits.append(contentsOf: cargs)
 
-        try self._check_basis_data(name.one, qargs, cargs, params)
-        try self._check_condition(name.one, condition)
+        try self._check_basis_data(name, qargs, cargs, params)
+        try self._check_condition(name, condition)
         try self._check_bits(qargs, self.input_map, false)
         try self._check_bits(all_cbits, self.input_map, true)
 
@@ -549,7 +542,7 @@ final class Circuit: NSCopying {
      new elements of input_circuit.basis added.
      input_circuit is a CircuitGraph
      */
-    private func _make_union_basis(input_circuit: Circuit) throws -> [String: (Int,Int,Int)] {
+    private func _make_union_basis(_ input_circuit: Circuit) throws -> [String: (Int,Int,Int)] {
         var union_basis = self.basis
         for (g, val) in input_circuit.basis {
             if union_basis[g] == nil {
@@ -560,6 +553,551 @@ final class Circuit: NSCopying {
             }
         }
         return union_basis
+    }
+
+    /**
+     Return a new gates map.
+     The new gates are a copy of self.gates with
+     new elements of input_circuit.gates added.
+     input_circuit is a CircuitGraph
+     NOTE: gates in input_circuit that are also in self must
+     be *identical* to the gates in self
+     */
+    private func _make_union_gates(_ input_circuit: Circuit) throws -> [String:GateData] {
+        var union_gates: [String:GateData] = [:]
+        for (key,gateData) in self.gates {
+            let data = gateData.copy(with: nil) as! GateData
+            union_gates[key] = data
+        }
+        for (k, v) in input_circuit.gates {
+            if union_gates[k] == nil {
+                union_gates[k] = v
+            }
+            guard let union_gate = union_gates[k] else {
+                continue
+            }
+            guard let input_circuit_gate = input_circuit.gates[k] else {
+                continue
+            }
+            if union_gate.opaque != input_circuit_gate.opaque ||
+                union_gate.n_args != input_circuit_gate.n_args ||
+                union_gate.n_bits != input_circuit_gate.n_bits ||
+                union_gate.args != input_circuit_gate.args ||
+                union_gate.bits != input_circuit_gate.bits {
+                throw CircuitError.ineqgate(name: k)
+            }
+            if !union_gate.opaque &&
+                union_gate.body.qasm() != input_circuit_gate.body.qasm() {
+                throw CircuitError.ineqgate(name: k)
+            }
+        }
+        return union_gates
+    }
+
+    /**
+     Check that wiremap neither fragments nor leaves duplicate registers.
+     1. There are no fragmented registers. A register in keyregs
+     is fragmented if not all of its (qu)bits are renamed by wire_map.
+     2. There are no duplicate registers. A register is duplicate if
+     it appears in both self and keyregs but not in wire_map.
+     wire_map is a map from (regname,idx) in keyregs to (regname,idx)
+     in valregs
+     keyregs is a map from register names to sizes
+     valregs is a map from register names to sizes
+     valreg is a Bool, if False the method ignores valregs and does not
+     add regs for bits in the wire_map image that don't appear in valregs
+     Return the set of regs to add to self
+     */
+    private func _check_wiremap_registers(_ wire_map: [HashableTuple<String,Int>:HashableTuple<String,Int>],
+                                          _ keyregs: [String:Int],
+                                          _ valregs: [String:Int],
+                                          _ valreg:Bool = true) throws -> Set<HashableTuple<String,Int>> {
+        var add_regs = Set<HashableTuple<String,Int>>()
+        var reg_frag_chk: [String:[Bool]]  = [:]
+        for (k, v) in keyregs {
+            reg_frag_chk[k] = Array(repeating: false, count: v)
+        }
+        for (k,_) in wire_map {
+            if keyregs[k.one] != nil {
+                reg_frag_chk[k.one]![k.two] = true
+            }
+        }
+        for (k, v) in reg_frag_chk {
+            let s = Set<Bool>(v)
+            if s.count == 2 {
+                throw CircuitError.wirefrag(name: k)
+            }
+            if s.count == 1 && s.contains(false) {
+                if self.qregs[k] != nil || self.cregs[k] != nil {
+                    throw CircuitError.unmappedupname(name: k)
+                }
+                else {
+                    // Add registers that appear only in keyregs
+                    add_regs.update(with: HashableTuple<String,Int>(k, keyregs[k]!))
+                }
+            }
+            else {
+                if valreg {
+                    // If mapping to a register not in valregs, add it.
+                    // (k,0) exists in wire_map because wire_map doesn't
+                    // fragment k
+                    let key = HashableTuple<String,Int>(k, 0)
+                    if valregs[key.one] == nil {
+                        if let tuple = wire_map[key] {
+                            var size: Int = 0
+                            for (_,x) in wire_map {
+                                if x.one == tuple.one {
+                                    if x.two > size {
+                                        size = x.two
+                                    }
+                                }
+                            }
+                            add_regs.update(with: HashableTuple<String,Int>(tuple.one, size + 1))
+                        }
+                    }
+                }
+            }
+        }
+        return add_regs
+    }
+
+    /**
+     Check that the wiremap is consistent.
+     Check that the wiremap refers to valid wires and that
+     those wires have consistent types.
+     wire_map is a map from (regname,idx) in keymap to (regname,idx)
+     in valmap
+     keymap is a map whose keys are wire_map keys
+     valmap is a map whose keys are wire_map values
+     input_circuit is a CircuitGraph
+     */
+    private func _check_wiremap_validity(_ wire_map: [HashableTuple<String,Int>:HashableTuple<String,Int>],
+                                         _ keymap: [HashableTuple<String,Int>:Int],
+                                         _ valmap: [HashableTuple<String,Int>:Int],
+                                         _ input_circuit: Circuit) throws {
+        for (k, v) in wire_map {
+            if keymap[k] == nil {
+                throw CircuitError.invalidwiremapkey(name: k)
+            }
+            if valmap[v] == nil {
+                throw CircuitError.invalidwiremapvalue(name: v)
+            }
+            if input_circuit.wire_type[k] != self.wire_type[v] {
+                throw CircuitError.inconsistentewiremap(name: k, value: v)
+            }
+        }
+    }
+
+    /**
+     "Use the wire_map dict to change the condition tuple's creg name.
+     wire_map is map from wires to wires
+     condition is a tuple (reg,int)
+     Returns the new condition tuple
+     */
+    private func _map_condition(_ wire_map: [HashableTuple<String,Int>:HashableTuple<String,Int>],
+                                _ condition: HashableTuple<String,Int>?) -> HashableTuple<String,Int>? {
+        if condition == nil {
+            return nil
+        }
+        // Map the register name, using fact that registers must not be
+        // fragmented by the wire_map (this must have been checked
+        // elsewhere)
+        let bit0 = HashableTuple<String,Int>(condition!.one, 0)
+        var value = bit0
+        if let v = wire_map[bit0] {
+            value = v
+        }
+        return  HashableTuple<String,Int>(value.one, condition!.two)
+    }
+
+    /**
+     Apply the input circuit to the output of this circuit.
+     The two bases must be "compatible" or an exception occurs.
+     A subset of input qubits of the input circuit are mapped
+     to a subset of output qubits of this circuit.
+     wire_map[input_qubit_to_input_circuit] = output_qubit_of_self
+     */
+    public func compose_back(_ input_circuit: Circuit, _ wire_map: [HashableTuple<String,Int>:HashableTuple<String,Int>] = [:]) throws {
+        let union_basis = try self._make_union_basis(input_circuit)
+        let union_gates = try self._make_union_gates(input_circuit)
+
+        // Check the wire map for duplicate values
+        if Set<HashableTuple<String,Int>>(wire_map.values).count != wire_map.count {
+            throw CircuitError.duplicateswiremap
+        }
+
+        let add_qregs = try self._check_wiremap_registers(wire_map,input_circuit.qregs,self.qregs)
+        for register in add_qregs {
+            try self.add_qreg(register.one, register.two)
+        }
+        let add_cregs = try self._check_wiremap_registers(wire_map,input_circuit.cregs,self.cregs)
+        for register in add_cregs {
+            try self.add_creg(register.one, register.two)
+        }
+        try self._check_wiremap_validity(wire_map, input_circuit.input_map,self.output_map, input_circuit)
+
+        // Compose
+        self.basis = union_basis
+        self.gates = union_gates
+        let topological_sort = input_circuit.multi_graph.topological_sort()
+        for node in topological_sort {
+            guard let nd = node.data else {
+                continue
+            }
+            switch nd.type {
+            case  "in":
+                let dataIn = nd as! CircuitVertexInData
+                // if in wire_map, get new name, else use existing name
+                var m_name = dataIn.name
+                if let n = wire_map[dataIn.name] {
+                    m_name = n
+                }
+                // the mapped wire should already exist
+                assert(self.output_map[m_name] != nil,"wire (\(m_name.one),\(m_name.two) not in self")
+                assert(input_circuit.wire_type[dataIn.name] != nil, "inconsistent wire_type for (\(dataIn.name.one),\(dataIn.name.two)) in input_circuit")
+            case "out":
+                // ignore output nodes
+                break
+            case "op":
+                let dataOp = nd as! CircuitVertexOpData
+                let condition = self._map_condition(wire_map, nd.condition)
+                try self._check_condition(dataOp.name, condition)
+                var m_qargs: [HashableTuple<String,Int>] = []
+                for qarg in nd.qargs {
+                    var value = qarg
+                    if let v = wire_map[qarg] {
+                        value = v
+                    }
+                    m_qargs.append(value)
+                }
+                var m_cargs: [HashableTuple<String,Int>] = []
+                for carg in nd.cargs {
+                    var value = carg
+                    if let v = wire_map[carg] {
+                        value = v
+                    }
+                    m_cargs.append(value)
+                }
+                try self.apply_operation_back(dataOp.name, m_qargs, m_cargs,dataOp.params, condition)
+            default:
+                assert(false, "bad node type \(nd.type)")
+            }
+        }
+    }
+
+    /**
+     Apply the input circuit to the input of this circuit.
+     The two bases must be "compatible" or an exception occurs.
+     A subset of output qubits of the input circuit are mapped
+     to a subset of input qubits of
+     this circuit.
+     */
+    public func compose_front(_ input_circuit: Circuit, _ wire_map: [HashableTuple<String,Int>:HashableTuple<String,Int>] = [:]) throws {
+        let union_basis = try self._make_union_basis(input_circuit)
+        let union_gates = try self._make_union_gates(input_circuit)
+
+        // Check the wire map
+        if Set<HashableTuple<String,Int>>(wire_map.values).count != wire_map.count {
+            throw CircuitError.duplicateswiremap
+        }
+
+        let add_qregs = try self._check_wiremap_registers(wire_map,input_circuit.qregs,self.qregs)
+        for r in add_qregs {
+            try self.add_qreg(r.one, r.two)
+        }
+
+        let add_cregs = try self._check_wiremap_registers(wire_map,input_circuit.cregs,self.cregs)
+        for r in add_cregs {
+            try self.add_creg(r.one, r.two)
+        }
+        try self._check_wiremap_validity(wire_map, input_circuit.output_map,self.input_map, input_circuit)
+
+        // Compose
+        self.basis = union_basis
+        self.gates = union_gates
+        let topological_sort = input_circuit.multi_graph.topological_sort(reverse: true)
+        for node in topological_sort {
+            guard let nd = node.data else {
+                continue
+            }
+            switch nd.type {
+            case "out":
+                // if in wire_map, get new name, else use existing name
+                let dataOut = nd as! CircuitVertexOutData
+                var m_name = dataOut.name
+                if let n = wire_map[dataOut.name] {
+                    m_name = n
+                }
+                // the mapped wire should already exist
+                assert(self.input_map[m_name] != nil,"wire (\(m_name.one),\(m_name.two) not in self")
+                assert(input_circuit.wire_type[dataOut.name] != nil, "inconsistent wire_type for (\(dataOut.name.one),\(dataOut.name.two)) in input_circuit")
+            case "in":
+                // ignore input nodes
+                break
+            case "op":
+                let dataOp = nd as! CircuitVertexOpData
+                let condition = self._map_condition(wire_map, nd.condition)
+                try self._check_condition(dataOp.name, condition)
+                var m_qargs: [HashableTuple<String,Int>] = []
+                for qarg in nd.qargs {
+                    var value = qarg
+                    if let v = wire_map[qarg] {
+                        value = v
+                    }
+                    m_qargs.append(value)
+                }
+                var m_cargs: [HashableTuple<String,Int>] = []
+                for carg in nd.cargs {
+                    var value = carg
+                    if let v = wire_map[carg] {
+                        value = v
+                    }
+                    m_cargs.append(value)
+                }
+                try self.apply_operation_front(dataOp.name, m_qargs, m_cargs,dataOp.params, condition)
+            default:
+                assert(false, "bad node type \(nd.type)")
+            }
+        }
+    }
+
+    /**
+     Return the number of operations.
+     */
+    public func size() -> Int {
+        return self.multi_graph.order() - 2 * self.wire_type.count
+    }
+    /**
+     Return the circuit depth.
+     */
+    public func depth() -> Int {
+        assert(self.multi_graph.is_directed_acyclic_graph(), "not a DAG")
+        return self.multi_graph.dag_longest_path_length() - 1
+    }
+    /**
+     Return the total number of qubits used by the circuit
+     */
+    public func width() -> Int {
+        return self.wire_type.count - self.num_cbits()
+    }
+    /**
+     Return the total number of bits used by the circuit
+     */
+    public func num_cbits() -> Int {
+        var n: Int = 0
+        for (_,v) in self.wire_type {
+            if v {
+                n += 1
+            }
+        }
+        return n
+    }
+
+    /**
+     Compute how many components the circuit can decompose into
+     */
+    public func num_tensor_factors() -> Int {
+        return self.multi_graph.number_weakly_connected_components()
+    }
+
+    /**
+     Return a QASM string for the named gate.
+     */
+    private func _gate_string(_ name: String) -> String {
+        guard let data = self.gates[name] else {
+            return ""
+        }
+        var out: String = ""
+        if data.opaque {
+            out = "opaque " + name
+        }
+        else {
+            out = "gate " + name
+        }
+        if data.n_args > 0 {
+            out += "(" + data.args.joined(separator: ",") + ")"
+        }
+        var bits: [String] = []
+        for v in data.bits {
+            bits.append("\(v.one)[\(v.two)]")
+        }
+        out += " " + bits.joined(separator: ",")
+        if data.opaque {
+            out += ";"
+        }
+        else {
+            out += "\n{\n" + data.body.qasm() + "}"
+        }
+        return out
+    }
+
+    /**
+     "Return a string containing QASM for this circuit.
+     if qeflag is True, add a line to include "qelib1.inc"
+     and only generate gate code for gates not in qelib1.
+     if no_decls is True, only print the instructions.
+     if aliases is not None, aliases contains a dict mapping
+     the current qubits in the circuit to new qubit names.
+     We will deduce the register names and sizes from aliases.
+     if decls_only is True, only print the declarations.
+     if add_swap is True, add the definition of swap in terms of
+     cx if necessary.
+     */
+    public func qasm(_ decls_only: Bool = false,
+                     _ add_swap: Bool = false,
+                     _ no_decls: Bool = false,
+                     _ qeflag: Bool = false,
+                     _ aliasesMap: [HashableTuple<String,Int>:HashableTuple<String,Int>]? = nil) -> String {
+        // Rename qregs if necessary
+        var qregdata: [String:Int] = [:]
+        if let aliases = aliasesMap {
+            for (_,q) in aliases {
+                guard let n = qregdata[q.one] else {
+                    qregdata[q.one] = q.two + 1
+                    continue
+                }
+                if n < q.two + 1 {
+                    qregdata[q.one] = q.two + 1
+                }
+            }
+        }
+        else {
+            qregdata = self.qregs
+        }
+        var out: String = ""
+        // Write top matter
+        if no_decls {
+            out = ""
+        }
+        else {
+            var printed_gates: [String] = []
+            out = "OPENQASM 2.0;\n"
+            if qeflag {
+                out += "include \"qelib1.inc\";\n"
+            }
+            for (k,v) in qregdata.sorted(by: { $0.0 < $1.0 }) {
+                out += "qreg \(k)[\(v)];\n"
+            }
+            for (k,v) in self.cregs.sorted(by: { $0.0 < $1.0 }) {
+                out += "creg \(k)[\(v)];\n"
+            }
+            var omit:Set<String> = ["U", "CX", "measure", "reset", "barrier"]
+            if qeflag {
+                let qelib:Set<String> = ["u3", "u2", "u1", "cx", "id", "x", "y", "z", "h",
+                                         "s", "sdg", "t", "tdg", "cz", "cy", "ccx", "cu1",
+                                         "cu3"]
+                omit = omit.union(qelib)
+                printed_gates.append(contentsOf:qelib)
+            }
+            for (k,_) in self.basis {
+                if !omit.contains(k) {
+                    guard let gdata = self.gates[k] else {
+                        continue
+                    }
+                    if !gdata.opaque {
+                        let calls = gdata.body.calls()
+                        for c in calls {
+                            if !printed_gates.contains(c) {
+                                out += self._gate_string(c) + "\n"
+                                printed_gates.append(c)
+                            }
+                        }
+                    }
+                    if !printed_gates.contains(k) {
+                        out += self._gate_string(k) + "\n"
+                        printed_gates.append(k)
+                    }
+                }
+            }
+            if add_swap && !qeflag && self.basis["cx"] == nil {
+                out += "gate cx a,b { CX a,b; }\n"
+            }
+            if add_swap && self.basis["swap"] == nil {
+                out += "gate swap a,b { cx a,b; cx b,a; cx a,b; }\n"
+            }
+        }
+        // Write the instructions
+        if !decls_only {
+            let topological_sort = self.multi_graph.topological_sort()
+            for node in topological_sort {
+                guard let nd = node.data else {
+                    continue
+                }
+                if nd.type == "op" {
+                    let dataOp = nd as! CircuitVertexOpData
+                    if let condition = nd.condition {
+                        out += "if(\(condition.one)==\(condition.two)) "
+                    }
+                    if nd.cargs.isEmpty  {
+                        let nm = dataOp.name
+                        var qarglist:[HashableTuple<String,Int>] = []
+                        if let aliases = aliasesMap {
+                            for x in nd.qargs {
+                                if let v = aliases[x] {
+                                    qarglist.append(v)
+                                }
+                            }
+                        }
+                        else {
+                            qarglist = nd.qargs
+                        }
+                        var args: [String] = []
+                        for v in qarglist {
+                            args.append("\(v.one)[\(v.two)]")
+                        }
+                        let qarg = args.joined(separator: ",")
+                        if !nd.params.isEmpty {
+                            let param = nd.params.joined(separator: ",")
+                            out += "\(nm)(\(param))) \(qarg);\n"
+                        }
+                        else {
+                            out += "\(nm) \(qarg);\n"
+                        }
+                    }
+                    else {
+                        if dataOp.name == "measure" {
+                            assert(nd.cargs.count == 1 && nd.qargs.count == 1 && nd.params.count == 0, "bad node data")
+                            var qname = nd.qargs[0].one
+                            var qindex = nd.qargs[0].two
+                            if let aliases = aliasesMap {
+                                if let newq = aliases[HashableTuple<String,Int>(qname, qindex)] {
+                                    qname = newq.one
+                                    qindex = newq.two
+                                }
+                            }
+                            out += "measure \(qname)[\(qindex)] -> \(nd.cargs[0].one)[\(nd.cargs[0].two)];\n" 
+                        }
+                        else {
+                            assert(false,"bad node data")
+                        }
+                    }
+                }
+            }
+        }
+        return out
+    }
+
+    /**
+     Return predecessor and successor dictionaries.
+     These map from wire names to predecessor and successor
+     nodes for the operation node n in self.multi_graph.
+     */
+    private func _make_pred_succ_maps(_ n: Int) -> ([HashableTuple<String,Int>:Int],[HashableTuple<String,Int>:Int]) {
+        var pred_map: [HashableTuple<String,Int>:Int] = [:]
+        var edges = self.multi_graph.in_edges_iter(n)
+        for edge in edges {
+            if let data = edge.data {
+                pred_map[data.name] = edge.source.key
+            }
+        }
+        var succ_map: [HashableTuple<String,Int>:Int] = [:]
+        edges = self.multi_graph.out_edges_iter(n)
+        for edge in edges {
+            if let data = edge.data {
+                succ_map[data.name] = edge.neighbor.key
+            }
+        }
+        return (pred_map, succ_map)
     }
 
     /**
@@ -574,8 +1112,11 @@ final class Circuit: NSCopying {
         let ts = self.multi_graph.topological_sort()
         for nd in ts {
             if let data = nd.data {
-                if data.type == "op" && data.name.one == name {
-                    nlist.append(nd.key)
+                if data.type == "op" {
+                    let dataOp = data as! CircuitVertexOpData
+                    if dataOp.name == name {
+                        nlist.append(nd.key)
+                    }
                 }
             }
         }
@@ -603,26 +1144,4 @@ final class Circuit: NSCopying {
         }
     }
 
-    /**
-     Return predecessor and successor dictionaries.
-     These map from wire names to predecessor and successor
-     nodes for the operation node n in self.multi_graph.
-     */
-    private func _make_pred_succ_maps(_ n: Int) -> ([HashableTuple<String,Int>:Int],[HashableTuple<String,Int>:Int]) {
-        var pred_map: [HashableTuple<String,Int>:Int] = [:]
-        var edges = self.multi_graph.in_edges_iter(n)
-        for edge in edges {
-            if let data = edge.data {
-                pred_map[data.name] = edge.source.key
-            }
-        }
-        var succ_map: [HashableTuple<String,Int>:Int] = [:]
-        edges = self.multi_graph.out_edges_iter(n)
-        for edge in edges {
-            if let data = edge.data {
-                succ_map[data.name] = edge.neighbor.key
-            }
-        }
-        return (pred_map, succ_map)
-    }
 }

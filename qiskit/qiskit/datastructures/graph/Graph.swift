@@ -170,7 +170,8 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         return vertex.neighbors
     }
 
-    public func topological_sort() -> [GraphVertex<VertexDataType,EdgeDataType>] {
+    //TODO Implement the reverse case
+    public func topological_sort(reverse: Bool = false) -> [GraphVertex<VertexDataType,EdgeDataType>] {
         var stack = Stack<GraphVertex<VertexDataType,EdgeDataType>>()
         var visited = Set<Int>()
         for vertex in self.vertexList {
@@ -285,5 +286,22 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
                 Graph.descendentsUtil(edge.neighbor, &visited, &list)
             }
         }
+    }
+
+    // TODO implement
+    public func order() -> Int {
+        return 0
+    }
+    
+    public func is_directed_acyclic_graph() -> Bool {
+        return true
+    }
+
+    public func dag_longest_path_length() -> Int {
+        return 0
+    }
+
+    public func number_weakly_connected_components() -> Int {
+        return 0
     }
 }

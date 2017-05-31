@@ -23,6 +23,10 @@ public class Instruction: CustomStringConvertible {
         preconditionFailure("description not implemented")
     }
 
+    public var qasm: String {
+        return self.description
+    }
+
     /**
      Create a new instruction.
      

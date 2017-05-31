@@ -55,6 +55,10 @@ public final class QuantumCircuit: CustomStringConvertible {
         return text
     }
 
+    public var qasm: String {
+        return self.description
+    }
+    
     /**
      Attach a instruction.
      */
