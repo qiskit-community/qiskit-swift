@@ -31,6 +31,9 @@ public enum CircuitError: Error, CustomStringConvertible {
     case invalidwiremapvalue(name: HashableTuple<String,Int>)
     case inconsistentewiremap(name: HashableTuple<String,Int>, value: HashableTuple<String,Int>)
     case duplicateswiremap
+    case duplicatewires
+    case totalwires(expected: Int, total: Int)
+    case missingwire(wire: HashableTuple<String,Int>)
     case internalError(error: Error)
 
     public var description: String {
@@ -73,6 +76,12 @@ public enum CircuitError: Error, CustomStringConvertible {
             return "inconsistent wire_map at (\(name.one)[\(name.two)],\(value.one)[\(value.two)])"
         case .duplicateswiremap():
             return "duplicates in wire_map"
+        case .duplicatewires():
+            return "duplicate wires"
+        case .totalwires(let expected, let total):
+            return "expected \(expected) wires, got \(total)"
+        case .missingwire(let w):
+            return "wire (\(w.one),\(w.two)) not in input circuit"
         case .internalError(let error):
             return error.localizedDescription
         }

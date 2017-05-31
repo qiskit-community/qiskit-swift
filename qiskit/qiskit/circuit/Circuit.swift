@@ -1078,6 +1078,33 @@ final class Circuit: NSCopying {
     }
 
     /**
+     Check that a list of wires satisfies some conditions.
+     The wires give an order for (qu)bits in the input circuit
+     that is replacing the named operation.
+     - no duplicate names
+     - correct length for named operation
+     - elements are wires of input_circuit
+     Raises an exception otherwise.
+     */
+    private func _check_wires_list(_ wires:[HashableTuple<String,Int>], _ name: String, _ input_circuit: Circuit) throws {
+        if Set<HashableTuple<String,Int>>(wires).count != wires.count {
+            throw CircuitError.duplicatewires
+        }
+        var wire_tot: Int = 0
+        if let vals = self.basis[name] {
+            wire_tot = vals.0 + vals.1
+        }
+        if wires.count != wire_tot {
+            throw CircuitError.totalwires(expected:wire_tot, total: wires.count)
+        }
+        for w in wires {
+            if input_circuit.wire_type[w] == nil {
+                throw CircuitError.missingwire(wire: w)
+            }
+        }
+    }
+
+    /**
      Return predecessor and successor dictionaries.
      These map from wire names to predecessor and successor
      nodes for the operation node n in self.multi_graph.
@@ -1143,5 +1170,4 @@ final class Circuit: NSCopying {
             }
         }
     }
-
 }
