@@ -247,6 +247,23 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         return false
     }
 
+    public func nonAncestors(_ key: Int) -> [GraphVertex<VertexDataType,EdgeDataType>] {
+        var vertexSet: Set<Int> = []
+        for vertex in self.vertexList {
+            vertexSet.update(with: vertex.key)
+        }
+        var ancestorsSet: Set<Int> = []
+        for ancestor in self.ancestors(key) {
+            ancestorsSet.update(with: ancestor.key)
+        }
+        let nonAncestorsSet = vertexSet.subtracting(ancestorsSet)
+        var nonAncestorsList: [GraphVertex<VertexDataType,EdgeDataType>] = []
+        for nonAncestor in nonAncestorsSet {
+            nonAncestorsList.append(self.vertex(nonAncestor)!)
+        }
+        return nonAncestorsList
+    }
+
     public func neighbors(_ key: Int) -> [GraphVertex<VertexDataType,EdgeDataType>] {
         guard let vertex = self.vertex(key) else {
             return []
@@ -262,7 +279,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         return self.neighbors(key)
     }
 
-    public func descendents(_ key: Int) -> [GraphVertex<VertexDataType,EdgeDataType>] {
+    public func descendants(_ key: Int) -> [GraphVertex<VertexDataType,EdgeDataType>] {
         guard let vertex = self.vertex(key) else {
             return []
         }
@@ -270,22 +287,39 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         var visited = Set<Int>()
         for edge in vertex.neighbors {
             if !visited.contains(edge.neighbor.key) {
-                Graph.descendentsUtil(edge.neighbor, &visited, &list)
+                Graph.descendantsUtil(edge.neighbor, &visited, &list)
             }
         }
         return list
     }
 
-    private class func descendentsUtil(_ vertex: GraphVertex<VertexDataType,EdgeDataType>,
+    private class func descendantsUtil(_ vertex: GraphVertex<VertexDataType,EdgeDataType>,
                                       _ visited: inout Set<Int>,
                                       _ list: inout [GraphVertex<VertexDataType,EdgeDataType>]) {
         list.append(vertex)
         visited.update(with: vertex.key)
         for edge in vertex.neighbors {
             if !visited.contains(edge.neighbor.key) {
-                Graph.descendentsUtil(edge.neighbor, &visited, &list)
+                Graph.descendantsUtil(edge.neighbor, &visited, &list)
             }
         }
+    }
+
+    public func nonDescendants(_ key: Int) -> [GraphVertex<VertexDataType,EdgeDataType>] {
+        var vertexSet: Set<Int> = []
+        for vertex in self.vertexList {
+            vertexSet.update(with: vertex.key)
+        }
+        var descendantsSet: Set<Int> = []
+        for descendant in self.descendants(key) {
+            descendantsSet.update(with: descendant.key)
+        }
+        let nonDescendantsSet = vertexSet.subtracting(descendantsSet)
+        var nonDescendantsList: [GraphVertex<VertexDataType,EdgeDataType>] = []
+        for nonDescendant in nonDescendantsSet {
+            nonDescendantsList.append(self.vertex(nonDescendant)!)
+        }
+        return nonDescendantsList
     }
 
     // TODO implement

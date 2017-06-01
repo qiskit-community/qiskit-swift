@@ -34,6 +34,8 @@ public enum CircuitError: Error, CustomStringConvertible {
     case duplicatewires
     case totalwires(expected: Int, total: Int)
     case missingwire(wire: RegBit)
+    case missingname(name: String)
+    case invalidoptype(type: String)
     case internalError(error: Error)
 
     public var description: String {
@@ -82,6 +84,10 @@ public enum CircuitError: Error, CustomStringConvertible {
             return "expected \(expected) wires, got \(total)"
         case .missingwire(let w):
             return "wire (\(w.name),\(w.index)) not in input circuit"
+        case .missingname(let name):
+            return "\(name) is not in the list of basis operations"
+        case .invalidoptype(let type):
+            return "expected node type \"op\", got \(type)"
         case .internalError(let error):
             return error.localizedDescription
         }

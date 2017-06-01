@@ -1127,6 +1127,321 @@ final class Circuit: NSCopying {
     }
 
     /**
+     Map all wires of the input circuit.
+     Map all wires of the input circuit to predecessor and
+     successor nodes in self, keyed on wires in self.
+     pred_map, succ_map dicts come from _make_pred_succ_maps
+     input_circuit is the input circuit
+     wire_map is the wire map from wires of input_circuit to wires of self
+     returns full_pred_map, full_succ_map
+     */
+    private func _full_pred_succ_maps(_ pred_map: [RegBit:Int],
+                                      _ succ_map: [RegBit:Int],
+                                      _ input_circuit: Circuit,
+                                      _ wire_map: [RegBit:RegBit]) -> ([RegBit:Int],[RegBit:Int]) {
+        var full_pred_map: [RegBit:Int] = [:]
+        var full_succ_map: [RegBit:Int] = [:]
+        for (w,_) in input_circuit.input_map {
+            // If w is wire mapped, find the corresponding predecessor
+            // of the node
+            if let wm = wire_map[w] {
+                full_pred_map[wm] = pred_map[wm]
+                full_succ_map[wm] = succ_map[wm]
+                continue
+            }
+            if let wm = self.output_map[w] {
+                // Otherwise, use the corresponding output nodes of self
+                // and compute the predecessor.
+                full_succ_map[w] = wm
+                full_pred_map[w] = self.multi_graph.predecessors(wm)[0].key
+                assert(self.multi_graph.predecessors(wm).count == 1,
+                       "too many predecessors for (\(w.name),\(w.index)) output node")
+            }
+        }
+        return (full_pred_map, full_succ_map)
+    }
+
+    /**
+     Replace every occurrence of named operation with input_circuit.
+     */
+    public func  substitute_circuit_all(_ name: String,
+                                        _ input_circuit: Circuit,
+                                        _ wires: [RegBit] = []) throws {
+        if self.basis[name] == nil {
+            throw CircuitError.missingname(name: name)
+        }
+
+        try self._check_wires_list(wires, name, input_circuit)
+        let union_basis = try self._make_union_basis(input_circuit)
+        let union_gates = try self._make_union_gates(input_circuit)
+
+        // Create a proxy wire_map to identify fragments and duplicates
+        // and determine what registers need to be added to self
+        var proxy_map: [RegBit:RegBit] = [:]
+        for w in wires {
+            proxy_map[w] = RegBit("",0)
+        }
+        let add_qregs = try self._check_wiremap_registers(proxy_map,input_circuit.qregs,[:], false)
+        for r in add_qregs {
+            try self.add_qreg(r.name, r.index)
+        }
+
+        let add_cregs = try self._check_wiremap_registers(proxy_map,input_circuit.cregs,[:], false)
+        for r in add_cregs {
+            try self.add_creg(r.name, r.index)
+        }
+
+        // Iterate through the nodes of self and replace the selected nodes
+        // by iterating through the input_circuit, constructing and
+        // checking the validity of the wire_map for each replacement
+        // NOTE: We do not replace conditioned gates. One way to implement
+        //       this later is to add or update the conditions of each gate
+        //       that we add from the input_circuit.
+        self.basis = union_basis
+        self.gates = union_gates
+        let topological_sort = self.multi_graph.topological_sort()
+        for node in topological_sort {
+            guard let nd = node.data else {
+                continue
+            }
+            if nd.type != "op" {
+                continue
+            }
+            let dataOp = nd as! CircuitVertexOpData
+            if dataOp.name != name {
+                continue
+            }
+            if dataOp.condition != nil {
+                continue
+            }
+            var args: [RegBit] = dataOp.qargs
+            args.append(contentsOf: dataOp.cargs)
+            var wire_map:[RegBit:RegBit] = [:]
+            for i in 0..<wires.count {
+                if i < args.count {
+                    wire_map[wires[i]] = args[i]
+                }
+            }
+            var wm: [RegBit:Int] = [:]
+            for w in wires {
+                wm[w] = 0
+            }
+            try self._check_wiremap_validity(wire_map, wm,self.input_map, input_circuit)
+            let (pred_map, succ_map) = self._make_pred_succ_maps(node.key)
+            var (full_pred_map, full_succ_map) = self._full_pred_succ_maps(pred_map, succ_map,input_circuit, wire_map)
+            // Now that we know the connections, delete node
+            self.multi_graph.remove_vertex(node.key)
+            // Iterate over nodes of input_circuit
+            let tsin = input_circuit.multi_graph.topological_sort()
+            for m in tsin {
+                guard let md = m.data else {
+                    continue
+                }
+                if md.type != "op" {
+                    continue
+                }
+                let mdOp = md as! CircuitVertexOpData
+                // Insert a new node
+                let condition = self._map_condition(wire_map,mdOp.condition)
+                var m_qargs: [RegBit] = []
+                for x in mdOp.qargs {
+                    if let v = wire_map[x] {
+                        m_qargs.append(v)
+                    }
+                    else {
+                        m_qargs.append(x)
+                    }
+                }
+                var m_cargs: [RegBit] = []
+                for x in mdOp.cargs {
+                    if let v = wire_map[x] {
+                        m_cargs.append(v)
+                    }
+                    else {
+                        m_cargs.append(x)
+                    }
+                }
+                self._add_op_node(mdOp.name, m_qargs, m_cargs, mdOp.params, condition)
+                // Add edges from predecessor nodes to new node
+                // and update predecessor nodes that change
+                var all_cbits = self._bits_in_condition(condition)
+                all_cbits.append(contentsOf: m_cargs)
+                var al = m_qargs
+                al.append(contentsOf: all_cbits)
+                for q in al {
+                    if let qp = full_pred_map[q] {
+                        self.multi_graph.add_edge(qp,self.node_counter, CircuitEdgeData(q))
+                        full_pred_map[q] = self.node_counter
+                    }
+                }
+            }
+            // Connect all predecessors and successors, and remove
+            // residual edges between input and output nodes
+            for (w,_) in full_pred_map {
+                guard let wp = full_pred_map[w] else {
+                    continue
+                }
+                guard let ws = full_succ_map[w] else {
+                    continue
+                }
+                self.multi_graph.add_edge(wp, ws,CircuitEdgeData(w))
+                guard let wo = self.output_map[w] else {
+                    continue
+                }
+                let o_pred = self.multi_graph.predecessors(wo)
+                if o_pred.count > 1 {
+                    assert(o_pred.count == 2, "expected 2 predecessors here")
+                    var p:[Int] = []
+                    for x in o_pred {
+                        if x.key != wp {
+                            p.append(x.key)
+                        }
+                    }
+                    assert(p.count == 1, "expected 1 predecessor to pass filter")
+                    self.multi_graph.remove_edge(p[0], wo)
+                }
+            }
+        }
+    }
+
+    /**
+     Replace one node with input_circuit.
+     node is a reference to a node of self.multi_graph of type "op"
+     input_circuit is a CircuitGraph.
+     */
+    public func substitute_circuit_one(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>,
+                                       _ input_circuit: Circuit,
+                                       _ wires: [RegBit] = []) throws {
+
+        if node.data!.type != "op" {
+            throw CircuitError.invalidoptype(type: node.data!.type)
+        }
+        let nd = node.data as! CircuitVertexOpData
+
+        // TODO: reuse common code in substitute_circuit_one and _all
+
+        let name = nd.name
+        try self._check_wires_list(wires, name, input_circuit)
+        let union_basis = try self._make_union_basis(input_circuit)
+        let union_gates = try self._make_union_gates(input_circuit)
+
+        // Create a proxy wire_map to identify fragments and duplicates
+        // and determine what registers need to be added to self
+        var proxy_map: [RegBit:RegBit] = [:]
+        for w in wires {
+            proxy_map[w] = RegBit("",0)
+        }
+        let add_qregs = try self._check_wiremap_registers(proxy_map,input_circuit.qregs,[:], false)
+        for r in add_qregs {
+            try self.add_qreg(r.name, r.index)
+        }
+
+        let add_cregs = try self._check_wiremap_registers(proxy_map,input_circuit.cregs,[:], false)
+        for r in add_cregs {
+            try self.add_creg(r.name, r.index)
+        }
+
+        // Replace the node by iterating through the input_circuit.
+        // Constructing and checking the validity of the wire_map.
+        // NOTE: We do not replace conditioned gates. One way to implement
+        //       later is to add or update the conditions of each gate we add
+        //       from the input_circuit.
+        self.basis = union_basis
+        self.gates = union_gates
+
+        if nd.condition != nil {
+            return
+        }
+        var args: [RegBit] = nd.qargs
+        args.append(contentsOf: nd.cargs)
+        var wire_map:[RegBit:RegBit] = [:]
+        for i in 0..<wires.count {
+            if i < args.count {
+                wire_map[wires[i]] = args[i]
+            }
+        }
+        var wm: [RegBit:Int] = [:]
+        for w in wires {
+            wm[w] = 0
+        }
+        try self._check_wiremap_validity(wire_map, wm,self.input_map, input_circuit)
+        let (pred_map, succ_map) = self._make_pred_succ_maps(node.key)
+        var (full_pred_map, full_succ_map) = self._full_pred_succ_maps(pred_map, succ_map,input_circuit, wire_map)
+        // Now that we know the connections, delete node
+        self.multi_graph.remove_vertex(node.key)
+        // Iterate over nodes of input_circuit
+        let tsin = input_circuit.multi_graph.topological_sort()
+        for m in tsin {
+            guard let md = m.data else {
+                continue
+            }
+            if md.type != "op" {
+                continue
+            }
+            let mdOp = md as! CircuitVertexOpData
+            // Insert a new node
+            let condition = self._map_condition(wire_map,mdOp.condition)
+            var m_qargs: [RegBit] = []
+            for x in mdOp.qargs {
+                if let v = wire_map[x] {
+                    m_qargs.append(v)
+                }
+                else {
+                    m_qargs.append(x)
+                }
+            }
+            var m_cargs: [RegBit] = []
+            for x in mdOp.cargs {
+                if let v = wire_map[x] {
+                    m_cargs.append(v)
+                }
+                else {
+                    m_cargs.append(x)
+                }
+            }
+            self._add_op_node(mdOp.name, m_qargs, m_cargs, mdOp.params, condition)
+            // Add edges from predecessor nodes to new node
+            // and update predecessor nodes that change
+            var all_cbits = self._bits_in_condition(condition)
+            all_cbits.append(contentsOf: m_cargs)
+            var al = m_qargs
+            al.append(contentsOf: all_cbits)
+            for q in al {
+                if let qp = full_pred_map[q] {
+                    self.multi_graph.add_edge(qp,self.node_counter, CircuitEdgeData(q))
+                    full_pred_map[q] = self.node_counter
+                }
+            }
+        }
+        // Connect all predecessors and successors, and remove
+        // residual edges between input and output nodes
+        for (w,_) in full_pred_map {
+            guard let wp = full_pred_map[w] else {
+                continue
+            }
+            guard let ws = full_succ_map[w] else {
+                continue
+            }
+            self.multi_graph.add_edge(wp, ws,CircuitEdgeData(w))
+            guard let wo = self.output_map[w] else {
+                continue
+            }
+            let o_pred = self.multi_graph.predecessors(wo)
+            if o_pred.count > 1 {
+                assert(o_pred.count == 2, "expected 2 predecessors here")
+                var p:[Int] = []
+                for x in o_pred {
+                    if x.key != wp {
+                        p.append(x.key)
+                    }
+                }
+                assert(p.count == 1, "expected 1 predecessor to pass filter")
+                self.multi_graph.remove_edge(p[0], wo)
+            }
+        }
+    }
+
+    /**
      Return a list of "op" nodes with the given name.
      */
     public func get_named_nodes(_ name: String) throws -> [Int] {
@@ -1153,7 +1468,7 @@ final class Circuit: NSCopying {
      Remove an operation node n.
      Add edges from predecessors to successors.
      */
-    public func _remove_op_node(_ n: Int) {
+    private func _remove_op_node(_ n: Int) {
         let (pred_map, succ_map) = self._make_pred_succ_maps(n)
         self.multi_graph.remove_vertex(n)
         for w in pred_map.keys {
@@ -1166,6 +1481,64 @@ final class Circuit: NSCopying {
             self.multi_graph.add_edge(predIndex, succIndex)
             if let edge = self.multi_graph.edge(predIndex,succIndex) {
                 edge.data = CircuitEdgeData(w)
+            }
+        }
+    }
+
+    /**
+     Remove all of the ancestor operation nodes of node.
+     */
+    public func remove_ancestors_of(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>) {
+        let anc = self.multi_graph.ancestors(node.key)
+        // TODO: probably better to do all at once using
+        // multi_graph.remove_nodes_from; same for related functions ...
+        for n in anc {
+            if let nd = n.data {
+                if nd.type == "op" {
+                    self._remove_op_node(n.key)
+                }
+            }
+        }
+    }
+
+    /**
+     Remove all of the descendant operation nodes of node.
+     */
+    public func remove_descendants_of(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>) {
+        let dec = self.multi_graph.descendants(node.key)
+        for n in dec {
+            if let nd = n.data {
+            if nd.type == "op" {
+                self._remove_op_node(n.key)
+                }
+            }
+        }
+    }
+
+    /**
+     Remove all of the non-ancestors operation nodes of node.
+     */
+    public func remove_nonancestors_of(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>) {
+        let comp = self.multi_graph.nonAncestors(node.key)
+        for n in comp {
+            if let nd = n.data {
+                if nd.type == "op" {
+                    self._remove_op_node(n.key)
+                }
+            }
+        }
+    }
+
+    /**
+     Remove all of the non-descendants operation nodes of node.
+     */
+    public func remove_nondescendants_of(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>) {
+        let comp = self.multi_graph.nonDescendants(node.key)
+        for n in comp {
+            if let nd = n.data {
+                if nd.type == "op" {
+                    self._remove_op_node(n.key)
+                }
             }
         }
     }

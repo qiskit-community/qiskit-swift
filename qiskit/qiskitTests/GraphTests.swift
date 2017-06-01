@@ -103,7 +103,7 @@ class GraphTests: XCTestCase {
         XCTAssertEqual(str, "2 0")
     }
 
-    func testDescendents() {
+    func testDescendants() {
         let g = Graph<NSString,NSString>(true)
         g.add_edge(5, 2)
         g.add_edge(5, 0)
@@ -112,17 +112,17 @@ class GraphTests: XCTestCase {
         g.add_edge(2, 3)
         g.add_edge(3, 1)
 
-        var str = GraphTests.formatList(g.descendents(0))
+        var str = GraphTests.formatList(g.descendants(0))
         XCTAssertEqual(str, "")
-        str = GraphTests.formatList(g.descendents(1))
+        str = GraphTests.formatList(g.descendants(1))
         XCTAssertEqual(str, "")
-        str = GraphTests.formatList(g.descendents(2))
+        str = GraphTests.formatList(g.descendants(2))
         XCTAssertEqual(str, "3 1")
-        str = GraphTests.formatList(g.descendents(3))
+        str = GraphTests.formatList(g.descendants(3))
         XCTAssertEqual(str, "1")
-        str = GraphTests.formatList(g.descendents(4))
+        str = GraphTests.formatList(g.descendants(4))
         XCTAssertEqual(str, "0 1")
-        str = GraphTests.formatList(g.descendents(5))
+        str = GraphTests.formatList(g.descendants(5))
         XCTAssertEqual(str, "2 3 1 0")
     }
 
