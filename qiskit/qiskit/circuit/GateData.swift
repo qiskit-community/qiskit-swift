@@ -23,10 +23,10 @@ final class GateData: NSCopying {
     let n_args: Int
     let n_bits: Int
     let args: [String]
-    let bits: [HashableTuple<String,Int>]
+    let bits: [RegBit]
     let body: ASTNodeTemp
 
-    init(_ opaque: Bool, _ n_args: Int, _ n_bits: Int, _ args: [String], _ bits: [HashableTuple<String,Int>], _ body: ASTNodeTemp) {
+    init(_ opaque: Bool, _ n_args: Int, _ n_bits: Int, _ args: [String], _ bits: [RegBit], _ body: ASTNodeTemp) {
         self.opaque = opaque
         self.n_args = n_args
         self.n_bits = n_bits

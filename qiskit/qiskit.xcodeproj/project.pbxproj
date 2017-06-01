@@ -12,6 +12,7 @@
 		693A9F441ECA366000112AC9 /* CX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693A9F431ECA366000112AC9 /* CX.swift */; };
 		693A9F461ECA369500112AC9 /* UBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693A9F451ECA369500112AC9 /* UBase.swift */; };
 		693A9F481ECA38D100112AC9 /* Qconfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693A9F471ECA38D100112AC9 /* Qconfig.swift */; };
+		694DCE1A1EDFA764002A7A8B /* RegBit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694DCE191EDFA764002A7A8B /* RegBit.swift */; };
 		695701341ED75C1C00C6CCAB /* Graph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695701311ED75C1C00C6CCAB /* Graph.swift */; };
 		695701351ED75C1C00C6CCAB /* GraphVertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695701321ED75C1C00C6CCAB /* GraphVertex.swift */; };
 		695701361ED75C1C00C6CCAB /* GraphEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695701331ED75C1C00C6CCAB /* GraphEdge.swift */; };
@@ -80,6 +81,7 @@
 		693A9F431ECA366000112AC9 /* CX.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CX.swift; path = extensions/CX.swift; sourceTree = "<group>"; };
 		693A9F451ECA369500112AC9 /* UBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UBase.swift; path = extensions/UBase.swift; sourceTree = "<group>"; };
 		693A9F471ECA38D100112AC9 /* Qconfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Qconfig.swift; path = qiskit/network/Qconfig.swift; sourceTree = SOURCE_ROOT; };
+		694DCE191EDFA764002A7A8B /* RegBit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RegBit.swift; path = circuit/RegBit.swift; sourceTree = "<group>"; };
 		695701311ED75C1C00C6CCAB /* Graph.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Graph.swift; path = datastructures/graph/Graph.swift; sourceTree = "<group>"; };
 		695701321ED75C1C00C6CCAB /* GraphVertex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GraphVertex.swift; path = datastructures/graph/GraphVertex.swift; sourceTree = "<group>"; };
 		695701331ED75C1C00C6CCAB /* GraphEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GraphEdge.swift; path = datastructures/graph/GraphEdge.swift; sourceTree = "<group>"; };
@@ -182,6 +184,7 @@
 				69EF51481EDC72BD0074AE42 /* CircuitVertexData.swift */,
 				69EF514A1EDC72E10074AE42 /* CircuitEdgeData.swift */,
 				69E234311EDEE76200E47750 /* GateData.swift */,
+				694DCE191EDFA764002A7A8B /* RegBit.swift */,
 			);
 			name = circuit;
 			sourceTree = "<group>";
@@ -466,6 +469,7 @@
 				69DE36091ECD152100EC4756 /* CXBase.swift in Sources */,
 				69DE360D1ECD155000EC4756 /* CZ.swift in Sources */,
 				69D3108A1ECA182000B3E752 /* IBMQuantumExperienceResults.swift in Sources */,
+				694DCE1A1EDFA764002A7A8B /* RegBit.swift in Sources */,
 				69DE360F1ECD188000EC4756 /* Iden.swift in Sources */,
 				697F259C1ED45BED0065B106 /* Circuit.swift in Sources */,
 				69EF514B1EDC72E10074AE42 /* CircuitEdgeData.swift in Sources */,

@@ -32,17 +32,17 @@ final class Circuit: NSCopying {
      Map from a wire's name (reg,idx) to a Bool that is True if the
      wire is a classical bit and False if the wire is a qubit.
     */
-    private var wire_type: [HashableTuple<String,Int>:Bool] = [:]
+    private var wire_type: [RegBit:Bool] = [:]
 
     /**
      Map from wire names (reg,idx) to input nodes of the graph
     */
-    private var input_map: [HashableTuple<String,Int>:Int] = [:]
+    private var input_map: [RegBit:Int] = [:]
 
     /**
      Map from wire names (reg,idx) to output nodes of the graph
     */
-    private var output_map: [HashableTuple<String,Int>:Int] = [:]
+    private var output_map: [RegBit:Int] = [:]
 
     /**
      Running count of the total number of nodes
@@ -152,8 +152,8 @@ final class Circuit: NSCopying {
             iscreg = true
         }
         for i in 0..<reg_size {
-            let oldTuple = HashableTuple<String,Int>(regname, i)
-            let newTuple = HashableTuple<String,Int>(newname, i)
+            let oldTuple = RegBit(regname, i)
+            let newTuple = RegBit(newname, i)
             self.wire_type[newTuple] = iscreg
             self.wire_type.removeValue(forKey: oldTuple)
             self.input_map[newTuple] = self.input_map[oldTuple]
@@ -168,30 +168,31 @@ final class Circuit: NSCopying {
             }
             if data.type == "in" || data.type == "out" {
                 let dataInOut = data as! CircuitVertexInOutData
-                if dataInOut.name.one == regname {
-                    dataInOut.name = HashableTuple<String,Int>(newname, dataInOut.name.two)
+                if dataInOut.name.name == regname {
+                    dataInOut.name = RegBit(newname, dataInOut.name.index)
                 }
             }
             else if data.type == "op" {
-                var qa: [HashableTuple<String,Int>] = []
-                for var a in data.qargs {
-                    if a.one == regname {
-                        a = HashableTuple<String,Int>(newname, a.two)
+                let dataOp = data as! CircuitVertexOpData
+                var qa: [RegBit] = []
+                for var a in dataOp.qargs {
+                    if a.name == regname {
+                        a = RegBit(newname, a.index)
                     }
                     qa.append(a)
                 }
-                data.qargs = qa
-                var ca: [HashableTuple<String,Int>] = []
-                for var a in data.cargs {
-                    if a.one == regname {
-                        a = HashableTuple<String,Int>(newname, a.two)
+                dataOp.qargs = qa
+                var ca: [RegBit] = []
+                for var a in dataOp.cargs {
+                    if a.name == regname {
+                        a = RegBit(newname, a.index)
                     }
                     ca.append(a)
                 }
-                data.cargs = ca
-                if let condition = data.condition {
-                    if condition.one == regname {
-                        data.condition  = HashableTuple<String,Int>(newname, condition.two)
+                dataOp.cargs = ca
+                if let condition = dataOp.condition {
+                    if condition.name == regname {
+                        dataOp.condition  = RegBit(newname, condition.index)
                     }
                 }
             }
@@ -201,8 +202,8 @@ final class Circuit: NSCopying {
             guard let data = edge.data else {
                 continue
             }
-            if data.name.one == regname {
-                data.name = HashableTuple<String,Int>(newname, data.name.two)
+            if data.name.name == regname {
+                data.name = RegBit(newname, data.name.index)
             }
         }
     }
@@ -241,7 +242,7 @@ final class Circuit: NSCopying {
         }
         self.qregs[name] = size
         for j in 0..<size {
-            try self._add_wire(HashableTuple<String,Int>(name, j))
+            try self._add_wire(RegBit(name, j))
         }
     }
 
@@ -254,7 +255,7 @@ final class Circuit: NSCopying {
         }
         self.cregs[name] = size
         for j in 0..<size {
-            try self._add_wire(HashableTuple<String,Int>(name, j), true)
+            try self._add_wire(RegBit(name, j), true)
         }
     }
 
@@ -263,9 +264,9 @@ final class Circuit: NSCopying {
     name is a (string,int) tuple containing register name and index
     This adds a pair of in and out nodes connected by an edge.
      */
-    private func _add_wire(_ name: HashableTuple<String,Int>, _ isClassical:Bool = false) throws {
+    private func _add_wire(_ name: RegBit, _ isClassical:Bool = false) throws {
         if self.wire_type[name] != nil {
-            throw CircuitError.duplicatewire(tuple: name)
+            throw CircuitError.duplicatewire(regBit: name)
         }
         self.wire_type[name] = isClassical
         self.node_counter += 1
@@ -348,8 +349,8 @@ final class Circuit: NSCopying {
      params is a list of strings that represent floats
      */
     private func _check_basis_data(_ name: String,
-                                   _ qargs: [HashableTuple<String,Int>],
-                                   _ cargs: [HashableTuple<String,Int>],
+                                   _ qargs: [RegBit],
+                                   _ cargs: [RegBit],
                                    _ params: [String]) throws {
         // Check that we have this operation
         if self.basis[name] == nil {
@@ -388,10 +389,10 @@ final class Circuit: NSCopying {
      name is a string used for error reporting
      condition is either None or a tuple (string,int) giving (creg,value)
      */
-    private func _check_condition(_ name: String, _ cond: HashableTuple<String,Int>?) throws {
+    private func _check_condition(_ name: String, _ cond: RegBit?) throws {
         // Verify creg exists
         if let condition = cond {
-            if self.cregs[condition.one] != nil {
+            if self.cregs[condition.name] != nil {
                 throw CircuitError.cregcondition(name: name)
             }
         }
@@ -405,7 +406,7 @@ final class Circuit: NSCopying {
      amap is a dictionary keyed on (regname,idx) tuples
      bval is boolean
      */
-    private func _check_bits(_ args: [HashableTuple<String,Int>], _ amap: [HashableTuple<String,Int>:Int], _ bval: Bool) throws {
+    private func _check_bits(_ args: [RegBit], _ amap: [RegBit:Int], _ bval: Bool) throws {
         // Check for each wire
         for q in args {
             if amap[q] == nil {
@@ -424,12 +425,12 @@ final class Circuit: NSCopying {
      cond is either None or a (regname,int) tuple specifying
      a classical if condition.
      */
-    private func _bits_in_condition(_ condition: HashableTuple<String,Int>?) -> [HashableTuple<String,Int>] {
-        var all_bits:[HashableTuple<String,Int>] = []
+    private func _bits_in_condition(_ condition: RegBit?) -> [RegBit] {
+        var all_bits:[RegBit] = []
         if let cond = condition {
-            if let size = self.cregs[cond.one] {
+            if let size = self.cregs[cond.name] {
                 for j in 0..<size {
-                    all_bits.append(HashableTuple<String,Int>(cond.one,j))
+                    all_bits.append(RegBit(cond.name,j))
                 }
             }
         }
@@ -445,19 +446,15 @@ final class Circuit: NSCopying {
      ncondition classical condition (or None)
      */
     private func _add_op_node(_ nname: String,
-                              _ nqargs: [HashableTuple<String,Int>],
-                              _ ncargs: [HashableTuple<String,Int>],
+                              _ nqargs: [RegBit],
+                              _ ncargs: [RegBit],
                               _ nparams: [String],
-                              _ ncondition: HashableTuple<String,Int>?) {
+                              _ ncondition: RegBit?) {
         // Add a new operation node to the graph
         self.node_counter += 1
         let node = self.multi_graph.add_vertex(self.node_counter)
         // Update that operation node's data
-        node.data = CircuitVertexOpData(nname)
-        node.data!.qargs = nqargs
-        node.data!.cargs = ncargs
-        node.data!.params = nparams
-        node.data!.condition = ncondition
+        node.data = CircuitVertexOpData(nname,nqargs,ncargs,nparams,ncondition)
     }
 
     /**
@@ -469,10 +466,10 @@ final class Circuit: NSCopying {
      condition is either None or a tuple (string,int) giving (creg,value)
      */
     private func apply_operation_back(_ name: String,
-                                      _ qargs: [HashableTuple<String,Int>],
-                                      _ cargs: [HashableTuple<String,Int>] = [],
+                                      _ qargs: [RegBit],
+                                      _ cargs: [RegBit] = [],
                                       _ params:[String] = [],
-                                      _ condition: HashableTuple<String,Int>?) throws {
+                                      _ condition: RegBit?) throws {
         var all_cbits = self._bits_in_condition(condition)
         all_cbits.append(contentsOf: cargs)
 
@@ -507,10 +504,10 @@ final class Circuit: NSCopying {
      condition is either None or a tuple (string,int) giving (creg,value)
      */
     public func apply_operation_front(_ name: String,
-                                      _ qargs: [HashableTuple<String,Int>],
-                                      _ cargs: [HashableTuple<String,Int>] = [],
+                                      _ qargs: [RegBit],
+                                      _ cargs: [RegBit] = [],
                                       _ params:[String] = [],
-                                      _ condition: HashableTuple<String,Int>?) throws {
+                                      _ condition: RegBit?) throws {
         var all_cbits = self._bits_in_condition(condition)
         all_cbits.append(contentsOf: cargs)
 
@@ -608,18 +605,18 @@ final class Circuit: NSCopying {
      add regs for bits in the wire_map image that don't appear in valregs
      Return the set of regs to add to self
      */
-    private func _check_wiremap_registers(_ wire_map: [HashableTuple<String,Int>:HashableTuple<String,Int>],
+    private func _check_wiremap_registers(_ wire_map: [RegBit:RegBit],
                                           _ keyregs: [String:Int],
                                           _ valregs: [String:Int],
-                                          _ valreg:Bool = true) throws -> Set<HashableTuple<String,Int>> {
-        var add_regs = Set<HashableTuple<String,Int>>()
+                                          _ valreg:Bool = true) throws -> Set<RegBit> {
+        var add_regs = Set<RegBit>()
         var reg_frag_chk: [String:[Bool]]  = [:]
         for (k, v) in keyregs {
             reg_frag_chk[k] = Array(repeating: false, count: v)
         }
         for (k,_) in wire_map {
-            if keyregs[k.one] != nil {
-                reg_frag_chk[k.one]![k.two] = true
+            if keyregs[k.name] != nil {
+                reg_frag_chk[k.name]![k.index] = true
             }
         }
         for (k, v) in reg_frag_chk {
@@ -633,7 +630,7 @@ final class Circuit: NSCopying {
                 }
                 else {
                     // Add registers that appear only in keyregs
-                    add_regs.update(with: HashableTuple<String,Int>(k, keyregs[k]!))
+                    add_regs.update(with: RegBit(k, keyregs[k]!))
                 }
             }
             else {
@@ -641,18 +638,18 @@ final class Circuit: NSCopying {
                     // If mapping to a register not in valregs, add it.
                     // (k,0) exists in wire_map because wire_map doesn't
                     // fragment k
-                    let key = HashableTuple<String,Int>(k, 0)
-                    if valregs[key.one] == nil {
+                    let key = RegBit(k, 0)
+                    if valregs[key.name] == nil {
                         if let tuple = wire_map[key] {
                             var size: Int = 0
                             for (_,x) in wire_map {
-                                if x.one == tuple.one {
-                                    if x.two > size {
-                                        size = x.two
+                                if x.name == tuple.name {
+                                    if x.index > size {
+                                        size = x.index
                                     }
                                 }
                             }
-                            add_regs.update(with: HashableTuple<String,Int>(tuple.one, size + 1))
+                            add_regs.update(with: RegBit(tuple.name, size + 1))
                         }
                     }
                 }
@@ -671,16 +668,16 @@ final class Circuit: NSCopying {
      valmap is a map whose keys are wire_map values
      input_circuit is a CircuitGraph
      */
-    private func _check_wiremap_validity(_ wire_map: [HashableTuple<String,Int>:HashableTuple<String,Int>],
-                                         _ keymap: [HashableTuple<String,Int>:Int],
-                                         _ valmap: [HashableTuple<String,Int>:Int],
+    private func _check_wiremap_validity(_ wire_map: [RegBit:RegBit],
+                                         _ keymap: [RegBit:Int],
+                                         _ valmap: [RegBit:Int],
                                          _ input_circuit: Circuit) throws {
         for (k, v) in wire_map {
             if keymap[k] == nil {
-                throw CircuitError.invalidwiremapkey(name: k)
+                throw CircuitError.invalidwiremapkey(regBit: k)
             }
             if valmap[v] == nil {
-                throw CircuitError.invalidwiremapvalue(name: v)
+                throw CircuitError.invalidwiremapvalue(regBit: v)
             }
             if input_circuit.wire_type[k] != self.wire_type[v] {
                 throw CircuitError.inconsistentewiremap(name: k, value: v)
@@ -694,20 +691,20 @@ final class Circuit: NSCopying {
      condition is a tuple (reg,int)
      Returns the new condition tuple
      */
-    private func _map_condition(_ wire_map: [HashableTuple<String,Int>:HashableTuple<String,Int>],
-                                _ condition: HashableTuple<String,Int>?) -> HashableTuple<String,Int>? {
+    private func _map_condition(_ wire_map: [RegBit:RegBit],
+                                _ condition: RegBit?) -> RegBit? {
         if condition == nil {
             return nil
         }
         // Map the register name, using fact that registers must not be
         // fragmented by the wire_map (this must have been checked
         // elsewhere)
-        let bit0 = HashableTuple<String,Int>(condition!.one, 0)
+        let bit0 = RegBit(condition!.name, 0)
         var value = bit0
         if let v = wire_map[bit0] {
             value = v
         }
-        return  HashableTuple<String,Int>(value.one, condition!.two)
+        return  RegBit(value.name, condition!.index)
     }
 
     /**
@@ -717,22 +714,22 @@ final class Circuit: NSCopying {
      to a subset of output qubits of this circuit.
      wire_map[input_qubit_to_input_circuit] = output_qubit_of_self
      */
-    public func compose_back(_ input_circuit: Circuit, _ wire_map: [HashableTuple<String,Int>:HashableTuple<String,Int>] = [:]) throws {
+    public func compose_back(_ input_circuit: Circuit, _ wire_map: [RegBit:RegBit] = [:]) throws {
         let union_basis = try self._make_union_basis(input_circuit)
         let union_gates = try self._make_union_gates(input_circuit)
 
         // Check the wire map for duplicate values
-        if Set<HashableTuple<String,Int>>(wire_map.values).count != wire_map.count {
+        if Set<RegBit>(wire_map.values).count != wire_map.count {
             throw CircuitError.duplicateswiremap
         }
 
         let add_qregs = try self._check_wiremap_registers(wire_map,input_circuit.qregs,self.qregs)
         for register in add_qregs {
-            try self.add_qreg(register.one, register.two)
+            try self.add_qreg(register.name, register.index)
         }
         let add_cregs = try self._check_wiremap_registers(wire_map,input_circuit.cregs,self.cregs)
         for register in add_cregs {
-            try self.add_creg(register.one, register.two)
+            try self.add_creg(register.name, register.index)
         }
         try self._check_wiremap_validity(wire_map, input_circuit.input_map,self.output_map, input_circuit)
 
@@ -753,25 +750,26 @@ final class Circuit: NSCopying {
                     m_name = n
                 }
                 // the mapped wire should already exist
-                assert(self.output_map[m_name] != nil,"wire (\(m_name.one),\(m_name.two) not in self")
-                assert(input_circuit.wire_type[dataIn.name] != nil, "inconsistent wire_type for (\(dataIn.name.one),\(dataIn.name.two)) in input_circuit")
+                assert(self.output_map[m_name] != nil,"wire (\(m_name.name),\(m_name.index) not in self")
+                assert(input_circuit.wire_type[dataIn.name] != nil,
+                       "inconsistent wire_type for (\(dataIn.name.name),\(dataIn.name.index)) in input_circuit")
             case "out":
                 // ignore output nodes
                 break
             case "op":
                 let dataOp = nd as! CircuitVertexOpData
-                let condition = self._map_condition(wire_map, nd.condition)
+                let condition = self._map_condition(wire_map, dataOp.condition)
                 try self._check_condition(dataOp.name, condition)
-                var m_qargs: [HashableTuple<String,Int>] = []
-                for qarg in nd.qargs {
+                var m_qargs: [RegBit] = []
+                for qarg in dataOp.qargs {
                     var value = qarg
                     if let v = wire_map[qarg] {
                         value = v
                     }
                     m_qargs.append(value)
                 }
-                var m_cargs: [HashableTuple<String,Int>] = []
-                for carg in nd.cargs {
+                var m_cargs: [RegBit] = []
+                for carg in dataOp.cargs {
                     var value = carg
                     if let v = wire_map[carg] {
                         value = v
@@ -792,23 +790,23 @@ final class Circuit: NSCopying {
      to a subset of input qubits of
      this circuit.
      */
-    public func compose_front(_ input_circuit: Circuit, _ wire_map: [HashableTuple<String,Int>:HashableTuple<String,Int>] = [:]) throws {
+    public func compose_front(_ input_circuit: Circuit, _ wire_map: [RegBit:RegBit] = [:]) throws {
         let union_basis = try self._make_union_basis(input_circuit)
         let union_gates = try self._make_union_gates(input_circuit)
 
         // Check the wire map
-        if Set<HashableTuple<String,Int>>(wire_map.values).count != wire_map.count {
+        if Set<RegBit>(wire_map.values).count != wire_map.count {
             throw CircuitError.duplicateswiremap
         }
 
         let add_qregs = try self._check_wiremap_registers(wire_map,input_circuit.qregs,self.qregs)
         for r in add_qregs {
-            try self.add_qreg(r.one, r.two)
+            try self.add_qreg(r.name, r.index)
         }
 
         let add_cregs = try self._check_wiremap_registers(wire_map,input_circuit.cregs,self.cregs)
         for r in add_cregs {
-            try self.add_creg(r.one, r.two)
+            try self.add_creg(r.name, r.index)
         }
         try self._check_wiremap_validity(wire_map, input_circuit.output_map,self.input_map, input_circuit)
 
@@ -829,25 +827,26 @@ final class Circuit: NSCopying {
                     m_name = n
                 }
                 // the mapped wire should already exist
-                assert(self.input_map[m_name] != nil,"wire (\(m_name.one),\(m_name.two) not in self")
-                assert(input_circuit.wire_type[dataOut.name] != nil, "inconsistent wire_type for (\(dataOut.name.one),\(dataOut.name.two)) in input_circuit")
+                assert(self.input_map[m_name] != nil,"wire (\(m_name.name),\(m_name.index) not in self")
+                assert(input_circuit.wire_type[dataOut.name] != nil,
+                       "inconsistent wire_type for (\(dataOut.name.name),\(dataOut.name.index)) in input_circuit")
             case "in":
                 // ignore input nodes
                 break
             case "op":
                 let dataOp = nd as! CircuitVertexOpData
-                let condition = self._map_condition(wire_map, nd.condition)
+                let condition = self._map_condition(wire_map, dataOp.condition)
                 try self._check_condition(dataOp.name, condition)
-                var m_qargs: [HashableTuple<String,Int>] = []
-                for qarg in nd.qargs {
+                var m_qargs: [RegBit] = []
+                for qarg in dataOp.qargs {
                     var value = qarg
                     if let v = wire_map[qarg] {
                         value = v
                     }
                     m_qargs.append(value)
                 }
-                var m_cargs: [HashableTuple<String,Int>] = []
-                for carg in nd.cargs {
+                var m_cargs: [RegBit] = []
+                for carg in dataOp.cargs {
                     var value = carg
                     if let v = wire_map[carg] {
                         value = v
@@ -919,7 +918,7 @@ final class Circuit: NSCopying {
         }
         var bits: [String] = []
         for v in data.bits {
-            bits.append("\(v.one)[\(v.two)]")
+            bits.append(v.qasm)
         }
         out += " " + bits.joined(separator: ",")
         if data.opaque {
@@ -947,17 +946,17 @@ final class Circuit: NSCopying {
                      _ add_swap: Bool = false,
                      _ no_decls: Bool = false,
                      _ qeflag: Bool = false,
-                     _ aliasesMap: [HashableTuple<String,Int>:HashableTuple<String,Int>]? = nil) -> String {
+                     _ aliasesMap: [RegBit:RegBit]? = nil) -> String {
         // Rename qregs if necessary
         var qregdata: [String:Int] = [:]
         if let aliases = aliasesMap {
             for (_,q) in aliases {
-                guard let n = qregdata[q.one] else {
-                    qregdata[q.one] = q.two + 1
+                guard let n = qregdata[q.name] else {
+                    qregdata[q.name] = q.index + 1
                     continue
                 }
-                if n < q.two + 1 {
-                    qregdata[q.one] = q.two + 1
+                if n < q.index + 1 {
+                    qregdata[q.name] = q.index + 1
                 }
             }
         }
@@ -1025,29 +1024,29 @@ final class Circuit: NSCopying {
                 }
                 if nd.type == "op" {
                     let dataOp = nd as! CircuitVertexOpData
-                    if let condition = nd.condition {
-                        out += "if(\(condition.one)==\(condition.two)) "
+                    if let condition = dataOp.condition {
+                        out += "if(\(condition.name)==\(condition.index)) "
                     }
-                    if nd.cargs.isEmpty  {
+                    if dataOp.cargs.isEmpty  {
                         let nm = dataOp.name
-                        var qarglist:[HashableTuple<String,Int>] = []
+                        var qarglist:[RegBit] = []
                         if let aliases = aliasesMap {
-                            for x in nd.qargs {
+                            for x in dataOp.qargs {
                                 if let v = aliases[x] {
                                     qarglist.append(v)
                                 }
                             }
                         }
                         else {
-                            qarglist = nd.qargs
+                            qarglist = dataOp.qargs
                         }
                         var args: [String] = []
                         for v in qarglist {
-                            args.append("\(v.one)[\(v.two)]")
+                            args.append(v.qasm)
                         }
                         let qarg = args.joined(separator: ",")
-                        if !nd.params.isEmpty {
-                            let param = nd.params.joined(separator: ",")
+                        if !dataOp.params.isEmpty {
+                            let param = dataOp.params.joined(separator: ",")
                             out += "\(nm)(\(param))) \(qarg);\n"
                         }
                         else {
@@ -1056,16 +1055,16 @@ final class Circuit: NSCopying {
                     }
                     else {
                         if dataOp.name == "measure" {
-                            assert(nd.cargs.count == 1 && nd.qargs.count == 1 && nd.params.count == 0, "bad node data")
-                            var qname = nd.qargs[0].one
-                            var qindex = nd.qargs[0].two
+                            assert(dataOp.cargs.count == 1 && dataOp.qargs.count == 1 && dataOp.params.count == 0, "bad node data")
+                            var qname = dataOp.qargs[0].name
+                            var qindex = dataOp.qargs[0].index
                             if let aliases = aliasesMap {
-                                if let newq = aliases[HashableTuple<String,Int>(qname, qindex)] {
-                                    qname = newq.one
-                                    qindex = newq.two
+                                if let newq = aliases[RegBit(qname, qindex)] {
+                                    qname = newq.name
+                                    qindex = newq.index
                                 }
                             }
-                            out += "measure \(qname)[\(qindex)] -> \(nd.cargs[0].one)[\(nd.cargs[0].two)];\n" 
+                            out += "measure \(RegBit.qasm(qname,qindex)) -> \(dataOp.cargs[0].qasm);\n"
                         }
                         else {
                             assert(false,"bad node data")
@@ -1086,8 +1085,8 @@ final class Circuit: NSCopying {
      - elements are wires of input_circuit
      Raises an exception otherwise.
      */
-    private func _check_wires_list(_ wires:[HashableTuple<String,Int>], _ name: String, _ input_circuit: Circuit) throws {
-        if Set<HashableTuple<String,Int>>(wires).count != wires.count {
+    private func _check_wires_list(_ wires:[RegBit], _ name: String, _ input_circuit: Circuit) throws {
+        if Set<RegBit>(wires).count != wires.count {
             throw CircuitError.duplicatewires
         }
         var wire_tot: Int = 0
@@ -1109,15 +1108,15 @@ final class Circuit: NSCopying {
      These map from wire names to predecessor and successor
      nodes for the operation node n in self.multi_graph.
      */
-    private func _make_pred_succ_maps(_ n: Int) -> ([HashableTuple<String,Int>:Int],[HashableTuple<String,Int>:Int]) {
-        var pred_map: [HashableTuple<String,Int>:Int] = [:]
+    private func _make_pred_succ_maps(_ n: Int) -> ([RegBit:Int],[RegBit:Int]) {
+        var pred_map: [RegBit:Int] = [:]
         var edges = self.multi_graph.in_edges_iter(n)
         for edge in edges {
             if let data = edge.data {
                 pred_map[data.name] = edge.source.key
             }
         }
-        var succ_map: [HashableTuple<String,Int>:Int] = [:]
+        var succ_map: [RegBit:Int] = [:]
         edges = self.multi_graph.out_edges_iter(n)
         for edge in edges {
             if let data = edge.data {

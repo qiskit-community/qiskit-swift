@@ -10,10 +10,6 @@ import Foundation
 
 class CircuitVertexData: NSCopying {
     let type: String
-    var qargs: [HashableTuple<String,Int>] = []
-    var cargs: [HashableTuple<String,Int>] = []
-    var params: [String] = []
-    var condition: HashableTuple<String,Int>? = nil
 
     init(type: String) {
         if type(of: self) == CircuitVertexData.self {
@@ -28,9 +24,9 @@ class CircuitVertexData: NSCopying {
 }
 
 class CircuitVertexInOutData: CircuitVertexData {
-    var name: HashableTuple<String,Int>
+    var name: RegBit
 
-    init(name: HashableTuple<String,Int>, type: String) {
+    init(name: RegBit, type: String) {
         if type(of: self) == CircuitVertexInOutData.self {
             fatalError("Abstract class instantiation.")
         }
@@ -41,52 +37,44 @@ class CircuitVertexInOutData: CircuitVertexData {
 
 final class CircuitVertexInData: CircuitVertexInOutData {
 
-    init(_ name: HashableTuple<String,Int>) {
+    init(_ name: RegBit) {
         super.init(name: name, type: "in")
     }
 
     public override func copy(with zone: NSZone? = nil) -> Any {
-        let copy = CircuitVertexInData(self.name)
-        copy.qargs = self.qargs
-        copy.cargs = self.cargs
-        copy.params = self.params
-        copy.condition = self.condition
-        return copy
+        return CircuitVertexInData(self.name)
     }
 }
 
 final class CircuitVertexOutData: CircuitVertexInOutData {
 
-    init(_ name: HashableTuple<String,Int>) {
+    init(_ name: RegBit) {
         super.init(name: name, type: "out")
     }
 
     public override func copy(with zone: NSZone? = nil) -> Any {
-        let copy = CircuitVertexOutData(self.name)
-        copy.qargs = self.qargs
-        copy.cargs = self.cargs
-        copy.params = self.params
-        copy.condition = self.condition
-        return copy
+        return CircuitVertexOutData(self.name)
     }
 }
 
-
 final class CircuitVertexOpData: CircuitVertexData {
     let name: String
+    var qargs: [RegBit]
+    var cargs: [RegBit]
+    let params: [String]
+    var condition: RegBit?
 
-    init(_ name: String) {
+    init(_ name: String,_ qargs: [RegBit], _ cargs: [RegBit], _ params: [String], _ condition: RegBit?) {
         self.name = name
+        self.qargs = qargs
+        self.cargs = cargs
+        self.params = params
+        self.condition = condition
         super.init(type: "op")
     }
 
     public override func copy(with zone: NSZone? = nil) -> Any {
-        let copy = CircuitVertexOpData(self.name)
-        copy.qargs = self.qargs
-        copy.cargs = self.cargs
-        copy.params = self.params
-        copy.condition = self.condition
-        return copy
+        return CircuitVertexOpData(self.name,self.qargs,self.cargs,self.params,self.condition)
     }
 }
 

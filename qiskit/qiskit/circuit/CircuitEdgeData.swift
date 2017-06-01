@@ -9,9 +9,9 @@
 import Foundation
 
 final class CircuitEdgeData: NSCopying {
-    public var name: HashableTuple<String,Int>
+    public var name: RegBit
 
-    public init(_ name: HashableTuple<String,Int>) {
+    public init(_ name: RegBit) {
         self.name = name
     }
 
