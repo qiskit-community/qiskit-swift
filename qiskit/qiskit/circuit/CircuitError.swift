@@ -36,7 +36,6 @@ public enum CircuitError: Error, CustomStringConvertible {
     case missingwire(wire: RegBit)
     case missingname(name: String)
     case invalidoptype(type: String)
-    case internalError(error: Error)
 
     public var description: String {
         switch self {
@@ -88,8 +87,6 @@ public enum CircuitError: Error, CustomStringConvertible {
             return "\(name) is not in the list of basis operations"
         case .invalidoptype(let type):
             return "expected node type \"op\", got \(type)"
-        case .internalError(let error):
-            return error.localizedDescription
         }
     }
 }

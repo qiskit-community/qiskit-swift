@@ -324,7 +324,7 @@ final class Circuit: NSCopying {
      "bits"   = list of qubit names
      "body"   = GateBody AST node
      */
-    public func add_gate_data(_ name: String, _ gateMap: GateData) throws {
+    func add_gate_data(_ name: String, _ gateMap: GateData) throws {
         if self.gates[name] == nil {
             self.gates[name] = gateMap
             if let basis = self.basis[name] {
@@ -1309,7 +1309,7 @@ final class Circuit: NSCopying {
      node is a reference to a node of self.multi_graph of type "op"
      input_circuit is a CircuitGraph.
      */
-    public func substitute_circuit_one(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>,
+    func substitute_circuit_one(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>,
                                        _ input_circuit: Circuit,
                                        _ wires: [RegBit] = []) throws {
 
@@ -1488,7 +1488,7 @@ final class Circuit: NSCopying {
     /**
      Remove all of the ancestor operation nodes of node.
      */
-    public func remove_ancestors_of(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>) {
+    func remove_ancestors_of(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>) {
         let anc = self.multi_graph.ancestors(node.key)
         // TODO: probably better to do all at once using
         // multi_graph.remove_nodes_from; same for related functions ...
@@ -1504,7 +1504,7 @@ final class Circuit: NSCopying {
     /**
      Remove all of the descendant operation nodes of node.
      */
-    public func remove_descendants_of(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>) {
+    func remove_descendants_of(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>) {
         let dec = self.multi_graph.descendants(node.key)
         for n in dec {
             if let nd = n.data {
@@ -1518,7 +1518,7 @@ final class Circuit: NSCopying {
     /**
      Remove all of the non-ancestors operation nodes of node.
      */
-    public func remove_nonancestors_of(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>) {
+    func remove_nonancestors_of(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>) {
         let comp = self.multi_graph.nonAncestors(node.key)
         for n in comp {
             if let nd = n.data {
@@ -1532,7 +1532,7 @@ final class Circuit: NSCopying {
     /**
      Remove all of the non-descendants operation nodes of node.
      */
-    public func remove_nondescendants_of(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>) {
+    func remove_nondescendants_of(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>) {
         let comp = self.multi_graph.nonDescendants(node.key)
         for n in comp {
             if let nd = n.data {
@@ -1541,5 +1541,262 @@ final class Circuit: NSCopying {
                 }
             }
         }
+    }
+
+    /**
+     Return a list of layers for all d layers of this circuit.
+     A layer is a circuit whose gates act on disjoint qubits, i.e.
+     a layer has depth 1. The total number of layers equals the
+     circuit depth d. The layers are indexed from 0 to d-1 with the
+     earliest layer at index 0. The layers are constructed using a
+     greedy algorithm. Each returned layer is a dict containing
+     {"graph": circuit graph, "partition": list of qubit lists}.
+     TODO: Gates that use the same cbits will end up in different
+     layers as this is currently implemented. This may not be
+     the desired behavior.
+     */
+    public func layers() throws -> [Layer] {
+        var layers_list: [Layer] = []
+        // node_map contains an input node or previous layer node for
+        // each wire in the circuit.
+        var node_map = self.input_map
+        // wires_with_ops_remaining is a set of wire names that have
+        // operations we still need to assign to layers
+        var wires_with_ops_remaining = Set<RegBit>(self.input_map.keys)
+        while !wires_with_ops_remaining.isEmpty {
+            // Create a new circuit graph and populate with regs and basis
+            let new_layer = Circuit()
+            for (k, v) in self.qregs {
+                try new_layer.add_qreg(k, v)
+            }
+            for (k, v) in self.cregs {
+                try new_layer.add_creg(k, v)
+            }
+            new_layer.basis = self.basis
+            for (key,value) in self.gates {
+                let copy = value.copy(with: nil) as! GateData
+                new_layer.gates[key] = copy
+            }
+            // Save the support of each operation we add to the layer
+            var support_list: [RegBit] = []
+            // Determine what operations to add in this layer
+            // ops_touched is a map from operation nodes touched in this
+            // iteration to the set of their unvisited input wires. When all
+            // of the inputs of a touched node are visited, the node is a
+            // foreground node we can add to the current layer.
+            var ops_touched: [Int:Set<RegBit>] = [:]
+            let wires_loop = Array<RegBit>(wires_with_ops_remaining)
+            var emit: Bool = false
+            for w in wires_loop {
+                let outEdges = self.multi_graph.out_edges_iter(node_map[w]!)
+                var oe: [GraphEdge<CircuitEdgeData,CircuitVertexData>] = []
+                for edge in outEdges {
+                    if let data = edge.neighbor.data {
+                        if data.type == "in" || data.type == "out" {
+                            let dInOut = data as! CircuitVertexInOutData
+                            if dInOut.name == w {
+                                oe.append(edge)
+                            }
+                        }
+                    }
+                }
+                assert(oe.count == 1, "should only be one out-edge per (qu)bit")
+                let nxt_nd = oe[0].source
+                // If we reach an output node, we are done with this wire.
+                if nxt_nd.data!.type == "out" {
+                    wires_with_ops_remaining.remove(w)
+                }
+                else {
+                    // Otherwise, we are somewhere inside the circuit
+                    if nxt_nd.data!.type == "op" {
+                        // Operation data
+                        let dOp = nxt_nd.data! as! CircuitVertexOpData
+                        let qa = dOp.qargs
+                        let ca = dOp.cargs
+                        let pa = dOp.params
+                        let co = dOp.condition
+                        let cob = self._bits_in_condition(co)
+                        // First time we see an operation, add to ops_touched
+                        if ops_touched[nxt_nd.key] == nil {
+                            ops_touched[nxt_nd.key] = Set<RegBit>(qa).union(ca).union(cob)
+                        }
+                        // Mark inputs visited by deleting from set
+                        // NOTE: expect trouble with if(c==1) measure q -> c;
+                        assert(ops_touched[nxt_nd.key]!.contains(w), "expected wire")
+                        ops_touched[nxt_nd.key]!.remove(w)
+                        // Node becomes "foreground" if set becomes empty,
+                        // i.e. every input is available for this operation
+                        if ops_touched[nxt_nd.key]!.isEmpty {
+                            // Add node to new_layer
+                            try new_layer.apply_operation_back(dOp.name, qa, ca, pa, co)
+                            // Update node_map to point to this op
+                            for v in Set<RegBit>(qa).union(ca).union(cob) {
+                                node_map[v] = nxt_nd.key
+                            }
+                            // Add operation to partition
+                            if dOp.name != "barrier" {
+                                // support_list.append(list(set(qa) | set(ca) |
+                                //                          set(cob)))
+                                support_list.append(contentsOf: Set<RegBit>(qa))
+                            }
+                            emit = true
+                        }
+                    }
+                }
+            }
+            if emit {
+                layers_list.append(Layer(new_layer,support_list))
+                emit = false
+            }
+            else {
+                assert(!wires_with_ops_remaining.isEmpty, "not finished but empty?")
+            }
+        }
+        return layers_list
+    }
+
+    /**
+     Return a list of layers for all gates of this circuit.
+     A serial layer is a circuit with one gate. The layers have the
+     same structure as in layers().
+     */
+    func serial_layers() throws -> [Layer] {
+        var layers_list: [Layer] = []
+        let topological_sort = self.multi_graph.topological_sort()
+        for nxt_nd in topological_sort {
+            guard let nd = nxt_nd.data else {
+                continue
+            }
+            if nd.type != "op" {
+                continue
+            }
+            let dOp = nd as! CircuitVertexOpData
+            let new_layer = Circuit()
+            for (k, v) in self.qregs {
+                try new_layer.add_qreg(k, v)
+            }
+            for (k, v) in self.cregs {
+                try new_layer.add_creg(k, v)
+            }
+            new_layer.basis = self.basis
+            for (key,value) in self.gates {
+                let copy = value.copy(with: nil) as! GateData
+                new_layer.gates[key] = copy
+            }
+            // Save the support of the operation we add to the layer
+            var support_list: [RegBit] = []
+            // Operation data
+            let qa = dOp.qargs
+            let ca = dOp.cargs
+            let pa = dOp.params
+            let co = dOp.condition
+            // Add node to new_layer
+            try new_layer.apply_operation_back(dOp.name,qa, ca, pa, co)
+            //Add operation to partition
+            if dOp.name != "barrier" {
+                // support_list.append(list(set(qa) | set(ca) | set(cob)))
+                support_list.append(contentsOf: Set<RegBit>(qa))
+            }
+            layers_list.append(Layer(new_layer,support_list))
+        }
+        return layers_list
+    }
+
+    /**
+     Return a set of runs of "op" nodes with the given names.
+     For example, "... h q[0]; cx q[0],q[1]; cx q[0],q[1]; h q[1]; .."
+     would produce the tuple of cx nodes as an element of the set returned
+     from a call to collect_runs(["cx"]). If instead the cx nodes were
+     "cx q[0],q[1]; cx q[1],q[0];", the method would still return the
+     pair in a tuple. The namelist can contain names that are not
+     in the circuit's basis.
+     Nodes must have only one successor to continue the run.
+     */
+    func collect_runs(namelist: Set<String>) -> [[Int]] {
+        var group_list: [[Int]] = []
+
+        // Iterate through the nodes of self in topological order
+        // and form tuples containing sequences of gates
+        // on the same qubit(s).
+        let topological_sort = self.multi_graph.topological_sort()
+        var nodes_seen:[Int:Bool] = [:]
+        for node in topological_sort {
+            nodes_seen[node.key] = false
+        }
+        for node in topological_sort {
+            guard let nd = node.data else {
+                continue
+            }
+            if nd.type != "op" {
+                continue
+            }
+            let ndOp = nd as! CircuitVertexOpData
+            if !namelist.contains(ndOp.name) {
+                continue
+            }
+            if nodes_seen[node.key]! {
+                continue
+            }
+            var group: [Int] = [node.key]
+            nodes_seen[node.key] = true
+            var s = self.multi_graph.successors(node.key)
+            while s.count == 1 {
+                guard let sd = s[0].data else {
+                    break
+                }
+                if sd.type != "op" {
+                    break
+                }
+                let ndOp = sd as! CircuitVertexOpData
+                if !namelist.contains(ndOp.name) {
+                    break
+                }
+                group.append(s[0].key)
+                nodes_seen[s[0].key] = true
+                s = self.multi_graph.successors(s[0].key)
+            }
+            if group.count > 1 {
+                group_list.append(group)
+            }
+        }
+        return group_list
+    }
+
+    /**
+     Count the occurrences of operation names.
+     Returns a dictionary of counts keyed on the operation name.
+    */
+    func count_ops() -> [String:Int] {
+        var op_dict: [String:Int] = [:]
+        let topological_sort = self.multi_graph.topological_sort()
+        for node in topological_sort {
+            guard let nd = node.data else {
+                continue
+            }
+            if nd.type != "op" {
+                continue
+            }
+            let ndOp = nd as! CircuitVertexOpData
+            let name = ndOp.name
+            if op_dict[name] == nil {
+                op_dict[name] = 1
+            }
+            else {
+                op_dict[name]! += 1
+            }
+        }
+        return op_dict
+    }
+
+    /**
+     Return a dictionary of circuit properties.
+     */
+    func property_summary() -> [String:AnyObject] {
+        return [ "size": self.size() as AnyObject,
+                 "depth": self.depth() as AnyObject,
+                 "width": self.width() as AnyObject,
+                 "bits":  self.num_cbits() as AnyObject,
+                 "factors": self.num_tensor_factors() as AnyObject,
+                 "operations": self.count_ops() as AnyObject ]
     }
 }
