@@ -8,14 +8,55 @@
 
 import Foundation
 
+enum SearchProcessType {
+    case vertexEarly
+    case vertexLate
+    case edge
+}
+
+enum EdgeClassification {
+    case tree
+    case back
+    case forward
+    case cross
+    case unknown
+}
+
+final class BFSState {
+    fileprivate(set) var discovered: Set<Int> = []
+    fileprivate(set) var processed: Set<Int> = []
+    fileprivate(set) var parent: [Int:Int] = [:]
+}
+
+typealias BFSHandler<VertexDataType: NSCopying,EdgeDataType: NSCopying> = (SearchProcessType,
+                        GraphVertex<VertexDataType,EdgeDataType>?,
+                        GraphEdge<EdgeDataType,VertexDataType>?,
+                        BFSState) throws -> (Void)
+
+final class DFSState {
+    var finished = false
+    fileprivate var queue: [Int] = []
+    fileprivate(set) var discovered: Set<Int> = []
+    fileprivate(set) var processed: Set<Int> = []
+    fileprivate(set) var time: Int = 0
+    fileprivate(set) var entryTime: [Int:Int] = [:]
+    fileprivate(set) var exitTime: [Int:Int] = [:]
+    fileprivate(set) var parent: [Int:Int] = [:]
+}
+
+typealias DFSHandler<VertexDataType: NSCopying,EdgeDataType: NSCopying> = (SearchProcessType,
+                                                        GraphVertex<VertexDataType,EdgeDataType>?,
+                                                        GraphEdge<EdgeDataType,VertexDataType>?,
+                                                        DFSState) throws -> (Void)
+
 final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying {
 
-    public private(set) var vertexList: [GraphVertex<VertexDataType,EdgeDataType>] = []
+    public private(set) var vertices: [GraphVertex<VertexDataType,EdgeDataType>] = []
     public let isDirected: Bool
 
     public var edges: [GraphEdge<EdgeDataType,VertexDataType>] {
         var edges: [GraphEdge<EdgeDataType,VertexDataType>] = []
-        for vertex in self.vertexList {
+        for vertex in self.vertices {
             for edge in vertex.neighbors {
                 edges.append(edge)
             }
@@ -29,7 +70,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
 
     public func copy(with zone: NSZone? = nil) -> Any {
         let copy = Graph(self.isDirected)
-        for vertex in self.vertexList {
+        for vertex in self.vertices {
             let v = copy.add_vertex(vertex.key)
             if let data = vertex.data {
                 v.data = data.copy(with: zone) as? VertexDataType
@@ -40,13 +81,13 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
             if let data = edge.data {
                 d = data.copy(with: zone) as? EdgeDataType
             }
-            copy.add_edge(edge.source.key, edge.neighbor.key, d, edge.weight)
+            copy.add_edge(edge.source.key, edge.neighbor.key, d)
         }
         return copy
     }
 
     public func vertex(_ key: Int) -> GraphVertex<VertexDataType,EdgeDataType>? {
-        for vertex in self.vertexList {
+        for vertex in self.vertices {
             if vertex.key == key {
                 return vertex
             }
@@ -65,42 +106,40 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         var vertex = self.vertex(key)
         if vertex == nil {
             vertex = GraphVertex(key)
-            self.vertexList.append(vertex!)
+            self.vertices.append(vertex!)
         }
         return vertex!
     }
 
-    public func add_edge(_ sourceIndex: Int, _ neighborIndex: Int, _ data: EdgeDataType? = nil, _ weight: Int = 0) {
+    public func add_edge(_ sourceIndex: Int, _ neighborIndex: Int, _ data: EdgeDataType? = nil) {
         var source = self.vertex(sourceIndex)
         if source == nil {
             source = GraphVertex(sourceIndex)
-            self.vertexList.append(source!)
+            self.vertices.append(source!)
         }
         var neighbor = self.vertex(neighborIndex)
         if neighbor == nil {
             neighbor = GraphVertex(neighborIndex)
-            self.vertexList.append(neighbor!)
+            self.vertices.append(neighbor!)
         }
         var edge = self.edge(sourceIndex,neighborIndex)
         if edge == nil {
-            edge = GraphEdge(source!,neighbor!,weight)
+            edge = GraphEdge(source!,neighbor!)
             edge!.data = data
             edge!.source.neighbors.append(edge!)
         }
         else {
             edge!.data = data
-            edge!.weight = weight
         }
         if !self.isDirected {
             edge = self.edge(neighborIndex,sourceIndex)
             if edge == nil {
-                edge = GraphEdge(neighbor!,source!,weight)
+                edge = GraphEdge(neighbor!,source!)
                 edge!.data = data
                 edge!.source.neighbors.append(edge!)
             }
             else {
                 edge!.data = data
-                edge!.weight = weight
             }
         }
     }
@@ -134,10 +173,10 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         if self.vertex(index) == nil {
             return
         }
-        var newVertexList: [GraphVertex<VertexDataType,EdgeDataType>] = []
-        for vertex in self.vertexList {
+        var newvertices: [GraphVertex<VertexDataType,EdgeDataType>] = []
+        for vertex in self.vertices {
             if vertex.key != index {
-                newVertexList.append(vertex)
+                newvertices.append(vertex)
                 var newNeighborList: [GraphEdge<EdgeDataType,VertexDataType>] = []
                 for edge in vertex.neighbors {
                     if edge.neighbor.key != index {
@@ -147,7 +186,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
                 vertex.neighbors = newNeighborList
             }
         }
-        self.vertexList = newVertexList
+        self.vertices = newvertices
     }
 
     public func in_edges_iter(_ index: Int) -> [GraphEdge<EdgeDataType,VertexDataType>] {
@@ -170,32 +209,123 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         return vertex.neighbors
     }
 
-    //TODO Implement the reverse case
-    public func topological_sort(reverse: Bool = false) -> [GraphVertex<VertexDataType,EdgeDataType>] {
-        var stack = Stack<GraphVertex<VertexDataType,EdgeDataType>>()
-        var visited = Set<Int>()
-        for vertex in self.vertexList {
-            if !visited.contains(vertex.key) {
-                Graph.topologicalSortUtil(vertex, &visited, &stack)
+    public static func bfs(_ start:  GraphVertex<VertexDataType,EdgeDataType>,
+                           _ state:   BFSState,
+                           _ handler: BFSHandler<VertexDataType,EdgeDataType>) throws {
+        var queue = Queue<GraphVertex<VertexDataType,EdgeDataType>>()
+        queue.enqueue(start)
+        state.discovered.update(with: start.key)
+        while !queue.isEmpty {
+            let vertex = queue.dequeue()
+            try handler(SearchProcessType.vertexEarly,vertex,nil,state)
+            for edge in vertex.neighbors {
+                let neighbor = edge.neighbor
+                try handler(SearchProcessType.edge,nil,edge,state)
+                if !state.discovered.contains(neighbor.key) {
+                    state.discovered.update(with: neighbor.key)
+                    state.parent[neighbor.key] = vertex.key
+                    queue.enqueue(neighbor)
+                }
             }
+            state.processed.update(with: vertex.key)
+            try handler(SearchProcessType.vertexLate,vertex,nil,state)
         }
-        var vertexList: [GraphVertex<VertexDataType,EdgeDataType>] = []
-        while !stack.isEmpty {
-            vertexList.append(stack.pop())
-        }
-        return vertexList
     }
 
-    private class func topologicalSortUtil(_ vertex: GraphVertex<VertexDataType,EdgeDataType>,
-                                           _ visited: inout Set<Int>,
-                                           _ stack: inout Stack<GraphVertex<VertexDataType,EdgeDataType>>) {
-        visited.update(with: vertex.key)
+    public static func dfs(_ vertex:  GraphVertex<VertexDataType,EdgeDataType>,
+                           _ state:   DFSState,
+                           _ handler: DFSHandler<VertexDataType,EdgeDataType>) throws {
+
+        if state.finished {
+            return
+        }
+        state.discovered.update(with: vertex.key)
+        state.time += 1
+        state.entryTime[vertex.key] = state.time
+        try handler(SearchProcessType.vertexEarly,vertex,nil,state)
         for edge in vertex.neighbors {
-            if !visited.contains(edge.neighbor.key) {
-                self.topologicalSortUtil(edge.neighbor, &visited, &stack)
+            let neighbor = edge.neighbor
+            if !state.discovered.contains(neighbor.key) {
+                state.parent[neighbor.key] = vertex.key
+                try handler(SearchProcessType.edge,nil,edge,state)
+                try Graph.dfs(neighbor, state, handler)
+                if state.finished {
+                    return
+                }
             }
         }
-        stack.push(vertex)
+        try handler(SearchProcessType.vertexLate,vertex,nil,state)
+        state.time += 1
+        state.exitTime[vertex.key] = state.time
+        state.processed.update(with: vertex.key)
+    }
+
+    public static func edgeClassification(_ edge: GraphEdge<EdgeDataType,VertexDataType>,
+                                          _ state: DFSState) -> EdgeClassification {
+        if let parent = state.parent[edge.neighbor.key] {
+            if parent == edge.source.key {
+                return EdgeClassification.tree
+            }
+        }
+        if state.discovered.contains(edge.neighbor.key) &&
+            !state.processed.contains(edge.neighbor.key) {
+            return EdgeClassification.back
+        }
+        if state.processed.contains(edge.neighbor.key) {
+            var entryTimeSource = 0
+            if let time = state.entryTime[edge.source.key] {
+                entryTimeSource = time
+            }
+            var entryTimeNeighbor = 0
+            if let time = state.entryTime[edge.neighbor.key] {
+                entryTimeNeighbor = time
+            }
+            if entryTimeNeighbor > entryTimeSource {
+                return EdgeClassification.forward
+            }
+            if entryTimeNeighbor < entryTimeSource {
+                return EdgeClassification.cross
+            }
+        }
+        return EdgeClassification.unknown
+    }
+
+    public func topological_sort(reverse: Bool = false) throws -> [GraphVertex<VertexDataType,EdgeDataType>] {
+        if !self.isDirected {
+            throw GraphError.isUndirected
+        }
+        let state: DFSState = DFSState()
+        var queue = Queue<GraphVertex<VertexDataType,EdgeDataType>>()
+        var stack = Stack<GraphVertex<VertexDataType,EdgeDataType>>()
+        for vertex in self.vertices {
+            if !state.discovered.contains(vertex.key) {
+                try Graph.dfs(vertex, state) { (searchProcessType,vertex,edge,state) -> Void in
+                    if searchProcessType == SearchProcessType.vertexLate {
+                        stack.push(vertex!)
+                        queue.enqueue(vertex!)
+                        return
+                    }
+                    if searchProcessType == SearchProcessType.edge {
+                        let classification = Graph.edgeClassification(edge!,state)
+                        if classification == EdgeClassification.back {
+                            throw GraphError.isCyclic
+                        }
+                    }
+                }
+            }
+        }
+        var vertices: [GraphVertex<VertexDataType,EdgeDataType>] = []
+        if reverse {
+            while !queue.isEmpty {
+                vertices.append(queue.dequeue())
+            }
+        }
+        else {
+            while !stack.isEmpty {
+                vertices.append(stack.pop())
+            }
+        }
+        return vertices
     }
 
     public func predecessors(_ key: Int) -> [GraphVertex<VertexDataType,EdgeDataType>] {
@@ -214,7 +344,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
     public func ancestors(_ key: Int) -> [GraphVertex<VertexDataType,EdgeDataType>] {
         var list: [GraphVertex<VertexDataType,EdgeDataType>] = []
         var visited = Set<Int>()
-        for vertex in self.vertexList {
+        for vertex in self.vertices {
             if vertex.key == key {
                 continue
             }
@@ -249,7 +379,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
 
     public func nonAncestors(_ key: Int) -> [GraphVertex<VertexDataType,EdgeDataType>] {
         var vertexSet: Set<Int> = []
-        for vertex in self.vertexList {
+        for vertex in self.vertices {
             vertexSet.update(with: vertex.key)
         }
         var ancestorsSet: Set<Int> = []
@@ -307,7 +437,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
 
     public func nonDescendants(_ key: Int) -> [GraphVertex<VertexDataType,EdgeDataType>] {
         var vertexSet: Set<Int> = []
-        for vertex in self.vertexList {
+        for vertex in self.vertices {
             vertexSet.update(with: vertex.key)
         }
         var descendantsSet: Set<Int> = []
@@ -322,20 +452,51 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         return nonDescendantsList
     }
 
-    // TODO implement
     public func order() -> Int {
-        return 0
+        return self.vertices.count
     }
     
     public func is_directed_acyclic_graph() -> Bool {
+        if !self.isDirected {
+            return false
+        }
+        let state: DFSState = DFSState()
+        for vertex in self.vertices {
+            if !state.discovered.contains(vertex.key) {
+                do {
+                    try Graph.dfs(vertex, state) { (searchProcessType,vertex,edge,state) -> Void in
+                        if searchProcessType == SearchProcessType.edge {
+                            let classification = Graph.edgeClassification(edge!,state)
+                            if classification == EdgeClassification.back {
+                                throw GraphError.isCyclic
+                            }
+                        }
+                    }
+                }
+                catch GraphError.isCyclic {
+                    return false
+                }
+                catch {
+                    return false
+                }
+            }
+        }
         return true
     }
 
-    public func dag_longest_path_length() -> Int {
+    // TODO implement
+    public func dag_longest_path_length() throws -> Int {
+        if !self.isDirected {
+            throw GraphError.isUndirected
+        }
         return 0
     }
 
-    public func number_weakly_connected_components() -> Int {
+    // TODO implement
+    public func number_weakly_connected_components() throws -> Int {
+        if !self.isDirected {
+            throw GraphError.isUndirected
+        }
         return 0
     }
 }

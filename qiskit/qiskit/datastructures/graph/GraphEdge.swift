@@ -13,11 +13,9 @@ final class GraphEdge<EdgeDataType: NSCopying,VertexDataType: NSCopying> {
     public var data: EdgeDataType? = nil
     public let source: GraphVertex<VertexDataType,EdgeDataType>
     public let neighbor: GraphVertex<VertexDataType,EdgeDataType>
-    public internal(set) var weight: Int
 
-    init(_ source: GraphVertex<VertexDataType,EdgeDataType>, _ neighbor: GraphVertex<VertexDataType,EdgeDataType>, _ weight: Int) {
+    init(_ source: GraphVertex<VertexDataType,EdgeDataType>, _ neighbor: GraphVertex<VertexDataType,EdgeDataType>) {
         self.source = source
         self.neighbor = neighbor
-        self.weight = weight
     }
 }

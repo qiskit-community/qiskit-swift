@@ -22,16 +22,22 @@ class GraphTests: XCTestCase {
     }
 
     func testTopologicalSort() {
-        let g = Graph<NSString,NSString>(true)
-        g.add_edge(5, 2)
-        g.add_edge(5, 0)
-        g.add_edge(4, 0)
-        g.add_edge(4, 1)
-        g.add_edge(2, 3)
-        g.add_edge(3, 1)
+        do {
+            let g = Graph<NSString,NSString>(true)
+            g.add_edge(5, 2)
+            g.add_edge(5, 0)
+            g.add_edge(4, 0)
+            g.add_edge(4, 1)
+            g.add_edge(2, 3)
+            g.add_edge(3, 1)
 
-        let str = GraphTests.formatList(g.topological_sort())
-        XCTAssertEqual(str, "4 5 0 2 3 1")
+            var str = try GraphTests.formatList(g.topological_sort())
+            XCTAssertEqual(str, "4 5 0 2 3 1")
+            str = try GraphTests.formatList(g.topological_sort(reverse: true))
+            XCTAssertEqual(str, "1 3 2 0 5 4")
+        } catch let error {
+            XCTFail("\(error)")
+        }
     }
 
     func testPredecessors() {

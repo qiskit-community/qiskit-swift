@@ -162,7 +162,7 @@ final class Circuit: NSCopying {
             self.output_map.removeValue(forKey: oldTuple)
         }
         // n node d = data
-        for node in self.multi_graph.vertexList {
+        for node in self.multi_graph.vertices {
             guard let data = node.data else {
                 continue
             }
@@ -736,7 +736,7 @@ final class Circuit: NSCopying {
         // Compose
         self.basis = union_basis
         self.gates = union_gates
-        let topological_sort = input_circuit.multi_graph.topological_sort()
+        let topological_sort = try input_circuit.multi_graph.topological_sort()
         for node in topological_sort {
             guard let nd = node.data else {
                 continue
@@ -813,7 +813,7 @@ final class Circuit: NSCopying {
         // Compose
         self.basis = union_basis
         self.gates = union_gates
-        let topological_sort = input_circuit.multi_graph.topological_sort(reverse: true)
+        let topological_sort = try input_circuit.multi_graph.topological_sort(reverse: true)
         for node in topological_sort {
             guard let nd = node.data else {
                 continue
@@ -869,9 +869,9 @@ final class Circuit: NSCopying {
     /**
      Return the circuit depth.
      */
-    public func depth() -> Int {
+    public func depth() throws -> Int {
         assert(self.multi_graph.is_directed_acyclic_graph(), "not a DAG")
-        return self.multi_graph.dag_longest_path_length() - 1
+        return try self.multi_graph.dag_longest_path_length() - 1
     }
     /**
      Return the total number of qubits used by the circuit
@@ -895,8 +895,8 @@ final class Circuit: NSCopying {
     /**
      Compute how many components the circuit can decompose into
      */
-    public func num_tensor_factors() -> Int {
-        return self.multi_graph.number_weakly_connected_components()
+    public func num_tensor_factors() throws -> Int {
+        return try self.multi_graph.number_weakly_connected_components()
     }
 
     /**
@@ -946,7 +946,7 @@ final class Circuit: NSCopying {
                      _ add_swap: Bool = false,
                      _ no_decls: Bool = false,
                      _ qeflag: Bool = false,
-                     _ aliasesMap: [RegBit:RegBit]? = nil) -> String {
+                     _ aliasesMap: [RegBit:RegBit]? = nil) throws -> String {
         // Rename qregs if necessary
         var qregdata: [String:Int] = [:]
         if let aliases = aliasesMap {
@@ -1017,7 +1017,7 @@ final class Circuit: NSCopying {
         }
         // Write the instructions
         if !decls_only {
-            let topological_sort = self.multi_graph.topological_sort()
+            let topological_sort = try self.multi_graph.topological_sort()
             for node in topological_sort {
                 guard let nd = node.data else {
                     continue
@@ -1199,7 +1199,7 @@ final class Circuit: NSCopying {
         //       that we add from the input_circuit.
         self.basis = union_basis
         self.gates = union_gates
-        let topological_sort = self.multi_graph.topological_sort()
+        let topological_sort = try self.multi_graph.topological_sort()
         for node in topological_sort {
             guard let nd = node.data else {
                 continue
@@ -1232,7 +1232,7 @@ final class Circuit: NSCopying {
             // Now that we know the connections, delete node
             self.multi_graph.remove_vertex(node.key)
             // Iterate over nodes of input_circuit
-            let tsin = input_circuit.multi_graph.topological_sort()
+            let tsin = try input_circuit.multi_graph.topological_sort()
             for m in tsin {
                 guard let md = m.data else {
                     continue
@@ -1370,7 +1370,7 @@ final class Circuit: NSCopying {
         // Now that we know the connections, delete node
         self.multi_graph.remove_vertex(node.key)
         // Iterate over nodes of input_circuit
-        let tsin = input_circuit.multi_graph.topological_sort()
+        let tsin = try input_circuit.multi_graph.topological_sort()
         for m in tsin {
             guard let md = m.data else {
                 continue
@@ -1450,7 +1450,7 @@ final class Circuit: NSCopying {
         }
         var nlist: [Int] = []
         // Iterate through the nodes of self in topological order
-        let ts = self.multi_graph.topological_sort()
+        let ts = try self.multi_graph.topological_sort()
         for nd in ts {
             if let data = nd.data {
                 if data.type == "op" {
@@ -1662,7 +1662,7 @@ final class Circuit: NSCopying {
      */
     func serial_layers() throws -> [Layer] {
         var layers_list: [Layer] = []
-        let topological_sort = self.multi_graph.topological_sort()
+        let topological_sort = try self.multi_graph.topological_sort()
         for nxt_nd in topological_sort {
             guard let nd = nxt_nd.data else {
                 continue
@@ -1712,13 +1712,13 @@ final class Circuit: NSCopying {
      in the circuit's basis.
      Nodes must have only one successor to continue the run.
      */
-    func collect_runs(namelist: Set<String>) -> [[Int]] {
+    func collect_runs(namelist: Set<String>) throws -> [[Int]] {
         var group_list: [[Int]] = []
 
         // Iterate through the nodes of self in topological order
         // and form tuples containing sequences of gates
         // on the same qubit(s).
-        let topological_sort = self.multi_graph.topological_sort()
+        let topological_sort = try self.multi_graph.topological_sort()
         var nodes_seen:[Int:Bool] = [:]
         for node in topological_sort {
             nodes_seen[node.key] = false
@@ -1766,9 +1766,9 @@ final class Circuit: NSCopying {
      Count the occurrences of operation names.
      Returns a dictionary of counts keyed on the operation name.
     */
-    func count_ops() -> [String:Int] {
+    func count_ops() throws -> [String:Int] {
         var op_dict: [String:Int] = [:]
-        let topological_sort = self.multi_graph.topological_sort()
+        let topological_sort = try self.multi_graph.topological_sort()
         for node in topological_sort {
             guard let nd = node.data else {
                 continue
@@ -1791,12 +1791,12 @@ final class Circuit: NSCopying {
     /**
      Return a dictionary of circuit properties.
      */
-    func property_summary() -> [String:AnyObject] {
+    func property_summary() throws -> [String:AnyObject] {
         return [ "size": self.size() as AnyObject,
-                 "depth": self.depth() as AnyObject,
+                 "depth": try self.depth() as AnyObject,
                  "width": self.width() as AnyObject,
                  "bits":  self.num_cbits() as AnyObject,
-                 "factors": self.num_tensor_factors() as AnyObject,
-                 "operations": self.count_ops() as AnyObject ]
+                 "factors": try self.num_tensor_factors() as AnyObject,
+                 "operations": try self.count_ops() as AnyObject ]
     }
 }
