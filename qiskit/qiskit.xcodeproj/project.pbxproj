@@ -21,9 +21,10 @@
 		695701361ED75C1C00C6CCAB /* GraphEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695701331ED75C1C00C6CCAB /* GraphEdge.swift */; };
 		695701381ED75C2E00C6CCAB /* Stack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695701371ED75C2E00C6CCAB /* Stack.swift */; };
 		6957013A1ED75C8B00C6CCAB /* HashableTuple.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695701391ED75C8B00C6CCAB /* HashableTuple.swift */; };
-		6957013C1ED75E9100C6CCAB /* GraphTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6957013B1ED75E9100C6CCAB /* GraphTests.swift */; };
+		6957013C1ED75E9100C6CCAB /* DataStructureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6957013B1ED75E9100C6CCAB /* DataStructureTests.swift */; };
 		6974E5951ECA1EF300D1AE97 /* QISKitException.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6974E5941ECA1EF300D1AE97 /* QISKitException.swift */; };
 		697BEDB11ED0844E00AB9A86 /* GatesTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697BEDB01ED0844E00AB9A86 /* GatesTools.swift */; };
+		697D36AE1EE3493B00557541 /* OrderedDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697D36AD1EE3493B00557541 /* OrderedDictionary.swift */; };
 		697F259C1ED45BED0065B106 /* Circuit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697F259B1ED45BED0065B106 /* Circuit.swift */; };
 		697F259E1ED45DD90065B106 /* CircuitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697F259D1ED45DD90065B106 /* CircuitError.swift */; };
 		69D310771ECA180500B3E752 /* QuantumProgram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D3106A1ECA180500B3E752 /* QuantumProgram.swift */; };
@@ -93,9 +94,10 @@
 		695701331ED75C1C00C6CCAB /* GraphEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GraphEdge.swift; path = datastructures/graph/GraphEdge.swift; sourceTree = "<group>"; };
 		695701371ED75C2E00C6CCAB /* Stack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Stack.swift; path = datastructures/Stack.swift; sourceTree = "<group>"; };
 		695701391ED75C8B00C6CCAB /* HashableTuple.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HashableTuple.swift; path = datastructures/HashableTuple.swift; sourceTree = "<group>"; };
-		6957013B1ED75E9100C6CCAB /* GraphTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GraphTests.swift; sourceTree = "<group>"; };
+		6957013B1ED75E9100C6CCAB /* DataStructureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataStructureTests.swift; sourceTree = "<group>"; };
 		6974E5941ECA1EF300D1AE97 /* QISKitException.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QISKitException.swift; path = sdk/QISKitException.swift; sourceTree = "<group>"; };
 		697BEDB01ED0844E00AB9A86 /* GatesTools.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GatesTools.swift; path = extensions/GatesTools.swift; sourceTree = "<group>"; };
+		697D36AD1EE3493B00557541 /* OrderedDictionary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OrderedDictionary.swift; path = datastructures/OrderedDictionary.swift; sourceTree = "<group>"; };
 		697F259B1ED45BED0065B106 /* Circuit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Circuit.swift; path = circuit/Circuit.swift; sourceTree = "<group>"; };
 		697F259D1ED45DD90065B106 /* CircuitError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CircuitError.swift; path = circuit/CircuitError.swift; sourceTree = "<group>"; };
 		69D3106A1ECA180500B3E752 /* QuantumProgram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QuantumProgram.swift; path = sdk/QuantumProgram.swift; sourceTree = "<group>"; };
@@ -180,6 +182,7 @@
 				695701371ED75C2E00C6CCAB /* Stack.swift */,
 				690188731EE269B0005B4419 /* Queue.swift */,
 				695701391ED75C8B00C6CCAB /* HashableTuple.swift */,
+				697D36AD1EE3493B00557541 /* OrderedDictionary.swift */,
 			);
 			name = "Data Structures";
 			sourceTree = "<group>";
@@ -308,7 +311,7 @@
 			isa = PBXGroup;
 			children = (
 				DFBC4F701EC7384200027640 /* QiskitTests.swift */,
-				6957013B1ED75E9100C6CCAB /* GraphTests.swift */,
+				6957013B1ED75E9100C6CCAB /* DataStructureTests.swift */,
 				DFBC4F721EC7384200027640 /* Info.plist */,
 			);
 			path = qiskitTests;
@@ -459,6 +462,7 @@
 				69D310801ECA180500B3E752 /* CompositeGate.swift in Sources */,
 				697F259E1ED45DD90065B106 /* CircuitError.swift in Sources */,
 				695701361ED75C1C00C6CCAB /* GraphEdge.swift in Sources */,
+				697D36AE1EE3493B00557541 /* OrderedDictionary.swift in Sources */,
 				695701351ED75C1C00C6CCAB /* GraphVertex.swift in Sources */,
 				69D3108F1ECA192000B3E752 /* Instruction.swift in Sources */,
 				69D3107E1ECA180500B3E752 /* Reset.swift in Sources */,
@@ -508,7 +512,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6957013C1ED75E9100C6CCAB /* GraphTests.swift in Sources */,
+				6957013C1ED75E9100C6CCAB /* DataStructureTests.swift in Sources */,
 				DFBC4F711EC7384200027640 /* QiskitTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

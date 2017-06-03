@@ -8,23 +8,27 @@
 
 import Foundation
 
-final class GraphVertex<VertexDataType: NSCopying,EdgeDataType: NSCopying> {
+final class GraphVertex<VertexDataType: NSCopying> {
 
     public let key: Int
     public var data: VertexDataType? = nil
-    var neighbors: [GraphEdge<EdgeDataType,VertexDataType>] = []
+    var neighbors: OrderedDictionary<Int,GraphVertex<VertexDataType>> = OrderedDictionary<Int,GraphVertex<VertexDataType>>()
 
     public init(_ key: Int) {
         self.key = key
     }
-    public func edge(_ neighborKey: Int) -> GraphEdge<EdgeDataType,VertexDataType>? {
-        for edge in self.neighbors {
-            if edge.neighbor.key == neighborKey {
-                return edge
-            }
-        }
-        return nil
-    }
 
+    public func copy(with zone: NSZone? = nil) -> Any {
+        let copy = GraphVertex<VertexDataType>(self.key)
+        if self.data != nil {
+            let d = self.data!.copy(with: zone) as! VertexDataType
+            copy.data = d
+        }
+        for i in 0..<self.neighbors.count {
+            let neighbor = self.neighbors.value(i).copy(with: zone) as! GraphVertex<VertexDataType>
+            copy.neighbors[neighbor.key] = neighbor
+        }
+        return copy
+    }
 }
 

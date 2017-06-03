@@ -162,7 +162,8 @@ final class Circuit: NSCopying {
             self.output_map.removeValue(forKey: oldTuple)
         }
         // n node d = data
-        for node in self.multi_graph.vertices {
+        for i in 0..<self.multi_graph.vertices.count {
+            let node = self.multi_graph.vertices.value(i)
             guard let data = node.data else {
                 continue
             }
@@ -198,7 +199,8 @@ final class Circuit: NSCopying {
             }
         }
         // eX = edge, d= data
-        for edge in self.multi_graph.edges {
+        for i in 0..<self.multi_graph.edges.count {
+            let edge = self.multi_graph.edges.value(i)
             guard let data = edge.data else {
                 continue
             }
@@ -1113,14 +1115,14 @@ final class Circuit: NSCopying {
         var edges = self.multi_graph.in_edges_iter(n)
         for edge in edges {
             if let data = edge.data {
-                pred_map[data.name] = edge.source.key
+                pred_map[data.name] = edge.source
             }
         }
         var succ_map: [RegBit:Int] = [:]
         edges = self.multi_graph.out_edges_iter(n)
         for edge in edges {
             if let data = edge.data {
-                succ_map[data.name] = edge.neighbor.key
+                succ_map[data.name] = edge.neighbor
             }
         }
         return (pred_map, succ_map)
@@ -1309,7 +1311,7 @@ final class Circuit: NSCopying {
      node is a reference to a node of self.multi_graph of type "op"
      input_circuit is a CircuitGraph.
      */
-    func substitute_circuit_one(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>,
+    func substitute_circuit_one(_ node: GraphVertex<CircuitVertexData>,
                                        _ input_circuit: Circuit,
                                        _ wires: [RegBit] = []) throws {
 
@@ -1488,7 +1490,7 @@ final class Circuit: NSCopying {
     /**
      Remove all of the ancestor operation nodes of node.
      */
-    func remove_ancestors_of(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>) {
+    func remove_ancestors_of(_ node: GraphVertex<CircuitVertexData>) {
         let anc = self.multi_graph.ancestors(node.key)
         // TODO: probably better to do all at once using
         // multi_graph.remove_nodes_from; same for related functions ...
@@ -1504,7 +1506,7 @@ final class Circuit: NSCopying {
     /**
      Remove all of the descendant operation nodes of node.
      */
-    func remove_descendants_of(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>) {
+    func remove_descendants_of(_ node: GraphVertex<CircuitVertexData>) {
         let dec = self.multi_graph.descendants(node.key)
         for n in dec {
             if let nd = n.data {
@@ -1518,7 +1520,7 @@ final class Circuit: NSCopying {
     /**
      Remove all of the non-ancestors operation nodes of node.
      */
-    func remove_nonancestors_of(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>) {
+    func remove_nonancestors_of(_ node: GraphVertex<CircuitVertexData>) {
         let comp = self.multi_graph.nonAncestors(node.key)
         for n in comp {
             if let nd = n.data {
@@ -1532,7 +1534,7 @@ final class Circuit: NSCopying {
     /**
      Remove all of the non-descendants operation nodes of node.
      */
-    func remove_nondescendants_of(_ node: GraphVertex<CircuitVertexData,CircuitEdgeData>) {
+    func remove_nondescendants_of(_ node: GraphVertex<CircuitVertexData>) {
         let comp = self.multi_graph.nonDescendants(node.key)
         for n in comp {
             if let nd = n.data {
@@ -1589,9 +1591,10 @@ final class Circuit: NSCopying {
             var emit: Bool = false
             for w in wires_loop {
                 let outEdges = self.multi_graph.out_edges_iter(node_map[w]!)
-                var oe: [GraphEdge<CircuitEdgeData,CircuitVertexData>] = []
+                var oe: [GraphEdge<CircuitEdgeData>] = []
                 for edge in outEdges {
-                    if let data = edge.neighbor.data {
+                    let neighbor = self.multi_graph.vertex(edge.neighbor)!
+                    if let data = neighbor.data {
                         if data.type == "in" || data.type == "out" {
                             let dInOut = data as! CircuitVertexInOutData
                             if dInOut.name == w {
@@ -1601,7 +1604,7 @@ final class Circuit: NSCopying {
                     }
                 }
                 assert(oe.count == 1, "should only be one out-edge per (qu)bit")
-                let nxt_nd = oe[0].source
+                let nxt_nd = self.multi_graph.vertex(oe[0].source)!
                 // If we reach an output node, we are done with this wire.
                 if nxt_nd.data!.type == "out" {
                     wires_with_ops_remaining.remove(w)
