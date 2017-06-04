@@ -57,12 +57,12 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
                                                 OrderedDictionary<HashableTuple<Int,Int>,GraphEdge<EdgeDataType>>()
     public let isDirected: Bool
 
-    public init(_ isDirected: Bool) {
-        self.isDirected = isDirected
+    public init(directed: Bool) {
+        self.isDirected = directed
     }
 
     public func copy(with zone: NSZone? = nil) -> Any {
-        let copy = Graph(self.isDirected)
+        let copy = Graph(directed: self.isDirected)
         for i in 0..<self.vertices.count {
             let vertex = self.vertices.value(i).copy(with: zone) as! GraphVertex<VertexDataType>
             copy.vertices[vertex.key] = vertex
@@ -451,9 +451,6 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
                         }
                     }
                 }
-                catch GraphError.isCyclic {
-                    return false
-                }
                 catch {
                     return false
                 }
@@ -462,19 +459,88 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         return true
     }
 
-    // TODO implement
-    public func dag_longest_path_length() throws -> Int {
-        if !self.isDirected {
-            throw GraphError.isUndirected
+    public func dag_longest_path() throws -> [GraphVertex<VertexDataType>] {
+        var distanceMap: [Int:(Int,GraphVertex<VertexDataType>)] = [:]
+        for sortedVertex in try self.topological_sort() {
+            var pairs: [(Int,GraphVertex<VertexDataType>)] = []
+            for v in self.predecessors(sortedVertex.key) {
+                var distance = 1
+                if let pair = distanceMap[v.key] {
+                    distance += pair.0
+                }
+                pairs.append((distance,v))
+            }
+            var maxPair: (Int,GraphVertex<VertexDataType>) = (0,sortedVertex)
+            for pair in pairs {
+                if maxPair.0 <= pair.0 {
+                    maxPair = pair
+                }
+            }
+            distanceMap[sortedVertex.key] = maxPair
         }
-        return 0
+        var vertex: GraphVertex<VertexDataType>? = nil
+        var length: Int = 0
+        for (v, pair) in distanceMap {
+            if length <= pair.0 {
+                length = pair.0
+                vertex = self.vertex(v)
+            }
+        }
+        var path: [GraphVertex<VertexDataType>] = []
+        if var v = vertex {
+            while length > 0 {
+                path.append(v)
+                guard let pair = distanceMap[v.key] else {
+                    break
+                }
+                length = pair.0
+                v = pair.1
+            }
+            path.reverse()
+        }
+        return path
     }
 
-    // TODO implement
+    public func dag_longest_path_length() throws -> Int {
+        let path = try self.dag_longest_path()
+        if path.isEmpty {
+            return 0
+        }
+        return path.count - 1
+    }
+
     public func number_weakly_connected_components() throws -> Int {
         if !self.isDirected {
             throw GraphError.isUndirected
         }
-        return 0
+        // create undirect graph
+        let graph = Graph(directed: false)
+        for i in 0..<self.vertices.count {
+            let vertex = self.vertices.value(i)
+            _ = graph.add_vertex(vertex.key)
+        }
+        for i in 0..<self.edges.count {
+            let edge = self.edges.value(i)
+            graph.add_edge(edge.source, edge.neighbor)
+        }
+
+        var count: Int = 0
+        let state: DFSState = DFSState()
+        for i in 0..<graph.vertices.count {
+            let vertex = graph.vertices.value(i)
+            if !state.discovered.contains(vertex.key) {
+                var vertices: [Int] = []
+                try dfs(vertex, state) { (searchProcessType,vertex,edge,state) -> Void in
+                    if searchProcessType == SearchProcessType.vertexLate {
+                        vertices.append(vertex!.key)
+                        return
+                    }
+                }
+                if !vertices.isEmpty {
+                    count += 1
+                }
+            }
+        }
+        return count
     }
 }

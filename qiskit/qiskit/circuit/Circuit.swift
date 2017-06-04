@@ -66,7 +66,7 @@ final class Circuit: NSCopying {
       Edges carry wire labels (reg,idx) and each operation has
       corresponding in- and out-edges with the same wire labels.
     */
-    private var multi_graph:Graph<CircuitVertexData,CircuitEdgeData> = Graph<CircuitVertexData,CircuitEdgeData>(true)
+    private var multi_graph:Graph<CircuitVertexData,CircuitEdgeData> = Graph<CircuitVertexData,CircuitEdgeData>(directed: true)
 
     /**
       Map of qregs to sizes
