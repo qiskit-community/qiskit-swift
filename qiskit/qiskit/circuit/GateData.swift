@@ -24,9 +24,9 @@ final class GateData: NSCopying {
     let n_bits: Int
     let args: [String]
     let bits: [RegBit]
-    let body: ASTNodeTemp
+    let body: Node
 
-    init(_ opaque: Bool, _ n_args: Int, _ n_bits: Int, _ args: [String], _ bits: [RegBit], _ body: ASTNodeTemp) {
+    init(_ opaque: Bool, _ n_args: Int, _ n_bits: Int, _ args: [String], _ bits: [RegBit], _ body: Node) {
         self.opaque = opaque
         self.n_args = n_args
         self.n_bits = n_bits
@@ -36,21 +36,7 @@ final class GateData: NSCopying {
     }
 
     public func copy(with zone: NSZone? = nil) -> Any {
-        let body = self.body.copy(with: zone) as! ASTNodeTemp
+        let body = self.body.copy(with: zone) as! Node
         return GateData(self.opaque, self.n_args, self.n_bits, self.args, self.bits, body)
-    }
-}
-
-//TODO replace by real ast node
-class ASTNodeTemp: NSCopying {
-
-    func qasm() -> String {
-        return ""
-    }
-    func calls() -> [String] {
-        return []
-    }
-    public func copy(with zone: NSZone? = nil) -> Any {
-        return ASTNodeTemp()
     }
 }
