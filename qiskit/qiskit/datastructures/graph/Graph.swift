@@ -384,31 +384,28 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
     }
 
     public func descendants(_ key: Int) -> [GraphVertex<VertexDataType>] {
-        guard let vertex = self.vertex(key) else {
+        guard let rootVertex = self.vertex(key) else {
             return []
         }
-        var list: [GraphVertex<VertexDataType>] = []
-        var visited = Set<Int>()
-        for i in 0..<vertex.neighbors.count {
-            let neighbor = vertex.neighbors.value(i)
-            if !visited.contains(neighbor.key) {
-                Graph.descendantsUtil(neighbor, &visited, &list)
+        var vertices: [GraphVertex<VertexDataType>] = []
+        let state: DFSState = DFSState()
+        for i in 0..<rootVertex.neighbors.count {
+            let neighbor = rootVertex.neighbors.value(i)
+            if !state.discovered.contains(neighbor.key) {
+                do {
+                    try self.dfs(neighbor, state) { (searchProcessType,vertex,edge,state) -> Void in
+                        if searchProcessType == SearchProcessType.vertexEarly {
+                            if let v = vertex {
+                                vertices.append(v)
+                            }
+                        }
+                    }
+                }
+                catch {
+                }
             }
         }
-        return list
-    }
-
-    private class func descendantsUtil(_ vertex: GraphVertex<VertexDataType>,
-                                      _ visited: inout Set<Int>,
-                                      _ list: inout [GraphVertex<VertexDataType>]) {
-        list.append(vertex)
-        visited.update(with: vertex.key)
-        for i in 0..<vertex.neighbors.count {
-            let neighbor = vertex.neighbors.value(i)
-            if !visited.contains(neighbor.key) {
-                Graph.descendantsUtil(neighbor, &visited, &list)
-            }
-        }
+        return vertices
     }
 
     public func nonDescendants(_ key: Int) -> [GraphVertex<VertexDataType>] {
