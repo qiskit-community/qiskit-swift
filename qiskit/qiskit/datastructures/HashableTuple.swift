@@ -6,7 +6,7 @@
 //  Copyright © 2017 IBM. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
 public struct HashableTuple<A:Hashable,B:Hashable> : Hashable, Equatable {
     public let one: A

@@ -5,7 +5,6 @@
 //  Copyright © 2017 IBM. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
 #import <Foundation/Foundation.h>
 
 //! Project version number for qiskit.

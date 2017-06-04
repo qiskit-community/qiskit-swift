@@ -1,12 +1,12 @@
 //
 //  UBase.swift
-//  qisswiftkit
+//  qiskit
 //
 //  Created by Manoel Marques on 4/28/17.
 //  Copyright © 2017 IBM. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
 /**
  Built-in Single Qubit Gate class

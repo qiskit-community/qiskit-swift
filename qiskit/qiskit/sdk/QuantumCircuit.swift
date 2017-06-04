@@ -1,12 +1,12 @@
 //
 //  QuantumCircuit.swift
-//  qisswiftkit
+//  qiskit
 //
 //  Created by Manoel Marques on 5/13/17.
 //  Copyright © 2017 IBM. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
 public class QuantumCircuitHeader {
 
@@ -55,6 +55,10 @@ public final class QuantumCircuit: CustomStringConvertible {
         return text
     }
 
+    public var qasm: String {
+        return self.description
+    }
+    
     /**
      Attach a instruction.
      */

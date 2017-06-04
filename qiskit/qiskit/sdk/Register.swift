@@ -6,7 +6,7 @@
 //  Copyright © 2017 IBM. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
 public protocol RegisterArgument {
     var identifier: String { get }
@@ -29,7 +29,7 @@ public class RegisterTuple: RegisterArgument {
     }
 }
 
-public class Register: RegisterArgument {
+public class Register: RegisterArgument, CustomStringConvertible {
 
     public let name:String
     public let size:Int
@@ -39,13 +39,16 @@ public class Register: RegisterArgument {
     }
 
     public var description: String {
-        return ""
+        preconditionFailure("description not implemented")
     }
 
     /**
      Create a new generic register.
      */
     public init(_ name: String, _ size: Int) throws {
+        if type(of: self) == Register.self {
+            fatalError("Abstract class instantiation.")
+        }
         var matches: Int = 0
         do {
             let regex = try NSRegularExpression(pattern: "[a-z][a-zA-Z0-9_]*")

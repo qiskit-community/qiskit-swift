@@ -1,12 +1,12 @@
 //
 //  IBMQuantumExperience.swift
-//  qisswiftkit
+//  qiskit
 //
 //  Created by Manoel Marques on 4/5/17.
 //  Copyright © 2017 IBM. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
 /**
  Quantum Experience REST Access API

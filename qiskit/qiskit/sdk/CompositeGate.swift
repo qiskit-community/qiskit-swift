@@ -1,12 +1,12 @@
 //
 //  CompositeGate.swift
-//  qisswiftkit
+//  qiskit
 //
 //  Created by Manoel Marques on 4/7/17.
 //  Copyright © 2017 IBM. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
 /**
  Composite gate, a sequence of unitary gates.
@@ -17,14 +17,14 @@ public class CompositeGate: Gate {
     private var inverse_flag = false
 
     public override init(_ name: String, _ params: [Double], _ qargs: [QuantumRegister], _ circuit: QuantumCircuit?) {
-        if type(of: self) == Instruction.self {
+        if type(of: self) == CompositeGate.self {
             fatalError("Abstract class instantiation.")
         }
         super.init(name, params, qargs, circuit)
     }
 
     public override init(_ name: String, _ params: [Double], _ qargs: [QuantumRegisterTuple], _ circuit: QuantumCircuit?) {
-        if type(of: self) == Instruction.self {
+        if type(of: self) == CompositeGate.self {
             fatalError("Abstract class instantiation.")
         }
         super.init(name, params, qargs, circuit)

@@ -6,7 +6,7 @@
 //  Copyright © 2017 IBM. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
 /**
  Generic quantum computer instruction.
@@ -21,6 +21,10 @@ public class Instruction: CustomStringConvertible {
 
     public var description: String {
         preconditionFailure("description not implemented")
+    }
+
+    public var qasm: String {
+        return self.description
     }
 
     /**

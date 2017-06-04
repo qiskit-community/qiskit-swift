@@ -59,7 +59,7 @@ class QiskitTests: XCTestCase {
             _ = try circuit.measure(q[3], c[3])
             _ = try circuit.measure(q[4], c[4])
 
-            XCTAssertEqual(str, circuit.description)
+            XCTAssertEqual(str, circuit.qasm)
             //try self.runJob(circuit,"simulator")
         } catch let error {
             XCTFail("\(error)")
@@ -86,7 +86,7 @@ class QiskitTests: XCTestCase {
             _ = try circuit.measure(q[0], c[0])
             _ = try circuit.measure(q[2], c[1])
 
-            XCTAssertEqual(str, circuit.description)
+            XCTAssertEqual(str, circuit.qasm)
         } catch let error {
             XCTFail("\(error)")
         }
@@ -178,7 +178,7 @@ class QiskitTests: XCTestCase {
             }
             _ = try circuit.measure(cout[0], ans[4])
 
-            XCTAssertEqual(str, circuit.description)
+            XCTAssertEqual(str, circuit.qasm)
             //try self.runJob(circuit,"simulator")
          } catch let error {
             XCTFail("\(error)")
@@ -244,7 +244,7 @@ class QiskitTests: XCTestCase {
             _ = try circuit.h(q[3])
             _ = try circuit.measure(q[3], c3[0])
 
-            XCTAssertEqual(str, circuit.description)
+            XCTAssertEqual(str, circuit.qasm)
             //try self.runJob(circuit,"simulator")
          } catch let error {
             XCTFail("\(error)")

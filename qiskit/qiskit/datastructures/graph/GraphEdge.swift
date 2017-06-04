@@ -6,18 +6,25 @@
 //  Copyright © 2017 IBM. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
-final class GraphEdge<EdgeDataType: NSCopying,VertexDataType: NSCopying> {
+final class GraphEdge<EdgeDataType: NSCopying> {
 
     public var data: EdgeDataType? = nil
-    public let source: GraphVertex<VertexDataType,EdgeDataType>
-    public let neighbor: GraphVertex<VertexDataType,EdgeDataType>
-    public internal(set) var weight: Int
+    public let source: Int
+    public let neighbor: Int
 
-    init(_ source: GraphVertex<VertexDataType,EdgeDataType>, _ neighbor: GraphVertex<VertexDataType,EdgeDataType>, _ weight: Int) {
+    init(_ source: Int, _ neighbor: Int) {
         self.source = source
         self.neighbor = neighbor
-        self.weight = weight
+    }
+
+    public func copy(with zone: NSZone? = nil) -> Any {
+        let copy = GraphEdge<EdgeDataType>(self.source,self.neighbor)
+        if self.data != nil {
+            let d = self.data!.copy(with: zone) as! EdgeDataType
+            copy.data = d
+        }
+        return copy
     }
 }
