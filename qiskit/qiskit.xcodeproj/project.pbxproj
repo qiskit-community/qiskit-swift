@@ -15,6 +15,9 @@
 		693A9F441ECA366000112AC9 /* CX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693A9F431ECA366000112AC9 /* CX.swift */; };
 		693A9F461ECA369500112AC9 /* UBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693A9F451ECA369500112AC9 /* UBase.swift */; };
 		693A9F481ECA38D100112AC9 /* Qconfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693A9F471ECA38D100112AC9 /* Qconfig.swift */; };
+		69458A281EE5A1760027F5A6 /* Coupling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69458A271EE5A1760027F5A6 /* Coupling.swift */; };
+		69458A2A1EE5A6A10027F5A6 /* CouplingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69458A291EE5A6A10027F5A6 /* CouplingError.swift */; };
+		69458A2C1EE5B1320027F5A6 /* CouplingVertexData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69458A2B1EE5B1320027F5A6 /* CouplingVertexData.swift */; };
 		694DCE1A1EDFA764002A7A8B /* RegBit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694DCE191EDFA764002A7A8B /* RegBit.swift */; };
 		695701341ED75C1C00C6CCAB /* Graph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695701311ED75C1C00C6CCAB /* Graph.swift */; };
 		695701351ED75C1C00C6CCAB /* GraphVertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695701321ED75C1C00C6CCAB /* GraphVertex.swift */; };
@@ -89,6 +92,9 @@
 		693A9F431ECA366000112AC9 /* CX.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CX.swift; path = extensions/CX.swift; sourceTree = "<group>"; };
 		693A9F451ECA369500112AC9 /* UBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UBase.swift; path = extensions/UBase.swift; sourceTree = "<group>"; };
 		693A9F471ECA38D100112AC9 /* Qconfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Qconfig.swift; path = qiskit/network/Qconfig.swift; sourceTree = SOURCE_ROOT; };
+		69458A271EE5A1760027F5A6 /* Coupling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Coupling.swift; path = mapper/Coupling.swift; sourceTree = "<group>"; };
+		69458A291EE5A6A10027F5A6 /* CouplingError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CouplingError.swift; path = mapper/CouplingError.swift; sourceTree = "<group>"; };
+		69458A2B1EE5B1320027F5A6 /* CouplingVertexData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CouplingVertexData.swift; path = mapper/CouplingVertexData.swift; sourceTree = "<group>"; };
 		694DCE191EDFA764002A7A8B /* RegBit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RegBit.swift; path = circuit/RegBit.swift; sourceTree = "<group>"; };
 		695701311ED75C1C00C6CCAB /* Graph.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Graph.swift; path = datastructures/graph/Graph.swift; sourceTree = "<group>"; };
 		695701321ED75C1C00C6CCAB /* GraphVertex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GraphVertex.swift; path = datastructures/graph/GraphVertex.swift; sourceTree = "<group>"; };
@@ -244,6 +250,9 @@
 		69D310661ECA15CA00B3E752 /* mapper */ = {
 			isa = PBXGroup;
 			children = (
+				69458A271EE5A1760027F5A6 /* Coupling.swift */,
+				69458A291EE5A6A10027F5A6 /* CouplingError.swift */,
+				69458A2B1EE5B1320027F5A6 /* CouplingVertexData.swift */,
 			);
 			name = mapper;
 			sourceTree = "<group>";
@@ -474,6 +483,7 @@
 				697F259E1ED45DD90065B106 /* CircuitError.swift in Sources */,
 				695701361ED75C1C00C6CCAB /* GraphEdge.swift in Sources */,
 				697D36AE1EE3493B00557541 /* OrderedDictionary.swift in Sources */,
+				69458A281EE5A1760027F5A6 /* Coupling.swift in Sources */,
 				695701351ED75C1C00C6CCAB /* GraphVertex.swift in Sources */,
 				69D3108F1ECA192000B3E752 /* Instruction.swift in Sources */,
 				69D3107E1ECA180500B3E752 /* Reset.swift in Sources */,
@@ -500,8 +510,10 @@
 				69DE360F1ECD188000EC4756 /* Iden.swift in Sources */,
 				697F259C1ED45BED0065B106 /* Circuit.swift in Sources */,
 				69EF514B1EDC72E10074AE42 /* CircuitEdgeData.swift in Sources */,
+				69458A2A1EE5A6A10027F5A6 /* CouplingError.swift in Sources */,
 				697BEDB11ED0844E00AB9A86 /* GatesTools.swift in Sources */,
 				69E597AF1ECA980F00A321F5 /* X.swift in Sources */,
+				69458A2C1EE5B1320027F5A6 /* CouplingVertexData.swift in Sources */,
 				693A9F481ECA38D100112AC9 /* Qconfig.swift in Sources */,
 				693A9F441ECA366000112AC9 /* CX.swift in Sources */,
 				69DE360B1ECD153D00EC4756 /* CY.swift in Sources */,

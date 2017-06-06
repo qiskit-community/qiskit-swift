@@ -55,7 +55,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
                                                 OrderedDictionary<Int,GraphVertex<VertexDataType>>()
     public private(set) var edges: OrderedDictionary<HashableTuple<Int,Int>,GraphEdge<EdgeDataType>> =
                                                 OrderedDictionary<HashableTuple<Int,Int>,GraphEdge<EdgeDataType>>()
-    public let isDirected: Bool
+    public private(set) var isDirected: Bool
 
     public init(directed: Bool) {
         self.isDirected = directed
@@ -82,24 +82,27 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         return self.edges[HashableTuple<Int,Int>(sourceIndex,neighborIndex)]
     }
 
-    public func add_vertex(_ key: Int) -> GraphVertex<VertexDataType> {
+    public func add_vertex(_ key: Int, _ data: VertexDataType? = nil) -> GraphVertex<VertexDataType> {
         var vertex = self.vertex(key)
         if vertex == nil {
             vertex = GraphVertex(key)
             self.vertices[key] = vertex!
         }
+        vertex!.data = data
         return vertex!
     }
 
     public func add_edge(_ sourceIndex: Int, _ neighborIndex: Int, _ data: EdgeDataType? = nil) {
-        let source = self.add_vertex(sourceIndex)
-        let neighbor = self.add_vertex(neighborIndex)
+        self.add_edge(self.add_vertex(sourceIndex),self.add_vertex(neighborIndex),data)
+    }
+
+    public func add_edge(_ source: GraphVertex<VertexDataType>, _ neighbor: GraphVertex<VertexDataType>, _ data: EdgeDataType? = nil) {
         var edge = self.edge(source.key,neighbor.key)
         if edge == nil {
             edge = GraphEdge(source.key,neighbor.key)
             edge!.data = data
             source.neighbors[neighbor.key] = neighbor
-            self.edges[HashableTuple<Int,Int>(sourceIndex,neighborIndex)] = edge!
+            self.edges[HashableTuple<Int,Int>(source.key,neighbor.key)] = edge!
         }
         else {
             edge!.data = data
@@ -110,13 +113,14 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
                 edge = GraphEdge(neighbor.key,source.key)
                 edge!.data = data
                 neighbor.neighbors[source.key] = source
-                self.edges[HashableTuple<Int,Int>(neighborIndex,sourceIndex)] = edge!
+                self.edges[HashableTuple<Int,Int>(neighbor.key,source.key)] = edge!
             }
             else {
                 edge!.data = data
             }
         }
     }
+
 
     public func remove_edge(_ sourceIndex: Int, _ neighborIndex: Int) {
         self.edges[HashableTuple<Int,Int>(sourceIndex,neighborIndex)] = nil
@@ -506,38 +510,106 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         return path.count - 1
     }
 
-    public func number_weakly_connected_components() throws -> Int {
+    public func single_source_shortest_path_length(_ source: Int) -> [GraphVertex<VertexDataType>:Int] {
+        guard let vertex = self.vertex(source) else {
+            return [:]
+        }
+        var seen: [GraphVertex<VertexDataType>:Int] = [:]
+        var level: Int = 0
+        var nextlevel: [GraphVertex<VertexDataType>:Int] = [vertex:1]
+        while !nextlevel.isEmpty {
+            let thislevel = nextlevel
+            nextlevel = [:]
+            for (v,_) in thislevel {
+                if seen[v] == nil {
+                    seen[v] = level
+                    for i in 0..<v.neighbors.count {
+                        let neighbor = v.neighbors.value(i)
+                        nextlevel[neighbor] = 0
+                    }
+                }
+            }
+            level += 1
+        }
+        return seen
+    }
+
+    public func all_pairs_shortest_path_length() -> [GraphVertex<VertexDataType>: [GraphVertex<VertexDataType>:Int]] {
+        var paths: [GraphVertex<VertexDataType>: [GraphVertex<VertexDataType>:Int]] = [:]
+        for i in 0..<self.vertices.count {
+            let vertex = self.vertices.value(i)
+            paths[vertex] = self.single_source_shortest_path_length(vertex.key)
+        }
+        return paths
+    }
+
+    public func weakly_connected_components() throws -> [[GraphVertex<VertexDataType>]] {
         if !self.isDirected {
             throw GraphError.isUndirected
         }
+        var list: [[GraphVertex<VertexDataType>]] = []
         // create undirect graph
-        let graph = Graph(directed: false)
-        for i in 0..<self.vertices.count {
-            let vertex = self.vertices.value(i)
-            _ = graph.add_vertex(vertex.key)
-        }
-        for i in 0..<self.edges.count {
-            let edge = self.edges.value(i)
-            graph.add_edge(edge.source, edge.neighbor)
-        }
-
-        var count: Int = 0
+        let graph = self.to_undirected()
         let state: DFSState = DFSState()
         for i in 0..<graph.vertices.count {
             let vertex = graph.vertices.value(i)
             if !state.discovered.contains(vertex.key) {
-                var vertices: [Int] = []
+                var vertices: [GraphVertex<VertexDataType>] = []
                 try dfs(vertex, state) { (searchProcessType,vertex,edge,state) -> Void in
                     if searchProcessType == SearchProcessType.vertexLate {
-                        vertices.append(vertex!.key)
+                        vertices.append(vertex!)
                         return
                     }
                 }
                 if !vertices.isEmpty {
-                    count += 1
+                    list.append(vertices)
                 }
             }
         }
-        return count
+        // longest components first
+        return list.sorted { $0.count > $1.count }
+    }
+
+    public func number_weakly_connected_components() throws -> Int {
+        return try self.weakly_connected_components().count
+    }
+
+    public func is_weakly_connected() throws -> Bool {
+        let order = self.order()
+        if order == 0 {
+            throw GraphError.connectEmptyGraph
+        }
+        let list = try self.weakly_connected_components()
+        if list.isEmpty {
+            return false
+        }
+        let count = list.first!.count
+        return count == order
+
+    }
+
+    public func to_undirected() -> Graph {
+        let graph = self.copy(with: nil) as! Graph<VertexDataType,EdgeDataType>
+        if !self.isDirected {
+            return graph
+        }
+        graph.isDirected = false
+        for i in 0..<graph.edges.count {
+            let edge = self.edges.value(i)
+            var newEdge = self.edge(edge.neighbor,edge.source)
+            if newEdge == nil {
+                guard let source = graph.vertex(edge.source) else {
+                    continue
+                }
+                guard let neighbor = graph.vertex(edge.neighbor) else {
+                    continue
+                }
+                newEdge = GraphEdge(edge.neighbor,edge.source)
+                newEdge!.data = edge.data
+                neighbor.neighbors[source.key] = source
+                self.edges[HashableTuple<Int,Int>(newEdge!.source,newEdge!.neighbor)] = newEdge!
+            }
+        }
+        return graph
     }
 }

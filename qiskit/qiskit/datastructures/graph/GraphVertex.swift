@@ -8,11 +8,17 @@
 
 import Foundation
 
-final class GraphVertex<VertexDataType: NSCopying> {
+final class GraphVertex<VertexDataType: NSCopying> : Hashable, Equatable {
 
     public let key: Int
     public var data: VertexDataType? = nil
     var neighbors: OrderedDictionary<Int,GraphVertex<VertexDataType>> = OrderedDictionary<Int,GraphVertex<VertexDataType>>()
+
+    public var hashValue : Int {
+        get {
+            return self.key.hashValue
+        }
+    }
 
     public init(_ key: Int) {
         self.key = key
@@ -29,6 +35,10 @@ final class GraphVertex<VertexDataType: NSCopying> {
             copy.neighbors[neighbor.key] = neighbor
         }
         return copy
+    }
+
+    public static func ==<VertexDataType: NSCopying>(lhs: GraphVertex<VertexDataType>, rhs: GraphVertex<VertexDataType>) -> Bool {
+        return lhs.key == rhs.key
     }
 }
 
