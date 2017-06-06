@@ -56,7 +56,7 @@ final class Coupling: CustomStringConvertible {
         s += "\nedges: "
         list = []
         for tuple in self.get_edges() {
-            list.append("\(tuple.0.description)-\(tuple.1.description)")
+            list.append("\(tuple.one.description)-\(tuple.two.description)")
         }
         s += list.joined(separator: ", ")
         return s
@@ -104,8 +104,8 @@ final class Coupling: CustomStringConvertible {
      Return a list of edges in the coupling graph.
      Each edge is a pair of qubits and each qubit is a tuple (qreg, index).
      */
-    public func get_edges() -> [(RegBit,RegBit)] {
-        var edges: [(RegBit,RegBit)] = []
+    public func get_edges() -> Set<HashableTuple<RegBit,RegBit>> {
+        var edges: Set<HashableTuple<RegBit,RegBit>> = Set<HashableTuple<RegBit,RegBit>>()
         for i in 0..<self.G.edges.count {
             let edge = self.G.edges.value(i)
             guard let source = self.G.vertex(edge.source) else {
@@ -120,7 +120,7 @@ final class Coupling: CustomStringConvertible {
             guard let qubitNeighbor = self.index_to_qubit[neighbor] else {
                 continue
             }
-            edges.append((qubitSource,qubitNeighbor))
+            edges.update(with: HashableTuple<RegBit,RegBit>(qubitSource,qubitNeighbor))
         }
         return edges
     }

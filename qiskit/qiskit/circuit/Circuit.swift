@@ -55,7 +55,7 @@ final class Circuit: NSCopying {
      number of input qubits, input bits, and real parameters.
      The definition is external to the circuit object.
     */
-    private var basis: [String: (Int,Int,Int)] = [:]
+    private(set) var basis: [String: (Int,Int,Int)] = [:]
 
     /**
       Directed multigraph whose nodes are inputs, outputs, or operations.
@@ -216,7 +216,7 @@ final class Circuit: NSCopying {
     public func remove_all_ops_named(_ opname: String) throws {
         let nlist = try self.get_named_nodes(opname)
         for n in nlist {
-            self._remove_op_node(n)
+            self._remove_op_node(n.key)
         }
     }
 
@@ -1312,8 +1312,8 @@ final class Circuit: NSCopying {
      input_circuit is a CircuitGraph.
      */
     func substitute_circuit_one(_ node: GraphVertex<CircuitVertexData>,
-                                       _ input_circuit: Circuit,
-                                       _ wires: [RegBit] = []) throws {
+                                _ input_circuit: Circuit,
+                                wires: [RegBit] = []) throws {
 
         if node.data!.type != "op" {
             throw CircuitError.invalidoptype(type: node.data!.type)
@@ -1446,11 +1446,11 @@ final class Circuit: NSCopying {
     /**
      Return a list of "op" nodes with the given name.
      */
-    public func get_named_nodes(_ name: String) throws -> [Int] {
+    public func get_named_nodes(_ name: String) throws -> [GraphVertex<CircuitVertexData>] {
         if self.basis[name] == nil {
             throw CircuitError.nobasicop(name: name)
         }
-        var nlist: [Int] = []
+        var nlist: [GraphVertex<CircuitVertexData>] = []
         // Iterate through the nodes of self in topological order
         let ts = try self.multi_graph.topological_sort()
         for nd in ts {
@@ -1458,7 +1458,7 @@ final class Circuit: NSCopying {
                 if data.type == "op" {
                     let dataOp = data as! CircuitVertexOpData
                     if dataOp.name == name {
-                        nlist.append(nd.key)
+                        nlist.append(nd)
                     }
                 }
             }
