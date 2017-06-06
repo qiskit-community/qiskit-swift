@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import qiskit
 
 class QIskitParserTerminalTests: XCTestCase {
 
@@ -62,12 +63,12 @@ class QIskitParserTerminalTests: XCTestCase {
         
         ParseSuccessBlock = { (node: Node?) -> Void in
             XCTAssertNotNil(node)
-            guard let nni = node as? NodeNNInteger else {
+            guard let nni = node as? NodeNNInt else {
                 XCTFail("Real Node Type Expected!")
                 asyncExpectation.fulfill()
                 return
             }
-            XCTAssertEqual(5, nni.nnInteger)
+            XCTAssertEqual(5, nni.value)
             asyncExpectation.fulfill()
         }
         
@@ -88,39 +89,6 @@ class QIskitParserTerminalTests: XCTestCase {
         })
     }
 
-    func testParserPi() {
-        
-        let asyncExpectation = self.expectation(description: "parser")
-        
-        let buf: YY_BUFFER_STATE = yy_scan_string("pi")
-        
-        ParseSuccessBlock = { (node: Node?) -> Void in
-            XCTAssertNotNil(node)
-            guard let pin = node as? NodePi else {
-                XCTFail("Pi Node Type Expected!")
-                asyncExpectation.fulfill()
-                return
-            }
-            XCTAssertEqual(Double.pi, pin.pi)
-            asyncExpectation.fulfill()
-        }
-        
-        ParseFailBlock = { (message: String?) -> Void in
-            if let msg = message {
-                XCTFail(msg)
-            } else {
-                XCTFail("Unknown Error")
-            }
-            asyncExpectation.fulfill()
-        }
-        
-        yyparse()
-        yy_delete_buffer(buf)
-        
-        self.waitForExpectations(timeout: 180, handler: { (error) in
-            XCTAssertNil(error, "Failure in parser")
-        })
-    }
 
     func testParserId() {
         
@@ -135,7 +103,7 @@ class QIskitParserTerminalTests: XCTestCase {
                 asyncExpectation.fulfill()
                 return
             }
-            XCTAssertEqual("theidtofind", idn.s_id)
+            XCTAssertEqual("theidtofind", idn.name)
             asyncExpectation.fulfill()
         }
         
@@ -155,7 +123,6 @@ class QIskitParserTerminalTests: XCTestCase {
             XCTAssertNil(error, "Failure in parser")
         })
     }
-
 
 
 }

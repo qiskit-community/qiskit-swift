@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import qiskit
 
 class QiskitParserExpTests: XCTestCase {
 
@@ -28,7 +29,12 @@ class QiskitParserExpTests: XCTestCase {
         
         ParseSuccessBlock = { (node: Node?) -> Void in
             XCTAssertNotNil(node)
-            XCTAssertEqual(NodeType.N_ADD, node!.nodeType)
+            guard let nr = node as? NodeBinaryOp else {
+                XCTFail("BinaryOp Node Type Expected!")
+                asyncExpectation.fulfill()
+                return
+            }
+            XCTAssertEqual("+", nr.op)
             asyncExpectation.fulfill()
         }
         
@@ -57,7 +63,12 @@ class QiskitParserExpTests: XCTestCase {
         
         ParseSuccessBlock = { (node: Node?) -> Void in
             XCTAssertNotNil(node)
-            XCTAssertEqual(NodeType.N_MINUS, node!.nodeType)
+            guard let nr = node as? NodeBinaryOp else {
+                XCTFail("BinaryOp Node Type Expected!")
+                asyncExpectation.fulfill()
+                return
+            }
+            XCTAssertEqual("-", nr.op)
             asyncExpectation.fulfill()
         }
         
@@ -86,7 +97,12 @@ class QiskitParserExpTests: XCTestCase {
         
         ParseSuccessBlock = { (node: Node?) -> Void in
             XCTAssertNotNil(node)
-            XCTAssertEqual(NodeType.N_MULTIPLY, node!.nodeType)
+            guard let nr = node as? NodeBinaryOp else {
+                XCTFail("BinaryOp Node Type Expected!")
+                asyncExpectation.fulfill()
+                return
+            }
+            XCTAssertEqual("*", nr.op)
             asyncExpectation.fulfill()
         }
         
@@ -115,7 +131,12 @@ class QiskitParserExpTests: XCTestCase {
         
         ParseSuccessBlock = { (node: Node?) -> Void in
             XCTAssertNotNil(node)
-            XCTAssertEqual(NodeType.N_DIVIDE, node!.nodeType)
+            guard let nr = node as? NodeBinaryOp else {
+                XCTFail("BinaryOp Node Type Expected!")
+                asyncExpectation.fulfill()
+                return
+            }
+            XCTAssertEqual("/", nr.op)
             asyncExpectation.fulfill()
         }
         
@@ -135,16 +156,20 @@ class QiskitParserExpTests: XCTestCase {
             XCTAssertNil(error, "Failure in parser")
         })
     }
-
-    func testParserSIN() {
-        
+    
+     func testParserSIN() {
         let asyncExpectation = self.expectation(description: "parser")
         
         let buf: YY_BUFFER_STATE = yy_scan_string("sin(90)")
         
         ParseSuccessBlock = { (node: Node?) -> Void in
             XCTAssertNotNil(node)
-            XCTAssertEqual(NodeType.N_UNARY, node!.nodeType)
+            guard let nr = node as? NodePrefix else {
+                XCTFail("Prefix Node Type Expected!")
+                asyncExpectation.fulfill()
+                return
+            }
+            XCTAssertEqual("sin", nr.op)
             asyncExpectation.fulfill()
         }
         
@@ -163,6 +188,6 @@ class QiskitParserExpTests: XCTestCase {
         self.waitForExpectations(timeout: 180, handler: { (error) in
             XCTAssertNil(error, "Failure in parser")
         })
-    }
+     }
 
 }

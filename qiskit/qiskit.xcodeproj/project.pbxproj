@@ -71,10 +71,33 @@
 		DF7973621ED0747B00C01457 /* ParserBlocks.m in Sources */ = {isa = PBXBuildFile; fileRef = DF7973601ED0747B00C01457 /* ParserBlocks.m */; };
 		DF7973721ED3429D00C01457 /* ParseTree.h in Headers */ = {isa = PBXBuildFile; fileRef = DF7973701ED3429D00C01457 /* ParseTree.h */; };
 		DF7973731ED3429D00C01457 /* ParseTree.m in Sources */ = {isa = PBXBuildFile; fileRef = DF7973711ED3429D00C01457 /* ParseTree.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		DF7F720A1ED7BC600055D210 /* QiskitParserExpListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7F72081ED7BC600055D210 /* QiskitParserExpListTests.swift */; };
-		DF7F720B1ED7BC600055D210 /* QiskitParserExpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7F72091ED7BC600055D210 /* QiskitParserExpTests.swift */; };
 		DF7F720D1ED863F50055D210 /* QIskitParserTerminalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7F720C1ED863F50055D210 /* QIskitParserTerminalTests.swift */; };
-		DF7F720F1ED86EDA0055D210 /* QiskitParserArgTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7F720E1ED86EDA0055D210 /* QiskitParserArgTests.swift */; };
+		DF8E1CD31EE4A27B00DCC35C /* NodeProgram.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CD21EE4A27B00DCC35C /* NodeProgram.swift */; };
+		DF8E1CD51EE501D000DCC35C /* NodeUniversalUnitary.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CD41EE501D000DCC35C /* NodeUniversalUnitary.swift */; };
+		DF8E1CD71EE501E700DCC35C /* NodeReset.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CD61EE501E700DCC35C /* NodeReset.swift */; };
+		DF8E1CD91EE501FD00DCC35C /* NodeReal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CD81EE501FD00DCC35C /* NodeReal.swift */; };
+		DF8E1CDB1EE5021400DCC35C /* NodeQreg.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CDA1EE5021400DCC35C /* NodeQreg.swift */; };
+		DF8E1CDD1EE5022F00DCC35C /* NodePrimaryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CDC1EE5022F00DCC35C /* NodePrimaryList.swift */; };
+		DF8E1CDF1EE5024700DCC35C /* NodePrefix.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CDE1EE5024700DCC35C /* NodePrefix.swift */; };
+		DF8E1CE11EE5025C00DCC35C /* NodeOpaque.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CE01EE5025C00DCC35C /* NodeOpaque.swift */; };
+		DF8E1CE31EE5027300DCC35C /* NodeMeasure.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CE21EE5027300DCC35C /* NodeMeasure.swift */; };
+		DF8E1CE51EE5028800DCC35C /* NodeMagic.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CE41EE5028800DCC35C /* NodeMagic.swift */; };
+		DF8E1CE71EE502A200DCC35C /* NodeInt.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CE61EE502A200DCC35C /* NodeInt.swift */; };
+		DF8E1CE91EE502BB00DCC35C /* NodeIndexedId.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CE81EE502BB00DCC35C /* NodeIndexedId.swift */; };
+		DF8E1CEB1EE502D200DCC35C /* NodeIf.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CEA1EE502D200DCC35C /* NodeIf.swift */; };
+		DF8E1CED1EE502ED00DCC35C /* NodeIdList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CEC1EE502ED00DCC35C /* NodeIdList.swift */; };
+		DF8E1CEF1EE5030F00DCC35C /* NodeGateBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CEE1EE5030F00DCC35C /* NodeGateBody.swift */; };
+		DF8E1CF31EE5036300DCC35C /* NodeGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CF21EE5036300DCC35C /* NodeGate.swift */; };
+		DF8E1CF51EE5037D00DCC35C /* NodeExternal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CF41EE5037D00DCC35C /* NodeExternal.swift */; };
+		DF8E1CF71EE5039100DCC35C /* NodeExpressionList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CF61EE5039100DCC35C /* NodeExpressionList.swift */; };
+		DF8E1CF91EE503A800DCC35C /* NodeCustomUnitary.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CF81EE503A800DCC35C /* NodeCustomUnitary.swift */; };
+		DF8E1CFB1EE503BD00DCC35C /* NodeCreg.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CFA1EE503BD00DCC35C /* NodeCreg.swift */; };
+		DF8E1CFD1EE503D300DCC35C /* NodeCnot.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CFC1EE503D300DCC35C /* NodeCnot.swift */; };
+		DF8E1CFF1EE503E800DCC35C /* NodeBinaryOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CFE1EE503E800DCC35C /* NodeBinaryOp.swift */; };
+		DF8E1D011EE5040300DCC35C /* NodeBarrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1D001EE5040300DCC35C /* NodeBarrier.swift */; };
+		DF8E1D031EE5048300DCC35C /* NodeId.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1D021EE5048300DCC35C /* NodeId.swift */; };
+		DF8E1D051EE6F78B00DCC35C /* QiskitParserExpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1D041EE6F78B00DCC35C /* QiskitParserExpTests.swift */; };
+		DF8E1D071EE7022800DCC35C /* QiskitParserExpListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1D061EE7022800DCC35C /* QiskitParserExpListTests.swift */; };
 		DFA7844E1ED746E0002BB240 /* SymbolTable.h in Headers */ = {isa = PBXBuildFile; fileRef = DFA7844C1ED746E0002BB240 /* SymbolTable.h */; };
 		DFA7844F1ED746E0002BB240 /* SymbolTable.m in Sources */ = {isa = PBXBuildFile; fileRef = DFA7844D1ED746E0002BB240 /* SymbolTable.m */; };
 		DFBC4F6C1EC7384200027640 /* qiskit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFBC4F621EC7384100027640 /* qiskit.framework */; };
@@ -159,10 +182,33 @@
 		DF7973681ED083F600C01457 /* qiskitTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "qiskitTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		DF7973701ED3429D00C01457 /* ParseTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParseTree.h; sourceTree = "<group>"; };
 		DF7973711ED3429D00C01457 /* ParseTree.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParseTree.m; sourceTree = "<group>"; };
-		DF7F72081ED7BC600055D210 /* QiskitParserExpListTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QiskitParserExpListTests.swift; sourceTree = "<group>"; };
-		DF7F72091ED7BC600055D210 /* QiskitParserExpTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QiskitParserExpTests.swift; sourceTree = "<group>"; };
 		DF7F720C1ED863F50055D210 /* QIskitParserTerminalTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QIskitParserTerminalTests.swift; sourceTree = "<group>"; };
-		DF7F720E1ED86EDA0055D210 /* QiskitParserArgTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QiskitParserArgTests.swift; sourceTree = "<group>"; };
+		DF8E1CD21EE4A27B00DCC35C /* NodeProgram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeProgram.swift; path = _node/NodeProgram.swift; sourceTree = "<group>"; };
+		DF8E1CD41EE501D000DCC35C /* NodeUniversalUnitary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeUniversalUnitary.swift; path = _node/NodeUniversalUnitary.swift; sourceTree = "<group>"; };
+		DF8E1CD61EE501E700DCC35C /* NodeReset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeReset.swift; path = _node/NodeReset.swift; sourceTree = "<group>"; };
+		DF8E1CD81EE501FD00DCC35C /* NodeReal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeReal.swift; path = _node/NodeReal.swift; sourceTree = "<group>"; };
+		DF8E1CDA1EE5021400DCC35C /* NodeQreg.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeQreg.swift; path = _node/NodeQreg.swift; sourceTree = "<group>"; };
+		DF8E1CDC1EE5022F00DCC35C /* NodePrimaryList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodePrimaryList.swift; path = _node/NodePrimaryList.swift; sourceTree = "<group>"; };
+		DF8E1CDE1EE5024700DCC35C /* NodePrefix.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodePrefix.swift; path = _node/NodePrefix.swift; sourceTree = "<group>"; };
+		DF8E1CE01EE5025C00DCC35C /* NodeOpaque.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeOpaque.swift; path = _node/NodeOpaque.swift; sourceTree = "<group>"; };
+		DF8E1CE21EE5027300DCC35C /* NodeMeasure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeMeasure.swift; path = _node/NodeMeasure.swift; sourceTree = "<group>"; };
+		DF8E1CE41EE5028800DCC35C /* NodeMagic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeMagic.swift; path = _node/NodeMagic.swift; sourceTree = "<group>"; };
+		DF8E1CE61EE502A200DCC35C /* NodeInt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeInt.swift; path = _node/NodeInt.swift; sourceTree = "<group>"; };
+		DF8E1CE81EE502BB00DCC35C /* NodeIndexedId.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeIndexedId.swift; path = _node/NodeIndexedId.swift; sourceTree = "<group>"; };
+		DF8E1CEA1EE502D200DCC35C /* NodeIf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeIf.swift; path = _node/NodeIf.swift; sourceTree = "<group>"; };
+		DF8E1CEC1EE502ED00DCC35C /* NodeIdList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeIdList.swift; path = _node/NodeIdList.swift; sourceTree = "<group>"; };
+		DF8E1CEE1EE5030F00DCC35C /* NodeGateBody.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeGateBody.swift; path = _node/NodeGateBody.swift; sourceTree = "<group>"; };
+		DF8E1CF21EE5036300DCC35C /* NodeGate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeGate.swift; path = _node/NodeGate.swift; sourceTree = "<group>"; };
+		DF8E1CF41EE5037D00DCC35C /* NodeExternal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeExternal.swift; path = _node/NodeExternal.swift; sourceTree = "<group>"; };
+		DF8E1CF61EE5039100DCC35C /* NodeExpressionList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeExpressionList.swift; path = _node/NodeExpressionList.swift; sourceTree = "<group>"; };
+		DF8E1CF81EE503A800DCC35C /* NodeCustomUnitary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeCustomUnitary.swift; path = _node/NodeCustomUnitary.swift; sourceTree = "<group>"; };
+		DF8E1CFA1EE503BD00DCC35C /* NodeCreg.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeCreg.swift; path = _node/NodeCreg.swift; sourceTree = "<group>"; };
+		DF8E1CFC1EE503D300DCC35C /* NodeCnot.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeCnot.swift; path = _node/NodeCnot.swift; sourceTree = "<group>"; };
+		DF8E1CFE1EE503E800DCC35C /* NodeBinaryOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeBinaryOp.swift; path = _node/NodeBinaryOp.swift; sourceTree = "<group>"; };
+		DF8E1D001EE5040300DCC35C /* NodeBarrier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeBarrier.swift; path = _node/NodeBarrier.swift; sourceTree = "<group>"; };
+		DF8E1D021EE5048300DCC35C /* NodeId.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeId.swift; path = _node/NodeId.swift; sourceTree = "<group>"; };
+		DF8E1D041EE6F78B00DCC35C /* QiskitParserExpTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QiskitParserExpTests.swift; sourceTree = "<group>"; };
+		DF8E1D061EE7022800DCC35C /* QiskitParserExpListTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QiskitParserExpListTests.swift; sourceTree = "<group>"; };
 		DFA7844C1ED746E0002BB240 /* SymbolTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SymbolTable.h; sourceTree = "<group>"; };
 		DFA7844D1ED746E0002BB240 /* SymbolTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SymbolTable.m; sourceTree = "<group>"; };
 		DFBC4F621EC7384100027640 /* qiskit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = qiskit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -218,7 +264,31 @@
 		699AAB521EE47FDB0015DB83 /* _node */ = {
 			isa = PBXGroup;
 			children = (
+				DF8E1D001EE5040300DCC35C /* NodeBarrier.swift */,
+				DF8E1CFE1EE503E800DCC35C /* NodeBinaryOp.swift */,
+				DF8E1CFC1EE503D300DCC35C /* NodeCnot.swift */,
+				DF8E1CFA1EE503BD00DCC35C /* NodeCreg.swift */,
+				DF8E1CF81EE503A800DCC35C /* NodeCustomUnitary.swift */,
+				DF8E1CF61EE5039100DCC35C /* NodeExpressionList.swift */,
+				DF8E1CF41EE5037D00DCC35C /* NodeExternal.swift */,
+				DF8E1CF21EE5036300DCC35C /* NodeGate.swift */,
+				DF8E1CEE1EE5030F00DCC35C /* NodeGateBody.swift */,
+				DF8E1D021EE5048300DCC35C /* NodeId.swift */,
+				DF8E1CEC1EE502ED00DCC35C /* NodeIdList.swift */,
+				DF8E1CEA1EE502D200DCC35C /* NodeIf.swift */,
+				DF8E1CE81EE502BB00DCC35C /* NodeIndexedId.swift */,
+				DF8E1CE61EE502A200DCC35C /* NodeInt.swift */,
+				DF8E1CE41EE5028800DCC35C /* NodeMagic.swift */,
+				DF8E1CE21EE5027300DCC35C /* NodeMeasure.swift */,
 				699AAB531EE480160015DB83 /* Node.swift */,
+				DF8E1CE01EE5025C00DCC35C /* NodeOpaque.swift */,
+				DF8E1CDE1EE5024700DCC35C /* NodePrefix.swift */,
+				DF8E1CDC1EE5022F00DCC35C /* NodePrimaryList.swift */,
+				DF8E1CD21EE4A27B00DCC35C /* NodeProgram.swift */,
+				DF8E1CDA1EE5021400DCC35C /* NodeQreg.swift */,
+				DF8E1CD81EE501FD00DCC35C /* NodeReal.swift */,
+				DF8E1CD61EE501E700DCC35C /* NodeReset.swift */,
+				DF8E1CD41EE501D000DCC35C /* NodeUniversalUnitary.swift */,
 			);
 			name = _node;
 			sourceTree = "<group>";
@@ -347,11 +417,9 @@
 			isa = PBXGroup;
 			children = (
 				DFBC4F701EC7384200027640 /* QiskitTests.swift */,
-				6957013B1ED75E9100C6CCAB /* GraphTests.swift */,
-				DF7F720E1ED86EDA0055D210 /* QiskitParserArgTests.swift */,
-				DF7F72081ED7BC600055D210 /* QiskitParserExpListTests.swift */,
-				DF7F72091ED7BC600055D210 /* QiskitParserExpTests.swift */,
 				DF7F720C1ED863F50055D210 /* QIskitParserTerminalTests.swift */,
+				DF8E1D041EE6F78B00DCC35C /* QiskitParserExpTests.swift */,
+				DF8E1D061EE7022800DCC35C /* QiskitParserExpListTests.swift */,
 				6957013B1ED75E9100C6CCAB /* DataStructureTests.swift */,
 				DFBC4F721EC7384200027640 /* Info.plist */,
 				DF7973681ED083F600C01457 /* qiskitTests-Bridging-Header.h */,
@@ -505,31 +573,44 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DF8E1CE31EE5027300DCC35C /* NodeMeasure.swift in Sources */,
 				69DE36191ECD191F00EC4756 /* T.swift in Sources */,
+				DF8E1CDF1EE5024700DCC35C /* NodePrefix.swift in Sources */,
 				695701381ED75C2E00C6CCAB /* Stack.swift in Sources */,
 				69DE36231ECD1A1500EC4756 /* Header.swift in Sources */,
 				690188721EE24343005B4419 /* GraphError.swift in Sources */,
 				69E335531ECA1BD20027271D /* ClassicalRegister.swift in Sources */,
 				69D3107C1ECA180500B3E752 /* QuantumCircuit.swift in Sources */,
+				DF8E1CFB1EE503BD00DCC35C /* NodeCreg.swift in Sources */,
 				DF79735E1ED071F600C01457 /* tokenizer.lm in Sources */,
 				69D3108D1ECA18B800B3E752 /* Measure.swift in Sources */,
+				DF8E1CF31EE5036300DCC35C /* NodeGate.swift in Sources */,
+				DF8E1CF71EE5039100DCC35C /* NodeExpressionList.swift in Sources */,
+				DF8E1CEF1EE5030F00DCC35C /* NodeGateBody.swift in Sources */,
 				69EF51491EDC72BD0074AE42 /* CircuitVertexData.swift in Sources */,
 				69D3107B1ECA180500B3E752 /* Gate.swift in Sources */,
 				693A9F421ECA363D00112AC9 /* Barrier.swift in Sources */,
 				69D310801ECA180500B3E752 /* CompositeGate.swift in Sources */,
 				697F259E1ED45DD90065B106 /* CircuitError.swift in Sources */,
+				DF8E1CE11EE5025C00DCC35C /* NodeOpaque.swift in Sources */,
 				695701361ED75C1C00C6CCAB /* GraphEdge.swift in Sources */,
 				697D36AE1EE3493B00557541 /* OrderedDictionary.swift in Sources */,
 				695701351ED75C1C00C6CCAB /* GraphVertex.swift in Sources */,
 				69D3108F1ECA192000B3E752 /* Instruction.swift in Sources */,
 				69D3107E1ECA180500B3E752 /* Reset.swift in Sources */,
 				69DE361F1ECD197E00EC4756 /* Y.swift in Sources */,
+				DF8E1CFD1EE503D300DCC35C /* NodeCnot.swift in Sources */,
+				DF8E1CD91EE501FD00DCC35C /* NodeReal.swift in Sources */,
 				693A9F461ECA369500112AC9 /* UBase.swift in Sources */,
 				6903A9BF1EE07211006E8190 /* Layer.swift in Sources */,
 				6957013A1ED75C8B00C6CCAB /* HashableTuple.swift in Sources */,
+				DF8E1CD51EE501D000DCC35C /* NodeUniversalUnitary.swift in Sources */,
 				69DE36171ECD190E00EC4756 /* S.swift in Sources */,
+				DF8E1CD71EE501E700DCC35C /* NodeReset.swift in Sources */,
 				DF7973731ED3429D00C01457 /* ParseTree.m in Sources */,
 				69DE361D1ECD195600EC4756 /* U3.swift in Sources */,
+				DF8E1CE51EE5028800DCC35C /* NodeMagic.swift in Sources */,
+				DF8E1CED1EE502ED00DCC35C /* NodeIdList.swift in Sources */,
 				69D3108B1ECA182000B3E752 /* Credentials.swift in Sources */,
 				6974E5951ECA1EF300D1AE97 /* QISKitException.swift in Sources */,
 				69DBD7301ECA48BE0099CB1D /* CCX.swift in Sources */,
@@ -537,6 +618,8 @@
 				69E3354F1ECA1B8D0027271D /* Register.swift in Sources */,
 				69E335511ECA1BC00027271D /* QuantumRegister.swift in Sources */,
 				DF79735D1ED071F600C01457 /* parser.ym in Sources */,
+				DF8E1CFF1EE503E800DCC35C /* NodeBinaryOp.swift in Sources */,
+				DF8E1CD31EE4A27B00DCC35C /* NodeProgram.swift in Sources */,
 				DFA7844F1ED746E0002BB240 /* SymbolTable.m in Sources */,
 				69DE36211ECD198E00EC4756 /* Z.swift in Sources */,
 				69E597AB1ECA90A600A321F5 /* U1.swift in Sources */,
@@ -549,24 +632,33 @@
 				69DE360F1ECD188000EC4756 /* Iden.swift in Sources */,
 				697F259C1ED45BED0065B106 /* Circuit.swift in Sources */,
 				69EF514B1EDC72E10074AE42 /* CircuitEdgeData.swift in Sources */,
+				DF8E1CDD1EE5022F00DCC35C /* NodePrimaryList.swift in Sources */,
 				697BEDB11ED0844E00AB9A86 /* GatesTools.swift in Sources */,
+				DF8E1CF91EE503A800DCC35C /* NodeCustomUnitary.swift in Sources */,
 				69E597AF1ECA980F00A321F5 /* X.swift in Sources */,
 				693A9F481ECA38D100112AC9 /* Qconfig.swift in Sources */,
 				693A9F441ECA366000112AC9 /* CX.swift in Sources */,
 				69DE360B1ECD153D00EC4756 /* CY.swift in Sources */,
+				DF8E1D011EE5040300DCC35C /* NodeBarrier.swift in Sources */,
 				699AAB541EE480160015DB83 /* Node.swift in Sources */,
 				69DE36111ECD18AD00EC4756 /* RX.swift in Sources */,
 				69DE36071ECD150300EC4756 /* CSwap.swift in Sources */,
 				69D310881ECA182000B3E752 /* Request.swift in Sources */,
 				69E234321EDEE76200E47750 /* GateData.swift in Sources */,
+				DF8E1D031EE5048300DCC35C /* NodeId.swift in Sources */,
 				69D310771ECA180500B3E752 /* QuantumProgram.swift in Sources */,
+				DF8E1CE91EE502BB00DCC35C /* NodeIndexedId.swift in Sources */,
+				DF8E1CDB1EE5021400DCC35C /* NodeQreg.swift in Sources */,
 				69E597B11ECA99B300A321F5 /* H.swift in Sources */,
 				69D310891ECA182000B3E752 /* IBMQuantumExperience.swift in Sources */,
+				DF8E1CEB1EE502D200DCC35C /* NodeIf.swift in Sources */,
 				DF7973621ED0747B00C01457 /* ParserBlocks.m in Sources */,
+				DF8E1CF51EE5037D00DCC35C /* NodeExternal.swift in Sources */,
 				695701341ED75C1C00C6CCAB /* Graph.swift in Sources */,
 				6913D0A21ECE41D6003C5FD3 /* InstructionSet.swift in Sources */,
 				69DE36131ECD18BE00EC4756 /* RY.swift in Sources */,
 				69FEC8381ECB37E0002324E2 /* IBMQuantumExperienceError.swift in Sources */,
+				DF8E1CE71EE502A200DCC35C /* NodeInt.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -576,10 +668,9 @@
 			files = (
 				6957013C1ED75E9100C6CCAB /* DataStructureTests.swift in Sources */,
 				DFBC4F711EC7384200027640 /* QiskitTests.swift in Sources */,
-				DF7F720F1ED86EDA0055D210 /* QiskitParserArgTests.swift in Sources */,
-				DF7F720A1ED7BC600055D210 /* QiskitParserExpListTests.swift in Sources */,
+				DF8E1D071EE7022800DCC35C /* QiskitParserExpListTests.swift in Sources */,
 				DF7F720D1ED863F50055D210 /* QIskitParserTerminalTests.swift in Sources */,
-				DF7F720B1ED7BC600055D210 /* QiskitParserExpTests.swift in Sources */,
+				DF8E1D051EE6F78B00DCC35C /* QiskitParserExpTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -749,6 +840,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = qiskitTests/Info.plist;
@@ -767,6 +859,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = qiskitTests/Info.plist;

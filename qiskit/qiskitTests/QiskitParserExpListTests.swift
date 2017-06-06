@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import qiskit
 
 class QiskitParserExpListTests: XCTestCase {
 
@@ -28,8 +29,13 @@ class QiskitParserExpListTests: XCTestCase {
         
         ParseSuccessBlock = { (node: Node?) -> Void in
             XCTAssertNotNil(node)
-            XCTAssertEqual(NodeType.N_EXPLIST, node!.nodeType)
-            asyncExpectation.fulfill()
+            if node is NodeExpressionList {
+                asyncExpectation.fulfill()
+            } else {
+                XCTFail("NodeExpressionList Type Expected!")
+                asyncExpectation.fulfill()
+                return
+            }
         }
         
         ParseFailBlock = { (message: String?) -> Void in

@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "ParseTree.h"
 
+@class Node;
+
 extern void (^ParseSuccessBlock)(Node *node);
 extern void (^ParseFailBlock)(NSString *msg);
 
