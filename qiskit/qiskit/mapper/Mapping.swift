@@ -459,4 +459,138 @@ final class Mapping {
         u.execute()
         return ((u.backend as! CircuitBackend).circuit, initial_layout!)
     }
+
+    /**
+     Test if arguments are a solution to a system of equations.
+     Cos[phi+lamb] * Cos[theta] = Cos[xi] * Cos[theta1+theta2]
+     Sin[phi+lamb] * Cos[theta] = Sin[xi] * Cos[theta1-theta2]
+     Cos[phi-lamb] * Sin[theta] = Cos[xi] * Sin[theta1+theta2]
+     Sin[phi-lamb] * Sin[theta] = Sin[xi] * Sin[-theta1+theta2]
+     Returns the maximum absolute difference between right and left hand sides.
+     */
+    static func test_trig_solution(_ theta: Double,
+                                   _ phi: Double,
+                                   _ lamb: Double,
+                                   _ xi: Double,
+                                   _ theta1: Double,
+                                   _ theta2: Double) -> Double {
+        let delta1 = cos(phi + lamb) * cos(theta) - cos(xi) * cos(theta1 + theta2)
+        let delta2 = sin(phi + lamb) * cos(theta) - sin(xi) * cos(theta1 - theta2)
+        let delta3 = cos(phi - lamb) * sin(theta) - cos(xi) * sin(theta1 + theta2)
+        let delta4 = sin(phi - lamb) * sin(theta) - sin(xi) * sin(-theta1 + theta2)
+        return max(abs(delta1), abs(delta2), abs(delta3), abs(delta4))
+    }
+
+    /**
+     Express a Y.Z.Y single qubit gate as a Z.Y.Z gate.
+     Solve the equation
+     Ry(2*theta1).Rz(2*xi).Ry(2*theta2) = Rz(2*phi).Ry(2*theta).Rz(2*lambda)
+     for theta, phi, and lambda. This is equivalent to solving the system
+     given in the comment for test_solution. Use eps for comparisons with zero.
+     Return a solution theta, phi, and lambda.
+     */
+    static func yzy_to_zyz(xi: Double, theta1: Double, theta2: Double, eps: Double = 1e-9) -> (Double,Double,Double) {
+        var solutions: [(Double,Double,Double)] = []  // list of potential solutions
+        // Four cases to avoid singularities
+        if abs(cos(xi)) < eps / 10 {
+            solutions.append((theta2 - theta1, xi, 0.0))
+        }
+        else {
+            if abs(sin(theta1 + theta2)) < eps / 10.0 {
+                let phi_minus_lambda: [Double] = [Double.pi / 2.0 , 3.0 * Double.pi / 2.0, Double.pi / 2.0, 3.0 * Double.pi / 2.0]
+                let stheta_1: Double = asin(sin(xi) * sin(-theta1 + theta2))
+                let stheta_2: Double = asin(-sin(xi) * sin(-theta1 + theta2))
+                let stheta_3: Double = Double.pi - stheta_1
+                let stheta_4: Double = Double.pi - stheta_2
+                let stheta: [Double] = [stheta_1, stheta_2, stheta_3, stheta_4]
+                var phi_plus_lambda: [Double] = []
+                for x in stheta {
+                    phi_plus_lambda.append(acos(cos(theta1 + theta2) * cos(xi) / cos(x)))
+                }
+                var sphi: [Double] = []
+                var slam: [Double] = []
+                for i in 0..<phi_plus_lambda.count {
+                    if i < phi_minus_lambda.count {
+                        sphi.append((phi_plus_lambda[i] + phi_minus_lambda[i]) / 2.0)
+                        slam.append((phi_plus_lambda[i] - phi_minus_lambda[i]) / 2.0)
+                    }
+                    else {
+                        break
+                    }
+                }
+                for i in 0..<stheta.count {
+                    if i < sphi.count && i < slam.count {
+                        solutions.append((stheta[i],sphi[i],slam[i]))
+                    }
+                    else {
+                        break
+                    }
+                }
+            }
+            else {
+                if abs(cos(theta1 + theta2)) < eps / 10.0 {
+                    let phi_plus_lambda: [Double] = [Double.pi / 2.0, 3.0 * Double.pi / 2.0, Double.pi / 2.0, 3.0 * Double.pi / 2.0]
+                    let stheta_1: Double = acos(sin(xi) * cos(theta1 - theta2))
+                    let stheta_2: Double = acos(-sin(xi) * cos(theta1 - theta2))
+                    let stheta_3: Double = -stheta_1
+                    let stheta_4: Double = -stheta_2
+                    let stheta: [Double] = [stheta_1, stheta_2, stheta_3, stheta_4]
+                    var phi_minus_lambda: [Double] = []
+                    for x in stheta {
+                        phi_minus_lambda.append(acos(sin(theta1 + theta2) * cos(xi) / sin(x)))
+                    }
+                    var sphi: [Double] = []
+                    var slam: [Double] = []
+                    for i in 0..<phi_plus_lambda.count {
+                        if i < phi_minus_lambda.count {
+                            sphi.append((phi_plus_lambda[i] + phi_minus_lambda[i]) / 2.0)
+                            slam.append((phi_plus_lambda[i] - phi_minus_lambda[i]) / 2.0)
+                        }
+                        else {
+                            break
+                        }
+                    }
+                    for i in 0..<stheta.count {
+                        if i < sphi.count && i < slam.count {
+                            solutions.append((stheta[i],sphi[i],slam[i]))
+                        }
+                        else {
+                            break
+                        }
+                    }
+                }
+                else {
+                    let phi_plus_lambda: Double = atan(sin(xi) * cos(theta1 - theta2) / (cos(xi) * cos(theta1 + theta2)))
+                    let phi_minus_lambda: Double = atan(sin(xi) * sin(-theta1 + theta2) / (cos(xi) * sin(theta1 + theta2)))
+                    let sphi: Double = (phi_plus_lambda + phi_minus_lambda) / 2.0
+                    let slam: Double = (phi_plus_lambda - phi_minus_lambda) / 2.0
+                    solutions.append((acos(cos(xi) * cos(theta1 + theta2) / cos(sphi + slam)), sphi, slam))
+                    solutions.append((acos(cos(xi) * cos(theta1 + theta2) / cos(sphi + slam + Double.pi)), sphi + Double.pi / 2.0, slam + Double.pi / 2.0))
+                    solutions.append((acos(cos(xi) * cos(theta1 + theta2) / cos(sphi + slam)), sphi + Double.pi / 2.0, slam - Double.pi / 2.0))
+                    solutions.append((acos(cos(xi) * cos(theta1 + theta2) / cos(sphi + slam + Double.pi)), sphi + Double.pi, slam))
+                }
+            }
+        }
+        // Select the first solution with the required accuracy
+        var deltas: [Double] = []
+        for x in solutions {
+            deltas.append(Mapping.test_trig_solution(x.0, x.1, x.2, xi, theta1, theta2))
+        }
+        for i in 0..<deltas.count {
+            if i < solutions.count {
+                if deltas[i] < eps {
+                    return solutions[i]
+                }
+            }
+            else {
+                break
+            }
+        }
+        print("xi=", xi)
+        print("theta1=", theta1)
+        print("theta2=", theta2)
+        print("solutions=", solutions)
+        print("deltas=", deltas)
+        assert (false, "Error! No solution found. This should not happen.")
+    }
 }
