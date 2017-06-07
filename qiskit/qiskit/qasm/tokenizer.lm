@@ -117,9 +117,13 @@ CX {
 }
 
 U {
-    printf("Found U\n");
     yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
     return U;
+}
+
+-> {
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return ARROW;
 }
 
 [a-z][a-zA-Z0-9_]* {

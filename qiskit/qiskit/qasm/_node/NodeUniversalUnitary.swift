@@ -10,7 +10,7 @@ import Foundation
 
 @objc public class NodeUniversalUnitary: Node {
 
-    public init() {
+    public init(object1: Node?, object2: Node?, object3: Node?) {
         super.init(type: .N_UNIVERSALUNITARY)
     }
     

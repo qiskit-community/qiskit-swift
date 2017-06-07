@@ -9,6 +9,8 @@
 import Foundation
 
 public enum NodeType: String {
+    case N_ANYLIST = "any_list"
+    case N_ARGUMENT = "argument"
     case N_BARRIER = "barrier"
     case N_BINARYOP = "binop"
     case N_CNOT = "cnot"
@@ -25,6 +27,7 @@ public enum NodeType: String {
     case N_INT = "int"
     case N_MAGIC = "magic"
     case N_MEASURE = "measure"
+    case N_MIXEDLIST = "mixed_list"
     case N_OPAQUE = "opaque"
     case N_PREFIX = "prefix"
     case N_PRIMARYLIST = "primary_list"

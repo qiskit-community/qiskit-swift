@@ -33,6 +33,7 @@ void yyerror(char *s);
 %token <svalue> MATCHES
 %token <svalue> ID
 %token <svalue> STRING
+%token <svalue> ARROW
 
 %token <svalue> SIN
 %token <svalue> COS
@@ -41,13 +42,24 @@ void yyerror(char *s);
 %token <svalue> LN
 %token <svalue> SQRT
 
+%type <node> qop
+%type <node> uop
+%type <node> anylist
+%type <node> mixedlist
+%type <node> idlist
+%type <node> argument
 %type <node> explist
 %type <node> exp
 %type <node> real
 %type <node> nninteger
 %type <node> id
 %type <node> pi
+%type <node> u
+%type <node> cx
+%type <node> measure
+%type <node> reset
 %type <svalue> unaryop
+%type <svalue> arrow
 
 %left ','
 %right '='
@@ -57,8 +69,37 @@ void yyerror(char *s);
 
 %%
 
-qop : explist { if (ParseSuccessBlock) ParseSuccessBlock($1); }
+statement : qop { if (ParseSuccessBlock) ParseSuccessBlock($1); }
+| uop { if (ParseSuccessBlock) ParseSuccessBlock($1); }
+| anylist { if (ParseSuccessBlock) ParseSuccessBlock($1); }
+| mixedlist { if (ParseSuccessBlock) ParseSuccessBlock($1); }
+| argument { if (ParseSuccessBlock) ParseSuccessBlock($1); }
+| explist { if (ParseSuccessBlock) ParseSuccessBlock($1); }
 | exp { if (ParseSuccessBlock) ParseSuccessBlock($1); }
+| id { if (ParseSuccessBlock) ParseSuccessBlock($1); }
+
+qop : uop { $$ = $1; }
+| measure '(' argument ')' arrow '(' argument ')' ';' { $$ = [ParseTree createUniversalUnitary: $1 object2: $3 object3: $7]; }
+| reset '(' argument ')' ';' { $$ = [ParseTree createUniversalUnitary: $1 object2: $3 object3: nil]; }
+
+uop : u '(' exp ')' argument ';' { $$ = [ParseTree createUniversalUnitary: $1 object2: $3 object3: $5]; }
+| cx argument ',' argument ';' { $$ = [ParseTree createUniversalUnitary: $1 object2: $2 object3: $4]; }
+| id anylist ';' { $$ = [ParseTree  createUniversalUnitary: $1 object2: $2 object3: nil]; }
+| id '(' ')' anylist ';' { $$ = [ParseTree  createUniversalUnitary: $1 object2: $4 object3: nil]; }
+| id '(' explist ')' anylist ';' { $$ = [ParseTree  createUniversalUnitary: $1 object2: $3 object3: $5]; }
+
+anylist: idlist { $$ = [ParseTree createAnylistNode: $1]; }
+| mixedlist { $$ = [ParseTree createAnylistNode: $1];  }
+
+idlist: id { $$ = $1; }
+| idlist ',' id { $$ = [ParseTree createIdlistNode: $1 identifier: $3]; }
+
+mixedlist:  mixedlist ',' id { $$ = [ParseTree createMixedlistNode: $1 item2: $3 item3: nil]; }
+| mixedlist ',' id '[' nninteger ']' { $$ = [ParseTree createMixedlistNode: $1 item2: $3 item3: $5]; }
+| idlist ',' id '[' nninteger ']' { $$ = [ParseTree createMixedlistNode: $1 item2: $3 item3: $5]; }
+
+argument : id { $$ = [ParseTree createArgumentNode: $1 parameter: nil]; }
+| id '[' nninteger ']' { $$ = [ParseTree createArgumentNode: $1 parameter: $3]; }
 
 explist : exp { $$ = $1;  }
 | exp ',' explist { $$ = [ParseTree createExpressionList: $1 expression: $3]; }
@@ -80,6 +121,11 @@ real : REAL { $$ = [ParseTree createRealNodeWithValue: $1]; }
 nninteger : NNINTEGER { $$ = [ParseTree createIntNodeWithValue: $1]; }
 id : ID { $$ = [ParseTree createIdNodeWithValue: $1]; }
 pi : PI { $$ = [ParseTree createRealNodeWithValue: M_PI]; }
+u : U { $$ = [ParseTree createIdNodeWithValue: @"U"]; }
+cx: CX { $$ = [ParseTree createIdNodeWithValue: @"CX"]; }
+measure: MEASURE { $$ = [ParseTree createMeasureNode]; }
+reset : RESET { $$ = [ParseTree createResetNode]; }
+arrow : ARROW { $$ = $1; }
 
 unaryop : SIN { $$ = $1; }
 | COS { $$ = $1; }

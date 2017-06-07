@@ -10,8 +10,8 @@ import Foundation
 
 @objc public class NodeReset: Node {
     
-    public init(children: [Node]) {
-        super.init(type: .N_UNIVERSALUNITARY, children: children)
+    public init() {
+        super.init(type: .N_UNIVERSALUNITARY)
     }
     
     override public func qasm() -> String {

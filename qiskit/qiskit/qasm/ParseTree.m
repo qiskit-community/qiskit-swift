@@ -12,6 +12,31 @@
 
 @implementation ParseTree
 
++(Node*) createUniversalUnitary: (Node*) o1 object2: (Node*) o2 object3: (Node*) o3 {
+    NodeUniversalUnitary *node = [[NodeUniversalUnitary alloc] initWithObject1:o1 object2:o2 object3:o3];
+    return node;   
+}
+
++(Node*) createAnylistNode: (Node*) list {
+    NodeAnyList *node = [[NodeAnyList alloc] initWithList:list];
+    return node;
+}
+
++(Node*) createIdlistNode: (Node*) i0 identifier: (Node*) identifier {
+    NodeIdList *node = [[NodeIdList alloc] initWithIdList:i0 identifier:identifier];
+    return node;
+}
+
++(Node*) createMixedlistNode: (Node*) i0 item2: (Node*) i1 item3: (Node*) i2 {
+    NodeMixedList *node = [[NodeMixedList alloc] initWithItem1:i0 item2:i1 item3:i2];
+    return node;
+}
+
++(Node*) createArgumentNode: (Node*) identifier parameter: (Node*) nninteger {
+    NodeArgument *node = [[NodeArgument alloc] initWithIdentifier:identifier parameter:nninteger];
+    return node;
+}
+
 +(Node*) createExpressionList: (Node*) exp1 expression: (Node*) exp2 {
     NodeExpressionList *node = [[NodeExpressionList alloc] initWithChildren: @[exp1, exp2]];
     return node;
@@ -42,10 +67,14 @@
     return node;
 }
 
-+(Node*) createUniversalUnitary {
-    NodeUniversalUnitary *node = [[NodeUniversalUnitary alloc] init];
++(Node*) createMeasureNode {
+    NodeMeasure *node =  [[NodeMeasure alloc] init];
     return node;
 }
 
++(Node*) createResetNode {
+    NodeReset *node =  [[NodeReset alloc] init];
+    return node;
+}
 
 @end
