@@ -489,7 +489,10 @@ final class Mapping {
      given in the comment for test_solution. Use eps for comparisons with zero.
      Return a solution theta, phi, and lambda.
      */
-    static func yzy_to_zyz(xi: Double, theta1: Double, theta2: Double, eps: Double = 1e-9) -> (Double,Double,Double) {
+    static func yzy_to_zyz(_ xi: Double,
+                           _ theta1: Double,
+                           _ theta2: Double,
+                           _ eps: Double = 1e-9) -> (Double,Double,Double) {
         var solutions: [(Double,Double,Double)] = []  // list of potential solutions
         // Four cases to avoid singularities
         if abs(cos(xi)) < eps / 10 {
@@ -592,5 +595,208 @@ final class Mapping {
         print("solutions=", solutions)
         print("deltas=", deltas)
         assert (false, "Error! No solution found. This should not happen.")
+    }
+
+    /**
+     Return a triple theta, phi, lambda for the product.
+     u3(theta, phi, lambda)
+     = u3(theta1, phi1, lambda1).u3(theta2, phi2, lambda2)
+     = Rz(phi1).Ry(theta1).Rz(lambda1+phi2).Ry(theta2).Rz(lambda2)
+     = Rz(phi1).Rz(phi').Ry(theta').Rz(lambda').Rz(lambda2)
+     = u3(theta', phi1 + phi', lambda2 + lambda')
+     Return theta, phi, lambda.
+     */
+    static func compose_u3(_ theta1: Double,
+                           _ phi1: Double,
+                           _ lambda1: Double,
+                           _ theta2: Double,
+                           _ phi2: Double,
+                           _ lambda2: Double) -> (Double, Double, Double) {
+        // Careful with the factor of two in yzy_to_zyz
+        let (thetap, phip, lambdap) = Mapping.yzy_to_zyz((lambda1 + phi2) / 2.0, theta1 / 2.0, theta2 / 2.0)
+        return (2.0 * thetap, phi1 + 2.0 * phip, lambda2 + 2.0 * lambdap)
+    }
+
+    /**
+     Cancel back-to-back "cx" gates in circuit.
+     */
+    static func cx_cancellation(_ circuit: Circuit) throws {
+        let runs = try circuit.collect_runs(["cx"])
+        for run in runs {
+            // Partition the run into chunks with equal gate arguments
+            var partition: [[GraphVertex<CircuitVertexData>]] = []
+            var chunk: [GraphVertex<CircuitVertexData>] = []
+            for i in 0..<(run.count-1) {
+                chunk.append(run[i])
+                let qargs0 = (run[i].data as! CircuitVertexOpData).qargs
+                let qargs1 = (run[i + 1].data as! CircuitVertexOpData).qargs
+                if qargs0 != qargs1 {
+                    partition.append(chunk)
+                    chunk = []
+                }
+            }
+            chunk.append(run[run.count-1])
+            partition.append(chunk)
+            // Simplify each chunk in the partition
+            for chunk in partition {
+                if chunk.count % 2 == 0 {
+                    for n in chunk {
+                        circuit._remove_op_node(n.key)
+                    }
+                }
+                else {
+                    for i in 1..<chunk.count {
+                        circuit._remove_op_node(chunk[i].key)
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     "Simplify runs of single qubit gates in the QX basis.
+     Return a new circuit that has been optimized.
+     */
+    static func optimize_1q_gates(_ circuit: Circuit) throws -> Circuit {
+        let qx_basis = ["u1", "u2", "u3", "cx", "id"]
+        let urlr = try Unroller(Qasm(data: circuit.qasm(qeflag: true)).parse(), CircuitBackend(qx_basis))
+        urlr.execute()
+        let unrolled = (urlr.backend as! CircuitBackend).circuit
+
+        let runs = try unrolled.collect_runs(["u1", "u2", "u3", "id"])
+        for run in runs {
+            let qname = (run[0].data as! CircuitVertexOpData).qargs[0]
+            var right_name = "u1"
+            var right_parameters = (0.0, 0.0, 0.0)  // (theta, phi, lambda)
+            for node in run {
+                let nd = node.data as! CircuitVertexOpData
+                assert(nd.condition == nil, "internal error")
+                assert(nd.qargs.count == 1, "internal error")
+                assert(nd.qargs[0] == qname, "internal error")
+                var left_name = nd.name
+                assert(Set<String>(["u1", "u2", "u3", "id"]).contains(left_name), "internal error")
+                var left_parameters: (Double, Double, Double) = (0.0,0.0,0.0)
+                if left_name == "u1" {
+                    left_parameters = (0.0, 0.0, Double(nd.params[0])!)
+                }
+                else {
+                    if left_name == "u2" {
+                        left_parameters = (Double.pi / 2.0, Double(nd.params[0])!, Double(nd.params[1])!)
+                    }
+                    else {
+                        if left_name == "u3" {
+                            left_parameters = (Double(nd.params[0])!, Double(nd.params[1])!, Double(nd.params[2])!)
+                        }
+                        else {
+                            left_name = "u1"  // replace id with u1
+                            left_parameters = (0.0, 0.0, 0.0)
+                        }
+                    }
+                }
+                // Compose gates
+                let name_tuple = (left_name, right_name)
+                if name_tuple == ("u1", "u1") {
+                    // u1(lambda1) * u1(lambda2) = u1(lambda1 + lambda2)
+                    right_parameters = (0.0, 0.0, right_parameters.2 + left_parameters.2)
+                }
+                else {
+                    if name_tuple == ("u1", "u2") {
+                        // u1(lambda1) * u2(phi2, lambda2) = u2(phi2 + lambda1, lambda2)
+                        right_parameters = (Double.pi / 2, right_parameters.1 + left_parameters.2, right_parameters.2)
+                    }
+                    else {
+                        if name_tuple == ("u2", "u1") {
+                            // u2(phi1, lambda1) * u1(lambda2) = u2(phi1, lambda1 + lambda2)
+                            right_name = "u2"
+                            right_parameters = (Double.pi / 2.0, left_parameters.1, right_parameters.2 + left_parameters.2)
+                        }
+                        else {
+                            if name_tuple == ("u1", "u3") {
+                                // u1(lambda1) * u3(theta2, phi2, lambda2) =
+                                //     u3(theta2, phi2 + lambda1, lambda2)
+                                right_parameters = (right_parameters.0, right_parameters.1 + left_parameters.2, right_parameters.2)
+                            }
+                            else {
+                                if name_tuple == ("u3", "u1") {
+                                    // u3(theta1, phi1, lambda1) * u1(lambda2) =
+                                    //    u3(theta1, phi1, lambda1 + lambda2)
+                                    right_name = "u3"
+                                    right_parameters = (left_parameters.0, left_parameters.1, right_parameters.2 + left_parameters.2)
+                                }
+                                else {
+                                    if name_tuple == ("u2", "u2") {
+                                        // Using Ry(pi/2).Rz(2*lambda).Ry(pi/2) =
+                                        //    Rz(pi/2).Ry(pi-2*lambda).Rz(pi/2),
+                                        // u2(phi1, lambda1) * u2(phi2, lambda2) =
+                                        //    u3(pi - lambda1 - phi2, phi1 + pi/2, lambda2 + pi/2)
+                                        right_name = "u3"
+                                        right_parameters = (Double.pi - left_parameters.2 - right_parameters.1, left_parameters.1 + Double.pi / 2.0, right_parameters.2 + Double.pi / 2)
+                                    }
+                                    else {
+                                        // For composing u3's or u2's with u3's, use
+                                        // u2(phi, lambda) = u3(pi/2, phi, lambda)
+                                        // together with the qiskit.mapper.compose_u3 method.
+                                        right_name = "u3"
+                                        right_parameters = Mapping.compose_u3(left_parameters.0,
+                                                                        left_parameters.1,
+                                                                        left_parameters.2,
+                                                                        right_parameters.0,
+                                                                        right_parameters.1,
+                                                                        right_parameters.2)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                // Here down, when we simplify, we add f(theta) to lambda to correct
+                // the global phase when f(theta) is 2*pi. This isn't necessary but
+                // the other steps preserve the global phase, so we continue.
+                let epsilon = 1e-9  // for comparison with zero
+                // Y rotation is 0 mod 2*pi, so the gate is a u1
+                if abs(right_parameters.0.truncatingRemainder(dividingBy: 2.0) * Double.pi) < epsilon && right_name != "u1" {
+                    right_name = "u1"
+                    right_parameters = (0.0, 0.0, right_parameters.1 + right_parameters.2 + right_parameters.0)
+                }
+                // Y rotation is pi/2 or -pi/2 mod 2*pi, so the gate is a u2
+                if right_name == "u3" {
+                    // theta = pi/2 + 2*k*pi
+                    if abs((right_parameters.0 - Double.pi / 2.0).truncatingRemainder(dividingBy: 2.0) * Double.pi) < epsilon {
+                        right_name = "u2"
+                        right_parameters = (Double.pi / 2.0, right_parameters.1, right_parameters.2 + (right_parameters.0 - Double.pi / 2.0))
+                    }
+                    // theta = -pi/2 + 2*k*pi
+                    if abs((right_parameters.0 + Double.pi / 2.0).truncatingRemainder(dividingBy: 2.0) * Double.pi) < epsilon {
+                        right_name = "u2"
+                        right_parameters = (Double.pi / 2.0, right_parameters.1 + Double.pi, right_parameters.2 - Double.pi + (right_parameters.0 + Double.pi / 2.0))
+                    }
+                }
+                // u1 and lambda is 0 mod 4*pi so gate is nop
+                if right_name == "u1" && abs(right_parameters.2.truncatingRemainder(dividingBy: 4.0) * Double.pi) < epsilon {
+                    right_name = "nop"
+                }
+            }
+            // Replace the data of the first node in the run
+            var new_params: [String] = []
+            if right_name == "u1" {
+                new_params.append(String(right_parameters.2))
+            }
+            if right_name == "u2" {
+                new_params = [String(right_parameters.1), String(right_parameters.2)]
+            }
+            if right_name == "u3" {
+                new_params = [String(right_parameters.0), String(right_parameters.1), String(right_parameters.2)]
+            }
+            (run[0].data as! CircuitVertexOpData).name = right_name
+            (run[0].data as! CircuitVertexOpData).params = new_params
+            // Delete the other nodes in the run
+            for i in 1..<run.count {
+                unrolled._remove_op_node(run[i].key)
+            }
+            if right_name == "nop" {
+                unrolled._remove_op_node(run[0].key)
+            }
+        }
+        return unrolled
     }
 }

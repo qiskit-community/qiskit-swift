@@ -58,10 +58,10 @@ final class CircuitVertexOutData: CircuitVertexInOutData {
 }
 
 final class CircuitVertexOpData: CircuitVertexData {
-    let name: String
+    var name: String
     var qargs: [RegBit]
     var cargs: [RegBit]
-    let params: [String]
+    var params: [String]
     var condition: RegBit?
 
     init(_ name: String,_ qargs: [RegBit], _ cargs: [RegBit], _ params: [String], _ condition: RegBit?) {

@@ -1470,7 +1470,7 @@ final class Circuit: NSCopying {
      Remove an operation node n.
      Add edges from predecessors to successors.
      */
-    private func _remove_op_node(_ n: Int) {
+    func _remove_op_node(_ n: Int) {
         let (pred_map, succ_map) = self._make_pred_succ_maps(n)
         self.multi_graph.remove_vertex(n)
         for w in pred_map.keys {
@@ -1715,8 +1715,8 @@ final class Circuit: NSCopying {
      in the circuit's basis.
      Nodes must have only one successor to continue the run.
      */
-    func collect_runs(namelist: Set<String>) throws -> [[Int]] {
-        var group_list: [[Int]] = []
+    func collect_runs(_ namelist: Set<String>) throws -> [[GraphVertex<CircuitVertexData>]] {
+        var group_list: [[GraphVertex<CircuitVertexData>]] = []
 
         // Iterate through the nodes of self in topological order
         // and form tuples containing sequences of gates
@@ -1740,7 +1740,7 @@ final class Circuit: NSCopying {
             if nodes_seen[node.key]! {
                 continue
             }
-            var group: [Int] = [node.key]
+            var group: [GraphVertex<CircuitVertexData>] = [node]
             nodes_seen[node.key] = true
             var s = self.multi_graph.successors(node.key)
             while s.count == 1 {
@@ -1754,7 +1754,7 @@ final class Circuit: NSCopying {
                 if !namelist.contains(ndOp.name) {
                     break
                 }
-                group.append(s[0].key)
+                group.append(s[0])
                 nodes_seen[s[0].key] = true
                 s = self.multi_graph.successors(s[0].key)
             }
