@@ -46,11 +46,11 @@ final class Mapping {
      swap circuit has been applied. The trivial_flag is set if the layer
      has no multi-qubit gates.
      */
-    static func layer_permutation(layer_partition: [[RegBit]],
-                                  layout: [RegBit:RegBit],
-                                  qubit_subset: [RegBit],
-                                  coupling: Coupling,
-                                  trials: Int) throws -> (Bool, String?, Int?, [RegBit:RegBit]?, Bool) {
+    static func layer_permutation(_ layer_partition: [[RegBit]],
+                                  _ layout: [RegBit:RegBit],
+                                  _ qubit_subset: [RegBit],
+                                  _ coupling: Coupling,
+                                  _ trials: Int) throws -> (Bool, String?, Int?, [RegBit:RegBit]?, Bool) {
         var rev_layout: [RegBit:RegBit] = [:]
         for (a,b) in layout {
             rev_layout[b] = a
@@ -277,5 +277,186 @@ final class Mapping {
             throw MappingError.errorcouplinggraph(cxedge: cxedge)
         }
         return circuit_graph
+    }
+
+    /**
+     Map a Circuit onto a CouplingGraph using swap gates.
+     circuit_graph = input Circuit
+     coupling_graph = CouplingGraph to map onto
+     initial_layout = dict from qubits of circuit_graph to qubits
+     of coupling_graph (optional)
+     basis = basis string specifying basis of output Circuit
+     verbose = optional flag to print more information
+     Returns a Circuit object containing a circuit equivalent to
+     circuit_graph that respects couplings in coupling_graph, and
+     a layout dict mapping qubits of circuit_graph into qubits
+     of coupling_graph. The layout may differ from the initial_layout
+     if the first layer of gates cannot be executed on the
+     initial_layout.
+     */
+    static func swap_mapper(_ circuit_graph: Circuit,
+                            _ coupling_graph: Coupling,
+                            _ init_layout: [RegBit:RegBit]? = nil,
+                            _ b: String = "cx,u1,u2,u3,id",
+                            _ verbose: Bool = false) throws -> (Circuit, [RegBit:RegBit]) {
+        if circuit_graph.width() > coupling_graph.size() {
+            throw MappingError.errorqubitscouplinggraph
+        }
+        var initial_layout = init_layout
+        var basis = b
+        // Schedule the input circuit
+        let layerlist = try circuit_graph.layers()
+        if verbose {
+            print("schedule:")
+            for i in 0..<layerlist.count {
+                let partition = layerlist[i].partition
+                var array: [String] = []
+                for regBit in partition {
+                    array.append(regBit.description)
+                }
+                print("    \(i): \(array.joined(separator: ","))")
+            }
+        }
+
+        // Check input layout and create default layout if necessary
+        var qubit_subset: [RegBit] = []
+        if let init_layout = initial_layout {
+            let circ_qubits = circuit_graph.get_qubits()
+            let coup_qubits = coupling_graph.get_qubits()
+            for (k, v) in init_layout {
+                qubit_subset.append(v)
+                if !circ_qubits.contains(k) {
+                    throw MappingError.errorqubitinputcircuit(regBit: k)
+                }
+                if !coup_qubits.contains(v) {
+                    throw MappingError.errorqubitincouplinggraph(regBit: v)
+                }
+            }
+        }
+        else {
+            // Supply a default layout
+            qubit_subset = coupling_graph.get_qubits()
+            qubit_subset = Array(qubit_subset[0..<circuit_graph.width()])
+            var init_layout: [RegBit:RegBit] = [:]
+            let qubits = circuit_graph.get_qubits()
+            for i in 0..<qubits.count {
+                if i < qubit_subset.count {
+                    init_layout[qubits[i]] = qubit_subset[i]
+                }
+                else {
+                    break
+                }
+            }
+            initial_layout = init_layout
+        }
+
+        // Find swap circuit to preceed to each layer of input circuit
+        var layout = initial_layout!
+        var openqasm_output = ""
+        var first_layer = true  // True until first layer is output
+        var first_swapping_layer = true  // True until first swap layer is output
+        // Iterate over layers
+        for i in 0..<layerlist.count {
+            // Attempt to find a permutation for this layer
+            let (success_flag, best_circ, best_d, best_layout, trivial_flag) =
+                try Mapping.layer_permutation(layerlist[i].partition, layout, qubit_subset, coupling_graph, 20)
+            // If this fails, try one gate at a time in this layer
+            if !success_flag {
+                if verbose {
+                    print("swap_mapper: failed, layer \(i), retrying sequentially")
+                }
+                let serial_layerlist = try layerlist[i].graph.serial_layers()
+                // Go through each gate in the layer
+                for j in 0..<serial_layerlist.count {
+                    let (success_flag, best_circ, best_d, best_layout, trivial_flag) =
+                            try Mapping.layer_permutation(serial_layerlist[j].partition,
+                                    layout, qubit_subset, coupling_graph,20)
+                    // Give up if we fail again
+                    if !success_flag {
+                        throw MappingError.swapmapperfailed(i: i, j: j, qasm: try serial_layerlist[j].graph.qasm(no_decls: true,aliases:layout))
+                    }
+                    else {
+                        // Update the qubit positions each iteration
+                        let layout = best_layout
+                        if best_d == 0 {
+                            // Output qasm without swaps
+                            if first_layer {
+                                openqasm_output += try circuit_graph.qasm(decls_only: true, add_swap: true,aliases: layout)
+                                first_layer = false
+                            }
+                            if !trivial_flag && first_swapping_layer {
+                                initial_layout = layout
+                                first_swapping_layer = false
+                            }
+                        }
+                        else {
+                            // Output qasm with swaps
+                            if first_layer {
+                                openqasm_output += try circuit_graph.qasm(decls_only: true, add_swap: true,aliases: layout)
+                                first_layer = false
+                                initial_layout = layout
+                                first_swapping_layer = false
+                            }
+                            else {
+                                if !first_swapping_layer {
+                                    if verbose {
+                                        print("swap_mapper: layer \(i) \(j)), depth \(String(describing: best_d))")
+                                    }
+                                    openqasm_output += best_circ ?? ""
+                                }
+                                else {
+                                    initial_layout = layout
+                                    first_swapping_layer = false
+                                }
+                            }
+                            openqasm_output += try serial_layerlist[j].graph.qasm(no_decls: true,aliases: layout)
+                        }
+                    }
+                }
+            }
+            else {
+                // Update the qubit positions each iteration
+                layout = best_layout!
+                if best_d == 0 {
+                    // Output qasm without swaps
+                    if first_layer {
+                        openqasm_output += try circuit_graph.qasm(decls_only: true, add_swap: true,aliases: layout)
+                        first_layer = false
+                    }
+                    if !trivial_flag && first_swapping_layer {
+                        initial_layout = layout
+                        first_swapping_layer = false
+                    }
+                }
+                else {
+                    // Output qasm with swaps
+                    if first_layer {
+                        openqasm_output += try circuit_graph.qasm(decls_only: true, add_swap: true,aliases: layout)
+                        first_layer = false
+                        initial_layout = layout
+                        first_swapping_layer = false
+                    }
+                    else {
+                        if !first_swapping_layer {
+                            if verbose {
+                                print("swap_mapper: layer \(i), depth \(String(describing: best_d))")
+                            }
+                            openqasm_output += best_circ ?? ""
+                        }
+                        else {
+                            initial_layout = layout
+                            first_swapping_layer = false
+                        }
+                    }
+                }
+                openqasm_output += try layerlist[i].graph.qasm(no_decls: true,aliases: layout)
+            }
+        }
+        // Parse openqasm_output into Circuit object
+        basis += ",swap"
+        let ast = Qasm(data: openqasm_output).parse()
+        let u = Unroller(ast, CircuitBackend(basis.components(separatedBy:",")))
+        u.execute()
+        return ((u.backend as! CircuitBackend).circuit, initial_layout!)
     }
 }

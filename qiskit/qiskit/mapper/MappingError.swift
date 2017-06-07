@@ -15,6 +15,10 @@ public enum MappingError: Error, CustomStringConvertible {
     case layouterror
     case unexpectedsignature(a: Int, b: Int, c: Int)
     case errorcouplinggraph(cxedge: HashableTuple<RegBit,RegBit>)
+    case errorqubitscouplinggraph
+    case errorqubitinputcircuit(regBit: RegBit)
+    case errorqubitincouplinggraph(regBit: RegBit)
+    case swapmapperfailed(i: Int, j: Int, qasm: String)
 
     public var description: String {
         switch self {
@@ -24,6 +28,14 @@ public enum MappingError: Error, CustomStringConvertible {
             return "cx gate has unexpected signature(\(a),\(b),\(c))"
         case .errorcouplinggraph(let cxedge):
             return "circuit incompatible with CouplingGraph: cx on \(cxedge.one.description),\(cxedge.two.description)"
+        case .errorqubitscouplinggraph:
+            return "Not enough qubits in CouplingGraph"
+        case .errorqubitinputcircuit(let regBit):
+            return "initial_layout qubit \(regBit.description) not in input Circuit"
+        case .errorqubitincouplinggraph(let regBit):
+            return "initial_layout qubit \(regBit.description) not in input CouplingGraph"
+        case .swapmapperfailed(let i, let j, let qasm):
+            return "swap_mapper failed: layer \(i), sublayer \(j), \"\(qasm)\""
         }
     }
 }

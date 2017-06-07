@@ -114,10 +114,10 @@ final class Circuit: NSCopying {
     /**
      Return a list of qubits as (qreg, index) pairs.
      */
-    public func get_qubits() -> [(String,Int)] {
-        var array:[(String,Int)] = []
+    public func get_qubits() -> [RegBit] {
+        var array:[RegBit] = []
         for (name,index) in self.qregs {
-            array.append((name,index))
+            array.append(RegBit(name,index))
 
         }
         return array
@@ -944,15 +944,15 @@ final class Circuit: NSCopying {
      if add_swap is True, add the definition of swap in terms of
      cx if necessary.
      */
-    public func qasm(_ decls_only: Bool = false,
-                     _ add_swap: Bool = false,
-                     _ no_decls: Bool = false,
-                     _ qeflag: Bool = false,
-                     _ aliasesMap: [RegBit:RegBit]? = nil) throws -> String {
+    public func qasm(decls_only: Bool = false,
+                     add_swap: Bool = false,
+                     no_decls: Bool = false,
+                     qeflag: Bool = false,
+                     aliases: [RegBit:RegBit]? = nil) throws -> String {
         // Rename qregs if necessary
         var qregdata: [String:Int] = [:]
-        if let aliases = aliasesMap {
-            for (_,q) in aliases {
+        if let aliasesMap = aliases {
+            for (_,q) in aliasesMap {
                 guard let n = qregdata[q.name] else {
                     qregdata[q.name] = q.index + 1
                     continue
@@ -1032,9 +1032,9 @@ final class Circuit: NSCopying {
                     if dataOp.cargs.isEmpty  {
                         let nm = dataOp.name
                         var qarglist:[RegBit] = []
-                        if let aliases = aliasesMap {
+                        if let aliasesMap = aliases {
                             for x in dataOp.qargs {
-                                if let v = aliases[x] {
+                                if let v = aliasesMap[x] {
                                     qarglist.append(v)
                                 }
                             }
@@ -1060,8 +1060,8 @@ final class Circuit: NSCopying {
                             assert(dataOp.cargs.count == 1 && dataOp.qargs.count == 1 && dataOp.params.count == 0, "bad node data")
                             var qname = dataOp.qargs[0].name
                             var qindex = dataOp.qargs[0].index
-                            if let aliases = aliasesMap {
-                                if let newq = aliases[RegBit(qname, qindex)] {
+                            if let aliasesMap = aliases {
+                                if let newq = aliasesMap[RegBit(qname, qindex)] {
                                     qname = newq.name
                                     qindex = newq.index
                                 }
@@ -1580,7 +1580,7 @@ final class Circuit: NSCopying {
                 new_layer.gates[key] = copy
             }
             // Save the support of each operation we add to the layer
-            var support_list: [RegBit] = []
+            var support_list: [[RegBit]] = []
             // Determine what operations to add in this layer
             // ops_touched is a map from operation nodes touched in this
             // iteration to the set of their unvisited input wires. When all
@@ -1640,7 +1640,7 @@ final class Circuit: NSCopying {
                             if dOp.name != "barrier" {
                                 // support_list.append(list(set(qa) | set(ca) |
                                 //                          set(cob)))
-                                support_list.append(contentsOf: Set<RegBit>(qa))
+                                support_list.append(Array(Set<RegBit>(qa)))
                             }
                             emit = true
                         }
@@ -1687,7 +1687,7 @@ final class Circuit: NSCopying {
                 new_layer.gates[key] = copy
             }
             // Save the support of the operation we add to the layer
-            var support_list: [RegBit] = []
+            var support_list: [[RegBit]] = []
             // Operation data
             let qa = dOp.qargs
             let ca = dOp.cargs
@@ -1698,7 +1698,7 @@ final class Circuit: NSCopying {
             //Add operation to partition
             if dOp.name != "barrier" {
                 // support_list.append(list(set(qa) | set(ca) | set(cob)))
-                support_list.append(contentsOf: Set<RegBit>(qa))
+                support_list.append(Array(Set<RegBit>(qa)))
             }
             layers_list.append(Layer(new_layer,support_list))
         }
