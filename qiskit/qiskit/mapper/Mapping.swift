@@ -127,7 +127,7 @@ final class Mapping {
                     // Loop over edges of coupling graph
                     var opt_layout: [RegBit:RegBit] = [:]
                     var rev_opt_layout: [RegBit:RegBit] = [:]
-                    var opt_edge: HashableTuple<RegBit,RegBit>? = nil
+                    var opt_edge: TupleRegBit? = nil
                     for e in coupling.get_edges() {
                         // Are the qubits available?
                         if qubit_set.contains(e.one) && qubit_set.contains(e.two) {
@@ -260,14 +260,14 @@ final class Mapping {
             guard let data = cx_node.data as? CircuitVertexOpData else {
                 continue
             }
-            let cxedge = HashableTuple<RegBit,RegBit>(data.qargs[0], data.qargs[1])
+            let cxedge = TupleRegBit(data.qargs[0], data.qargs[1])
             if cg_edges.contains(cxedge) {
                 if verbose {
                     print("cx \(cxedge.one.description), \(cxedge.two.description) -- OK")
                 }
                 continue
             }
-            if cg_edges.contains(HashableTuple<RegBit,RegBit>(cxedge.two, cxedge.one)) {
+            if cg_edges.contains(TupleRegBit(cxedge.two, cxedge.one)) {
                 try circuit_graph.substitute_circuit_one(cx_node,flipped_cx_circuit,wires: [RegBit("q", 0), RegBit("q", 1)])
                 if verbose {
                     print("cx \(cxedge.one.description), \(cxedge.two.description) -FLIP")

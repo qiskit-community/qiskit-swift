@@ -53,8 +53,8 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
 
     public private(set) var vertices: OrderedDictionary<Int,GraphVertex<VertexDataType>> =
                                                 OrderedDictionary<Int,GraphVertex<VertexDataType>>()
-    public private(set) var edges: OrderedDictionary<HashableTuple<Int,Int>,GraphEdge<EdgeDataType>> =
-                                                OrderedDictionary<HashableTuple<Int,Int>,GraphEdge<EdgeDataType>>()
+    public private(set) var edges: OrderedDictionary<TupleInt,GraphEdge<EdgeDataType>> =
+                                                OrderedDictionary<TupleInt,GraphEdge<EdgeDataType>>()
     public private(set) var isDirected: Bool
 
     public init(directed: Bool) {
@@ -69,7 +69,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         }
         for i in 0..<self.edges.count {
             let edge = self.edges.value(i).copy(with: zone) as! GraphEdge<EdgeDataType>
-            copy.edges[HashableTuple<Int,Int>(edge.source,edge.neighbor)] = edge
+            copy.edges[TupleInt(edge.source,edge.neighbor)] = edge
         }
         return copy
     }
@@ -79,7 +79,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
     }
 
     public func edge(_ sourceIndex: Int, _ neighborIndex: Int) -> GraphEdge<EdgeDataType>? {
-        return self.edges[HashableTuple<Int,Int>(sourceIndex,neighborIndex)]
+        return self.edges[TupleInt(sourceIndex,neighborIndex)]
     }
 
     public func add_vertex(_ key: Int, _ data: VertexDataType? = nil) -> GraphVertex<VertexDataType> {
@@ -102,7 +102,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
             edge = GraphEdge(source.key,neighbor.key)
             edge!.data = data
             source.neighbors[neighbor.key] = neighbor
-            self.edges[HashableTuple<Int,Int>(source.key,neighbor.key)] = edge!
+            self.edges[TupleInt(source.key,neighbor.key)] = edge!
         }
         else {
             edge!.data = data
@@ -113,7 +113,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
                 edge = GraphEdge(neighbor.key,source.key)
                 edge!.data = data
                 neighbor.neighbors[source.key] = source
-                self.edges[HashableTuple<Int,Int>(neighbor.key,source.key)] = edge!
+                self.edges[TupleInt(neighbor.key,source.key)] = edge!
             }
             else {
                 edge!.data = data
@@ -123,12 +123,12 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
 
 
     public func remove_edge(_ sourceIndex: Int, _ neighborIndex: Int) {
-        self.edges[HashableTuple<Int,Int>(sourceIndex,neighborIndex)] = nil
+        self.edges[TupleInt(sourceIndex,neighborIndex)] = nil
         if let source = self.vertex(sourceIndex) {
             source.neighbors[neighborIndex] = nil
         }
         if !self.isDirected {
-            self.edges[HashableTuple<Int,Int>(neighborIndex,sourceIndex)] = nil
+            self.edges[TupleInt(neighborIndex,sourceIndex)] = nil
             if let neighbor = self.vertex(neighborIndex) {
                 neighbor.neighbors[sourceIndex] = nil
             }
@@ -139,13 +139,13 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         if self.vertex(index) == nil {
             return
         }
-        self.edges[HashableTuple<Int,Int>(index,index)] = nil
+        self.edges[TupleInt(index,index)] = nil
         self.vertices[index] = nil
         for i in 0..<self.vertices.count {
             let vertex = self.vertices.value(i)
             vertex.neighbors[index] = nil
-            self.edges[HashableTuple<Int,Int>(index,vertex.key)] = nil
-            self.edges[HashableTuple<Int,Int>(vertex.key,index)] = nil
+            self.edges[TupleInt(index,vertex.key)] = nil
+            self.edges[TupleInt(vertex.key,index)] = nil
         }
     }
 
@@ -607,7 +607,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
                 newEdge = GraphEdge(edge.neighbor,edge.source)
                 newEdge!.data = edge.data
                 neighbor.neighbors[source.key] = source
-                self.edges[HashableTuple<Int,Int>(newEdge!.source,newEdge!.neighbor)] = newEdge!
+                self.edges[TupleInt(newEdge!.source,newEdge!.neighbor)] = newEdge!
             }
         }
         return graph

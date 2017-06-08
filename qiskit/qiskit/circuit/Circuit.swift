@@ -467,11 +467,11 @@ final class Circuit: NSCopying {
      params is a list of strings that represent floats
      condition is either None or a tuple (string,int) giving (creg,value)
      */
-    private func apply_operation_back(_ name: String,
+    func apply_operation_back(_ name: String,
                                       _ qargs: [RegBit],
                                       _ cargs: [RegBit] = [],
                                       _ params:[String] = [],
-                                      _ condition: RegBit?) throws {
+                                      _ condition: RegBit? = nil) throws {
         var all_cbits = self._bits_in_condition(condition)
         all_cbits.append(contentsOf: cargs)
 

@@ -8,6 +8,8 @@
 
 import Foundation
 
+public typealias TupleInt = HashableTuple<Int,Int>
+
 public struct HashableTuple<A:Hashable,B:Hashable> : Hashable, Equatable {
     public let one: A
     public let two: B

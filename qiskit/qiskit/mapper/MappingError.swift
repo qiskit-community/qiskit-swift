@@ -14,7 +14,7 @@ import Foundation
 public enum MappingError: Error, CustomStringConvertible {
     case layouterror
     case unexpectedsignature(a: Int, b: Int, c: Int)
-    case errorcouplinggraph(cxedge: HashableTuple<RegBit,RegBit>)
+    case errorcouplinggraph(cxedge: TupleRegBit)
     case errorqubitscouplinggraph
     case errorqubitinputcircuit(regBit: RegBit)
     case errorqubitincouplinggraph(regBit: RegBit)

@@ -18,6 +18,11 @@
 		692DBE061EE702490032F6CF /* Qasm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692DBE051EE702490032F6CF /* Qasm.swift */; };
 		692DBE081EE702FA0032F6CF /* UnrollerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692DBE071EE702FA0032F6CF /* UnrollerBackend.swift */; };
 		692DBE0A1EE7031D0032F6CF /* CircuitBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692DBE091EE7031D0032F6CF /* CircuitBackend.swift */; };
+		6931093F1EE98A6C00CD2CD1 /* RegBit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6931093E1EE98A6C00CD2CD1 /* RegBit.swift */; };
+		693109411EE9953600CD2CD1 /* BackendException.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693109401EE9953600CD2CD1 /* BackendException.swift */; };
+		693109431EE9964500CD2CD1 /* OneRegisterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693109421EE9964500CD2CD1 /* OneRegisterBackend.swift */; };
+		693109451EE9966D00CD2CD1 /* PrinterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693109441EE9966D00CD2CD1 /* PrinterBackend.swift */; };
+		693109471EE9969600CD2CD1 /* SimulatorBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693109461EE9969600CD2CD1 /* SimulatorBackend.swift */; };
 		693A9F421ECA363D00112AC9 /* Barrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693A9F411ECA363D00112AC9 /* Barrier.swift */; };
 		693A9F441ECA366000112AC9 /* CX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693A9F431ECA366000112AC9 /* CX.swift */; };
 		693A9F461ECA369500112AC9 /* UBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693A9F451ECA369500112AC9 /* UBase.swift */; };
@@ -25,7 +30,6 @@
 		69458A281EE5A1760027F5A6 /* Coupling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69458A271EE5A1760027F5A6 /* Coupling.swift */; };
 		69458A2A1EE5A6A10027F5A6 /* CouplingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69458A291EE5A6A10027F5A6 /* CouplingError.swift */; };
 		69458A2C1EE5B1320027F5A6 /* CouplingVertexData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69458A2B1EE5B1320027F5A6 /* CouplingVertexData.swift */; };
-		694DCE1A1EDFA764002A7A8B /* RegBit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694DCE191EDFA764002A7A8B /* RegBit.swift */; };
 		695701341ED75C1C00C6CCAB /* Graph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695701311ED75C1C00C6CCAB /* Graph.swift */; };
 		695701351ED75C1C00C6CCAB /* GraphVertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695701321ED75C1C00C6CCAB /* GraphVertex.swift */; };
 		695701361ED75C1C00C6CCAB /* GraphEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695701331ED75C1C00C6CCAB /* GraphEdge.swift */; };
@@ -102,6 +106,11 @@
 		692DBE051EE702490032F6CF /* Qasm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Qasm.swift; sourceTree = "<group>"; };
 		692DBE071EE702FA0032F6CF /* UnrollerBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UnrollerBackend.swift; path = unroll/UnrollerBackend.swift; sourceTree = "<group>"; };
 		692DBE091EE7031D0032F6CF /* CircuitBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CircuitBackend.swift; path = unroll/CircuitBackend.swift; sourceTree = "<group>"; };
+		6931093E1EE98A6C00CD2CD1 /* RegBit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RegBit.swift; path = datastructures/RegBit.swift; sourceTree = "<group>"; };
+		693109401EE9953600CD2CD1 /* BackendException.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BackendException.swift; path = unroll/BackendException.swift; sourceTree = "<group>"; };
+		693109421EE9964500CD2CD1 /* OneRegisterBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OneRegisterBackend.swift; path = unroll/OneRegisterBackend.swift; sourceTree = "<group>"; };
+		693109441EE9966D00CD2CD1 /* PrinterBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PrinterBackend.swift; path = unroll/PrinterBackend.swift; sourceTree = "<group>"; };
+		693109461EE9969600CD2CD1 /* SimulatorBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SimulatorBackend.swift; path = unroll/SimulatorBackend.swift; sourceTree = "<group>"; };
 		693A9F411ECA363D00112AC9 /* Barrier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Barrier.swift; path = extensions/Barrier.swift; sourceTree = "<group>"; };
 		693A9F431ECA366000112AC9 /* CX.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CX.swift; path = extensions/CX.swift; sourceTree = "<group>"; };
 		693A9F451ECA369500112AC9 /* UBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UBase.swift; path = extensions/UBase.swift; sourceTree = "<group>"; };
@@ -109,7 +118,6 @@
 		69458A271EE5A1760027F5A6 /* Coupling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Coupling.swift; path = mapper/Coupling.swift; sourceTree = "<group>"; };
 		69458A291EE5A6A10027F5A6 /* CouplingError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CouplingError.swift; path = mapper/CouplingError.swift; sourceTree = "<group>"; };
 		69458A2B1EE5B1320027F5A6 /* CouplingVertexData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CouplingVertexData.swift; path = mapper/CouplingVertexData.swift; sourceTree = "<group>"; };
-		694DCE191EDFA764002A7A8B /* RegBit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RegBit.swift; path = circuit/RegBit.swift; sourceTree = "<group>"; };
 		695701311ED75C1C00C6CCAB /* Graph.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Graph.swift; path = datastructures/graph/Graph.swift; sourceTree = "<group>"; };
 		695701321ED75C1C00C6CCAB /* GraphVertex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GraphVertex.swift; path = datastructures/graph/GraphVertex.swift; sourceTree = "<group>"; };
 		695701331ED75C1C00C6CCAB /* GraphEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GraphEdge.swift; path = datastructures/graph/GraphEdge.swift; sourceTree = "<group>"; };
@@ -204,6 +212,7 @@
 				695701371ED75C2E00C6CCAB /* Stack.swift */,
 				690188731EE269B0005B4419 /* Queue.swift */,
 				695701391ED75C8B00C6CCAB /* HashableTuple.swift */,
+				6931093E1EE98A6C00CD2CD1 /* RegBit.swift */,
 				697D36AD1EE3493B00557541 /* OrderedDictionary.swift */,
 			);
 			name = "Data Structures";
@@ -225,7 +234,6 @@
 				69EF51481EDC72BD0074AE42 /* CircuitVertexData.swift */,
 				69EF514A1EDC72E10074AE42 /* CircuitEdgeData.swift */,
 				69E234311EDEE76200E47750 /* GateData.swift */,
-				694DCE191EDFA764002A7A8B /* RegBit.swift */,
 				6903A9BE1EE07211006E8190 /* Layer.swift */,
 			);
 			name = circuit;
@@ -277,9 +285,13 @@
 		69D310671ECA15D300B3E752 /* unroll */ = {
 			isa = PBXGroup;
 			children = (
+				693109401EE9953600CD2CD1 /* BackendException.swift */,
+				692DBE091EE7031D0032F6CF /* CircuitBackend.swift */,
+				693109421EE9964500CD2CD1 /* OneRegisterBackend.swift */,
+				693109441EE9966D00CD2CD1 /* PrinterBackend.swift */,
+				693109461EE9969600CD2CD1 /* SimulatorBackend.swift */,
 				692DBE031EE701890032F6CF /* Unroller.swift */,
 				692DBE071EE702FA0032F6CF /* UnrollerBackend.swift */,
-				692DBE091EE7031D0032F6CF /* CircuitBackend.swift */,
 			);
 			name = unroll;
 			sourceTree = "<group>";
@@ -507,12 +519,15 @@
 				697D36AE1EE3493B00557541 /* OrderedDictionary.swift in Sources */,
 				69458A281EE5A1760027F5A6 /* Coupling.swift in Sources */,
 				695701351ED75C1C00C6CCAB /* GraphVertex.swift in Sources */,
+				693109431EE9964500CD2CD1 /* OneRegisterBackend.swift in Sources */,
 				69D3108F1ECA192000B3E752 /* Instruction.swift in Sources */,
 				69D3107E1ECA180500B3E752 /* Reset.swift in Sources */,
 				69DE361F1ECD197E00EC4756 /* Y.swift in Sources */,
+				693109411EE9953600CD2CD1 /* BackendException.swift in Sources */,
 				693A9F461ECA369500112AC9 /* UBase.swift in Sources */,
 				6903A9BF1EE07211006E8190 /* Layer.swift in Sources */,
 				6957013A1ED75C8B00C6CCAB /* HashableTuple.swift in Sources */,
+				693109471EE9969600CD2CD1 /* SimulatorBackend.swift in Sources */,
 				69DE36171ECD190E00EC4756 /* S.swift in Sources */,
 				69DE361D1ECD195600EC4756 /* U3.swift in Sources */,
 				69D3108B1ECA182000B3E752 /* Credentials.swift in Sources */,
@@ -529,7 +544,6 @@
 				69DE36091ECD152100EC4756 /* CXBase.swift in Sources */,
 				69DE360D1ECD155000EC4756 /* CZ.swift in Sources */,
 				69D3108A1ECA182000B3E752 /* IBMQuantumExperienceResults.swift in Sources */,
-				694DCE1A1EDFA764002A7A8B /* RegBit.swift in Sources */,
 				69DE360F1ECD188000EC4756 /* Iden.swift in Sources */,
 				697F259C1ED45BED0065B106 /* Circuit.swift in Sources */,
 				69EF514B1EDC72E10074AE42 /* CircuitEdgeData.swift in Sources */,
@@ -543,6 +557,7 @@
 				693A9F441ECA366000112AC9 /* CX.swift in Sources */,
 				69DE360B1ECD153D00EC4756 /* CY.swift in Sources */,
 				699AAB541EE480160015DB83 /* Node.swift in Sources */,
+				6931093F1EE98A6C00CD2CD1 /* RegBit.swift in Sources */,
 				69DE36111ECD18AD00EC4756 /* RX.swift in Sources */,
 				69DE36071ECD150300EC4756 /* CSwap.swift in Sources */,
 				69D310881ECA182000B3E752 /* Request.swift in Sources */,
@@ -555,6 +570,7 @@
 				6913D0A21ECE41D6003C5FD3 /* InstructionSet.swift in Sources */,
 				692DBE041EE701890032F6CF /* Unroller.swift in Sources */,
 				69DE36131ECD18BE00EC4756 /* RY.swift in Sources */,
+				693109451EE9966D00CD2CD1 /* PrinterBackend.swift in Sources */,
 				69FEC8381ECB37E0002324E2 /* IBMQuantumExperienceError.swift in Sources */,
 				692DBE021EE6F4B90032F6CF /* Random.swift in Sources */,
 			);
