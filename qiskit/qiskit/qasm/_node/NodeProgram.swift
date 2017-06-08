@@ -10,8 +10,13 @@ import Foundation
 
 @objc public class NodeProgram: Node  {
 
-    public init(children: [Node]) {
-        super.init(type: .N_PROGRAM, children: children)
+    var program: Node?
+    var statement: Node?
+    
+    public init(program: Node?, statement: Node?) {
+        super.init(type: .N_PROGRAM)
+        self.program = program
+        self.statement = statement
     }
     
     override public func qasm() -> String {

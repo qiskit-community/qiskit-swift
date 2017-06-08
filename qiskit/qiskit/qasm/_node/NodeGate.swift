@@ -10,14 +10,8 @@ import Foundation
 
 @objc public class NodeGate: Node {
 
-    var id: Node?
-    var arguments: Node?
-    var bitlist: Node?
-    var body: Node?
-    
-    public init(children: [Node]) {
+    public init() {
         super.init(type: .N_GATE)
-        self.id = children[0]
     }
     
     override public func qasm() -> String {

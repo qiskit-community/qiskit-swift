@@ -15,6 +15,7 @@ void yyerror(char *s);
     __unsafe_unretained Node *node;
 }
 
+%token <svalue> OPENQASM
 %token <ivalue> NNINTEGER
 %token <svalue> BARRIER
 %token <svalue> OPAQUE
@@ -42,6 +43,12 @@ void yyerror(char *s);
 %token <svalue> LN
 %token <svalue> SQRT
 
+%type <node> mainprogram
+%type <node> program
+%type <node> statment
+%type <node> decl
+%type <node> gatedecl
+%type <node> goplist
 %type <node> qop
 %type <node> uop
 %type <node> anylist
@@ -56,10 +63,18 @@ void yyerror(char *s);
 %type <node> pi
 %type <node> u
 %type <node> cx
+%type <node> creg
+%type <node> qreg
+%type <node> barrier
+%type <node> gate
 %type <node> measure
+%type <node> opaque
 %type <node> reset
+%type <node> ifn
+%type <node> openqasm
 %type <svalue> unaryop
 %type <svalue> arrow
+%type <svalue> assign
 
 %left ','
 %right '='
@@ -69,14 +84,35 @@ void yyerror(char *s);
 
 %%
 
-statement : qop { if (ParseSuccessBlock) ParseSuccessBlock($1); }
-| uop { if (ParseSuccessBlock) ParseSuccessBlock($1); }
-| anylist { if (ParseSuccessBlock) ParseSuccessBlock($1); }
-| mixedlist { if (ParseSuccessBlock) ParseSuccessBlock($1); }
-| argument { if (ParseSuccessBlock) ParseSuccessBlock($1); }
-| explist { if (ParseSuccessBlock) ParseSuccessBlock($1); }
-| exp { if (ParseSuccessBlock) ParseSuccessBlock($1); }
-| id { if (ParseSuccessBlock) ParseSuccessBlock($1); }
+mainprogram : openqasm real ';' program {
+    $$ = [ParseTree createMainProgram: $1 version: $2 program: $4];
+    ParseSuccessBlock($$);
+}
+
+program : statment { $$ = [ ParseTree createProgramNode: $1 statement: nil]; }
+| program statment { $$ = [ ParseTree createProgramNode: $1 statement: $2]; }
+
+statment : decl { $$ = [ ParseTree createStatmentNode: $1 p2: nil p3: nil p4: nil]; }
+| gatedecl goplist '}' { $$ = [ ParseTree createStatmentNode: $1 p2: $2 p3: nil p4: nil]; }
+| gatedecl '}' { $$ = [ ParseTree createStatmentNode: $1 p2: nil p3: nil p4: nil]; }
+| opaque id idlist ';' { $$ = [ ParseTree createStatmentNode: $1 p2: $2 p3: $3 p4: nil]; }
+| opaque id '(' ')' idlist ';' { $$ = [ ParseTree createStatmentNode: $1 p2: $2 p3: $5 p4: nil]; }
+| opaque id '(' idlist ')' idlist ';' { $$ = [ ParseTree createStatmentNode: $1 p2: $2 p3: $4 p4: $6]; }
+| qop { $$ = [ ParseTree createStatmentNode: $1 p2: nil p3: nil p4: nil]; }
+| ifn '(' id assign nninteger ')' qop { $$ = [ ParseTree createStatmentNode: $1 p2: $3 p3: $5 p4: $7]; }
+| barrier anylist ';' { $$ = [ ParseTree createStatmentNode: $1 p2: $2 p3: nil p4: nil]; }
+
+decl : qreg id '[' nninteger ']' ';' { $$ = [ ParseTree createDeclNode: $1 identifier: $2 nninteger: $4]; }
+| creg id '[' nninteger ']' ';' { $$ = [ ParseTree createDeclNode: $1 identifier: $2 nninteger: $4]; }
+
+gatedecl : gate id idlist '{' { $$ = [ParseTree createGateDeclNode: $1 identifier: $2 idlist1: $3 idlist2: nil]; }
+| gate id '(' ')' idlist '{' { $$ = [ParseTree createGateDeclNode: $1 identifier: $2 idlist1: $5 idlist2: nil]; }
+| gate id '(' idlist ')' idlist '{' { $$ = [ParseTree createGateDeclNode: $1 identifier: $2 idlist1: $4 idlist2: $6]; }
+
+goplist : uop { $$ = [ParseTree createGoplistNode: nil uop: $1 idlist: nil goplist: nil]; }
+| barrier idlist { $$ = [ParseTree createGoplistNode: $1 uop: nil idlist: $2 goplist: nil]; }
+| goplist  uop { $$ = [ParseTree createGoplistNode: nil uop: $2 idlist: nil goplist: $1]; }
+| goplist barrier idlist { $$ = [ParseTree createGoplistNode: $2 uop: nil idlist: $3 goplist: $1]; }
 
 qop : uop { $$ = $1; }
 | measure '(' argument ')' arrow '(' argument ')' ';' { $$ = [ParseTree createUniversalUnitary: $1 object2: $3 object3: $7]; }
@@ -123,9 +159,17 @@ id : ID { $$ = [ParseTree createIdNodeWithValue: $1]; }
 pi : PI { $$ = [ParseTree createRealNodeWithValue: M_PI]; }
 u : U { $$ = [ParseTree createIdNodeWithValue: @"U"]; }
 cx: CX { $$ = [ParseTree createIdNodeWithValue: @"CX"]; }
+creg: CREG { $$ = [ParseTree createCRegNode]; }
+qreg: QREG { $$ = [ParseTree createQRegNode]; }
+barrier: BARRIER { $$ = [ParseTree createBarrierNode]; }
+gate: GATE { $$ = [ParseTree createGateNode]; }
 measure: MEASURE { $$ = [ParseTree createMeasureNode]; }
-reset : RESET { $$ = [ParseTree createResetNode]; }
-arrow : ARROW { $$ = $1; }
+opaque: OPAQUE { $$ = [ParseTree createOpaqueNode]; }
+reset: RESET { $$ = [ParseTree createResetNode]; }
+ifn: IF { $$ = [ParseTree createIfNode]; }
+openqasm: OPENQASM { $$ = [ParseTree createMagicNode]; }
+arrow: ARROW { $$ = $1; }
+assign: ASSIGN { $$ = $1; }
 
 unaryop : SIN { $$ = $1; }
 | COS { $$ = $1; }

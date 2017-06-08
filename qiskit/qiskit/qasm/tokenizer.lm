@@ -57,42 +57,62 @@ sqrt {
 
 qreg {
     printf("Found a QREG\n");
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return QREG;
 }
 
 creg {
     printf("Found a Keyword %s\n", yytext );
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return CREG;
 }
 
 gate {
     printf("Found a GATE %s\n", yytext );
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return GATE;
 }
 
 measure {
     printf("Found a MEASURE %s\n", yytext );
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return MEASURE;
 }
 
 if {
     printf("Found a IF %s\n", yytext );
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return IF;
 }
 
 reset {
     printf("Found a RESET %s\n", yytext );
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return RESET;
 }
 
 assign {
     printf("Found a ASSIGN %s\n", yytext );
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return ASSIGN;
 }
 
 matches {
     printf("Found a MATCHES %s\n", yytext );
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return MATCHES;
 }
 
 barrier {
     printf("Found a BARRIER %s\n", yytext );
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return BARRIER;
 }
 
 opaque {
     printf("Found a OPAQUE %s\n", yytext );
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return OPAQUE;
 }
 
 \"([^\\\"]|\\.)*\" { 
@@ -104,7 +124,9 @@ include {
 }
 
 OPENQASM {
-    printf("Found a MAGIC %s\n", yytext );
+    printf("found OPENQASM");
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return OPENQASM;
 }
 
 "//".*  {

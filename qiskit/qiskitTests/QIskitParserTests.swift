@@ -1,5 +1,5 @@
 //
-//  QiskitParserArgTests.swift
+//  QIskitParserTerminalTests.swift
 //  qiskit
 //
 //  Created by Joe Ligman on 5/26/17.
@@ -9,7 +9,7 @@
 import XCTest
 import qiskit
 
-class QiskitParserArgTests: XCTestCase {
+class QIskitParserTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
@@ -21,18 +21,22 @@ class QiskitParserArgTests: XCTestCase {
         super.tearDown()
     }
 
-    func testParserArgument() {
+    func testParser() {
         
         let asyncExpectation = self.expectation(description: "parser")
         
-        let buf: YY_BUFFER_STATE = yy_scan_string("q[5]")
+        let qasmProgram = "OPENQASM 2.0;\n" +
+                            "qreg q[5];\n" +
+                            "creg c[5];\n"
+        
+        let buf: YY_BUFFER_STATE = yy_scan_string(qasmProgram)
         
         ParseSuccessBlock = { (node: Node?) -> Void in
             XCTAssertNotNil(node)
-            if node is NodeArgument {
+            if node is NodeMainProgram {
                 asyncExpectation.fulfill()
             } else {
-                XCTFail("NodeArgument Type Expected!")
+                XCTFail("Main Program Node Type Expected!")
                 asyncExpectation.fulfill()
                 return
             }
@@ -47,7 +51,6 @@ class QiskitParserArgTests: XCTestCase {
             asyncExpectation.fulfill()
         }
         
-        
         yyparse()
         yy_delete_buffer(buf)
         
@@ -55,39 +58,5 @@ class QiskitParserArgTests: XCTestCase {
             XCTAssertNil(error, "Failure in parser")
         })
     }
-
-    func testParserUop() {
-        
-        let asyncExpectation = self.expectation(description: "parser")
-        
-        let buf: YY_BUFFER_STATE = yy_scan_string("U (5.0 + 40) joe;")
-      
-        ParseSuccessBlock = { (node: Node?) -> Void in
-            XCTAssertNotNil(node)
-            if node is NodeUniversalUnitary {
-                asyncExpectation.fulfill()
-            } else {
-                XCTFail("NodeUniversalUnitary Type Expected!")
-                asyncExpectation.fulfill()
-                return
-            }
-        }
-        
-        ParseFailBlock = { (message: String?) -> Void in
-            if let msg = message {
-                XCTFail(msg)
-            } else {
-                XCTFail("Unknown Error")
-            }
-            asyncExpectation.fulfill()
-        }
-        
-        
-        yyparse()
-        yy_delete_buffer(buf)
-        
-        self.waitForExpectations(timeout: 180, handler: { (error) in
-            XCTAssertNil(error, "Failure in parser")
-        })
-    }
+    
 }

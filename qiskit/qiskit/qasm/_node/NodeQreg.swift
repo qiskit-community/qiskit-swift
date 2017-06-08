@@ -10,12 +10,8 @@ import Foundation
 
 @objc public class NodeQreg: Node {
 
-    var id: Node? = nil
-    
-    public init(children: [Node]) {
-        super.init(type: .N_QREG, children: children)
-        
-        self.id = children[0]        
+    public init() {
+        super.init(type: .N_QREG)
     }
     
     override public func qasm() -> String {

@@ -10,7 +10,7 @@ import Foundation
 
 @objc public class NodeOpaque: Node {
 
-    public init(children: [Node]) {
+    public init() {
         super.init(type: .N_OPAQUE)
     }
     

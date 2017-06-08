@@ -12,6 +12,36 @@
 
 @implementation ParseTree
 
++(Node*) createMainProgram: (Node*) magic version: (Node*) version program: (Node*) program {
+    NodeMainProgram *node = [[NodeMainProgram alloc] initWithMagic:magic version:version program:program];
+    return node;
+}
+
++(Node*) createProgramNode: (Node*) program statement: (Node*) statement {
+    NodeProgram *node = [[NodeProgram alloc] initWithProgram: program statement: statement];
+    return node;
+}
+
++(Node*) createStatmentNode: (Node*) p1 p2: (Node*) p2 p3: (Node*) p3 p4: (Node*) p4 {
+    NodeStatment *node = [[NodeStatment alloc] initWithP1:p1 p2:p2 p3:p3 p4:p4];
+    return node;
+}
+
++(Node*) createDeclNode: (Node*) reg identifier: (Node*) ident nninteger: (Node*) nninteger {
+    NodeDecl *node = [[NodeDecl alloc] initWithRegister:reg identifier:ident nninteger: nninteger];
+    return node;
+}
+
++(Node*) createGateDeclNode: (Node*) gate identifier: (Node*) ident idlist1: (Node*) idlist1 idlist2: (Node*) idlist2 {
+    NodeGateDecl *node = [[NodeGateDecl alloc] initWithGate: gate identifier:ident idlist1:idlist1 idlist2:idlist2];
+    return node;
+}
+
++(Node*) createGoplistNode: (Node*) barrier uop: (Node*) uop idlist: (Node*) idlist goplist: (Node*) goplist {
+    NodeGoplist *node = [[NodeGoplist alloc] initWithBarrier:barrier uop: uop idlist:idlist goplist:goplist];
+    return node;
+}
+
 +(Node*) createUniversalUnitary: (Node*) o1 object2: (Node*) o2 object3: (Node*) o3 {
     NodeUniversalUnitary *node = [[NodeUniversalUnitary alloc] initWithObject1:o1 object2:o2 object3:o3];
     return node;   
@@ -67,8 +97,43 @@
     return node;
 }
 
++(Node*) createBarrierNode {
+    NodeBarrier *node = [[NodeBarrier alloc] init];
+    return node;
+}
+
++(Node*) createGateNode {
+    NodeGate *node = [[NodeGate alloc] init];
+    return node;
+}
+
++(Node*) createCRegNode {
+    NodeCreg *node = [[NodeCreg alloc] init];
+    return node;
+}
+
++(Node*) createQRegNode {
+    NodeQreg *node = [[NodeQreg alloc] init];
+    return node;
+}
+
++(Node*) createIfNode {
+    NodeIf *node = [[NodeIf alloc] init];
+    return node;
+}
+
++(Node*) createMagicNode {
+    NodeMagic *node = [[NodeMagic alloc] init];
+    return node;
+}
+
 +(Node*) createMeasureNode {
     NodeMeasure *node =  [[NodeMeasure alloc] init];
+    return node;
+}
+
++(Node*) createOpaqueNode {
+    NodeOpaque *node = [[NodeOpaque alloc] init];
     return node;
 }
 

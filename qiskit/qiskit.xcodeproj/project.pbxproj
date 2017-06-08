@@ -71,7 +71,7 @@
 		DF7973621ED0747B00C01457 /* ParserBlocks.m in Sources */ = {isa = PBXBuildFile; fileRef = DF7973601ED0747B00C01457 /* ParserBlocks.m */; };
 		DF7973721ED3429D00C01457 /* ParseTree.h in Headers */ = {isa = PBXBuildFile; fileRef = DF7973701ED3429D00C01457 /* ParseTree.h */; };
 		DF7973731ED3429D00C01457 /* ParseTree.m in Sources */ = {isa = PBXBuildFile; fileRef = DF7973711ED3429D00C01457 /* ParseTree.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		DF7F720D1ED863F50055D210 /* QIskitParserTerminalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7F720C1ED863F50055D210 /* QIskitParserTerminalTests.swift */; };
+		DF7F720D1ED863F50055D210 /* QIskitParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7F720C1ED863F50055D210 /* QIskitParserTests.swift */; };
 		DF8E1CD31EE4A27B00DCC35C /* NodeProgram.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CD21EE4A27B00DCC35C /* NodeProgram.swift */; };
 		DF8E1CD51EE501D000DCC35C /* NodeUniversalUnitary.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CD41EE501D000DCC35C /* NodeUniversalUnitary.swift */; };
 		DF8E1CD71EE501E700DCC35C /* NodeReset.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CD61EE501E700DCC35C /* NodeReset.swift */; };
@@ -86,7 +86,6 @@
 		DF8E1CE91EE502BB00DCC35C /* NodeIndexedId.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CE81EE502BB00DCC35C /* NodeIndexedId.swift */; };
 		DF8E1CEB1EE502D200DCC35C /* NodeIf.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CEA1EE502D200DCC35C /* NodeIf.swift */; };
 		DF8E1CED1EE502ED00DCC35C /* NodeIdList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CEC1EE502ED00DCC35C /* NodeIdList.swift */; };
-		DF8E1CEF1EE5030F00DCC35C /* NodeGateBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CEE1EE5030F00DCC35C /* NodeGateBody.swift */; };
 		DF8E1CF31EE5036300DCC35C /* NodeGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CF21EE5036300DCC35C /* NodeGate.swift */; };
 		DF8E1CF51EE5037D00DCC35C /* NodeExternal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CF41EE5037D00DCC35C /* NodeExternal.swift */; };
 		DF8E1CF71EE5039100DCC35C /* NodeExpressionList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CF61EE5039100DCC35C /* NodeExpressionList.swift */; };
@@ -96,14 +95,16 @@
 		DF8E1CFF1EE503E800DCC35C /* NodeBinaryOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1CFE1EE503E800DCC35C /* NodeBinaryOp.swift */; };
 		DF8E1D011EE5040300DCC35C /* NodeBarrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1D001EE5040300DCC35C /* NodeBarrier.swift */; };
 		DF8E1D031EE5048300DCC35C /* NodeId.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1D021EE5048300DCC35C /* NodeId.swift */; };
-		DF8E1D051EE6F78B00DCC35C /* QiskitParserExpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1D041EE6F78B00DCC35C /* QiskitParserExpTests.swift */; };
-		DF8E1D071EE7022800DCC35C /* QiskitParserExpListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1D061EE7022800DCC35C /* QiskitParserExpListTests.swift */; };
 		DF8E1D091EE79F4C00DCC35C /* NodeArgument.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1D081EE79F4C00DCC35C /* NodeArgument.swift */; };
 		DF8E1D0B1EE7B05200DCC35C /* NodeMixedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1D0A1EE7B05200DCC35C /* NodeMixedList.swift */; };
 		DF8E1D0D1EE7B4FC00DCC35C /* NodeAnyList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1D0C1EE7B4FC00DCC35C /* NodeAnyList.swift */; };
-		DF8E1D0F1EE7BCB900DCC35C /* QiskitParserArgTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1D0E1EE7BCB900DCC35C /* QiskitParserArgTests.swift */; };
 		DFA7844E1ED746E0002BB240 /* SymbolTable.h in Headers */ = {isa = PBXBuildFile; fileRef = DFA7844C1ED746E0002BB240 /* SymbolTable.h */; };
 		DFA7844F1ED746E0002BB240 /* SymbolTable.m in Sources */ = {isa = PBXBuildFile; fileRef = DFA7844D1ED746E0002BB240 /* SymbolTable.m */; };
+		DFB567081EE90208004D2B65 /* NodeGoplist.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB567071EE90208004D2B65 /* NodeGoplist.swift */; };
+		DFB5670A1EE99B7B004D2B65 /* NodeGateDecl.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB567091EE99B7B004D2B65 /* NodeGateDecl.swift */; };
+		DFB5670C1EE99FAD004D2B65 /* NodeDecl.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB5670B1EE99FAD004D2B65 /* NodeDecl.swift */; };
+		DFB5670E1EE9A647004D2B65 /* NodeStatement.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB5670D1EE9A647004D2B65 /* NodeStatement.swift */; };
+		DFB567101EE9C0F7004D2B65 /* NodeMainProgram.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB5670F1EE9C0F7004D2B65 /* NodeMainProgram.swift */; };
 		DFBC4F6C1EC7384200027640 /* qiskit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFBC4F621EC7384100027640 /* qiskit.framework */; };
 		DFBC4F711EC7384200027640 /* QiskitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4F701EC7384200027640 /* QiskitTests.swift */; };
 		DFBC4FBA1EC73BF800027640 /* qiskit.h in Headers */ = {isa = PBXBuildFile; fileRef = DFBC4FA51EC73BF800027640 /* qiskit.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -186,7 +187,7 @@
 		DF7973681ED083F600C01457 /* qiskitTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "qiskitTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		DF7973701ED3429D00C01457 /* ParseTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParseTree.h; sourceTree = "<group>"; };
 		DF7973711ED3429D00C01457 /* ParseTree.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParseTree.m; sourceTree = "<group>"; };
-		DF7F720C1ED863F50055D210 /* QIskitParserTerminalTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QIskitParserTerminalTests.swift; sourceTree = "<group>"; };
+		DF7F720C1ED863F50055D210 /* QIskitParserTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QIskitParserTests.swift; sourceTree = "<group>"; };
 		DF8E1CD21EE4A27B00DCC35C /* NodeProgram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeProgram.swift; path = _node/NodeProgram.swift; sourceTree = "<group>"; };
 		DF8E1CD41EE501D000DCC35C /* NodeUniversalUnitary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeUniversalUnitary.swift; path = _node/NodeUniversalUnitary.swift; sourceTree = "<group>"; };
 		DF8E1CD61EE501E700DCC35C /* NodeReset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeReset.swift; path = _node/NodeReset.swift; sourceTree = "<group>"; };
@@ -201,7 +202,6 @@
 		DF8E1CE81EE502BB00DCC35C /* NodeIndexedId.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeIndexedId.swift; path = _node/NodeIndexedId.swift; sourceTree = "<group>"; };
 		DF8E1CEA1EE502D200DCC35C /* NodeIf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeIf.swift; path = _node/NodeIf.swift; sourceTree = "<group>"; };
 		DF8E1CEC1EE502ED00DCC35C /* NodeIdList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeIdList.swift; path = _node/NodeIdList.swift; sourceTree = "<group>"; };
-		DF8E1CEE1EE5030F00DCC35C /* NodeGateBody.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeGateBody.swift; path = _node/NodeGateBody.swift; sourceTree = "<group>"; };
 		DF8E1CF21EE5036300DCC35C /* NodeGate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeGate.swift; path = _node/NodeGate.swift; sourceTree = "<group>"; };
 		DF8E1CF41EE5037D00DCC35C /* NodeExternal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeExternal.swift; path = _node/NodeExternal.swift; sourceTree = "<group>"; };
 		DF8E1CF61EE5039100DCC35C /* NodeExpressionList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeExpressionList.swift; path = _node/NodeExpressionList.swift; sourceTree = "<group>"; };
@@ -211,14 +211,16 @@
 		DF8E1CFE1EE503E800DCC35C /* NodeBinaryOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeBinaryOp.swift; path = _node/NodeBinaryOp.swift; sourceTree = "<group>"; };
 		DF8E1D001EE5040300DCC35C /* NodeBarrier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeBarrier.swift; path = _node/NodeBarrier.swift; sourceTree = "<group>"; };
 		DF8E1D021EE5048300DCC35C /* NodeId.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeId.swift; path = _node/NodeId.swift; sourceTree = "<group>"; };
-		DF8E1D041EE6F78B00DCC35C /* QiskitParserExpTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QiskitParserExpTests.swift; sourceTree = "<group>"; };
-		DF8E1D061EE7022800DCC35C /* QiskitParserExpListTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QiskitParserExpListTests.swift; sourceTree = "<group>"; };
 		DF8E1D081EE79F4C00DCC35C /* NodeArgument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeArgument.swift; path = _node/NodeArgument.swift; sourceTree = "<group>"; };
 		DF8E1D0A1EE7B05200DCC35C /* NodeMixedList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeMixedList.swift; path = _node/NodeMixedList.swift; sourceTree = "<group>"; };
 		DF8E1D0C1EE7B4FC00DCC35C /* NodeAnyList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeAnyList.swift; path = _node/NodeAnyList.swift; sourceTree = "<group>"; };
-		DF8E1D0E1EE7BCB900DCC35C /* QiskitParserArgTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QiskitParserArgTests.swift; sourceTree = "<group>"; };
 		DFA7844C1ED746E0002BB240 /* SymbolTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SymbolTable.h; sourceTree = "<group>"; };
 		DFA7844D1ED746E0002BB240 /* SymbolTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SymbolTable.m; sourceTree = "<group>"; };
+		DFB567071EE90208004D2B65 /* NodeGoplist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeGoplist.swift; path = _node/NodeGoplist.swift; sourceTree = "<group>"; };
+		DFB567091EE99B7B004D2B65 /* NodeGateDecl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeGateDecl.swift; path = _node/NodeGateDecl.swift; sourceTree = "<group>"; };
+		DFB5670B1EE99FAD004D2B65 /* NodeDecl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeDecl.swift; path = _node/NodeDecl.swift; sourceTree = "<group>"; };
+		DFB5670D1EE9A647004D2B65 /* NodeStatement.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeStatement.swift; path = _node/NodeStatement.swift; sourceTree = "<group>"; };
+		DFB5670F1EE9C0F7004D2B65 /* NodeMainProgram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeMainProgram.swift; path = _node/NodeMainProgram.swift; sourceTree = "<group>"; };
 		DFBC4F621EC7384100027640 /* qiskit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = qiskit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFBC4F6B1EC7384200027640 /* qiskitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = qiskitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFBC4F701EC7384200027640 /* QiskitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QiskitTests.swift; sourceTree = "<group>"; };
@@ -279,15 +281,18 @@
 				DF8E1CFC1EE503D300DCC35C /* NodeCnot.swift */,
 				DF8E1CFA1EE503BD00DCC35C /* NodeCreg.swift */,
 				DF8E1CF81EE503A800DCC35C /* NodeCustomUnitary.swift */,
+				DFB5670B1EE99FAD004D2B65 /* NodeDecl.swift */,
 				DF8E1CF61EE5039100DCC35C /* NodeExpressionList.swift */,
 				DF8E1CF41EE5037D00DCC35C /* NodeExternal.swift */,
 				DF8E1CF21EE5036300DCC35C /* NodeGate.swift */,
-				DF8E1CEE1EE5030F00DCC35C /* NodeGateBody.swift */,
+				DFB567091EE99B7B004D2B65 /* NodeGateDecl.swift */,
+				DFB567071EE90208004D2B65 /* NodeGoplist.swift */,
 				DF8E1D021EE5048300DCC35C /* NodeId.swift */,
 				DF8E1CEC1EE502ED00DCC35C /* NodeIdList.swift */,
 				DF8E1CEA1EE502D200DCC35C /* NodeIf.swift */,
 				DF8E1CE81EE502BB00DCC35C /* NodeIndexedId.swift */,
 				DF8E1CE61EE502A200DCC35C /* NodeInt.swift */,
+				DFB5670F1EE9C0F7004D2B65 /* NodeMainProgram.swift */,
 				DF8E1CE41EE5028800DCC35C /* NodeMagic.swift */,
 				DF8E1CE21EE5027300DCC35C /* NodeMeasure.swift */,
 				DF8E1D0A1EE7B05200DCC35C /* NodeMixedList.swift */,
@@ -299,6 +304,7 @@
 				DF8E1CDA1EE5021400DCC35C /* NodeQreg.swift */,
 				DF8E1CD81EE501FD00DCC35C /* NodeReal.swift */,
 				DF8E1CD61EE501E700DCC35C /* NodeReset.swift */,
+				DFB5670D1EE9A647004D2B65 /* NodeStatement.swift */,
 				DF8E1CD41EE501D000DCC35C /* NodeUniversalUnitary.swift */,
 			);
 			name = _node;
@@ -428,10 +434,7 @@
 			isa = PBXGroup;
 			children = (
 				DFBC4F701EC7384200027640 /* QiskitTests.swift */,
-				DF7F720C1ED863F50055D210 /* QIskitParserTerminalTests.swift */,
-				DF8E1D041EE6F78B00DCC35C /* QiskitParserExpTests.swift */,
-				DF8E1D061EE7022800DCC35C /* QiskitParserExpListTests.swift */,
-				DF8E1D0E1EE7BCB900DCC35C /* QiskitParserArgTests.swift */,
+				DF7F720C1ED863F50055D210 /* QIskitParserTests.swift */,
 				6957013B1ED75E9100C6CCAB /* DataStructureTests.swift */,
 				DFBC4F721EC7384200027640 /* Info.plist */,
 				DF7973681ED083F600C01457 /* qiskitTests-Bridging-Header.h */,
@@ -598,7 +601,6 @@
 				69D3108D1ECA18B800B3E752 /* Measure.swift in Sources */,
 				DF8E1CF31EE5036300DCC35C /* NodeGate.swift in Sources */,
 				DF8E1CF71EE5039100DCC35C /* NodeExpressionList.swift in Sources */,
-				DF8E1CEF1EE5030F00DCC35C /* NodeGateBody.swift in Sources */,
 				69EF51491EDC72BD0074AE42 /* CircuitVertexData.swift in Sources */,
 				69D3107B1ECA180500B3E752 /* Gate.swift in Sources */,
 				693A9F421ECA363D00112AC9 /* Barrier.swift in Sources */,
@@ -615,8 +617,10 @@
 				DF8E1CD91EE501FD00DCC35C /* NodeReal.swift in Sources */,
 				693A9F461ECA369500112AC9 /* UBase.swift in Sources */,
 				6903A9BF1EE07211006E8190 /* Layer.swift in Sources */,
+				DFB5670E1EE9A647004D2B65 /* NodeStatement.swift in Sources */,
 				6957013A1ED75C8B00C6CCAB /* HashableTuple.swift in Sources */,
 				DF8E1CD51EE501D000DCC35C /* NodeUniversalUnitary.swift in Sources */,
+				DFB567081EE90208004D2B65 /* NodeGoplist.swift in Sources */,
 				69DE36171ECD190E00EC4756 /* S.swift in Sources */,
 				DF8E1CD71EE501E700DCC35C /* NodeReset.swift in Sources */,
 				DF7973731ED3429D00C01457 /* ParseTree.m in Sources */,
@@ -633,6 +637,7 @@
 				DF8E1CFF1EE503E800DCC35C /* NodeBinaryOp.swift in Sources */,
 				DF8E1CD31EE4A27B00DCC35C /* NodeProgram.swift in Sources */,
 				DF8E1D0D1EE7B4FC00DCC35C /* NodeAnyList.swift in Sources */,
+				DFB5670C1EE99FAD004D2B65 /* NodeDecl.swift in Sources */,
 				DFA7844F1ED746E0002BB240 /* SymbolTable.m in Sources */,
 				69DE36211ECD198E00EC4756 /* Z.swift in Sources */,
 				69E597AB1ECA90A600A321F5 /* U1.swift in Sources */,
@@ -643,6 +648,7 @@
 				69D3108A1ECA182000B3E752 /* IBMQuantumExperienceResults.swift in Sources */,
 				694DCE1A1EDFA764002A7A8B /* RegBit.swift in Sources */,
 				69DE360F1ECD188000EC4756 /* Iden.swift in Sources */,
+				DFB567101EE9C0F7004D2B65 /* NodeMainProgram.swift in Sources */,
 				697F259C1ED45BED0065B106 /* Circuit.swift in Sources */,
 				69EF514B1EDC72E10074AE42 /* CircuitEdgeData.swift in Sources */,
 				DF8E1CDD1EE5022F00DCC35C /* NodePrimaryList.swift in Sources */,
@@ -657,6 +663,7 @@
 				699AAB541EE480160015DB83 /* Node.swift in Sources */,
 				69DE36111ECD18AD00EC4756 /* RX.swift in Sources */,
 				69DE36071ECD150300EC4756 /* CSwap.swift in Sources */,
+				DFB5670A1EE99B7B004D2B65 /* NodeGateDecl.swift in Sources */,
 				69D310881ECA182000B3E752 /* Request.swift in Sources */,
 				69E234321EDEE76200E47750 /* GateData.swift in Sources */,
 				DF8E1D031EE5048300DCC35C /* NodeId.swift in Sources */,
@@ -683,10 +690,7 @@
 			files = (
 				6957013C1ED75E9100C6CCAB /* DataStructureTests.swift in Sources */,
 				DFBC4F711EC7384200027640 /* QiskitTests.swift in Sources */,
-				DF8E1D0F1EE7BCB900DCC35C /* QiskitParserArgTests.swift in Sources */,
-				DF8E1D071EE7022800DCC35C /* QiskitParserExpListTests.swift in Sources */,
-				DF7F720D1ED863F50055D210 /* QIskitParserTerminalTests.swift in Sources */,
-				DF8E1D051EE6F78B00DCC35C /* QiskitParserExpTests.swift in Sources */,
+				DF7F720D1ED863F50055D210 /* QIskitParserTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
