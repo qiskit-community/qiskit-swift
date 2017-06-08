@@ -13,11 +13,14 @@ import Foundation
  */
 public enum BackendException: Error, CustomStringConvertible {
     case erroropaque(name: String)
+    case qregadded
 
     public var description: String {
         switch self {
         case .erroropaque(let name):
             return "opaque gate \(name) not in basis"
+        case .qregadded():
+            return "sorry, already added the qreg; please declare all qregs before applying a gate"
         }
     }
 }
