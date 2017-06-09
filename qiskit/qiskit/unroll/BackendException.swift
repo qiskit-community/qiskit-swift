@@ -14,6 +14,7 @@ import Foundation
 public enum BackendException: Error, CustomStringConvertible {
     case erroropaque(name: String)
     case qregadded
+    case ifnotsupported
 
     public var description: String {
         switch self {
@@ -21,6 +22,8 @@ public enum BackendException: Error, CustomStringConvertible {
             return "opaque gate \(name) not in basis"
         case .qregadded():
             return "sorry, already added the qreg; please declare all qregs before applying a gate"
+        case .ifnotsupported():
+            return "UnitarySimulator does not support if"
         }
     }
 }
