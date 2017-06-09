@@ -117,10 +117,14 @@ opaque {
 
 \"([^\\\"]|\\.)*\" { 
     printf("Found a STRING %s\n", yytext );
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return STRING;
 }
 
 include {
     printf("Found a INCLUDE %s\n", yytext );
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return INCLD;
 }
 
 OPENQASM {
@@ -149,6 +153,7 @@ U {
 }
 
 [a-z][a-zA-Z0-9_]* {
+    printf("found an id %s\n", yytext);
     yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
     return ID;
 }

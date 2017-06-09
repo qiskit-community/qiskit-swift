@@ -14,12 +14,14 @@ import Foundation
     
     var magic: Node?
     var version: Node?
+    var incld: Node?
     var program: Node?
     
-    public init(magic: Node?, version: Node?, program: Node?) {
+    public init(magic: Node?, version: Node?, incld: Node?, program: Node?) {
         super.init(type: .N_MAINPROGRAM)
         self.magic = magic
         self.version = version
+        self.incld = incld
         self.program = program
     }
     

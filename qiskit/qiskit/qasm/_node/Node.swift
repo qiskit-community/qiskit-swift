@@ -25,6 +25,7 @@ public enum NodeType: String {
     case N_ID = "id"
     case N_IDLIST = "id_list"
     case N_IF = "if"
+    case N_INCLUDE = "incld"
     case N_INDEXEDID = "indexed_id"
     case N_INT = "int"
     case N_MAINPROGRAM = "main_program"

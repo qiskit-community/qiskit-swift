@@ -33,6 +33,7 @@ void yyerror(char *s);
 %token <svalue> ASSIGN
 %token <svalue> MATCHES
 %token <svalue> ID
+%token <svalue> INCLD
 %token <svalue> STRING
 %token <svalue> ARROW
 
@@ -44,6 +45,7 @@ void yyerror(char *s);
 %token <svalue> SQRT
 
 %type <node> mainprogram
+%type <node> include
 %type <node> program
 %type <node> statment
 %type <node> decl
@@ -75,6 +77,8 @@ void yyerror(char *s);
 %type <svalue> unaryop
 %type <svalue> arrow
 %type <svalue> assign
+%type <svalue> string
+%type <svalue> incld
 
 %left ','
 %right '='
@@ -85,9 +89,15 @@ void yyerror(char *s);
 %%
 
 mainprogram : openqasm real ';' program {
-    $$ = [ParseTree createMainProgram: $1 version: $2 program: $4];
+    $$ = [ParseTree createMainProgram: $1 version: $2 include: nil program: $4];
     ParseSuccessBlock($$);
 }
+| openqasm real ';' include program {
+    $$ = [ParseTree createMainProgram: $1 version: $2 include: $4 program: $4];
+    ParseSuccessBlock($$);
+}
+
+include : incld string ';' { $$ = [ParseTree createIncludeNode: $2]; }
 
 program : statment { $$ = [ ParseTree createProgramNode: $1 statement: nil]; }
 | program statment { $$ = [ ParseTree createProgramNode: $1 statement: $2]; }
@@ -115,6 +125,7 @@ goplist : uop { $$ = [ParseTree createGoplistNode: nil uop: $1 idlist: nil gopli
 | goplist barrier idlist { $$ = [ParseTree createGoplistNode: $2 uop: nil idlist: $3 goplist: $1]; }
 
 qop : uop { $$ = $1; }
+| measure argument arrow argument ';' { $$ = [ParseTree createUniversalUnitary: $1 object2: $2 object3: $4]; }
 | measure '(' argument ')' arrow '(' argument ')' ';' { $$ = [ParseTree createUniversalUnitary: $1 object2: $3 object3: $7]; }
 | reset '(' argument ')' ';' { $$ = [ParseTree createUniversalUnitary: $1 object2: $3 object3: nil]; }
 
@@ -130,7 +141,8 @@ anylist: idlist { $$ = [ParseTree createAnylistNode: $1]; }
 idlist: id { $$ = $1; }
 | idlist ',' id { $$ = [ParseTree createIdlistNode: $1 identifier: $3]; }
 
-mixedlist:  mixedlist ',' id { $$ = [ParseTree createMixedlistNode: $1 item2: $3 item3: nil]; }
+mixedlist: argument { $$ = $1; }
+| mixedlist ',' id { $$ = [ParseTree createMixedlistNode: $1 item2: $3 item3: nil]; }
 | mixedlist ',' id '[' nninteger ']' { $$ = [ParseTree createMixedlistNode: $1 item2: $3 item3: $5]; }
 | idlist ',' id '[' nninteger ']' { $$ = [ParseTree createMixedlistNode: $1 item2: $3 item3: $5]; }
 
@@ -170,6 +182,8 @@ ifn: IF { $$ = [ParseTree createIfNode]; }
 openqasm: OPENQASM { $$ = [ParseTree createMagicNode]; }
 arrow: ARROW { $$ = $1; }
 assign: ASSIGN { $$ = $1; }
+string: STRING { $$ = $1; }
+incld: INCLD { $$ = $1; }
 
 unaryop : SIN { $$ = $1; }
 | COS { $$ = $1; }

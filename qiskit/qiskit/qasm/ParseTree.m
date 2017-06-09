@@ -12,13 +12,18 @@
 
 @implementation ParseTree
 
-+(Node*) createMainProgram: (Node*) magic version: (Node*) version program: (Node*) program {
-    NodeMainProgram *node = [[NodeMainProgram alloc] initWithMagic:magic version:version program:program];
++(Node*) createMainProgram: (Node*) magic version: (Node*) version include: (Node*) incld  program: (Node*) program {
+    NodeMainProgram *node = [[NodeMainProgram alloc] initWithMagic:magic version:version incld: incld program:program];
     return node;
 }
 
 +(Node*) createProgramNode: (Node*) program statement: (Node*) statement {
     NodeProgram *node = [[NodeProgram alloc] initWithProgram: program statement: statement];
+    return node;
+}
+
++(Node*) createIncludeNode: (NSString*) file {
+    NodeInclude *node = [[NodeInclude alloc] initWithFile:file];
     return node;
 }
 

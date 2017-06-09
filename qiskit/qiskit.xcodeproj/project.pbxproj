@@ -105,6 +105,7 @@
 		DFB5670C1EE99FAD004D2B65 /* NodeDecl.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB5670B1EE99FAD004D2B65 /* NodeDecl.swift */; };
 		DFB5670E1EE9A647004D2B65 /* NodeStatement.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB5670D1EE9A647004D2B65 /* NodeStatement.swift */; };
 		DFB567101EE9C0F7004D2B65 /* NodeMainProgram.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB5670F1EE9C0F7004D2B65 /* NodeMainProgram.swift */; };
+		DFB567121EEA1493004D2B65 /* NodeInclude.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB567111EEA1493004D2B65 /* NodeInclude.swift */; };
 		DFBC4F6C1EC7384200027640 /* qiskit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFBC4F621EC7384100027640 /* qiskit.framework */; };
 		DFBC4F711EC7384200027640 /* QiskitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4F701EC7384200027640 /* QiskitTests.swift */; };
 		DFBC4FBA1EC73BF800027640 /* qiskit.h in Headers */ = {isa = PBXBuildFile; fileRef = DFBC4FA51EC73BF800027640 /* qiskit.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -221,6 +222,7 @@
 		DFB5670B1EE99FAD004D2B65 /* NodeDecl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeDecl.swift; path = _node/NodeDecl.swift; sourceTree = "<group>"; };
 		DFB5670D1EE9A647004D2B65 /* NodeStatement.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeStatement.swift; path = _node/NodeStatement.swift; sourceTree = "<group>"; };
 		DFB5670F1EE9C0F7004D2B65 /* NodeMainProgram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeMainProgram.swift; path = _node/NodeMainProgram.swift; sourceTree = "<group>"; };
+		DFB567111EEA1493004D2B65 /* NodeInclude.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeInclude.swift; path = _node/NodeInclude.swift; sourceTree = "<group>"; };
 		DFBC4F621EC7384100027640 /* qiskit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = qiskit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFBC4F6B1EC7384200027640 /* qiskitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = qiskitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFBC4F701EC7384200027640 /* QiskitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QiskitTests.swift; sourceTree = "<group>"; };
@@ -289,6 +291,7 @@
 				DFB567071EE90208004D2B65 /* NodeGoplist.swift */,
 				DF8E1D021EE5048300DCC35C /* NodeId.swift */,
 				DF8E1CEC1EE502ED00DCC35C /* NodeIdList.swift */,
+				DFB567111EEA1493004D2B65 /* NodeInclude.swift */,
 				DF8E1CEA1EE502D200DCC35C /* NodeIf.swift */,
 				DF8E1CE81EE502BB00DCC35C /* NodeIndexedId.swift */,
 				DF8E1CE61EE502A200DCC35C /* NodeInt.swift */,
@@ -648,6 +651,7 @@
 				69D3108A1ECA182000B3E752 /* IBMQuantumExperienceResults.swift in Sources */,
 				694DCE1A1EDFA764002A7A8B /* RegBit.swift in Sources */,
 				69DE360F1ECD188000EC4756 /* Iden.swift in Sources */,
+				DFB567121EEA1493004D2B65 /* NodeInclude.swift in Sources */,
 				DFB567101EE9C0F7004D2B65 /* NodeMainProgram.swift in Sources */,
 				697F259C1ED45BED0065B106 /* Circuit.swift in Sources */,
 				69EF514B1EDC72E10074AE42 /* CircuitEdgeData.swift in Sources */,

@@ -25,9 +25,19 @@ class QIskitParserTests: XCTestCase {
         
         let asyncExpectation = self.expectation(description: "parser")
         
-        let qasmProgram = "OPENQASM 2.0;\n" +
-                            "qreg q[5];\n" +
-                            "creg c[5];\n"
+        let qasmProgram: String =
+            "OPENQASM 2.0;\n" +
+                "include \"qelib1.inc\";\n" +
+                "qreg q[5];\n" +
+                "creg c[5];\n" +
+                "x q[0];\n" +
+                "x q[1];\n" +
+                "h q[2];\n" +
+                "measure q[0] -> c[0];\n" +
+                "measure q[1] -> c[1];\n" +
+                "measure q[2] -> c[2];\n" +
+                "measure q[3] -> c[3];\n" +
+                "measure q[4] -> c[4];"
         
         let buf: YY_BUFFER_STATE = yy_scan_string(qasmProgram)
         
