@@ -10,9 +10,9 @@ import Foundation
 
 final class Layer {
     public let graph: Circuit
-    public let partition : [RegBit]
+    public let partition : [[RegBit]]
 
-    init(_ graph: Circuit, _ partition: [RegBit]) {
+    init(_ graph: Circuit, _ partition: [[RegBit]]) {
         self.graph = graph
         self.partition = partition
     }

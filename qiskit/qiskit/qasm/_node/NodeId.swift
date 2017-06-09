@@ -10,14 +10,12 @@ import Foundation
 
 @objc public class NodeId: Node {
 
-    public var name: String?
-    
     public init(name: String) {
         super.init(type: .N_ID)
-        self.name = name
+        super.name = name
     }
     
     override public func qasm() -> String {
-        return "TODO"
+        preconditionFailure("qasm not implemented")
     }
 }

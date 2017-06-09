@@ -10,14 +10,12 @@ import Foundation
 
 @objc public class NodeNNInt: Node {
 
-    public var value: Int = 0
-    
     public init(value: Int) {
         super.init(type: .N_INT)
-        self.value = value
+        super.value = "\(value)"
     }
     
     override public func qasm() -> String {
-        return "TODO"
+        preconditionFailure("qasm not implemented")
     }
 }

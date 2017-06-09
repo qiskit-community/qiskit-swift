@@ -55,7 +55,7 @@ final class Circuit: NSCopying {
      number of input qubits, input bits, and real parameters.
      The definition is external to the circuit object.
     */
-    private var basis: [String: (Int,Int,Int)] = [:]
+    private(set) var basis: [String: (Int,Int,Int)] = [:]
 
     /**
       Directed multigraph whose nodes are inputs, outputs, or operations.
@@ -114,10 +114,10 @@ final class Circuit: NSCopying {
     /**
      Return a list of qubits as (qreg, index) pairs.
      */
-    public func get_qubits() -> [(String,Int)] {
-        var array:[(String,Int)] = []
+    public func get_qubits() -> [RegBit] {
+        var array:[RegBit] = []
         for (name,index) in self.qregs {
-            array.append((name,index))
+            array.append(RegBit(name,index))
 
         }
         return array
@@ -216,7 +216,7 @@ final class Circuit: NSCopying {
     public func remove_all_ops_named(_ opname: String) throws {
         let nlist = try self.get_named_nodes(opname)
         for n in nlist {
-            self._remove_op_node(n)
+            self._remove_op_node(n.key)
         }
     }
 
@@ -467,11 +467,11 @@ final class Circuit: NSCopying {
      params is a list of strings that represent floats
      condition is either None or a tuple (string,int) giving (creg,value)
      */
-    private func apply_operation_back(_ name: String,
+    func apply_operation_back(_ name: String,
                                       _ qargs: [RegBit],
                                       _ cargs: [RegBit] = [],
                                       _ params:[String] = [],
-                                      _ condition: RegBit?) throws {
+                                      _ condition: RegBit? = nil) throws {
         var all_cbits = self._bits_in_condition(condition)
         all_cbits.append(contentsOf: cargs)
 
@@ -585,8 +585,8 @@ final class Circuit: NSCopying {
                 union_gate.bits != input_circuit_gate.bits {
                 throw CircuitError.ineqgate(name: k)
             }
-            if !union_gate.opaque &&
-                union_gate.body.qasm() != input_circuit_gate.body.qasm() {
+            if !union_gate.opaque && union_gate.body != nil && input_circuit_gate.body != nil &&
+                union_gate.body!.qasm() != input_circuit_gate.body!.qasm() {
                 throw CircuitError.ineqgate(name: k)
             }
         }
@@ -918,16 +918,12 @@ final class Circuit: NSCopying {
         if data.n_args > 0 {
             out += "(" + data.args.joined(separator: ",") + ")"
         }
-        var bits: [String] = []
-        for v in data.bits {
-            bits.append(v.qasm)
-        }
-        out += " " + bits.joined(separator: ",")
+        out += " " + data.bits.joined(separator: ",")
         if data.opaque {
             out += ";"
         }
         else {
-            out += "\n{\n" + data.body.qasm() + "}"
+            out += "\n{\n" + (data.body != nil ? data.body!.qasm() : "") + "}"
         }
         return out
     }
@@ -944,15 +940,15 @@ final class Circuit: NSCopying {
      if add_swap is True, add the definition of swap in terms of
      cx if necessary.
      */
-    public func qasm(_ decls_only: Bool = false,
-                     _ add_swap: Bool = false,
-                     _ no_decls: Bool = false,
-                     _ qeflag: Bool = false,
-                     _ aliasesMap: [RegBit:RegBit]? = nil) throws -> String {
+    public func qasm(decls_only: Bool = false,
+                     add_swap: Bool = false,
+                     no_decls: Bool = false,
+                     qeflag: Bool = false,
+                     aliases: [RegBit:RegBit]? = nil) throws -> String {
         // Rename qregs if necessary
         var qregdata: [String:Int] = [:]
-        if let aliases = aliasesMap {
-            for (_,q) in aliases {
+        if let aliasesMap = aliases {
+            for (_,q) in aliasesMap {
                 guard let n = qregdata[q.name] else {
                     qregdata[q.name] = q.index + 1
                     continue
@@ -995,8 +991,8 @@ final class Circuit: NSCopying {
                     guard let gdata = self.gates[k] else {
                         continue
                     }
-                    if !gdata.opaque {
-                        let calls = gdata.body.calls()
+                    if !gdata.opaque && gdata.body != nil {
+                        let calls = gdata.body!.calls()
                         for c in calls {
                             if !printed_gates.contains(c) {
                                 out += self._gate_string(c) + "\n"
@@ -1032,9 +1028,9 @@ final class Circuit: NSCopying {
                     if dataOp.cargs.isEmpty  {
                         let nm = dataOp.name
                         var qarglist:[RegBit] = []
-                        if let aliases = aliasesMap {
+                        if let aliasesMap = aliases {
                             for x in dataOp.qargs {
-                                if let v = aliases[x] {
+                                if let v = aliasesMap[x] {
                                     qarglist.append(v)
                                 }
                             }
@@ -1060,8 +1056,8 @@ final class Circuit: NSCopying {
                             assert(dataOp.cargs.count == 1 && dataOp.qargs.count == 1 && dataOp.params.count == 0, "bad node data")
                             var qname = dataOp.qargs[0].name
                             var qindex = dataOp.qargs[0].index
-                            if let aliases = aliasesMap {
-                                if let newq = aliases[RegBit(qname, qindex)] {
+                            if let aliasesMap = aliases {
+                                if let newq = aliasesMap[RegBit(qname, qindex)] {
                                     qname = newq.name
                                     qindex = newq.index
                                 }
@@ -1312,8 +1308,8 @@ final class Circuit: NSCopying {
      input_circuit is a CircuitGraph.
      */
     func substitute_circuit_one(_ node: GraphVertex<CircuitVertexData>,
-                                       _ input_circuit: Circuit,
-                                       _ wires: [RegBit] = []) throws {
+                                _ input_circuit: Circuit,
+                                wires: [RegBit] = []) throws {
 
         if node.data!.type != "op" {
             throw CircuitError.invalidoptype(type: node.data!.type)
@@ -1446,11 +1442,11 @@ final class Circuit: NSCopying {
     /**
      Return a list of "op" nodes with the given name.
      */
-    public func get_named_nodes(_ name: String) throws -> [Int] {
+    public func get_named_nodes(_ name: String) throws -> [GraphVertex<CircuitVertexData>] {
         if self.basis[name] == nil {
             throw CircuitError.nobasicop(name: name)
         }
-        var nlist: [Int] = []
+        var nlist: [GraphVertex<CircuitVertexData>] = []
         // Iterate through the nodes of self in topological order
         let ts = try self.multi_graph.topological_sort()
         for nd in ts {
@@ -1458,7 +1454,7 @@ final class Circuit: NSCopying {
                 if data.type == "op" {
                     let dataOp = data as! CircuitVertexOpData
                     if dataOp.name == name {
-                        nlist.append(nd.key)
+                        nlist.append(nd)
                     }
                 }
             }
@@ -1470,7 +1466,7 @@ final class Circuit: NSCopying {
      Remove an operation node n.
      Add edges from predecessors to successors.
      */
-    private func _remove_op_node(_ n: Int) {
+    func _remove_op_node(_ n: Int) {
         let (pred_map, succ_map) = self._make_pred_succ_maps(n)
         self.multi_graph.remove_vertex(n)
         for w in pred_map.keys {
@@ -1580,7 +1576,7 @@ final class Circuit: NSCopying {
                 new_layer.gates[key] = copy
             }
             // Save the support of each operation we add to the layer
-            var support_list: [RegBit] = []
+            var support_list: [[RegBit]] = []
             // Determine what operations to add in this layer
             // ops_touched is a map from operation nodes touched in this
             // iteration to the set of their unvisited input wires. When all
@@ -1640,7 +1636,7 @@ final class Circuit: NSCopying {
                             if dOp.name != "barrier" {
                                 // support_list.append(list(set(qa) | set(ca) |
                                 //                          set(cob)))
-                                support_list.append(contentsOf: Set<RegBit>(qa))
+                                support_list.append(Array(Set<RegBit>(qa)))
                             }
                             emit = true
                         }
@@ -1687,7 +1683,7 @@ final class Circuit: NSCopying {
                 new_layer.gates[key] = copy
             }
             // Save the support of the operation we add to the layer
-            var support_list: [RegBit] = []
+            var support_list: [[RegBit]] = []
             // Operation data
             let qa = dOp.qargs
             let ca = dOp.cargs
@@ -1698,7 +1694,7 @@ final class Circuit: NSCopying {
             //Add operation to partition
             if dOp.name != "barrier" {
                 // support_list.append(list(set(qa) | set(ca) | set(cob)))
-                support_list.append(contentsOf: Set<RegBit>(qa))
+                support_list.append(Array(Set<RegBit>(qa)))
             }
             layers_list.append(Layer(new_layer,support_list))
         }
@@ -1715,8 +1711,8 @@ final class Circuit: NSCopying {
      in the circuit's basis.
      Nodes must have only one successor to continue the run.
      */
-    func collect_runs(namelist: Set<String>) throws -> [[Int]] {
-        var group_list: [[Int]] = []
+    func collect_runs(_ namelist: Set<String>) throws -> [[GraphVertex<CircuitVertexData>]] {
+        var group_list: [[GraphVertex<CircuitVertexData>]] = []
 
         // Iterate through the nodes of self in topological order
         // and form tuples containing sequences of gates
@@ -1740,7 +1736,7 @@ final class Circuit: NSCopying {
             if nodes_seen[node.key]! {
                 continue
             }
-            var group: [Int] = [node.key]
+            var group: [GraphVertex<CircuitVertexData>] = [node]
             nodes_seen[node.key] = true
             var s = self.multi_graph.successors(node.key)
             while s.count == 1 {
@@ -1754,7 +1750,7 @@ final class Circuit: NSCopying {
                 if !namelist.contains(ndOp.name) {
                     break
                 }
-                group.append(s[0].key)
+                group.append(s[0])
                 nodes_seen[s[0].key] = true
                 s = self.multi_graph.successors(s[0].key)
             }

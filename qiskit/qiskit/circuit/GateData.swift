@@ -23,10 +23,10 @@ final class GateData: NSCopying {
     let n_args: Int
     let n_bits: Int
     let args: [String]
-    let bits: [RegBit]
-    let body: Node
+    let bits: [String]
+    let body: Node?
 
-    init(_ opaque: Bool, _ n_args: Int, _ n_bits: Int, _ args: [String], _ bits: [RegBit], _ body: Node) {
+    init(_ opaque: Bool, _ n_args: Int, _ n_bits: Int, _ args: [String], _ bits: [String], _ body: Node?) {
         self.opaque = opaque
         self.n_args = n_args
         self.n_bits = n_bits
@@ -36,7 +36,7 @@ final class GateData: NSCopying {
     }
 
     public func copy(with zone: NSZone? = nil) -> Any {
-        let body = self.body.copy(with: zone) as! Node
+        let body: Node? = (self.body == nil) ? nil : self.body!.copy(with: zone) as? Node
         return GateData(self.opaque, self.n_args, self.n_bits, self.args, self.bits, body)
     }
 }

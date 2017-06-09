@@ -20,4 +20,7 @@ struct Stack<Element> {
     mutating func pop() -> Element {
         return items.removeLast()
     }
+    func peek() -> Element? {
+        return items.last
+    }
 }

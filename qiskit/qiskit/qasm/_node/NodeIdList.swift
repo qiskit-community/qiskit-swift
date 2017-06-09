@@ -17,6 +17,6 @@ import Foundation
     }
     
     override public func qasm() -> String {
-        return "TODO"
+        preconditionFailure("qasm not implemented")
     }
 }

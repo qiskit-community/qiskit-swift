@@ -6,18 +6,16 @@
 //  Copyright © 2017 IBM. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
 @objc public class NodeInclude: Node {
     
-    var file: String?
-    
     public init(file: String) {
         super.init(type: .N_INCLUDE)
-        self.file = file
+        super.file = file
     }
     
     override public func qasm() -> String {
-        return "TODO"
+        preconditionFailure("qasm not implemented")
     }
 }
