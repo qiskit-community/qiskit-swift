@@ -11,6 +11,20 @@ import Foundation
 //TODO Mock AST node - replace by real ast node
 class Node : NSCopying {
 
+    // I am not sure about types but those properties are being accessed in Unroller
+    let type: String = ""
+    let name: String = ""
+    let index: Int = 0
+    let line: Int = 0
+    let file: String = ""
+    let arguments: [AnyObject] = []
+    let bitlist: [AnyObject] = []
+    let n_args: Int = 0
+    let n_bits: Int = 0
+    let body: String = ""
+    let children: [Node] = []
+    let value: String = ""
+    
     public init() {
         if type(of: self) == Node.self {
             fatalError("Abstract class instantiation.")

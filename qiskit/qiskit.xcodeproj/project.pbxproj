@@ -23,6 +23,7 @@
 		693109431EE9964500CD2CD1 /* OneRegisterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693109421EE9964500CD2CD1 /* OneRegisterBackend.swift */; };
 		693109451EE9966D00CD2CD1 /* PrinterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693109441EE9966D00CD2CD1 /* PrinterBackend.swift */; };
 		693109471EE9969600CD2CD1 /* SimulatorBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693109461EE9969600CD2CD1 /* SimulatorBackend.swift */; };
+		693177A11EEAF42500B4CF9D /* UnrollerException.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693177A01EEAF42500B4CF9D /* UnrollerException.swift */; };
 		693A9F421ECA363D00112AC9 /* Barrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693A9F411ECA363D00112AC9 /* Barrier.swift */; };
 		693A9F441ECA366000112AC9 /* CX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693A9F431ECA366000112AC9 /* CX.swift */; };
 		693A9F461ECA369500112AC9 /* UBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693A9F451ECA369500112AC9 /* UBase.swift */; };
@@ -111,6 +112,7 @@
 		693109421EE9964500CD2CD1 /* OneRegisterBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OneRegisterBackend.swift; path = unroll/OneRegisterBackend.swift; sourceTree = "<group>"; };
 		693109441EE9966D00CD2CD1 /* PrinterBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PrinterBackend.swift; path = unroll/PrinterBackend.swift; sourceTree = "<group>"; };
 		693109461EE9969600CD2CD1 /* SimulatorBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SimulatorBackend.swift; path = unroll/SimulatorBackend.swift; sourceTree = "<group>"; };
+		693177A01EEAF42500B4CF9D /* UnrollerException.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UnrollerException.swift; path = unroll/UnrollerException.swift; sourceTree = "<group>"; };
 		693A9F411ECA363D00112AC9 /* Barrier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Barrier.swift; path = extensions/Barrier.swift; sourceTree = "<group>"; };
 		693A9F431ECA366000112AC9 /* CX.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CX.swift; path = extensions/CX.swift; sourceTree = "<group>"; };
 		693A9F451ECA369500112AC9 /* UBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UBase.swift; path = extensions/UBase.swift; sourceTree = "<group>"; };
@@ -292,6 +294,7 @@
 				693109461EE9969600CD2CD1 /* SimulatorBackend.swift */,
 				692DBE031EE701890032F6CF /* Unroller.swift */,
 				692DBE071EE702FA0032F6CF /* UnrollerBackend.swift */,
+				693177A01EEAF42500B4CF9D /* UnrollerException.swift */,
 			);
 			name = unroll;
 			sourceTree = "<group>";
@@ -562,6 +565,7 @@
 				69DE36071ECD150300EC4756 /* CSwap.swift in Sources */,
 				69D310881ECA182000B3E752 /* Request.swift in Sources */,
 				69E234321EDEE76200E47750 /* GateData.swift in Sources */,
+				693177A11EEAF42500B4CF9D /* UnrollerException.swift in Sources */,
 				69D310771ECA180500B3E752 /* QuantumProgram.swift in Sources */,
 				692DBE001EE6EA2C0032F6CF /* MappingError.swift in Sources */,
 				69E597B11ECA99B300A321F5 /* H.swift in Sources */,

@@ -252,7 +252,7 @@ final class Mapping {
             "cx_flipped q[0],q[1];\n"
 
         let u = Unroller(Qasm(data: flipped_qasm).parse(),CircuitBackend(["cx", "h"]))
-        u.execute()
+        try u.execute()
         let flipped_cx_circuit = (u.backend! as! CircuitBackend).circuit
         let cx_node_list = try circuit_graph.get_named_nodes("cx")
         let cg_edges = coupling_graph.get_edges()
@@ -456,7 +456,7 @@ final class Mapping {
         basis += ",swap"
         let ast = Qasm(data: openqasm_output).parse()
         let u = Unroller(ast, CircuitBackend(basis.components(separatedBy:",")))
-        u.execute()
+        try u.execute()
         return ((u.backend as! CircuitBackend).circuit, initial_layout!)
     }
 
@@ -660,7 +660,7 @@ final class Mapping {
     static func optimize_1q_gates(_ circuit: Circuit) throws -> Circuit {
         let qx_basis = ["u1", "u2", "u3", "cx", "id"]
         let urlr = try Unroller(Qasm(data: circuit.qasm(qeflag: true)).parse(), CircuitBackend(qx_basis))
-        urlr.execute()
+        try urlr.execute()
         let unrolled = (urlr.backend as! CircuitBackend).circuit
 
         let runs = try unrolled.collect_runs(["u1", "u2", "u3", "id"])
