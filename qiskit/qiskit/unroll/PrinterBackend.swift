@@ -106,7 +106,7 @@ final class PrinterBackend: UnrollerBackend {
             out += ";"
         }
         else {
-            out += "\n{\n" + gate.body.qasm() + "}"
+            out += "\n{\n" + (gate.body != nil ? gate.body!.qasm() : "") + "}"
         }
         return out
     }
@@ -125,8 +125,8 @@ final class PrinterBackend: UnrollerBackend {
                 return
             }
             // Print the hierarchy of gates this gate calls
-            if !gate.opaque {
-                let calls = gate.body.calls()
+            if !gate.opaque && gate.body != nil {
+                let calls = gate.body!.calls()
                 for call in calls {
                     if !self.printed_gates.contains(call) {
                         print(self._gate_string(call))

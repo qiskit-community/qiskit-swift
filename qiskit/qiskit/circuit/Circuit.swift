@@ -585,8 +585,8 @@ final class Circuit: NSCopying {
                 union_gate.bits != input_circuit_gate.bits {
                 throw CircuitError.ineqgate(name: k)
             }
-            if !union_gate.opaque &&
-                union_gate.body.qasm() != input_circuit_gate.body.qasm() {
+            if !union_gate.opaque && union_gate.body != nil && input_circuit_gate.body != nil &&
+                union_gate.body!.qasm() != input_circuit_gate.body!.qasm() {
                 throw CircuitError.ineqgate(name: k)
             }
         }
@@ -918,16 +918,12 @@ final class Circuit: NSCopying {
         if data.n_args > 0 {
             out += "(" + data.args.joined(separator: ",") + ")"
         }
-        var bits: [String] = []
-        for v in data.bits {
-            bits.append(v.qasm)
-        }
-        out += " " + bits.joined(separator: ",")
+        out += " " + data.bits.joined(separator: ",")
         if data.opaque {
             out += ";"
         }
         else {
-            out += "\n{\n" + data.body.qasm() + "}"
+            out += "\n{\n" + (data.body != nil ? data.body!.qasm() : "") + "}"
         }
         return out
     }
@@ -995,8 +991,8 @@ final class Circuit: NSCopying {
                     guard let gdata = self.gates[k] else {
                         continue
                     }
-                    if !gdata.opaque {
-                        let calls = gdata.body.calls()
+                    if !gdata.opaque && gdata.body != nil {
+                        let calls = gdata.body!.calls()
                         for c in calls {
                             if !printed_gates.contains(c) {
                                 out += self._gate_string(c) + "\n"

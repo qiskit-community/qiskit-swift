@@ -17,11 +17,11 @@ class Node : NSCopying {
     let index: Int = 0
     let line: Int = 0
     let file: String = ""
-    let arguments: [AnyObject] = []
-    let bitlist: [AnyObject] = []
+    let arguments: Node? = nil
+    let bitlist: Node = Node()
     let n_args: Int = 0
     let n_bits: Int = 0
-    let body: String = ""
+    let body: Node = Node()
     let children: [Node] = []
     let value: String = ""
     
