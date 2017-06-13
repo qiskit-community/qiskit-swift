@@ -14,7 +14,7 @@ import Foundation
 final class CircuitBackend: UnrollerBackend {
 
     private let prec: Int = 15
-    private var creg:RegBit? = nil
+    private var creg:String? = nil
     private var cval:Int? = nil
     let circuit: Circuit = Circuit()
     private var basis: [String]
@@ -82,7 +82,9 @@ final class CircuitBackend: UnrollerBackend {
         if self.listen {
             var condition: RegBit? = nil
             if let reg = self.creg {
-                condition = reg
+                if let val = self.cval {
+                    condition = RegBit(reg,val)
+                }
             }
             if !self.basis.contains("U") {
                 self.basis.append("U")
@@ -101,7 +103,9 @@ final class CircuitBackend: UnrollerBackend {
         if self.listen {
             var condition: RegBit? = nil
             if let reg = self.creg {
-                condition = reg
+                if let val = self.cval {
+                    condition = RegBit(reg,val)
+                }
             }
             if !self.basis.contains("CX") {
                 self.basis.append("CX")
@@ -119,7 +123,9 @@ final class CircuitBackend: UnrollerBackend {
     func measure(_ qubit: RegBit, _ bit: RegBit) throws {
         var condition: RegBit? = nil
         if let reg = self.creg {
-            condition = reg
+            if let val = self.cval {
+                condition = RegBit(reg,val)
+            }
         }
         if !self.basis.contains("measure") {
             self.basis.append("measure")
@@ -155,7 +161,9 @@ final class CircuitBackend: UnrollerBackend {
     func reset(_ qubit: RegBit) throws {
         var condition: RegBit? = nil
         if let reg = self.creg {
-            condition = reg
+            if let val = self.cval {
+                condition = RegBit(reg,val)
+            }
         }
         if !self.basis.contains("reset") {
             self.basis.append("reset")
@@ -169,7 +177,7 @@ final class CircuitBackend: UnrollerBackend {
      creg is a name string.
      cval is the integer value for the test.
      */
-    func set_condition(_ creg: RegBit, _ cval: Int) {
+    func set_condition(_ creg: String, _ cval: Int) {
         self.creg = creg
         self.cval = cval
     }
@@ -199,7 +207,9 @@ final class CircuitBackend: UnrollerBackend {
         if self.listen && self.basis.contains(name) {
             var condition: RegBit? = nil
             if let reg = self.creg {
-                condition = reg
+                if let val = self.cval {
+                    condition = RegBit(reg,val)
+                }
             }
             self.in_gate = name
             self.listen = false

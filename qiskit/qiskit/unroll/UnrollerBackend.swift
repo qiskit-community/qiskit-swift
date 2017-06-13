@@ -84,7 +84,7 @@ protocol UnrollerBackend {
      creg is a name string.
      cval is the integer value for the test.
      */
-    func set_condition(_ creg: RegBit, _ cval: Int)
+    func set_condition(_ creg: String, _ cval: Int)
 
     /**
      Drop the current condition.

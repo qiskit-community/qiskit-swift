@@ -14,7 +14,7 @@ import Foundation
 final class PrinterBackend: UnrollerBackend {
 
     private let prec: Int = 15
-    private var creg:RegBit? = nil
+    private var creg:String? = nil
     private var cval:Int? = nil
     private var basis: [String]
     private var listen: Bool = true
@@ -154,7 +154,7 @@ final class PrinterBackend: UnrollerBackend {
             }
             if let reg = self.creg {
                 if let val = self.cval {
-                    print("if(\(reg.name)==\(val)) ")
+                    print("if(\(reg)==\(val)) ")
                 }
             }
             print("U(\(self._fs(arg.0)),\(self._fs(arg.1)),\(self._fs(arg.2))) \(qubit.description);")
@@ -173,7 +173,7 @@ final class PrinterBackend: UnrollerBackend {
             }
             if let reg = self.creg {
                 if let val = self.cval {
-                    print("if(\(reg.name)==\(val)) ")
+                    print("if(\(reg)==\(val)) ")
                 }
             }
             print("CX \(qubit0.description),\(qubit1.description);")
@@ -191,7 +191,7 @@ final class PrinterBackend: UnrollerBackend {
         }
         if let reg = self.creg {
             if let val = self.cval {
-                print("if(\(reg.name)==\(val)) ")
+                print("if(\(reg)==\(val)) ")
             }
         }
         print("measure \(qubit.description) -> \(bit.description);")
@@ -229,7 +229,7 @@ final class PrinterBackend: UnrollerBackend {
         }
         if let reg = self.creg {
             if let val = self.cval {
-                print("if(\(reg.name)==\(val)) ")
+                print("if(\(reg)==\(val)) ")
             }
         }
         print("reset \(qubit.description);")
@@ -240,7 +240,7 @@ final class PrinterBackend: UnrollerBackend {
      creg is a name string.
      cval is the integer value for the test.
      */
-    func set_condition(_ creg: RegBit, _ cval: Int) {
+    func set_condition(_ creg: String, _ cval: Int) {
         self.creg = creg
         self.cval = cval
         if self.comments {
@@ -289,7 +289,7 @@ final class PrinterBackend: UnrollerBackend {
             self.listen = false
             if let reg = self.creg {
                 if let val = self.cval {
-                    print("if(\(reg.name)==\(val)) ")
+                    print("if(\(reg)==\(val)) ")
                 }
             }
             print(name)

@@ -76,7 +76,7 @@ final class SimulatorBackend: UnrollerBackend {
     private var _cbit_order: [RegBit:Int] = [:]
     private var _operation_order: Int = 0
     private let prec: Int = 15
-    private var creg:RegBit? = nil
+    private var creg:String? = nil
     private var cval:Int? = nil
     private var gates: [String:GateData] = [:]
     private var trace: Bool = false
@@ -182,7 +182,7 @@ final class SimulatorBackend: UnrollerBackend {
             if self.trace {
                 if let reg = self.creg {
                     if let val = self.cval {
-                        print("if(\(reg.name)==\(val)) ")
+                        print("if(\(reg)==\(val)) ")
                     }
                 }
                 print("U(\(self._fs(arg.0)),\(self._fs(arg.1)),\(self._fs(arg.2))) \(qubit.description);")
@@ -219,7 +219,7 @@ final class SimulatorBackend: UnrollerBackend {
             if self.trace {
                 if let reg = self.creg {
                     if let val = self.cval {
-                        print("if(\(reg.name)==\(val)) ")
+                        print("if(\(reg)==\(val)) ")
                     }
                 }
                 print("CX \(qubit0.description),\(qubit1.description);")
@@ -294,7 +294,7 @@ final class SimulatorBackend: UnrollerBackend {
      creg is a name string.
      cval is the integer value for the test.
      */
-    func set_condition(_ creg: RegBit, _ cval: Int) {
+    func set_condition(_ creg: String, _ cval: Int) {
         self.creg = creg
         self.cval = cval
     }
@@ -338,7 +338,7 @@ final class SimulatorBackend: UnrollerBackend {
             if self.trace {
                 if let reg = self.creg {
                     if let val = self.cval {
-                        print("if(\(reg.name)==\(val)) ")
+                        print("if(\(reg)==\(val)) ")
                     }
                 }
                 print(name)
