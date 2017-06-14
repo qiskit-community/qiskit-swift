@@ -11,10 +11,14 @@ import Foundation
 @objc public class NodePrefix: Node {
 
     public var op: String = ""
+    public var external: NodeExternal?
 
     public init(op: String, children: [Node]) {
         super.init(type: .N_PREFIX)
         self.op = op
+        if NodeExternal.externalFunctions.contains(op) {
+            external = NodeExternal(operation: op)
+        }
         self.children = children
     }
     
