@@ -23,6 +23,9 @@ public enum IBMQuantumExperienceError: Error, CustomStringConvertible {
     case missingExecutionId
     case missingStatus
     case timeout
+    case missingDevice(device: String)
+    case missingRealDevice(device: String)
+    case errorDevice(device: String)
     case internalError(error: Error)
 
     public var description: String {
@@ -47,6 +50,12 @@ public enum IBMQuantumExperienceError: Error, CustomStringConvertible {
             return "Missing Status"
         case .timeout():
             return "Timeout"
+        case .missingDevice(let device):
+            return "Device \(device) does not exits in Quantum Experience. Only allow ibmqx2 or simulator"
+        case .missingRealDevice(let device):
+            return "Device \(device) does not exits in Quantum Experience Real Devices. Only allow ibmqx2"
+        case .errorDevice(let device):
+            return "Device \(device) does not exits"
         case .internalError(let error):
             return error.localizedDescription
         }

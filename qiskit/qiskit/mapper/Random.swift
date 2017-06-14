@@ -8,9 +8,6 @@
 
 import Foundation
 
-/**
- From java.util.Random nextGaussian
- */
 final class Random {
 
     private var nextNextGaussian: Double? = {
@@ -22,6 +19,9 @@ final class Random {
         return drand48()
     }
 
+    /**
+    From java.util.Random nextGaussian
+    */
     private func nextGaussian() -> Double {
         if let gaussian = nextNextGaussian {
             self.nextNextGaussian = nil
@@ -41,5 +41,12 @@ final class Random {
 
     func normal(mean: Double, standardDeviation: Double) -> Double {
         return self.nextGaussian() * standardDeviation + mean
+    }
+
+    /**
+    Return the next random floating point number in the range [0.0, 1.0).
+    */
+    class func random() -> Double {
+        return drand48()
     }
 }

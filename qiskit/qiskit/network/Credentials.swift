@@ -10,14 +10,25 @@ import Foundation
 
 final class Credentials {
 
+    private let token_unique: String
     let config: Qconfig
-    private(set) var token: String?
-    private(set) var ttl: Int?
-    private(set) var created: String?
-    private(set) var userId: String?
+    private(set) var data_credentials: [String:AnyObject] = [:]
 
-    init(config: Qconfig) {
-        self.config = config
+    var token: String? {
+        return self.data_credentials["id"] as? String
+    }
+    var userId: String? {
+        return self.data_credentials["userId"] as? String
+    }
+
+    init(_ token: String, _ config: Qconfig? = nil) throws {
+        self.token_unique = token
+        if let c = config {
+            self.config = c
+        }
+        else {
+            self.config = try Qconfig()
+        }
     }
 
     func obtainToken(request: Request, responseHandler: @escaping ((_:IBMQuantumExperienceError?) -> Void)) {
@@ -27,23 +38,8 @@ final class Credentials {
             return
         }
         request.postInternal(url: url,
-                     data: ["apiToken": (self.config.apiToken as AnyObject)]) { (json, error) -> Void in
-            self.token = nil
-            if let token = json["id"] as? String {
-                self.token = token
-            }
-            self.ttl = nil
-            if let ttl = json["ttl"] as? NSNumber {
-                self.ttl = ttl.intValue
-            }
-            self.created = nil
-            if let created = json["created"] as? String {
-                self.created = created
-            }
-            self.userId = nil
-            if let userId = json["userId"] as? String {
-                self.userId = userId
-            }
+                     data: ["apiToken": (self.token_unique as AnyObject)]) { (json, error) -> Void in
+            self.data_credentials = json
             responseHandler(error)
         }
     }

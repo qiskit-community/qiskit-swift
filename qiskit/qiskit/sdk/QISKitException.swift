@@ -27,6 +27,17 @@ public enum QISKitException: Error, CustomStringConvertible {
     case regindexrange
     case circuitsnotcompatible
     case noarguments
+    case missingFileName
+    case missingCircuit
+    case missingCircuits
+    case missingQuantumProgram(name: String)
+    case missingCompiledQasm
+    case errorShots
+    case errorMaxCredit
+    case missingStatus
+    case timeout
+    case errorStatus(status: String)
+    case errorLocalSimulator
     case internalError(error: Error)
 
     public var description: String {
@@ -59,6 +70,28 @@ public enum QISKitException: Error, CustomStringConvertible {
             return "circuits are not compatible"
         case .noarguments():
             return "no arguments passed"
+        case .missingFileName():
+            return "No filename provided"
+        case .missingCircuit():
+            return "Circuit not found"
+        case .missingCircuits():
+            return "No circuits"
+        case .missingQuantumProgram(let name):
+            return "result: \(name) not in QuantumProgram"
+        case .missingCompiledQasm():
+            return "No compiled qasm for this circuit"
+        case .errorShots():
+            return "Online devices only support job batches with equal numbers of shots"
+        case .errorMaxCredit():
+            return "Online devices only support job batches with equal max credit"
+        case .missingStatus():
+            return "Missing Status"
+        case .timeout():
+            return "Timeout"
+        case .errorStatus(let status):
+            return "status: \(status)"
+        case .errorLocalSimulator():
+            return "Not a local simulator"
         case .internalError(let error):
             return error.localizedDescription
         }

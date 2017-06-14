@@ -14,11 +14,11 @@ final class Request {
     private static let REACHTIMEOUT: TimeInterval = 90.0
     private static let CONNTIMEOUT: TimeInterval = 120.0
 
-    private let credential: Credentials
+    let credential: Credentials
     private var urlSession: URLSession
 
-    init(_ credential: Credentials) {
-        self.credential = credential
+    init(_ token: String, _ config: Qconfig? = nil) throws {
+        self.credential = try Credentials(token, config)
 
         let sessionConfig = URLSessionConfiguration.ephemeral
         sessionConfig.allowsCellularAccess = true
@@ -127,14 +127,14 @@ final class Request {
         task.resume()
     }
 
-    func get(path: String, params: String = "",
+    func get(path: String, params: String = "", with_token: Bool = true,
              responseHandler: @escaping ((_:[String:AnyObject], _:IBMQuantumExperienceError?) -> Void)) {
-        self.getInternal(path: path, params: params) { (json, error) in
+        self.getInternal(path: path, params: params, with_token: with_token) { (json, error) in
             if error != nil {
                 if case IBMQuantumExperienceError.httpError(_, let status, _) = error! {
                     if status == 401 {
                         self.credential.obtainToken(request: self) { (error) -> Void in
-                            self.getInternal(path: path, params: params) { (json, error) in
+                            self.getInternal(path: path, params: params, with_token: true) { (json, error) in
                                 responseHandler(json, error)
                             }
                         }
@@ -146,13 +146,19 @@ final class Request {
         }
     }
 
-    private func getInternal(path: String, params: String = "",
+    private func getInternal(path: String, params: String = "", with_token: Bool = true,
                              responseHandler: @escaping ((_:[String:AnyObject], _:IBMQuantumExperienceError?) -> Void)) {
-        guard let token = self.credential.token else {
-            responseHandler([:], IBMQuantumExperienceError.missingTokenId)
-            return
+        var access_token = ""
+        if with_token {
+            if let token = self.credential.token {
+                access_token = "?access_token=\(token)"
+            }
+            else {
+                responseHandler([:], IBMQuantumExperienceError.missingTokenId)
+                return
+            }
         }
-        let fullPath = "\(path)?access_token=\(token)\(params)"
+        let fullPath = "\(path)\(access_token)\(params)"
         guard let url = URL(string: fullPath, relativeTo:self.credential.config.url) else {
             responseHandler([:],
                 IBMQuantumExperienceError.invalidURL(url: "\(self.credential.config.url.description)\(fullPath)"))
