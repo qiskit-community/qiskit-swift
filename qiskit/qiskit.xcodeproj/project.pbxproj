@@ -427,7 +427,6 @@
 				69E335501ECA1BC00027271D /* QuantumRegister.swift */,
 				69E335521ECA1BD20027271D /* ClassicalRegister.swift */,
 				6974E5941ECA1EF300D1AE97 /* QISKitException.swift */,
-				DFBC4FA21EC73BF800027640 /* network */,
 			);
 			name = sdk;
 			sourceTree = "<group>";
@@ -468,6 +467,7 @@
 				69D310691ECA179D00B3E752 /* simulators */,
 				69D310671ECA15D300B3E752 /* unroll */,
 				69D310681ECA16E400B3E752 /* sdk */,
+				DFBC4FA21EC73BF800027640 /* network */,
 				DFBC4FA51EC73BF800027640 /* qiskit.h */,
 				DFBC4FA11EC73BF800027640 /* Info.plist */,
 			);
