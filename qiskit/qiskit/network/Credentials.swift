@@ -39,13 +39,22 @@ final class Credentials {
     func obtainToken(request: Request, responseHandler: @escaping ((_:IBMQuantumExperienceError?) -> Void)) {
         let path = "users/loginWithToken"
         guard let url = URL(string: path, relativeTo: self.config.url) else {
-            responseHandler(IBMQuantumExperienceError.invalidURL(url: "\(self.config.url.description)/\(path)"))
+            DispatchQueue.main.async {
+                responseHandler(IBMQuantumExperienceError.invalidURL(url: "\(self.config.url.description)/\(path)"))
+            }
             return
         }
-        request.postInternal(url: url,
-                             data: ["apiToken": self.token_unique]) { (json, error) -> Void in
+        request.postInternal(url: url, data: ["apiToken": self.token_unique]) { (out, error) -> Void in
+            if error != nil {
+                responseHandler(error)
+                return
+            }
+            guard let json = out as? [String:Any] else {
+                responseHandler(IBMQuantumExperienceError.invalidResponseData)
+                return
+            }
             self.data_credentials = json
-            responseHandler(error)
+            responseHandler(nil)
         }
     }
 }

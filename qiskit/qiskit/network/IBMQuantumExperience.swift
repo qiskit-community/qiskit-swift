@@ -278,38 +278,29 @@ public final class IBMQuantumExperience {
                              responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
-                DispatchQueue.main.async {
-                    responseHandler(nil, error)
-                }
+                responseHandler(nil, error)
                 return
             }
             self.req.get(path: "Executions/\(idExecution)") { (out, error) -> Void in
                 if error != nil {
-                    DispatchQueue.main.async {
-                        responseHandler(nil, error)
-                    }
+                    responseHandler(nil, error)
                     return
                 }
-                var execution = out
+                guard var execution = out as? [String:Any] else {
+                    responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                    return
+                }
                 guard let codeId = execution["codeId"] as? String else {
-                    DispatchQueue.main.async {
-                        responseHandler(execution, error)
-                    }
+                    responseHandler(execution, error)
                     return
                 }
                 self.get_code(codeId) { (code, error) -> Void in
                     if error != nil {
-                        DispatchQueue.main.async {
-                            responseHandler(nil, error)
-                        }
+                        responseHandler(nil, error)
                         return
                     }
                     execution["code"] = code
-                    DispatchQueue.main.async {
-                        DispatchQueue.main.async {
-                            responseHandler(execution, error)
-                        }
-                    }
+                    responseHandler(execution, error)
                 }
             }
         }
@@ -325,16 +316,16 @@ public final class IBMQuantumExperience {
                                           responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
-                DispatchQueue.main.async {
-                    responseHandler(nil, error)
-                }
+                responseHandler(nil, error)
                 return
             }
-            self.req.get(path: "Executions/\(idExecution)") { (execution, error) -> Void in
+            self.req.get(path: "Executions/\(idExecution)") { (out, error) -> Void in
                 if error != nil {
-                    DispatchQueue.main.async {
-                        responseHandler(nil, error)
-                    }
+                    responseHandler(nil, error)
+                    return
+                }
+                guard let execution = out as? [String:Any] else {
+                    responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
                     return
                 }
                 var result: [String:Any] = [:]
@@ -351,9 +342,7 @@ public final class IBMQuantumExperience {
                         }
                     }
                 }
-                DispatchQueue.main.async {
-                    responseHandler(result, error)
-                }
+                responseHandler(result, error)
             }
         }
     }
@@ -364,34 +353,29 @@ public final class IBMQuantumExperience {
      - parameter idCode: code identifier
      - parameter responseHandler: Closure to be called upon completion
      */
-    private func get_code(_ idCode: String, responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
+    private func get_code(_ idCode: String, responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
-                DispatchQueue.main.async {
-                    responseHandler([:], error)
-                }
+                responseHandler(nil, error)
                 return
             }
-            self.req.get(path: "Codes/\(idCode)") { (code, error) -> Void in
+            self.req.get(path: "Codes/\(idCode)") { (out, error) -> Void in
                 if error != nil {
-                    DispatchQueue.main.async {
-                        responseHandler(code, error)
-                    }
+                    responseHandler(nil, error)
+                    return
+                }
+                guard var code = out as? [String:Any] else {
+                    responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
                     return
                 }
                 self.req.get(path:"Codes/\(idCode)/executions",
                 params:"filter={\"limit\":3}") { (executions, error) -> Void in
                     if error != nil {
-                        DispatchQueue.main.async {
-                            responseHandler(code, error)
-                        }
+                        responseHandler(nil, error)
                         return
                     }
-                    var codeCopy = code
-                    codeCopy["executions"] = executions 
-                    DispatchQueue.main.async {
-                        responseHandler(codeCopy, error)
-                    }
+                    code["executions"] = executions
+                    responseHandler(code, error)
                 }
             }
         }
@@ -407,21 +391,19 @@ public final class IBMQuantumExperience {
                              responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
-                DispatchQueue.main.async {
-                    responseHandler(nil, error)
-                }
+                responseHandler(nil, error)
                 return
             }
-            self.req.get(path: "Codes/\(idCode)/export/png/url") { (image, error) -> Void in
+            self.req.get(path: "Codes/\(idCode)/export/png/url") { (out, error) -> Void in
                 if error != nil {
-                    DispatchQueue.main.async {
-                        responseHandler(image, error)
-                    }
+                    responseHandler(nil, error)
                     return
                 }
-                DispatchQueue.main.async {
-                    responseHandler(image, error)
+                guard let image = out as? [String:Any] else {
+                    responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                    return
                 }
+                responseHandler(image, error)
             }
         }
     }
@@ -432,22 +414,20 @@ public final class IBMQuantumExperience {
     public func get_last_codes(responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
-                DispatchQueue.main.async {
-                    responseHandler(nil, error)
-                }
+                responseHandler(nil, error)
                 return
             }
             self.req.get(path: "users/\(self.req.credential.userId!)/codes/latest",
                          params: "&includeExecutions=true") { (out, error) -> Void in
-                if error != nil {
-                    DispatchQueue.main.async {
-                        responseHandler(nil, error)
-                    }
-                    return
-                }
-                DispatchQueue.main.async {
-                    responseHandler(out["codes"] as? [String:Any], error)
-                }
+                            if error != nil {
+                                responseHandler(nil, error)
+                                return
+                            }
+                            guard let result = out as? [String:Any] else {
+                                responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                                return
+                            }
+                            responseHandler(result["codes"] as? [String:Any], error)
             }
         }
     }
@@ -464,9 +444,7 @@ public final class IBMQuantumExperience {
                                responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
-                DispatchQueue.main.async {
-                    responseHandler(nil, error)
-                }
+                responseHandler(nil, error)
                 return
             }
             var data: [String : Any] = [:]
@@ -498,14 +476,22 @@ public final class IBMQuantumExperience {
                 }
                 self.req.post(path: "codes/execute",
                               params: "&shots=\(shots)&seed=\(seed!)&deviceRunType=\(device_type)",
-                data: data) { (execution, error) -> Void in
+                data: data) { (out, error) -> Void in
+                    guard let execution = out as? [String:Any] else {
+                        responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                        return
+                    }
                     self.post_run_experiment(execution,error,timeout,responseHandler)
                 }
             }
             else {
                 self.req.post(path: "codes/execute",
                               params: "&shots=\(shots)&deviceRunType=\(device_type)",
-                data: data) { (execution, error) -> Void in
+                data: data) { (out, error) -> Void in
+                    guard let execution = out as? [String:Any] else {
+                        responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                        return
+                    }
                     self.post_run_experiment(execution,error,timeout,responseHandler)
                 }
             }
@@ -517,29 +503,21 @@ public final class IBMQuantumExperience {
                                      _ timeout: Int,
                                      _ responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         if error != nil {
-            DispatchQueue.main.async {
-                responseHandler(nil, error)
-            }
+            responseHandler(nil, error)
             return
         }
         var respond: [String:Any] = [:]
         guard let statusMap = execution["status"] as? [String:Any] else {
-            DispatchQueue.main.async {
-                responseHandler(nil, IBMQuantumExperienceError.missingStatus)
-            }
+            responseHandler(nil, IBMQuantumExperienceError.missingStatus)
             return
         }
         guard let status = statusMap["id"] as? String else {
-            DispatchQueue.main.async {
-                responseHandler(nil, IBMQuantumExperienceError.missingStatus)
-            }
+            responseHandler(nil, IBMQuantumExperienceError.missingStatus)
             return
         }
         print("Status: \(status)")
         guard let id_execution = execution["id"] as? String else {
-            DispatchQueue.main.async {
-                responseHandler(nil, IBMQuantumExperienceError.missingExecutionId)
-            }
+            responseHandler(nil, IBMQuantumExperienceError.missingExecutionId)
             return
         }
         var result: [String:Any] = [:]
@@ -562,31 +540,23 @@ public final class IBMQuantumExperience {
                     respond["result"] = result
                 }
             }
-            DispatchQueue.main.async {
-                responseHandler(respond, nil)
-            }
+            responseHandler(respond, nil)
             return
         }
         if status == "ERROR" {
-            DispatchQueue.main.async {
-                responseHandler(respond, nil)
-            }
+            responseHandler(respond, nil)
             return
         }
         self.getCompleteResultFromExecution(id_execution, ((timeout > 300) ? 300 : timeout)) { (out, error) in
             if error != nil {
-                DispatchQueue.main.async {
-                    responseHandler(nil, error)
-                }
+                responseHandler(nil, error)
                 return
             }
-            DispatchQueue.main.async {
-                if let result = out {
-                    respond["status"] = "DONE"
-                    respond["result"] = result
-                }
-                responseHandler(respond, error)
+            if let result = out {
+                respond["status"] = "DONE"
+                respond["result"] = result
             }
+            responseHandler(respond, error)
         }
     }
 
@@ -595,22 +565,16 @@ public final class IBMQuantumExperience {
         @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
-                DispatchQueue.main.async {
-                    responseHandler(nil, error)
-                }
+                responseHandler(nil, error)
                 return
             }
             self.get_result_from_execution(idExecution) { (execution, error) -> Void in
                 if error != nil {
-                    DispatchQueue.main.async {
-                        responseHandler(nil, error)
-                    }
+                    responseHandler(nil, error)
                     return
                 }
                 if timeOut <= 0 {
-                    DispatchQueue.main.async {
-                        responseHandler(execution, error)
-                    }
+                    responseHandler(execution, error)
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     self.getCompleteResultFromExecution(idExecution, timeOut-1, responseHandler: responseHandler)
@@ -631,9 +595,7 @@ public final class IBMQuantumExperience {
 
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
-                DispatchQueue.main.async {
-                    responseHandler(nil, error)
-                }
+                responseHandler(nil, error)
                 return
             }
             var data: [String : Any] = [:]
@@ -668,10 +630,12 @@ public final class IBMQuantumExperience {
             backendDict["name"] = device_type
             data["backend"] = backendDict
 
-            self.req.post(path: "Jobs", data: data) { (json, error) -> Void in
-                DispatchQueue.main.async {
-                    responseHandler(json, error)
+            self.req.post(path: "Jobs", data: data) { (out, error) -> Void in
+                guard let json = out as? [String:Any] else {
+                    responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                    return
                 }
+                responseHandler(json, error)
             }
         }
     }
@@ -685,15 +649,15 @@ public final class IBMQuantumExperience {
     public func get_job(jobId: String, responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
-                DispatchQueue.main.async {
-                    responseHandler(nil, error)
-                }
+                responseHandler(nil, error)
                 return
             }
-            self.req.get(path: "Jobs/\(jobId)") { (json, error) -> Void in
-                DispatchQueue.main.async {
-                    responseHandler(json, error)
+            self.req.get(path: "Jobs/\(jobId)") { (out, error) -> Void in
+                guard let json = out as? [String:Any] else {
+                    responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                    return
                 }
+                responseHandler(json, error)
             }
         }
     }
@@ -704,10 +668,14 @@ public final class IBMQuantumExperience {
     func device_status(_ device: String = "ibmqx2",
                        responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         guard let device_type = self._check_device(device, "status") else {
-            responseHandler([:],IBMQuantumExperienceError.missingDevice(device: device))
+            responseHandler(nil,IBMQuantumExperienceError.missingDevice(device: device))
             return
         }
-        self.req.get(path:"Status/queue?device=\(device_type)",with_token: false) { (json, error) -> Void in
+        self.req.get(path:"Status/queue?device=\(device_type)",with_token: false) { (out, error) -> Void in
+            guard let json = out as? [String:Any] else {
+                responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                return
+            }
             responseHandler(["available" : (json["state"] != nil) ], error)
         }
     }
@@ -717,20 +685,26 @@ public final class IBMQuantumExperience {
      */
     func device_calibration(_ device: String = "ibmqx2",
                             responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
-        if !self._check_credentials() {
-            responseHandler([:],IBMQuantumExperienceError.missingTokenId)
-            return
-        }
-        guard let device_type = self._check_device(device, "calibration") else {
-            responseHandler([:],IBMQuantumExperienceError.missingRealDevice(device: device))
-            return
-        }
-        self.req.get(path:"DeviceStats/statsByDevice/\(device_type)",params:"&raw=true") { (json, error) -> Void in
-            var dev = device
-            if device_type == "Real5Qv2" {
-                dev = "ibmqx2"
+        self.checkCredentials(request: self.req) { (error) -> Void in
+            if error != nil {
+                responseHandler(nil, error)
+                return
             }
-            responseHandler(self._beautify_calibration(json, dev),error)
+            guard let device_type = self._check_device(device, "calibration") else {
+                responseHandler(nil,IBMQuantumExperienceError.missingRealDevice(device: device))
+                return
+            }
+            self.req.get(path:"DeviceStats/statsByDevice/\(device_type)",params:"&raw=true") { (out, error) -> Void in
+                guard let json = out as? [String:Any] else {
+                    responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                    return
+                }
+                var dev = device
+                if device_type == "Real5Qv2" {
+                    dev = "ibmqx2"
+                }
+                responseHandler(self._beautify_calibration(json, dev),error)
+            }
         }
     }
 
@@ -739,27 +713,29 @@ public final class IBMQuantumExperience {
      */
     public func device_parameters(_ device: String = "ibmqx2",
                                   responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
-        if !self._check_credentials() {
-            responseHandler([:],IBMQuantumExperienceError.missingTokenId)
-            return
-        }
-        guard let device_type = self._check_device(device, "calibration") else {
-            responseHandler(nil,IBMQuantumExperienceError.missingRealDevice(device: device))
-            return
-        }
-        self.req.get(path: "DeviceStats/statsByDevice/\(device_type)", params: "&raw=true") { (out, error) -> Void in
+        self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
-                DispatchQueue.main.async {
-                    responseHandler(out, error)
-                }
+                responseHandler(nil, error)
                 return
             }
-            var dev = device
-            if device_type == "Real5Qv2" {
-                dev = "ibmqx2"
+            guard let device_type = self._check_device(device, "calibration") else {
+                responseHandler(nil,IBMQuantumExperienceError.missingRealDevice(device: device))
+                return
             }
-            let ret = self._beautify_calibration_parameters(out, dev)
-            DispatchQueue.main.async {
+            self.req.get(path: "DeviceStats/statsByDevice/\(device_type)", params: "&raw=true") { (out, error) -> Void in
+                if error != nil {
+                    responseHandler(nil, error)
+                    return
+                }
+                guard let json = out as? [String:Any] else {
+                    responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                    return
+                }
+                var dev = device
+                if device_type == "Real5Qv2" {
+                    dev = "ibmqx2"
+                }
+                let ret = self._beautify_calibration_parameters(json, dev)
                 responseHandler(ret, error)
             }
         }
@@ -769,28 +745,28 @@ public final class IBMQuantumExperience {
      Get the devices availables to use in the QX Platform
      */
     public func available_devices(responseHandler: @escaping ((_:[[String:Any]]?, _:IBMQuantumExperienceError?) -> Void)) {
-        if !self._check_credentials() {
-            responseHandler(nil,IBMQuantumExperienceError.missingTokenId)
-            return
-        }
-        self.req.get(path: "Devices/list") { (out, error) -> Void in
+        self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
-                DispatchQueue.main.async {
+                responseHandler(nil, error)
+                return
+            }
+            self.req.get(path: "Devices/list") { (out, error) -> Void in
+                if error != nil {
                     responseHandler(nil, error)
+                    return
                 }
-                return
+                guard let devices_real = out as? [[String:Any]] else {
+                    responseHandler(nil,IBMQuantumExperienceError.missingDevices)
+                    return
+                }
+                var respond: [[String:Any]] = []
+                var sim: [String:Any] = [:]
+                sim["name"] = "simulator"
+                sim["type"] = "Simulator"
+                sim["num_qubits"] = 24
+                respond.append(sim)
+                self.available_devices(devices_real, respond, responseHandler)
             }
-            guard let devices_real = out as? [[String:Any]] else {
-                responseHandler(nil,IBMQuantumExperienceError.missingDevices)
-                return
-            }
-            var respond: [[String:Any]] = []
-            var sim: [String:Any] = [:]
-            sim["name"] = "simulator"
-            sim["type"] = "Simulator"
-            sim["num_qubits"] = 24
-            respond.append(sim)
-            self.available_devices(devices_real, respond, responseHandler)
         }
     }
 
@@ -798,9 +774,7 @@ public final class IBMQuantumExperience {
                                    _ respond: [[String:Any]],
                 _ responseHandler: @escaping ((_:[[String:Any]]?, _:IBMQuantumExperienceError?) -> Void)) {
         if devices.isEmpty {
-            DispatchQueue.main.async {
-                responseHandler(respond, nil)
-            }
+            responseHandler(respond, nil)
             return
         }
         var devs = devices
@@ -817,11 +791,13 @@ public final class IBMQuantumExperience {
                 real["name"] = "ibmqx2"
             }
         }
-        self.req.get(path: "Topologies/\(topologyId)") { (topology, error) -> Void in
+        self.req.get(path: "Topologies/\(topologyId)") { (out, error) -> Void in
             if error != nil {
-                DispatchQueue.main.async {
-                    responseHandler(nil, error)
-                }
+                responseHandler(nil, error)
+                return
+            }
+            guard let topology = out as? [String:Any] else {
+                responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
                 return
             }
             if let top = topology["topology"] as? [String:Any] {

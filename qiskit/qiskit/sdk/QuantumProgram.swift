@@ -113,7 +113,7 @@ public final class QuantumProgram {
             self.__api.device_status(device,responseHandler:responseHandler)
             return
         }
-        responseHandler([:],IBMQuantumExperienceError.errorDevice(device: device))
+        responseHandler(nil,IBMQuantumExperienceError.errorDevice(device: device))
     }
 
     /**
@@ -126,7 +126,7 @@ public final class QuantumProgram {
             self.__api.device_calibration(device,responseHandler:responseHandler)
             return
         }
-        responseHandler([:],IBMQuantumExperienceError.errorDevice(device: device))
+        responseHandler(nil,IBMQuantumExperienceError.errorDevice(device: device))
     }
 
     /**

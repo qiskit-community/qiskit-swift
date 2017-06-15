@@ -18,6 +18,7 @@ public enum IBMQuantumExperienceError: Error, CustomStringConvertible {
     case invalidHTTPResponse(response: URLResponse)
     case httpError(url: String, status: Int, msg: String)
     case nullResponseData(url: String)
+    case invalidResponseData
     case missingTokenId
     case missingJobId
     case missingExecutionId
@@ -43,6 +44,8 @@ public enum IBMQuantumExperienceError: Error, CustomStringConvertible {
             return "\(url) Http status: \(status); \(msg)"
         case .nullResponseData(let url):
             return url
+        case .invalidResponseData:
+            return "Invalid response data"
         case .missingTokenId():
             return "Missing TokenId"
         case .missingJobId():
