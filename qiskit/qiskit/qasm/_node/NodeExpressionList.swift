@@ -10,8 +10,18 @@ import Foundation
 
 @objc public class NodeExpressionList: Node {
 
-    public init(children: [Node]) {
+    public var expressionList: [Node]?
+    
+    public init(expression: Node, expressionList: Node?) {
         super.init(type: .N_EXPRESSIONLIST)
+        
+        if let exlist = expressionList as? NodeExpressionList {
+            if exlist.expressionList == nil {
+                exlist.expressionList = []
+            } else {
+                exlist.expressionList!.append(self)
+            }
+        }
     }
     
     override public func qasm() -> String {

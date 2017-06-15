@@ -10,14 +10,18 @@ import Foundation
 
 @objc public class NodeMixedList: Node {
 
-    var item1: Node?
-    var item2: Node?
-    var item3: Node?
-    public init(item1: Node?, item2: Node?, item3: Node?) {
+    public var mixedList: [Node]?
+
+    public init(listNode: Node?, item2: Node?, item3: Node?) {
         super.init(type: .N_MIXEDLIST)
-        self.item1 = item1
-        self.item2 = item2
-        self.item3 = item3
+
+        if let lst = listNode as? NodeMixedList {
+            if lst.mixedList == nil {
+                lst.mixedList = []
+            } else {
+                lst.mixedList!.append(self)
+            }
+        }
     }
     
     override public func qasm() -> String {

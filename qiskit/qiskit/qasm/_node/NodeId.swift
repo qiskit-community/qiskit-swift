@@ -10,9 +10,11 @@ import Foundation
 
 @objc public class NodeId: Node {
 
-    public init(name: String) {
+    public var identifier: String = ""
+    
+    public init(identifier: String) {
         super.init(type: .N_ID)
-        super.name = name
+        self.identifier = identifier
     }
     
     override public func qasm() -> String {

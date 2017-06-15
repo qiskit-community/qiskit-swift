@@ -20,17 +20,20 @@
 +(Node*) createDeclNode: (Node*) reg identifier: (Node*) ident nninteger: (Node*) nninteger;
 +(Node*) createGateDeclNode: (Node*) gate identifier: (Node*) ident idlist1: (Node*) idlist1 idlist2: (Node*) idlist2;
 +(Node*) createGoplistNode: (Node*) barrier uop: (Node*) uop idlist: (Node*) idlist goplist: (Node*) goplist;
++(Node*) createQopNode: (Node*) o1 object2: (Node*) o2 object3: (Node*) o3;
 +(Node*) createUniversalUnitary: (Node*) o1 object2: (Node*) o2 object3: (Node*) o3;
 +(Node*) createAnylistNode: (Node*) list;
 +(Node*) createIdlistNode: (Node*) i0 identifier: (Node*) identifier;
-+(Node*) createMixedlistNode: (Node*) i0 item2: (Node*) i1 item3: (Node*) i2;
++(Node*) createMixedlistNode: (Node*) listNode item2: (Node*) i1 item3: (Node*) i2;
 +(Node*) createIndexedIdNode: (Node*) identifier parameter: (Node*) nninteger;
-+(Node*) createExpressionList: (Node*) exp1 expression: (Node*) exp2;
++(Node*) createExpressionList: (Node*) exp1 explist: (Node*) explist;
 +(Node*) createBinaryOperation: (NSString*) op operand1: (Node*) o1 operand2: (Node*) o2;
 +(Node*) createPrefixOperation: (NSString*) op operand: (Node*) o;
+
 +(Node*) createIdNodeWithValue: (NSString*) value;
 +(Node*) createIntNodeWithValue: (int) value;
 +(Node*) createRealNodeWithValue: (float) value;
+
 +(Node*) createBarrierNode;
 +(Node*) createGateNode;
 +(Node*) createCRegNode;

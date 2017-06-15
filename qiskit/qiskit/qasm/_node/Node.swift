@@ -35,6 +35,7 @@ public enum NodeType: String {
     case N_MEASURE = "measure"
     case N_MIXEDLIST = "mixed_list"
     case N_OPAQUE = "opaque"
+    case N_QOP = "qop"
     case N_PREFIX = "prefix"
     case N_PRIMARYLIST = "primary_list"
     case N_PROGRAM = "program"

@@ -10,9 +10,10 @@ import Foundation
 
 @objc public class NodeNNInt: Node {
 
+    public var nninteger: Int = Int.allZeros
     public init(value: Int) {
         super.init(type: .N_INT)
-        super.value = "\(value)"
+        nninteger = value
     }
     
     override public func qasm() -> String {
