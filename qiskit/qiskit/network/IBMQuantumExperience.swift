@@ -665,7 +665,7 @@ public final class IBMQuantumExperience {
     /**
      Get the status of a chip
      */
-    func device_status(_ device: String = "ibmqx2",
+    public func device_status(_ device: String = "ibmqx2",
                        responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         guard let device_type = self._check_device(device, "status") else {
             responseHandler(nil,IBMQuantumExperienceError.missingDevice(device: device))
@@ -683,7 +683,7 @@ public final class IBMQuantumExperience {
     /**
      Get the calibration of a real chip
      */
-    func device_calibration(_ device: String = "ibmqx2",
+    public func device_calibration(_ device: String = "ibmqx2",
                             responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
