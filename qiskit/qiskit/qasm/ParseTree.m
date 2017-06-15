@@ -67,8 +67,8 @@
     return node;
 }
 
-+(Node*) createArgumentNode: (Node*) identifier parameter: (Node*) nninteger {
-    NodeArgument *node = [[NodeArgument alloc] initWithIdentifier:identifier parameter:nninteger];
++(Node*) createIndexedIdNode: (Node*) identifier parameter: (Node*) nninteger {
+    NodeIndexedId *node = [[NodeIndexedId alloc] initWithIdentifier:identifier parameter:nninteger];
     return node;
 }
 
@@ -119,6 +119,16 @@
 
 +(Node*) createQRegNode {
     NodeQreg *node = [[NodeQreg alloc] init];
+    return node;
+}
+
++(Node*) createCXNode {
+    NodeCnot *node = [[NodeCnot alloc] init];
+    return node;
+}
+
++(Node*) createUNode {
+    NodeU *node = [[NodeU alloc] init];
     return node;
 }
 

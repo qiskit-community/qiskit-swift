@@ -10,7 +10,9 @@ import Foundation
 
 @objc public class NodeExternal: Node {
 
-    public init(children: [Node]) {
+    static let externalFunctions = ["sin", "cos", "tan", "exp", "ln", "sqrt"]
+    
+    public init(operation: String) {
         super.init(type: .N_EXTERNAL)
     }
     

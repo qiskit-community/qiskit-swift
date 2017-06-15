@@ -24,7 +24,7 @@
 +(Node*) createAnylistNode: (Node*) list;
 +(Node*) createIdlistNode: (Node*) i0 identifier: (Node*) identifier;
 +(Node*) createMixedlistNode: (Node*) i0 item2: (Node*) i1 item3: (Node*) i2;
-+(Node*) createArgumentNode: (Node*) identifier parameter: (Node*) nninteger;
++(Node*) createIndexedIdNode: (Node*) identifier parameter: (Node*) nninteger;
 +(Node*) createExpressionList: (Node*) exp1 expression: (Node*) exp2;
 +(Node*) createBinaryOperation: (NSString*) op operand1: (Node*) o1 operand2: (Node*) o2;
 +(Node*) createPrefixOperation: (NSString*) op operand: (Node*) o;
@@ -35,6 +35,8 @@
 +(Node*) createGateNode;
 +(Node*) createCRegNode;
 +(Node*) createQRegNode;
++(Node*) createCXNode;
++(Node*) createUNode;
 +(Node*) createIfNode;
 +(Node*) createMagicNode;
 +(Node*) createMeasureNode;
