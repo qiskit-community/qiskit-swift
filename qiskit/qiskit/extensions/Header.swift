@@ -16,6 +16,9 @@ public final class Header: QuantumCircuitHeader {
 }
 
 extension QuantumCircuit {
+    convenience public init() {
+        self.init(Header())
+    }
     convenience public init(_ regs: [Register]) throws {
         try self.init(regs, Header())
     }

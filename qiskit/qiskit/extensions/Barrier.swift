@@ -21,14 +21,18 @@ public final class Barrier: Instruction {
         super.init("barrier", [], qargs, circuit)
     }
 
+    fileprivate init(_ qregs: [QuantumRegister], _ gate: CompositeGate) {
+        super.init("barrier", [], qregs, gate.circuit)
+    }
+
+    fileprivate init(_ qargs: [QuantumRegisterTuple], _ gate: CompositeGate) {
+        super.init("barrier", [], qargs, gate.circuit)
+    }
+
     public override var description: String {
         var text = "barrier "
-        for i in 0..<self.args.count {
-            if i > 0 {
-                text.append(",")
-            }
-            text.append(self.args[i].identifier)
-        }
+        let array = self.args.map {$0.identifier}
+        text.append(array.joined(separator: ","))
         return text
     }
 
@@ -63,11 +67,8 @@ extension QuantumCircuit {
     /**
      Apply barrier to QuantumRegister
      */
-    public func barrier(_ regs: [QuantumRegister]) throws -> Barrier {
-        var registers: [QuantumRegister] = []
-        for reg in regs {
-            registers.append(reg)
-        }
+    public func barrier(_ regs: [QuantumRegister] = []) throws -> Barrier {
+        var registers = regs
         if registers.isEmpty { //TODO: implement this for all single qubit gates
             for register in self.regs {
                 if register is QuantumRegister {
@@ -94,16 +95,12 @@ extension QuantumCircuit {
      Apply barrier to tuples (reg, idx)
      */
     public func barrier(_ qTuples: [QuantumRegisterTuple]) throws -> Barrier {
-        var tuples: [QuantumRegisterTuple] = []
-        for tuple in qTuples {
-            tuples.append(tuple)
-        }
         var qubits: [QuantumRegisterTuple] = []
-        if tuples.isEmpty { //TODO: implement this for all single qubit gates
+        if qTuples.isEmpty { //TODO: implement this for all single qubit gates
             var registers: [QuantumRegister] = []
-            for register in self.regs {
-                if register is QuantumRegister {
-                    registers.append(register as! QuantumRegister)
+            for reg in self.regs {
+                if let register = reg as? QuantumRegister {
+                    registers.append(register)
                 }
             }
             if registers.isEmpty {
@@ -118,12 +115,53 @@ extension QuantumCircuit {
             }
         }
         else {
-            for tuple_element in tuples {
+            for tuple_element in qTuples {
                 try self._check_qubit(tuple_element)
                 qubits.append(tuple_element)
             }
         }
         try QuantumCircuit._check_dups(qubits)
         return self._attach(Barrier(qubits, self)) as! Barrier
+    }
+}
+
+extension CompositeGate {
+
+    /**
+     Apply barrier to QuantumRegister
+     */
+    public func barrier(_ regs: [QuantumRegister] = []) throws -> Barrier {
+        if regs.isEmpty {
+            throw QISKitException.noarguments
+        }
+        var qubits: [QuantumRegisterTuple] = []
+        for register in regs {
+            for j in 0..<register.size {
+                let tuple_element = QuantumRegisterTuple(register,j)
+                try self._check_qubit(tuple_element)
+                qubits.append(tuple_element)
+            }
+        }
+        try QuantumCircuit._check_dups(qubits)
+        return self._attach(Barrier(qubits, self))
+    }
+
+    /**
+     Apply barrier to tuples (reg, idx)
+     */
+    public func barrier(_ qTuples: [QuantumRegisterTuple]) throws -> Barrier {
+        if qTuples.isEmpty {
+            throw QISKitException.noarguments
+        }
+        var qubits: [QuantumRegisterTuple] = []
+        if qTuples.isEmpty { //TODO: implement this for all single qubit gates
+            throw QISKitException.noarguments
+        }
+        for tuple_element in qTuples {
+            try self._check_qubit(tuple_element)
+            qubits.append(tuple_element)
+        }
+        try QuantumCircuit._check_dups(qubits)
+        return self._attach(Barrier(qubits, self))
     }
 }

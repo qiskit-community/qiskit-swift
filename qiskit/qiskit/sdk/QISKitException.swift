@@ -15,6 +15,7 @@ public enum QISKitException: Error, CustomStringConvertible {
 
     case intructionCircuitNil
     case regexists(name: String)
+    case regnotexists(name: String)
     case controlValueNegative
     case notcreg
     case regNotInCircuit(name: String)
@@ -47,6 +48,8 @@ public enum QISKitException: Error, CustomStringConvertible {
             return "Instruction's circuit not assigned"
         case .regexists(let name):
             return "register '\(name)'already exists"
+        case .regnotexists(let name):
+            return "register '\(name)'does not exist"
         case .controlValueNegative():
             return "control value should be non-negative"
         case .notcreg():

@@ -40,8 +40,8 @@ public final class QuantumCircuit: CustomStringConvertible {
         try self.add(regs)
     }
 
-    public init() {
-        self.header = QuantumCircuitHeader()
+    public init(_ header: QuantumCircuitHeader = QuantumCircuitHeader()) {
+        self.header = header
     }
 
     /**
