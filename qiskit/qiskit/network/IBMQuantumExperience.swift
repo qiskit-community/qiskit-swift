@@ -29,6 +29,10 @@ public final class IBMQuantumExperience {
         self.req = try Request(token,config)
     }
 
+    init() throws {
+        self.req = try Request()
+    }
+
     /**
      Check if the name of a device is valid to run in QX Platform
      */
@@ -101,21 +105,24 @@ public final class IBMQuantumExperience {
     /**
      Beautify the calibrations returned by QX platform
      */
-    private func _beautify_calibration_parameters(_ cals: [String:[[String:AnyObject]]], _ device: String) -> [String:AnyObject] {
-        var ret: [String:AnyObject] = [:]
-        ret["name"] = device as AnyObject
+    private func _beautify_calibration_parameters(_ cals: [String:Any], _ device: String) -> [String:Any] {
+        var ret: [String:Any] = [:]
+        ret["name"] = device 
         var calibration_date: String? = nil
-        var units: [String:AnyObject] = [:]
-        for (key,attrs) in cals {
+        var units: [String:Any] = [:]
+        for (key,val) in cals {
+            guard let attrs = val as? [[String:Any]] else {
+                continue
+            }
             if key == "fridge_temperature" {
                 for attr in attrs {
                     if let value = attr["value"] as? String {
-                        ret["fridgeTemperature"] = Double(value)! as AnyObject
+                        ret["fridgeTemperature"] = Double(value)! 
                         if var unit = attr["units"] as? String {
                             if unit == "Kelvin" {
                                 unit = "K"
                             }
-                            units["fridgeTemperature"] = unit as AnyObject
+                            units["fridgeTemperature"] = unit 
                         }
                     }
                     if let date = attr["date"] as? Double {
@@ -126,39 +133,39 @@ public final class IBMQuantumExperience {
             }
             if key.hasPrefix("Q") {
                 let new_key = "Q" + String(Int(key.replacingOccurrences(of:"Q", with: ""))! - 1)
-                var map: [String:AnyObject] = [:]
-                ret[new_key] = map as AnyObject
+                var map: [String:Any] = [:]
+                ret[new_key] = map 
                 for attr in attrs {
                     if let label = attr["label"] as? String {
                         if let value = attr["value"] as? String {
                             if label.hasPrefix("f") {
-                                map = ret[new_key] as! [String:AnyObject]
-                                map["frequency"] = Double(value)! as AnyObject
-                                ret[new_key] = map as AnyObject
+                                map = ret[new_key] as! [String:Any]
+                                map["frequency"] = Double(value)! 
+                                ret[new_key] = map 
                                 if let unit = attr["units"] as? Double {
-                                    units["frequency"] = String(unit) as AnyObject
+                                    units["frequency"] = String(unit) 
                                 }
                             }
                             if label.hasPrefix("t_1") {
-                                map = ret[new_key] as! [String:AnyObject]
-                                map["t1"] = Double(value)! as AnyObject
-                                ret[new_key] = map as AnyObject
+                                map = ret[new_key] as! [String:Any]
+                                map["t1"] = Double(value)! 
+                                ret[new_key] = map 
                                 if var unit = attr["units"] as? String {
                                     if unit == "microseconds" {
                                         unit = "us"
                                     }
-                                    units["tx"] = unit as AnyObject
+                                    units["tx"] = unit 
                                 }
                             }
                             if label.hasPrefix("t_2") {
-                                map = ret[new_key] as! [String:AnyObject]
-                                map["t2"] = Double(value)! as AnyObject
-                                ret[new_key] = map as AnyObject
+                                map = ret[new_key] as! [String:Any]
+                                map["t2"] = Double(value)! 
+                                ret[new_key] = map 
                                 if var unit = attr["units"] as? String {
                                     if unit == "microseconds" {
                                         unit = "us"
                                     }
-                                    units["tx"] = unit as AnyObject
+                                    units["tx"] = unit 
                                 }
                             }
                         }
@@ -172,22 +179,22 @@ public final class IBMQuantumExperience {
             }
         }
         if calibration_date != nil {
-            ret["coherenceStartTime"] = calibration_date! as AnyObject
+            ret["coherenceStartTime"] = calibration_date! 
         }
 
         // TODO: Get from new calibrations files
-        ret["singleQubitGateTime"] = Int(80) as AnyObject
-        ret["units"] = units as AnyObject
+        ret["singleQubitGateTime"] = Int(80) 
+        ret["units"] = units 
 
-        return ["backend": ret as AnyObject]
+        return ["backend": ret ]
     }
 
     /**
-     Beautify the calibrations returned by QX platform [[String:AnyObject]]
+     Beautify the calibrations returned by QX platform [[String:Any]]
      */
-    private func _beautify_calibration(_ cals: [String:AnyObject], _ device: String) -> [String:AnyObject] {
-        var ret: [String:AnyObject] = [:]
-        ret["name"] = device as AnyObject
+    private func _beautify_calibration(_ cals: [String:Any], _ device: String) -> [String:Any] {
+        var ret: [String:Any] = [:]
+        ret["name"] = device 
         var calibration_date: String? = nil
         var coupling_map: [String:[Int]] = [:]
         for (key,value) in cals {
@@ -201,16 +208,16 @@ public final class IBMQuantumExperience {
                 }
                 coupling_map[key_qubit]!.append(qubit_to)
                 let new_key = "CX" + String(qubit_from) + "_" + String(qubit_to)
-                var map: [String:AnyObject] = [:]
-                ret[new_key] = map as AnyObject
-                let attrs = value as! [[String:AnyObject]]
+                var map: [String:Any] = [:]
+                ret[new_key] = map 
+                let attrs = value as! [[String:Any]]
                 for attr in attrs {
                     if let label = attr["label"] as? String {
                         if label.hasPrefix("e_g") {
                             if let value = attr["value"] as? String {
-                                map = ret[new_key] as! [String:AnyObject]
-                                map["gateError"] = Double(value)! as AnyObject
-                                ret[new_key] = map as AnyObject
+                                map = ret[new_key] as! [String:Any]
+                                map["gateError"] = Double(value)! 
+                                ret[new_key] = map 
                             }
                         }
                     }
@@ -224,21 +231,21 @@ public final class IBMQuantumExperience {
             }
             if key.hasPrefix("Q") {
                 let new_key = "Q" + String(Int(key.replacingOccurrences(of:"Q", with:""))!-1)
-                var map: [String:AnyObject] = [:]
-                ret[new_key] = map as AnyObject
-                let attrs = value as! [[String:AnyObject]]
+                var map: [String:Any] = [:]
+                ret[new_key] = map 
+                let attrs = value as! [[String:Any]]
                 for attr in attrs {
                     if let label = attr["label"] as? String {
                         if let value = attr["value"] as? String {
                             if label.hasPrefix("e_g")  {
-                                map = ret[new_key] as! [String:AnyObject]
-                                map["gateError"] = Double(value)! as AnyObject
-                                ret[new_key] = map as AnyObject
+                                map = ret[new_key] as! [String:Any]
+                                map["gateError"] = Double(value)! 
+                                ret[new_key] = map 
                             }
                             if label.hasPrefix("e_r") {
-                                map = ret[new_key] as! [String:AnyObject]
-                                map["readoutError"] = Double(value)! as AnyObject
-                                ret[new_key] = map as AnyObject
+                                map = ret[new_key] as! [String:Any]
+                                map["readoutError"] = Double(value)! 
+                                ret[new_key] = map 
                             }
                         }
                     }
@@ -252,13 +259,13 @@ public final class IBMQuantumExperience {
             }
         }
         if calibration_date != nil {
-            ret["calibrationStartTime"] = calibration_date! as AnyObject
+            ret["calibrationStartTime"] = calibration_date! 
         }
         if !coupling_map.isEmpty {
-            ret["couplingMap"] = coupling_map as AnyObject
+            ret["couplingMap"] = coupling_map 
         }
 
-        return ["backend": ret as AnyObject]
+        return ["backend": ret ]
     }
 
     /**
@@ -267,8 +274,8 @@ public final class IBMQuantumExperience {
      - parameter idExecution: execution identifier
      - parameter responseHandler: Closure to be called upon completion
      */
-    public func getExecution(_ idExecution: String,
-                             responseHandler: @escaping ((_:GetExecutionResult?, _:IBMQuantumExperienceError?) -> Void)) {
+    public func get_execution(_ idExecution: String,
+                             responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
                 DispatchQueue.main.async {
@@ -283,21 +290,21 @@ public final class IBMQuantumExperience {
                     }
                     return
                 }
-                let execution = GetExecutionResult(out)
-                guard let codeId = execution.codeId else {
+                var execution = out
+                guard let codeId = execution["codeId"] as? String else {
                     DispatchQueue.main.async {
                         responseHandler(execution, error)
                     }
                     return
                 }
-                self.getCode(codeId) { (code, error) -> Void in
+                self.get_code(codeId) { (code, error) -> Void in
                     if error != nil {
                         DispatchQueue.main.async {
                             responseHandler(nil, error)
                         }
                         return
                     }
-                    let execution = GetExecutionResult(out, code)
+                    execution["code"] = code
                     DispatchQueue.main.async {
                         DispatchQueue.main.async {
                             responseHandler(execution, error)
@@ -314,8 +321,8 @@ public final class IBMQuantumExperience {
      - parameter idExecution: execution identifier
      - parameter responseHandler: Closure to be called upon completion
      */
-    public func getResultFromExecution(_ idExecution: String,
-                                       responseHandler: @escaping ((_:GetExecutionResult.Result?, _:IBMQuantumExperienceError?) -> Void)) {
+    public func get_result_from_execution(_ idExecution: String,
+                                          responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
                 DispatchQueue.main.async {
@@ -323,16 +330,29 @@ public final class IBMQuantumExperience {
                 }
                 return
             }
-            self.req.get(path: "Executions/\(idExecution)") { (out, error) -> Void in
+            self.req.get(path: "Executions/\(idExecution)") { (execution, error) -> Void in
                 if error != nil {
                     DispatchQueue.main.async {
                         responseHandler(nil, error)
                     }
                     return
                 }
-                let execution = GetExecutionResult(out)
+                var result: [String:Any] = [:]
+                if let executionResult = execution["result"] as? [String:Any] {
+                    if let data =  executionResult["data"] as? [String:Any] {
+                        if let p = data["p"] {
+                            result["measure"] = p
+                        }
+                        if let valsxyz = data["valsxyz"] {
+                            result["bloch"] = valsxyz
+                        }
+                        if let additionalData = data["additionalData"] {
+                            result["extraInfo"] = additionalData
+                        }
+                    }
+                }
                 DispatchQueue.main.async {
-                    responseHandler(execution.result, error)
+                    responseHandler(result, error)
                 }
             }
         }
@@ -344,7 +364,7 @@ public final class IBMQuantumExperience {
      - parameter idCode: code identifier
      - parameter responseHandler: Closure to be called upon completion
      */
-    private func getCode(_ idCode: String, responseHandler: @escaping ((_:[String:AnyObject], _:IBMQuantumExperienceError?) -> Void)) {
+    private func get_code(_ idCode: String, responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
                 DispatchQueue.main.async {
@@ -368,7 +388,7 @@ public final class IBMQuantumExperience {
                         return
                     }
                     var codeCopy = code
-                    codeCopy["executions"] = executions as AnyObject
+                    codeCopy["executions"] = executions 
                     DispatchQueue.main.async {
                         responseHandler(codeCopy, error)
                     }
@@ -383,8 +403,8 @@ public final class IBMQuantumExperience {
      - parameter idCode: Code Identifier
      - parameter responseHandler: Closure to be called upon completion
      */
-    public func getImageCode(_ idCode: String,
-                             responseHandler: @escaping ((_:[String:AnyObject]?, _:IBMQuantumExperienceError?) -> Void)) {
+    public func get_image_code(_ idCode: String,
+                             responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
                 DispatchQueue.main.async {
@@ -407,17 +427,9 @@ public final class IBMQuantumExperience {
     }
 
     /**
-     Runs an experiment. Asynchronous.
-
-     - parameter qasms: Array of qasm code string
-     - parameter backend: Backend type
-     - parameter shots:
-     - parameter name: Experiment name
-     - parameter timeout:
-     - parameter responseHandler: Closure to be called upon completion
+     Get the last codes of the user
      */
-    public func runExperiment(qasm: String, backend: String, shots: Int, name: String? = nil, timeout: Int = 60,
-                              responseHandler: @escaping ((_:RunExperimentResult?, _:IBMQuantumExperienceError?) -> Void)) {
+    public func get_last_codes(responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
                 DispatchQueue.main.async {
@@ -425,87 +437,31 @@ public final class IBMQuantumExperience {
                 }
                 return
             }
-            var data: [String : AnyObject] = [:]
-            var q: String = qasm.replacingOccurrences(of: "IBMQASM 2.0;", with: "")
-            q = q.replacingOccurrences(of: "OPENQASM 2.0;", with: "")
-            data["qasm"] = q as AnyObject
-            data["codeType"] = "QASM2" as AnyObject
-            if let n = name {
-                data["name"] = n as AnyObject
-            } else {
-                let date = Date()
-                let calendar = Calendar.current
-                let c = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
-                data["name"] = "Experiment #\(c.year!)\(c.month!)\(c.day!)\(c.hour!)\(c.minute!)\(c.second!))"
-                    as AnyObject
-            }
-            self.req.post(path: "codes/execute", params: "&shots=\(shots)&deviceRunType=\(backend)",
-            data: data) { (json, error) -> Void in
+            self.req.get(path: "users/\(self.req.credential.userId!)/codes/latest",
+                         params: "&includeExecutions=true") { (out, error) -> Void in
                 if error != nil {
                     DispatchQueue.main.async {
                         responseHandler(nil, error)
                     }
                     return
                 }
-                let runExperimentResult = RunExperimentResult(json)
-                guard let status = runExperimentResult.status else {
-                    DispatchQueue.main.async {
-                        responseHandler(nil, IBMQuantumExperienceError.missingStatus)
-                    }
-                    return
-                }
-                print("Status: \(status)")
-                if status == "DONE" {
-                    DispatchQueue.main.async {
-                        responseHandler(runExperimentResult, nil)
-                    }
-                    return
-                }
-                if status == "ERROR" {
-                    DispatchQueue.main.async {
-                        responseHandler(runExperimentResult, nil)
-                    }
-                    return
-                }
-                guard let executionId = runExperimentResult.executionId else {
-                    DispatchQueue.main.async {
-                        responseHandler(nil, IBMQuantumExperienceError.missingExecutionId)
-                    }
-                    return
-                }
-                self.getCompleteResultFromExecution(executionId, ((timeout > 300) ? 300 : timeout)) { (out, error) in
-                    if error != nil {
-                        DispatchQueue.main.async {
-                            responseHandler(nil, error)
-                        }
-                        return
-                    }
-                    guard let result = out else {
-                        DispatchQueue.main.async {
-                            responseHandler(nil, IBMQuantumExperienceError.missingStatus)
-                        }
-                        return
-                    }
-                    DispatchQueue.main.async {
-                        responseHandler(RunExperimentResult(result.json), error)
-                    }
+                DispatchQueue.main.async {
+                    responseHandler(out["codes"] as? [String:Any], error)
                 }
             }
         }
     }
 
     /**
-     Runs a job. Asynchronous.
-
-     - parameter qasms: Array of qasm code string
-     - parameter backend: Backend type
-     - parameter shots:
-     - parameter maxCredits:
-     - parameter responseHandler: Closure to be called upon completion
+     Runs an experiment. Asynchronous.
      */
-    public func run_job(qasms: [[String:AnyObject]], backend: String, shots: Int, maxCredits: Int,
-                       responseHandler: @escaping ((_:RunJobResult?, _:IBMQuantumExperienceError?) -> Void)) {
-
+    public func run_experiment(qasm: String,
+                               device: String = "simulator",
+                               shots: Int = 1,
+                               name: String? = nil,
+                               seed: Double? = nil,
+                               timeout: Int = 60,
+                               responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
                 DispatchQueue.main.async {
@@ -513,136 +469,130 @@ public final class IBMQuantumExperience {
                 }
                 return
             }
-            var data: [String : AnyObject] = [:]
-            var qasmArray: [[String:AnyObject]] = []
-            for var dict in qasms {
-                if var value = dict["qasm"] as? String {
-                    value = value.replacingOccurrences(of: "IBMQASM 2.0;", with: "")
-                    dict["qasm"] = value.replacingOccurrences(of: "OPENQASM 2.0;", with: "") as AnyObject
-                }
-                qasmArray.append(dict)
+            var data: [String : Any] = [:]
+            var q: String = qasm.replacingOccurrences(of: "IBMQASM 2.0;", with: "")
+            q = q.replacingOccurrences(of: "OPENQASM 2.0;", with: "")
+            data["qasm"] = q 
+            data["codeType"] = "QASM2" 
+            if let n = name {
+                data["name"] = n 
+            } else {
+                let date = Date()
+                let calendar = Calendar.current
+                let c = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
+                data["name"] = "Experiment #\(c.year!)\(c.month!)\(c.day!)\(c.hour!)\(c.minute!)\(c.second!))"
+                    
             }
-            data["qasms"] = qasmArray as AnyObject
-            data["shots"] = shots as AnyObject
-            data["maxCredits"] = maxCredits as AnyObject
-            var backendDict: [String:String] = [:]
-            backendDict["name"] = backend
-            data["backend"] = backendDict as AnyObject
-            self.req.post(path: "Jobs", data: data) { (json, error) -> Void in
-                DispatchQueue.main.async {
-                    responseHandler(RunJobResult(json), error)
-                }
-            }
-        }
-    }
-
-    /**
-     Gets job information. Asynchronous.
-
-     - parameter jobId: job identifier
-     - parameter responseHandler: Closure to be called upon completion
-     */
-    public func getJob(jobId: String, responseHandler: @escaping ((_:GetJobResult?, _:IBMQuantumExperienceError?) -> Void)) {
-        self.checkCredentials(request: self.req) { (error) -> Void in
-            if error != nil {
-                DispatchQueue.main.async {
-                    responseHandler(nil, error)
-                }
+            guard let device_type = self._check_device(device, "experiment") else {
+                responseHandler(nil,IBMQuantumExperienceError.missingDevice(device: device))
                 return
             }
-            self.req.get(path: "Jobs/\(jobId)") { (json, error) -> Void in
-                DispatchQueue.main.async {
-                    responseHandler(GetJobResult(json), error)
+            if !IBMQuantumExperience.__names_device_simulator.contains(device) && seed != nil {
+                responseHandler(nil,IBMQuantumExperienceError.errorSeed(device: device))
+                return
+            }
+            if seed != nil {
+                if String(seed!).characters.count >= 11 {
+                    responseHandler(nil,IBMQuantumExperienceError.errorSeedLength)
+                    return
+                }
+                self.req.post(path: "codes/execute",
+                              params: "&shots=\(shots)&seed=\(seed!)&deviceRunType=\(device_type)",
+                data: data) { (execution, error) -> Void in
+                    self.post_run_experiment(execution,error,timeout,responseHandler)
+                }
+            }
+            else {
+                self.req.post(path: "codes/execute",
+                              params: "&shots=\(shots)&deviceRunType=\(device_type)",
+                data: data) { (execution, error) -> Void in
+                    self.post_run_experiment(execution,error,timeout,responseHandler)
                 }
             }
         }
     }
 
-    /**
-     Runs a job and gets its information once its status changes from RUNNING. Asynchronous.
-
-     - parameter qasms: Array of qasm code string
-     - parameter Backend: Backend type
-     - parameter shots:
-     - parameter maxCredits:
-     - parameter wait: wait in seconds
-     - parameter timeout: timeout in seconds
-     - parameter responseHandler: Closure to be called upon completion
-     */
-    public func runJobToCompletion(qasms: [[String:AnyObject]], backend: String, shots: Int, maxCredits: Int,
-                                   wait: Int = 5, timeout: Int = 60,
-                                   responseHandler: @escaping ((_:GetJobResult?, _:IBMQuantumExperienceError?) -> Void)) {
-        self.run_job(qasms: qasms, backend: backend, shots: shots, maxCredits: maxCredits) { (out, error) in
-            if error != nil {
+    private func post_run_experiment(_ execution: [String:Any],
+                                     _ error:IBMQuantumExperienceError?,
+                                     _ timeout: Int,
+                                     _ responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
+        if error != nil {
+            DispatchQueue.main.async {
                 responseHandler(nil, error)
-                return
             }
-            guard let runJobResult = out else {
-                responseHandler(nil, IBMQuantumExperienceError.missingStatus)
-                return
-            }
-            guard let status = runJobResult.status else {
-                responseHandler(nil, IBMQuantumExperienceError.missingStatus)
-                return
-            }
-            print("Status: \(status)")
-            guard let jobid = runJobResult.jobId else {
-                responseHandler(nil, IBMQuantumExperienceError.missingJobId)
-                return
-            }
-            print("JobId: \(jobid)")
-
-            self.waitForJob(jobid, wait, timeout) { (result, error) in
-                responseHandler(result, error)
-            }
+            return
         }
-    }
+        var respond: [String:Any] = [:]
+        guard let statusMap = execution["status"] as? [String:Any] else {
+            DispatchQueue.main.async {
+                responseHandler(nil, IBMQuantumExperienceError.missingStatus)
+            }
+            return
+        }
+        guard let status = statusMap["id"] as? String else {
+            DispatchQueue.main.async {
+                responseHandler(nil, IBMQuantumExperienceError.missingStatus)
+            }
+            return
+        }
+        print("Status: \(status)")
+        guard let id_execution = execution["id"] as? String else {
+            DispatchQueue.main.async {
+                responseHandler(nil, IBMQuantumExperienceError.missingExecutionId)
+            }
+            return
+        }
+        var result: [String:Any] = [:]
+        respond["status"] = status
+        respond["idExecution"] = id_execution
+        respond["idCode"] = execution["codeId"]
 
-    /**
-     Gets job information once its status changes from RUNNING. Asynchronous.
-
-     - parameter jobId: job identifier
-     - parameter wait: wait in seconds
-     - parameter timeout: timeout in seconds
-     - parameter responseHandler: Closure to be called upon completion
-     */
-    public func waitForJob(_ jobId: String, _ wait: Int, _ timeout: Int,
-                           _ responseHandler: @escaping ((_:GetJobResult?, _:IBMQuantumExperienceError?) -> Void)) {
-        self.waitForJob(jobId, wait, timeout, 0, responseHandler)
-    }
-
-    private func waitForJob(_ jobId: String, _ wait: Int, _ timeout: Int, _ elapsed: Int,
-                            _ responseHandler: @escaping ((_:GetJobResult?, _:IBMQuantumExperienceError?) -> Void)) {
-        self.getJob(jobId: jobId) { (result, error) -> Void in
+        if status == "DONE" {
+            if let executionResult = execution["result"] as? [String:Any] {
+                if let data =  executionResult["data"] as? [String:Any] {
+                    if let additionalData = data["additionalData"] {
+                        result["extraInfo"] = additionalData
+                    }
+                    if let p = data["p"] {
+                        result["measure"] = p
+                    }
+                    if let valsxyz = data["valsxyz"] {
+                        result["bloch"] = valsxyz
+                    }
+                    respond["result"] = result
+                }
+            }
+            DispatchQueue.main.async {
+                responseHandler(respond, nil)
+            }
+            return
+        }
+        if status == "ERROR" {
+            DispatchQueue.main.async {
+                responseHandler(respond, nil)
+            }
+            return
+        }
+        self.getCompleteResultFromExecution(id_execution, ((timeout > 300) ? 300 : timeout)) { (out, error) in
             if error != nil {
-                responseHandler(result, error)
+                DispatchQueue.main.async {
+                    responseHandler(nil, error)
+                }
                 return
             }
-            guard let jobResult = result else {
-                responseHandler(result, IBMQuantumExperienceError.missingStatus)
-                return
-            }
-            guard let status = jobResult.status else {
-                responseHandler(result, IBMQuantumExperienceError.missingStatus)
-                return
-            }
-            if status != "RUNNING" {
-                responseHandler(result, nil)
-                return
-            }
-            if elapsed >= timeout {
-                responseHandler(result, IBMQuantumExperienceError.timeout)
-                return
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(wait)) {
-                self.waitForJob(jobId, wait, timeout, elapsed + wait, responseHandler)
+            DispatchQueue.main.async {
+                if let result = out {
+                    respond["status"] = "DONE"
+                    respond["result"] = result
+                }
+                responseHandler(respond, error)
             }
         }
     }
 
     private func getCompleteResultFromExecution(_ idExecution: String, _ timeOut: Int,
                                                 responseHandler:
-                                                @escaping ((_:GetExecutionResult.Result?, _:IBMQuantumExperienceError?) -> Void)) {
+        @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
                 DispatchQueue.main.async {
@@ -650,7 +600,7 @@ public final class IBMQuantumExperience {
                 }
                 return
             }
-            self.getResultFromExecution(idExecution) { (execution, error) -> Void in
+            self.get_result_from_execution(idExecution) { (execution, error) -> Void in
                 if error != nil {
                     DispatchQueue.main.async {
                         responseHandler(nil, error)
@@ -670,16 +620,95 @@ public final class IBMQuantumExperience {
     }
 
     /**
+     Runs a job. Asynchronous.
+     */
+    public func run_job(qasms: [[String:Any]],
+                        device: String = "simulator",
+                        shots: Int = 1,
+                        maxCredits: Int = 3,
+                        seed: Double? = nil,
+                        responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
+
+        self.checkCredentials(request: self.req) { (error) -> Void in
+            if error != nil {
+                DispatchQueue.main.async {
+                    responseHandler(nil, error)
+                }
+                return
+            }
+            var data: [String : Any] = [:]
+            var qasmArray: [[String:Any]] = []
+            for var dict in qasms {
+                if var value = dict["qasm"] as? String {
+                    value = value.replacingOccurrences(of: "IBMQASM 2.0;", with: "")
+                    dict["qasm"] = value.replacingOccurrences(of: "OPENQASM 2.0;", with: "") 
+                }
+                qasmArray.append(dict)
+            }
+            data["qasms"] = qasmArray 
+            data["shots"] = shots 
+            data["maxCredits"] = maxCredits
+
+            guard let device_type = self._check_device(device, "job") else {
+                responseHandler(nil,IBMQuantumExperienceError.missingDevice(device: device))
+                return
+            }
+            if !IBMQuantumExperience.__names_device_simulator.contains(device) && seed != nil {
+                responseHandler(nil,IBMQuantumExperienceError.errorSeed(device: device))
+                return
+            }
+            if seed != nil {
+                if String(seed!).characters.count >= 11 {
+                    responseHandler(nil,IBMQuantumExperienceError.errorSeedLength)
+                    return
+                }
+                data["seed"] = seed!
+            }
+            var backendDict: [String:String] = [:]
+            backendDict["name"] = device_type
+            data["backend"] = backendDict
+
+            self.req.post(path: "Jobs", data: data) { (json, error) -> Void in
+                DispatchQueue.main.async {
+                    responseHandler(json, error)
+                }
+            }
+        }
+    }
+
+    /**
+     Gets job information. Asynchronous.
+
+     - parameter jobId: job identifier
+     - parameter responseHandler: Closure to be called upon completion
+     */
+    public func get_job(jobId: String, responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
+        self.checkCredentials(request: self.req) { (error) -> Void in
+            if error != nil {
+                DispatchQueue.main.async {
+                    responseHandler(nil, error)
+                }
+                return
+            }
+            self.req.get(path: "Jobs/\(jobId)") { (json, error) -> Void in
+                DispatchQueue.main.async {
+                    responseHandler(json, error)
+                }
+            }
+        }
+    }
+
+    /**
      Get the status of a chip
      */
     func device_status(_ device: String = "ibmqx2",
-                       responseHandler: @escaping ((_:[String:AnyObject]?, _:IBMQuantumExperienceError?) -> Void)) {
+                       responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         guard let device_type = self._check_device(device, "status") else {
             responseHandler([:],IBMQuantumExperienceError.missingDevice(device: device))
             return
         }
         self.req.get(path:"Status/queue?device=\(device_type)",with_token: false) { (json, error) -> Void in
-            responseHandler(["available" : (json["state"] != nil) as AnyObject], error)
+            responseHandler(["available" : (json["state"] != nil) ], error)
         }
     }
 
@@ -687,7 +716,7 @@ public final class IBMQuantumExperience {
      Get the calibration of a real chip
      */
     func device_calibration(_ device: String = "ibmqx2",
-                            responseHandler: @escaping ((_:[String:AnyObject]?, _:IBMQuantumExperienceError?) -> Void)) {
+                            responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         if !self._check_credentials() {
             responseHandler([:],IBMQuantumExperienceError.missingTokenId)
             return
@@ -708,61 +737,102 @@ public final class IBMQuantumExperience {
     /**
      Get the parameters of calibration of a real chip
      */
-/*    public func device_parameters(_ device: String = "ibmqx2",
-                                  responseHandler: @escaping ((_:[String:AnyObject]?, _:IBMQuantumExperienceError?) -> Void)) {
+    public func device_parameters(_ device: String = "ibmqx2",
+                                  responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         if !self._check_credentials() {
             responseHandler([:],IBMQuantumExperienceError.missingTokenId)
             return
         }
-        let device_type = self._check_device(device, "calibration")
-        if device_type == nil {
-            respond = {}
-            respond["error"] = str("Device " +
-                    device +
-                    " not exits in Quantum Experience" +
-                    " Real Devices. Only allow ibmqx2")
-            return respond
+        guard let device_type = self._check_device(device, "calibration") else {
+            responseHandler(nil,IBMQuantumExperienceError.missingRealDevice(device: device))
+            return
         }
-        ret = self.req.get("/DeviceStats/statsByDevice/" + device_type,
-                            "&raw=true")
-        var dev = device
-        if device_type == "Real5Qv2" {
-            dev = "ibmqx2"
+        self.req.get(path: "DeviceStats/statsByDevice/\(device_type)", params: "&raw=true") { (out, error) -> Void in
+            if error != nil {
+                DispatchQueue.main.async {
+                    responseHandler(out, error)
+                }
+                return
+            }
+            var dev = device
+            if device_type == "Real5Qv2" {
+                dev = "ibmqx2"
+            }
+            let ret = self._beautify_calibration_parameters(out, dev)
+            DispatchQueue.main.async {
+                responseHandler(ret, error)
+            }
         }
-        ret = self._beautify_calibration_parameters(ret, dev)
-        return ret
     }
-*/
+
     /**
      Get the devices availables to use in the QX Platform
      */
-/*    public func available_devices(responseHandler: @escaping ((_:[String:AnyObject]?, _:IBMQuantumExperienceError?) -> Void)) {
+    public func available_devices(responseHandler: @escaping ((_:[[String:Any]]?, _:IBMQuantumExperienceError?) -> Void)) {
         if !self._check_credentials() {
-            responseHandler([:],IBMQuantumExperienceError.missingTokenId)
+            responseHandler(nil,IBMQuantumExperienceError.missingTokenId)
             return
         }
-        devices_real = self.req.get("/Devices/list")
-        respond = []
-        sim = {}
-        sim["name"] = "simulator"
-        sim["type"] = "Simulator"
-        sim["num_qubits"] = 24
-        respond.append(sim)
-        for device in devices_real {
-            real = {}
-            real["type"] = "Real"
-            real["name"] = device["serialNumber"]
-            if real["name"] == "Real5Qv2" {
+        self.req.get(path: "Devices/list") { (out, error) -> Void in
+            if error != nil {
+                DispatchQueue.main.async {
+                    responseHandler(nil, error)
+                }
+                return
+            }
+            guard let devices_real = out as? [[String:Any]] else {
+                responseHandler(nil,IBMQuantumExperienceError.missingDevices)
+                return
+            }
+            var respond: [[String:Any]] = []
+            var sim: [String:Any] = [:]
+            sim["name"] = "simulator"
+            sim["type"] = "Simulator"
+            sim["num_qubits"] = 24
+            respond.append(sim)
+            self.available_devices(devices_real, respond, responseHandler)
+        }
+    }
+
+    private func available_devices(_ devices: [[String:Any]],
+                                   _ respond: [[String:Any]],
+                _ responseHandler: @escaping ((_:[[String:Any]]?, _:IBMQuantumExperienceError?) -> Void)) {
+        if devices.isEmpty {
+            DispatchQueue.main.async {
+                responseHandler(respond, nil)
+            }
+            return
+        }
+        var devs = devices
+        let device = devs.remove(at: 0)
+        guard let topologyId = device["topologyId"] as? String else {
+            self.available_devices(devs,respond,responseHandler)
+            return
+        }
+        var real: [String:Any] = [:]
+        real["type"] = "Real"
+        real["name"] = device["serialNumber"]
+        if let n = real["name"] as? String {
+            if n == "Real5Qv2" {
                 real["name"] = "ibmqx2"
             }
-            topology = self.req.get("/Topologies/"+device["topologyId"])
-            if (("topology" in topology) and ("adjacencyMatrix" in topology["topology"])) {
-                real["topology"] = topology["topology"]["adjacencyMatrix"]
+        }
+        self.req.get(path: "Topologies/\(topologyId)") { (topology, error) -> Void in
+            if error != nil {
+                DispatchQueue.main.async {
+                    responseHandler(nil, error)
+                }
+                return
+            }
+            if let top = topology["topology"] as? [String:Any] {
+                if let adjacencyMatrix = top["adjacencyMatrix"] {
+                    real["topology"] = adjacencyMatrix
+                }
             }
             real["num_qubits"] = topology["qubits"]
-            respond.append(real)
+            var resp = respond
+            resp.append(real)
+            self.available_devices(devs,resp,responseHandler)
         }
-        return respond
     }
-*/
 }

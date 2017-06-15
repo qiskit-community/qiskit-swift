@@ -17,6 +17,16 @@ final class Request {
     let credential: Credentials
     private var urlSession: URLSession
 
+    init() throws {
+        self.credential = try Credentials()
+
+        let sessionConfig = URLSessionConfiguration.ephemeral
+        sessionConfig.allowsCellularAccess = true
+        sessionConfig.timeoutIntervalForRequest = Request.REACHTIMEOUT
+        sessionConfig.timeoutIntervalForResource = Request.CONNTIMEOUT
+        self.urlSession = URLSession(configuration: sessionConfig)
+    }
+
     init(_ token: String, _ config: Qconfig? = nil) throws {
         self.credential = try Credentials(token, config)
 
@@ -27,8 +37,8 @@ final class Request {
         self.urlSession = URLSession(configuration: sessionConfig)
     }
 
-    func post(path: String, params: String = "", data: [String : AnyObject] = [:],
-              responseHandler: @escaping ((_:[String:AnyObject], _:IBMQuantumExperienceError?) -> Void)) {
+    func post(path: String, params: String = "", data: [String : Any] = [:],
+              responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
         self.postInternal(path: path, params: params, data: data) { (json, error) in
             if error != nil {
                 if case IBMQuantumExperienceError.httpError(_, let status, _) = error! {
@@ -46,8 +56,8 @@ final class Request {
         }
     }
 
-    func postInternal(path: String, params: String = "", data: [String : AnyObject] = [:],
-                      responseHandler: @escaping ((_:[String:AnyObject], _:IBMQuantumExperienceError?) -> Void)) {
+    func postInternal(path: String, params: String = "", data: [String : Any] = [:],
+                      responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
         guard let token = self.credential.token else {
             responseHandler([:], IBMQuantumExperienceError.missingTokenId)
             return
@@ -61,8 +71,8 @@ final class Request {
         postInternal(url: url, data: data, responseHandler: responseHandler)
     }
 
-    func postInternal(url: URL, data: [String : AnyObject] = [:],
-                      responseHandler: @escaping ((_:[String:AnyObject], _:IBMQuantumExperienceError?) -> Void)) {
+    func postInternal(url: URL, data: [String : Any] = [:],
+                      responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
         print(url.absoluteString)
         var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData,
                                  timeoutInterval: Request.CONNTIMEOUT)
@@ -98,12 +108,12 @@ final class Request {
                     print(dataString)
                 }
                 guard let json = try JSONSerialization.jsonObject(with: data!, options: .allowFragments)
-                    as? [String : AnyObject] else {
+                    as? [String : Any] else {
                         responseHandler([:], IBMQuantumExperienceError.invalidHTTPResponse(response: response!))
                         return
                 }
                 var msg = ""
-                if let errorObj = json["error"] as? [String:AnyObject] {
+                if let errorObj = json["error"] as? [String:Any] {
                     if let status = errorObj["status"] as? Int {
                         msg.append("Status: \(status)")
                     }
@@ -128,7 +138,7 @@ final class Request {
     }
 
     func get(path: String, params: String = "", with_token: Bool = true,
-             responseHandler: @escaping ((_:[String:AnyObject], _:IBMQuantumExperienceError?) -> Void)) {
+             responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
         self.getInternal(path: path, params: params, with_token: with_token) { (json, error) in
             if error != nil {
                 if case IBMQuantumExperienceError.httpError(_, let status, _) = error! {
@@ -147,7 +157,7 @@ final class Request {
     }
 
     private func getInternal(path: String, params: String = "", with_token: Bool = true,
-                             responseHandler: @escaping ((_:[String:AnyObject], _:IBMQuantumExperienceError?) -> Void)) {
+                             responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
         var access_token = ""
         if with_token {
             if let token = self.credential.token {
@@ -190,12 +200,12 @@ final class Request {
                     print(dataString)
                 }
                 guard let json = try JSONSerialization.jsonObject(with: data!,
-                                    options: .allowFragments) as? [String : AnyObject] else {
+                                    options: .allowFragments) as? [String : Any] else {
                     responseHandler([:], IBMQuantumExperienceError.invalidHTTPResponse(response: response!))
                     return
                 }
                 var msg = ""
-                if let errorObj = json["error"] as? [String:AnyObject] {
+                if let errorObj = json["error"] as? [String:Any] {
                     if let status = errorObj["status"] as? Int {
                         msg.append("Status: \(status)")
                     }

@@ -50,7 +50,6 @@
 		69D310801ECA180500B3E752 /* CompositeGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D310731ECA180500B3E752 /* CompositeGate.swift */; };
 		69D310881ECA182000B3E752 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D310841ECA182000B3E752 /* Request.swift */; };
 		69D310891ECA182000B3E752 /* IBMQuantumExperience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D310851ECA182000B3E752 /* IBMQuantumExperience.swift */; };
-		69D3108A1ECA182000B3E752 /* IBMQuantumExperienceResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D310861ECA182000B3E752 /* IBMQuantumExperienceResults.swift */; };
 		69D3108B1ECA182000B3E752 /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D310871ECA182000B3E752 /* Credentials.swift */; };
 		69D3108D1ECA18B800B3E752 /* Measure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D3108C1ECA18B800B3E752 /* Measure.swift */; };
 		69D3108F1ECA192000B3E752 /* Instruction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D3108E1ECA192000B3E752 /* Instruction.swift */; };
@@ -179,7 +178,6 @@
 		69D310731ECA180500B3E752 /* CompositeGate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CompositeGate.swift; path = sdk/CompositeGate.swift; sourceTree = "<group>"; };
 		69D310841ECA182000B3E752 /* Request.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Request.swift; path = qiskit/network/Request.swift; sourceTree = SOURCE_ROOT; };
 		69D310851ECA182000B3E752 /* IBMQuantumExperience.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IBMQuantumExperience.swift; path = qiskit/network/IBMQuantumExperience.swift; sourceTree = SOURCE_ROOT; };
-		69D310861ECA182000B3E752 /* IBMQuantumExperienceResults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IBMQuantumExperienceResults.swift; path = qiskit/network/IBMQuantumExperienceResults.swift; sourceTree = SOURCE_ROOT; };
 		69D310871ECA182000B3E752 /* Credentials.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Credentials.swift; path = qiskit/network/Credentials.swift; sourceTree = SOURCE_ROOT; };
 		69D3108C1ECA18B800B3E752 /* Measure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Measure.swift; path = sdk/Measure.swift; sourceTree = "<group>"; };
 		69D3108E1ECA192000B3E752 /* Instruction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Instruction.swift; path = sdk/Instruction.swift; sourceTree = "<group>"; };
@@ -493,7 +491,6 @@
 				69D310841ECA182000B3E752 /* Request.swift */,
 				69D310851ECA182000B3E752 /* IBMQuantumExperience.swift */,
 				69FEC8371ECB37E0002324E2 /* IBMQuantumExperienceError.swift */,
-				69D310861ECA182000B3E752 /* IBMQuantumExperienceResults.swift */,
 				69D310871ECA182000B3E752 /* Credentials.swift */,
 			);
 			name = network;
@@ -696,7 +693,6 @@
 				69DE361B1ECD194600EC4756 /* U2.swift in Sources */,
 				69DE36091ECD152100EC4756 /* CXBase.swift in Sources */,
 				69DE360D1ECD155000EC4756 /* CZ.swift in Sources */,
-				69D3108A1ECA182000B3E752 /* IBMQuantumExperienceResults.swift in Sources */,
 				69DE360F1ECD188000EC4756 /* Iden.swift in Sources */,
 				DFB567121EEA1493004D2B65 /* NodeInclude.swift in Sources */,
 				DFB567101EE9C0F7004D2B65 /* NodeMainProgram.swift in Sources */,

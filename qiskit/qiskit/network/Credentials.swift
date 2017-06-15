@@ -12,7 +12,7 @@ final class Credentials {
 
     private let token_unique: String
     let config: Qconfig
-    private(set) var data_credentials: [String:AnyObject] = [:]
+    private(set) var data_credentials: [String:Any] = [:]
 
     var token: String? {
         return self.data_credentials["id"] as? String
@@ -21,6 +21,11 @@ final class Credentials {
         return self.data_credentials["userId"] as? String
     }
 
+    init() throws {
+        self.token_unique = ""
+        self.config = try Qconfig()
+    }
+    
     init(_ token: String, _ config: Qconfig? = nil) throws {
         self.token_unique = token
         if let c = config {
@@ -38,7 +43,7 @@ final class Credentials {
             return
         }
         request.postInternal(url: url,
-                     data: ["apiToken": (self.token_unique as AnyObject)]) { (json, error) -> Void in
+                             data: ["apiToken": self.token_unique]) { (json, error) -> Void in
             self.data_credentials = json
             responseHandler(error)
         }

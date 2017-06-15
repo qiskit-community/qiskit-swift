@@ -26,6 +26,9 @@ public enum IBMQuantumExperienceError: Error, CustomStringConvertible {
     case missingDevice(device: String)
     case missingRealDevice(device: String)
     case errorDevice(device: String)
+    case errorSeed(device: String)
+    case errorSeedLength
+    case missingDevices
     case internalError(error: Error)
 
     public var description: String {
@@ -56,6 +59,12 @@ public enum IBMQuantumExperienceError: Error, CustomStringConvertible {
             return "Device \(device) does not exits in Quantum Experience Real Devices. Only allow ibmqx2"
         case .errorDevice(let device):
             return "Device \(device) does not exits"
+        case .errorSeed(let device):
+            return "No seed allowed in \(device)"
+        case .errorSeedLength():
+            return "No seed allowed. Max 10 digits."
+        case .missingDevices():
+            return "Missing devices"
         case .internalError(let error):
             return error.localizedDescription
         }

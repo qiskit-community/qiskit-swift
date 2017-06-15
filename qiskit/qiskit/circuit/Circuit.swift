@@ -1790,12 +1790,12 @@ final class Circuit: NSCopying {
     /**
      Return a dictionary of circuit properties.
      */
-    func property_summary() throws -> [String:AnyObject] {
-        return [ "size": self.size() as AnyObject,
-                 "depth": try self.depth() as AnyObject,
-                 "width": self.width() as AnyObject,
-                 "bits":  self.num_cbits() as AnyObject,
-                 "factors": try self.num_tensor_factors() as AnyObject,
-                 "operations": try self.count_ops() as AnyObject ]
+    func property_summary() throws -> [String:Any] {
+        return [ "size": self.size(),
+                 "depth": try self.depth(),
+                 "width": self.width(),
+                 "bits":  self.num_cbits(),
+                 "factors": try self.num_tensor_factors(),
+                 "operations": try self.count_ops() ]
     }
 }

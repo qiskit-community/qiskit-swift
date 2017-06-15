@@ -69,7 +69,7 @@ import Foundation
 */
 final class SimulatorBackend: UnrollerBackend {
 
-    private var circuit: [String:AnyObject] = [:]
+    private var circuit: [String:Any] = [:]
     private var _number_of_qubits: Int = 0
     private var _number_of_cbits: Int = 0
     private var _qubit_order: [RegBit:Int] = [:]
@@ -90,7 +90,7 @@ final class SimulatorBackend: UnrollerBackend {
      basis is a list of operation name strings.
      */
     init(_ basis: [String] = []) {
-        self.circuit["qasm"] = [] as AnyObject
+        self.circuit["qasm"] = [] 
         self.basis = basis
     }
 
@@ -135,8 +135,8 @@ final class SimulatorBackend: UnrollerBackend {
             self._qubit_order[RegBit(name, j)] = self._number_of_qubits + j
         }
         self._number_of_qubits += size
-        self.circuit["number_of_qubits"] = self._number_of_qubits as AnyObject
-        self.circuit["qubit_order"] = self._qubit_order as AnyObject
+        self.circuit["number_of_qubits"] = self._number_of_qubits 
+        self.circuit["qubit_order"] = self._qubit_order 
         if self.trace {
             print("added \(size) qubits from qreg \(name) giving a total of \(self._number_of_qubits) qubits")
         }
@@ -153,8 +153,8 @@ final class SimulatorBackend: UnrollerBackend {
             self._cbit_order[RegBit(name, j)] = self._number_of_cbits + j
         }
         self._number_of_cbits += size
-        self.circuit["number_of_cbits"] = self._number_of_cbits as AnyObject
-        self.circuit["cbit_order"] = self._cbit_order as AnyObject
+        self.circuit["number_of_cbits"] = self._number_of_cbits 
+        self.circuit["cbit_order"] = self._cbit_order 
         if self.trace {
             print("added \(size) cbits from creg \(name) giving a total of \(self._number_of_cbits) cbits")
         }
@@ -192,8 +192,8 @@ final class SimulatorBackend: UnrollerBackend {
             }
             let qubit_indices = [self._qubit_order[qubit]!]
             self._operation_order += 1
-            self.circuit["number_of_operations"] = self._operation_order as AnyObject
-            var array: [AnyObject] = self.circuit["qasm"] as! [AnyObject]
+            self.circuit["number_of_operations"] = self._operation_order 
+            var array: [Any] = self.circuit["qasm"] as! [Any]
             array.append([
                 "gate_size" : 1,
                 "name" : "U",
@@ -201,8 +201,8 @@ final class SimulatorBackend: UnrollerBackend {
                 "phi" : arg.1,
                 "lambda" : arg.2,
                 "qubit_indices": qubit_indices
-                ] as AnyObject)
-            self.circuit["qasm"] = array as AnyObject
+                ] )
+            self.circuit["qasm"] = array 
         }
     }
 
@@ -229,14 +229,14 @@ final class SimulatorBackend: UnrollerBackend {
             }
             let qubit_indices = [self._qubit_order[qubit0]!, self._qubit_order[qubit1]!]
             self._operation_order += 1
-            self.circuit["number_of_operations"] = self._operation_order as AnyObject
-            var array: [AnyObject] = self.circuit["qasm"] as! [AnyObject]
+            self.circuit["number_of_operations"] = self._operation_order 
+            var array: [Any] = self.circuit["qasm"] as! [Any]
             array.append([
                 "gate_size": 2,
                 "name": "CX",
                 "qubit_indices": qubit_indices,
-                ] as AnyObject)
-            self.circuit["qasm"] = array as AnyObject
+                ] )
+            self.circuit["qasm"] = array 
         }
     }
 
@@ -247,16 +247,16 @@ final class SimulatorBackend: UnrollerBackend {
      */
     func measure(_ qubit: RegBit, _ cbit: RegBit) throws {
         self._operation_order += 1
-        self.circuit["number_of_operations"] = self._operation_order as AnyObject
+        self.circuit["number_of_operations"] = self._operation_order 
         let qubit_indices = [self._qubit_order[qubit]!]
         let cbit_indices = [self._cbit_order[cbit]!]
-        var array: [AnyObject] = self.circuit["qasm"] as! [AnyObject]
+        var array: [Any] = self.circuit["qasm"] as! [Any]
         array.append([
             "name": "measure",
             "qubit_indices": qubit_indices,
             "cbit_indices": cbit_indices
-        ] as AnyObject)
-        self.circuit["qasm"] = array as AnyObject
+        ] )
+        self.circuit["qasm"] = array 
         if self.trace {
             print("measure \(qubit.description) -> \(cbit.description);")
         }
@@ -276,14 +276,14 @@ final class SimulatorBackend: UnrollerBackend {
      */
     func reset(_ qubit: RegBit) throws {
         self._operation_order += 1
-        self.circuit["number_of_operations"] = self._operation_order as AnyObject
+        self.circuit["number_of_operations"] = self._operation_order 
         let qubit_indices = [self._qubit_order[qubit]!]
-        var array: [AnyObject] = self.circuit["qasm"] as! [AnyObject]
+        var array: [Any] = self.circuit["qasm"] as! [Any]
         array.append([
             "name": "reset",
             "qubit_indices" : qubit_indices
-        ] as AnyObject)
-        self.circuit["qasm"] = array as AnyObject
+        ] )
+        self.circuit["qasm"] = array 
         if self.trace {
             print("reset \(qubit.description);")
         }

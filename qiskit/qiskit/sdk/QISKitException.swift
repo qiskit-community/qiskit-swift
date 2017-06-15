@@ -38,6 +38,7 @@ public enum QISKitException: Error, CustomStringConvertible {
     case timeout
     case errorStatus(status: String)
     case errorLocalSimulator
+    case missingJobId
     case internalError(error: Error)
 
     public var description: String {
@@ -92,6 +93,8 @@ public enum QISKitException: Error, CustomStringConvertible {
             return "status: \(status)"
         case .errorLocalSimulator():
             return "Not a local simulator"
+        case .missingJobId():
+            return "Missing JobId"
         case .internalError(let error):
             return error.localizedDescription
         }
