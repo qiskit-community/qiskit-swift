@@ -59,7 +59,7 @@ class QiskitTests: XCTestCase {
             _ = try circuit.measure(q[3], c[3])
             _ = try circuit.measure(q[4], c[4])
 
-            XCTAssertEqual(str, circuit.qasm)
+            XCTAssertEqual(str, circuit.qasm())
             //try self.runJob(circuit,"simulator")
         } catch let error {
             XCTFail("\(error)")
@@ -86,7 +86,7 @@ class QiskitTests: XCTestCase {
             _ = try circuit.measure(q[0], c[0])
             _ = try circuit.measure(q[2], c[1])
 
-            XCTAssertEqual(str, circuit.qasm)
+            XCTAssertEqual(str, circuit.qasm())
         } catch let error {
             XCTFail("\(error)")
         }
@@ -178,7 +178,7 @@ class QiskitTests: XCTestCase {
             }
             _ = try circuit.measure(cout[0], ans[4])
 
-            XCTAssertEqual(str, circuit.qasm)
+            XCTAssertEqual(str, circuit.qasm())
             //try self.runJob(circuit,"simulator")
          } catch let error {
             XCTFail("\(error)")
@@ -244,81 +244,26 @@ class QiskitTests: XCTestCase {
             _ = try circuit.h(q[3])
             _ = try circuit.measure(q[3], c3[0])
 
-            XCTAssertEqual(str, circuit.qasm)
+            XCTAssertEqual(str, circuit.qasm())
             //try self.runJob(circuit,"simulator")
          } catch let error {
             XCTFail("\(error)")
          }
     }
 
-    private func runJob(_ circuit: QuantumCircuit, _ backend: String) throws {
-        var compile = QuantumProgram.QASMCompile()
-        compile.backend = backend
-        let config = try Qconfig(apiToken: QiskitTests.APItoken, url: QiskitTests.TESTURL)
-        let program = QuantumProgram(config, compile, circuit)
+    private func runJob(_ qConfig: Qconfig, _ circuit: QuantumCircuit, _ device: String) throws {
+        let qp = try QuantumProgram()
+        _ = qp.add_circuit("circuit",circuit)
+        try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
 
         let asyncExpectation = self.expectation(description: "runJob")
-        program.run { (result, error) in
+        qp.execute(["circuit"], device: device) { (result, error) in
             if error != nil {
                 XCTFail("Failure in runJob: \(error!)")
                 asyncExpectation.fulfill()
                 return
             }
-            guard let jobResult = result else {
-                XCTFail("Missing qasms array")
-                asyncExpectation.fulfill()
-                return
-            }
-            guard let qasms = jobResult.qasms else {
-                XCTFail("Missing qasms array")
-                asyncExpectation.fulfill()
-                return
-            }
-            if qasms.isEmpty {
-                XCTFail("Empty qasms array")
-                asyncExpectation.fulfill()
-                return
-            }
-            let qasm = qasms[0]
-            guard let result = qasm.result else {
-                XCTFail("Missing qasm result")
-                asyncExpectation.fulfill()
-                return
-            }
-            guard let data = result.data else {
-                XCTFail("Missing qasm result data")
-                asyncExpectation.fulfill()
-                return
-            }
-            guard let counts = data.counts else {
-                XCTFail("Missing qasm result data counts")
-                asyncExpectation.fulfill()
-                return
-            }
-            print("Counts: \(counts)")
-            guard let idExecution = qasm.executionId else {
-                XCTFail("Missing qasm executionId")
-                asyncExpectation.fulfill()
-                return
-            }
-            program.getExecution(idExecution) { (execution, error) in
-                if error != nil {
-                    XCTFail("Failure in runJob: \(error!)")
-                    asyncExpectation.fulfill()
-                    return
-                }
-                print("Execution: \(execution!)")
-                program.getResultFromExecution(idExecution) { (result, error) in
-                    defer {
-                        asyncExpectation.fulfill()
-                    }
-                    if error != nil {
-                        XCTFail("Failure in runJob: \(error!)")
-                        return
-                    }
-                    print("Result: \(result!)")
-                }
-            }
+            print(result!)
         }
         self.waitForExpectations(timeout: 180, handler: { (error) in
             XCTAssertNil(error, "Failure in runJob")

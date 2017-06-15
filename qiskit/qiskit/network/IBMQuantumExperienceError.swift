@@ -18,11 +18,18 @@ public enum IBMQuantumExperienceError: Error, CustomStringConvertible {
     case invalidHTTPResponse(response: URLResponse)
     case httpError(url: String, status: Int, msg: String)
     case nullResponseData(url: String)
+    case invalidResponseData
     case missingTokenId
     case missingJobId
     case missingExecutionId
     case missingStatus
     case timeout
+    case missingDevice(device: String)
+    case missingRealDevice(device: String)
+    case errorDevice(device: String)
+    case errorSeed(device: String)
+    case errorSeedLength
+    case missingDevices
     case internalError(error: Error)
 
     public var description: String {
@@ -37,6 +44,8 @@ public enum IBMQuantumExperienceError: Error, CustomStringConvertible {
             return "\(url) Http status: \(status); \(msg)"
         case .nullResponseData(let url):
             return url
+        case .invalidResponseData:
+            return "Invalid response data"
         case .missingTokenId():
             return "Missing TokenId"
         case .missingJobId():
@@ -47,6 +56,18 @@ public enum IBMQuantumExperienceError: Error, CustomStringConvertible {
             return "Missing Status"
         case .timeout():
             return "Timeout"
+        case .missingDevice(let device):
+            return "Device \(device) does not exits in Quantum Experience. Only allow ibmqx2 or simulator"
+        case .missingRealDevice(let device):
+            return "Device \(device) does not exits in Quantum Experience Real Devices. Only allow ibmqx2"
+        case .errorDevice(let device):
+            return "Device \(device) does not exits"
+        case .errorSeed(let device):
+            return "No seed allowed in \(device)"
+        case .errorSeedLength():
+            return "No seed allowed. Max 10 digits."
+        case .missingDevices():
+            return "Missing devices"
         case .internalError(let error):
             return error.localizedDescription
         }

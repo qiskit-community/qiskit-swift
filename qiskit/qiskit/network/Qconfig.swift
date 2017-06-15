@@ -18,10 +18,10 @@ public final class Qconfig {
     /// Target URL
     public var url: URL
     /// User API Token
-    public var apiToken: String
+    public var APItoken: String
 
-    public init(apiToken: String = "", url: String = BASEURL) throws {
-        self.apiToken = apiToken
+    public init(APItoken: String = "", url: String = BASEURL) throws {
+        self.APItoken = APItoken
         guard let u = URL(string: url) else {
             throw IBMQuantumExperienceError.invalidURL(url: url)
         }
