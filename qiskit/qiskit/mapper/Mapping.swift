@@ -595,6 +595,7 @@ final class Mapping {
         print("solutions=", solutions)
         print("deltas=", deltas)
         assert (false, "Error! No solution found. This should not happen.")
+        return (0.0,0.0,0.0)
     }
 
     /**

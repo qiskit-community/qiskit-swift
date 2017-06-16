@@ -692,6 +692,7 @@ public final class QuantumProgram {
                          _ job_result: [String: Any]) throws {
         guard let qasms = job_result["qasms"] as? [[String:Any]] else {
             assert(false, "Internal error in QuantumProgram.run(), job_result")
+            return
         }
         assert(toExecute.count == qasms.count, "Internal error in QuantumProgram.run(), job_result")
 
