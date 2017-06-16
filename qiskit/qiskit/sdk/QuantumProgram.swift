@@ -132,7 +132,7 @@ public final class QuantumProgram {
     /**
      Create a new set of Quantum Register
      */
-    private func create_quantum_registers(_ name: String, _ size: Int) throws -> QuantumRegister {
+    public func create_quantum_registers(_ name: String, _ size: Int) throws -> QuantumRegister {
         try self.__quantum_registers[name] = QuantumRegister(name, size)
         return self.__quantum_registers[name]!
     }
@@ -140,7 +140,7 @@ public final class QuantumProgram {
     /**
      Create a new set of Quantum Registers based in a array of that
      */
-    private func create_quantum_registers_group(_ registers_array:[Any]) throws -> [QuantumRegister] {
+    public func create_quantum_registers_group(_ registers_array:[Any]) throws -> [QuantumRegister] {
         var new_registers:[QuantumRegister] = []
         for reg in registers_array {
             if let register = reg as? [String:Any] {
@@ -157,7 +157,7 @@ public final class QuantumProgram {
     /**
      Create a new set of Classical Registers
      */
-    private func  create_classical_registers(_ name: String, _ size: Int) throws -> ClassicalRegister {
+    public func  create_classical_registers(_ name: String, _ size: Int) throws -> ClassicalRegister {
         try self.__classical_registers[name] = ClassicalRegister(name, size)
         return self.__classical_registers[name]!
     }
@@ -185,16 +185,49 @@ public final class QuantumProgram {
      qregisters is a Array of Quantum Registers
      cregisters is a Array of Classical Registers
      */
-    private func create_circuit(name: String,
-                                qregisters: [QuantumRegister] = [],
-                                cregisters: [ClassicalRegister] = [],
-                                circuit_object: QuantumCircuit = QuantumCircuit()) throws -> QuantumCircuit {
+    public func create_circuit(_ name: String,
+                               _ qregisters: [QuantumRegister] = [],
+                               _ cregisters: [ClassicalRegister] = [],
+                               _ circuit_object: QuantumCircuit = QuantumCircuit()) throws -> QuantumCircuit {
         self.__quantum_program.circuits[name] = QCircuit(name, circuit_object)
 
         for register in qregisters {
+            if self.__quantum_registers[register.name] == nil {
+                throw QISKitException.regnotexists(name: register.name)
+            }
             try self.__quantum_program.circuits[name]!.circuit.add([register])
         }
         for register in cregisters {
+            if self.__classical_registers[register.name] == nil {
+                throw QISKitException.regnotexists(name: register.name)
+            }
+            try self.__quantum_program.circuits[name]!.circuit.add([register])
+        }
+        return self.__quantum_program.circuits[name]!.circuit
+    }
+
+    /**
+     Create a new Quantum Circuit into the Quantum Program
+     name is a string, the name of the circuit
+     qregisters is a Array of Quantum Registers names
+     cregisters is a Array of Classical Registers names
+     */
+    public func create_circuit(_ name: String,
+                               _ qregisters: [String] = [],
+                               _ cregisters: [String] = [],
+                               _ circuit_object: QuantumCircuit = QuantumCircuit()) throws -> QuantumCircuit {
+        self.__quantum_program.circuits[name] = QCircuit(name, circuit_object)
+
+        for regName in qregisters {
+            guard let register = self.__quantum_registers[regName] else {
+                throw QISKitException.regnotexists(name: regName)
+            }
+            try self.__quantum_program.circuits[name]!.circuit.add([register])
+        }
+        for regName in cregisters {
+            guard let register = self.__classical_registers[regName] else {
+                throw QISKitException.regnotexists(name: regName)
+            }
             try self.__quantum_program.circuits[name]!.circuit.add([register])
         }
         return self.__quantum_program.circuits[name]!.circuit
@@ -293,7 +326,7 @@ public final class QuantumProgram {
                     if let n = circuit["name"] as? String {
                         name = n
                     }
-                    self.__init_circuit = try self.create_circuit(name:name,qregisters:quantumr,cregisters:classicalr)
+                    self.__init_circuit = try self.create_circuit(name,quantumr,classicalr)
                 }
             }
             return
@@ -320,7 +353,7 @@ public final class QuantumProgram {
             if let n = specs["name"] as? String {
                 name = n
             }
-            _ = try self.create_circuit(name:name,qregisters:[qReg!], cregisters:[cReg!])
+            _ = try self.create_circuit(name,[qReg!],[cReg!])
         }
     }
 
@@ -659,6 +692,7 @@ public final class QuantumProgram {
                          _ job_result: [String: Any]) throws {
         guard let qasms = job_result["qasms"] as? [[String:Any]] else {
             assert(false, "Internal error in QuantumProgram.run(), job_result")
+            return
         }
         assert(toExecute.count == qasms.count, "Internal error in QuantumProgram.run(), job_result")
 

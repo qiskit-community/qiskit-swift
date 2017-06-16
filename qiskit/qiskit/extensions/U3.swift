@@ -14,7 +14,7 @@ import Foundation
 public final class U3Gate: Gate {
 
     fileprivate init(_ theta: Double, _ phi: Double, _ lam: Double, _ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) {
-        super.init("u2", [theta,phi,lam], [qubit], circuit)
+        super.init("u3", [theta,phi,lam], [qubit], circuit)
     }
 
     public override var description: String {

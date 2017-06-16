@@ -23,9 +23,9 @@ public final class TGate: CompositeGate {
         let qubit = u1Gate.args[0] as! QuantumRegisterTuple
         let phi: Double = u1Gate.params[0]
         if phi > 0 {
-            return self.data[0]._qasmif("\(self.name) \(qubit.identifier);")
+            return self.data[0]._qasmif("\(self.name) \(qubit.identifier)")
         }
-        return self.data[0]._qasmif("tdg \(qubit.identifier);")
+        return self.data[0]._qasmif("tdg \(qubit.identifier)")
     }
 
 

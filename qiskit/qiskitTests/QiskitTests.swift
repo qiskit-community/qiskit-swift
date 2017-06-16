@@ -251,6 +251,98 @@ class QiskitTests: XCTestCase {
          }
     }
 
+    func test4developers() {
+        do {
+            let str: String =
+            "OPENQASM 2.0;\n" +
+            "include \"qelib1.inc\";\n" +
+            "qreg qr[4];\n" +
+            "creg cr[4];\n" +
+            "h qr[0];\n" +
+            "x qr[1];\n" +
+            "y qr[2];\n" +
+            "z qr[3];\n" +
+            "cx qr[0],qr[2];\n" +
+            "barrier qr[0],qr[1],qr[2],qr[3];\n" +
+            "u1(0.300000000000000) qr[0];\n" +
+            "u2(0.300000000000000,0.200000000000000) qr[1];\n" +
+            "u3(0.300000000000000,0.200000000000000,0.100000000000000) qr[2];\n" +
+            "s qr[0];\n" +
+            "t qr[1];\n" +
+            "id qr[1];\n" +
+            "measure qr[0] -> cr[0];"
+
+            let Q_program = try QuantumProgram()
+            _ = try Q_program.create_quantum_registers("qr", 4)
+            _ = try Q_program.create_classical_registers("cr", 4)
+            _ = try Q_program.create_circuit("Circuit", ["qr"], ["cr"])
+            guard let circuit = Q_program.get_circuit("Circuit") else {
+                XCTFail("Missing circuit")
+                return
+            }
+            guard let quantum_r = Q_program.get_quantum_registers("qr") else {
+                XCTFail("Missing quantum register")
+                return
+            }
+            guard let classical_r = Q_program.get_classical_registers("cr") else {
+                XCTFail("Missing classical register")
+                return
+            }
+
+            // H (Hadamard) gate to the qubit 0 in the Quantum Register "qr"
+            _ = try circuit.h(quantum_r[0])
+
+            // Pauli X gate to the qubit 1 in the Quantum Register "qr"
+            _ = try circuit.x(quantum_r[1])
+
+            // Pauli Y gate to the qubit 2 in the Quantum Register "qr"
+            _ = try circuit.y(quantum_r[2])
+
+            // Pauli Z gate to the qubit 3 in the Quantum Register "qr"
+            _ = try circuit.z(quantum_r[3])
+
+            // CNOT (Controlled-NOT) gate from qubit 0 to the Qbit 2
+            _ = try circuit.cx(quantum_r[0], quantum_r[2])
+
+            // add a barrier to your circuit
+            _ = try circuit.barrier()
+
+            // first physical gate: u1(lambda) to qubit 0
+            _ = try circuit.u1(0.3, quantum_r[0])
+
+            // second physical gate: u2(phi,lambda) to qubit 1
+            _ = try circuit.u2(0.3, 0.2, quantum_r[1])
+
+            // second physical gate: u3(theta,phi,lambda) to qubit 2
+            _ = try circuit.u3(0.3, 0.2, 0.1, quantum_r[2])
+
+            // S Phase gate to qubit 0
+            _ = try circuit.s(quantum_r[0])
+
+            // T Phase gate to qubit 1
+            _ = try circuit.t(quantum_r[1])
+
+            // identity gate to qubit 1
+            _ = try circuit.iden(quantum_r[1])
+
+            // Note: "if" is not implemented in the local simulator right now,
+            //       so we comment it out here. You can uncomment it and
+            //       run in the online simulator if you'd like.
+
+            // Classical if, from qubit2 gate Z to classical bit 1
+            // circuit.z(quantum_r[2]).c_if(classical_r, 0)
+            
+            // measure gate from the qubit 0 to classical bit 0
+            _ = try circuit.measure(quantum_r[0], classical_r[0])
+            
+            let QASM_source = try Q_program.get_qasm("Circuit")
+
+            XCTAssertEqual(str, QASM_source)
+        } catch let error {
+            XCTFail("\(error)")
+        }
+    }
+
     private func runJob(_ qConfig: Qconfig, _ circuit: QuantumCircuit, _ device: String) throws {
         let qp = try QuantumProgram()
         _ = qp.add_circuit("circuit",circuit)

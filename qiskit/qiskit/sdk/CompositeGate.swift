@@ -13,7 +13,7 @@ import Foundation
  */
 public class CompositeGate: Gate {
 
-    private(set) var data: [Gate] = []  // gate sequence defining the composite unitary
+    private(set) var data: [Instruction] = []  // gate sequence defining the composite unitary
     private var inverse_flag = false
 
     public override init(_ name: String, _ params: [Double], _ qargs: [QuantumRegister], _ circuit: QuantumCircuit?) {
@@ -65,6 +65,14 @@ public class CompositeGate: Gate {
     }
 
     /**
+     Attach barrier.
+     */
+    public func _attach(_ barrier: Barrier) -> Barrier {
+        self.data.append(barrier)
+        return barrier
+    }
+
+    /**
      Raise exception if q is not an argument or not qreg in circuit.
      */
     public func _check_qubit(_ qubit: QuantumRegisterTuple) throws {
@@ -101,7 +109,7 @@ public class CompositeGate: Gate {
      Invert this gate.
      */
     public override func inverse() -> Gate {
-        var array:[Gate] = []
+        var array:[Instruction] = []
         for gate in self.data.reversed() {
             array.append(gate.inverse())
         }
@@ -114,7 +122,7 @@ public class CompositeGate: Gate {
      Add controls to this gate.
      */
     public override func q_if(_ qregs:[QuantumRegister]) -> CompositeGate {
-        var array:[Gate] = []
+        var array:[Instruction] = []
         for gate in self.data {
             array.append(gate.q_if(qregs))
         }
