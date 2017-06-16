@@ -141,7 +141,7 @@ anylist: idlist { $$ = [ParseTree createAnylistNode: $1]; }
 idlist: id { $$ = [ParseTree createIdlistNode: nil identifier: $1]; }
 | idlist ',' id { $$ = [ParseTree createIdlistNode: $1 identifier: $3]; }
 
-mixedlist: argument { $$ = $1; }
+mixedlist: argument { $$ = [ParseTree createMixedlistNode: nil idlist: nil argument: $1]; }
 | mixedlist ',' argument { $$ = [ParseTree createMixedlistNode: $1 idlist: nil argument: $3]; }
 | idlist ',' argument { $$ = [ParseTree createMixedlistNode: nil idlist: $1 argument: $3]; }
 

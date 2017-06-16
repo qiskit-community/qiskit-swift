@@ -74,4 +74,53 @@ class QIskitParserTests: XCTestCase {
         })
     }
     
+    func testParserBell () {
+        
+        let asyncExpectation = self.expectation(description: "parser")
+        
+        let qasmProgram: String =
+            "OPENQASM 2.0;\n" +
+                "include \"qelib1.inc\";\n" +
+                "qreg q[3];\n" +
+                "creg c[2];\n" +
+                "h q[0];\n" +
+                "cx q[0],q[2];\n" +
+                "measure q[0] -> c[0];\n" +
+                "measure q[2] -> c[1];"
+        
+        let buf: YY_BUFFER_STATE = yy_scan_string(qasmProgram)
+        
+        ParseSuccessBlock = { (node: Node?) -> Void in
+            XCTAssertNotNil(node)
+            if node is NodeMainProgram {
+                let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
+                let emittedQasm = node!.qasm().components(separatedBy: whitespaceCharacterSet).joined()
+                let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
+                XCTAssertEqual(emittedQasm, targetQasm)
+                asyncExpectation.fulfill()
+            } else {
+                XCTFail("Main Program Node Type Expected!")
+                asyncExpectation.fulfill()
+                return
+            }
+            
+        }
+        
+        ParseFailBlock = { (message: String?) -> Void in
+            if let msg = message {
+                XCTFail(msg)
+            } else {
+                XCTFail("Unknown Error")
+            }
+            asyncExpectation.fulfill()
+        }
+        
+        yyparse()
+        yy_delete_buffer(buf)
+        
+        self.waitForExpectations(timeout: 180, handler: { (error) in
+            XCTAssertNil(error, "Failure in parser")
+        })
+
+    }
 }
