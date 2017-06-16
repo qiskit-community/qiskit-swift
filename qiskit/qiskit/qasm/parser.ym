@@ -142,9 +142,8 @@ idlist: id { $$ = [ParseTree createIdlistNode: nil identifier: $1]; }
 | idlist ',' id { $$ = [ParseTree createIdlistNode: $1 identifier: $3]; }
 
 mixedlist: argument { $$ = $1; }
-| mixedlist ',' id { $$ = [ParseTree createMixedlistNode: $1 item2: $3 item3: nil]; }
-| mixedlist ',' id '[' nninteger ']' { $$ = [ParseTree createMixedlistNode: $1 item2: $3 item3: $5]; }
-| idlist ',' id '[' nninteger ']' { $$ = [ParseTree createMixedlistNode: $1 item2: $3 item3: $5]; }
+| mixedlist ',' argument { $$ = [ParseTree createMixedlistNode: $1 idlist: nil argument: $3]; }
+| idlist ',' argument { $$ = [ParseTree createMixedlistNode: nil idlist: $1 argument: $3]; }
 
 argument : id { $$ = [ParseTree createIndexedIdNode: $1 parameter: nil]; }
 | id '[' nninteger ']' { $$ = [ParseTree createIndexedIdNode: $1 parameter: $3]; }

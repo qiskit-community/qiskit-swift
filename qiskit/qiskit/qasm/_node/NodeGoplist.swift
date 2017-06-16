@@ -10,60 +10,51 @@ import Foundation
 
 @objc public class NodeGoplist: Node {
     
-    var barrier: Node?
-    var uop: Node?
-    var idlist: Node?
-    var goplist: [Node]?
-    
-    public init(barrier: Node?, uop: Node?, idlist: Node?, goplist: Node?) {
+    var barrieridlist: [(barrier:Node, idlist:Node)]?
+    var uops: [Node]?
+
+    public init(barrier: Node, idlist: Node) {
         super.init(type: .N_GOPLIST)
         
-        self.barrier = barrier
-        self.uop = uop
-        self.idlist = idlist
-        
-        if let gplist = goplist as? NodeGoplist {
-            if gplist.goplist == nil {
-                gplist.goplist = []
-            } else {
-                 gplist.goplist!.append(self)
-            }
+        if barrieridlist == nil {
+            barrieridlist = [(barrier, idlist)]
+        } else {
+            barrieridlist!.append((barrier, idlist))
         }
+    }
 
+    public init(uop: Node) {
+        super.init(type: .N_GOPLIST)
+        if uops == nil {
+            uops = [uop]
+        } else {
+            uops!.append(uop)
+        }
+    }
+
+    public func addBarrierIdlist(barrier: Node, idlist: Node) {
+        barrieridlist?.append((barrier, idlist))
     }
     
-
+    public func addUop(uop: Node) {
+        uops?.append(uop)
+    }
+    
     override public func qasm() -> String {
         
-        if let up = uop {
-            if goplist == nil {
-                return "\(up.qasm())" // uop
-            } else {
-                var goplists: [String] = []
-                if let list = goplist {
-                    goplists = list.flatMap({ (node: Node) -> String in
-                        return node.qasm()
-                    })
-                }
-                return "\(goplists.joined(separator: ",")) \(up)" // goplist uop
+        var qasms: [String] = []
+        if let bl = barrieridlist {
+            for child in bl {
+                qasms.append(child.barrier.qasm())
+                qasms.append(child.idlist.qasm())
+            }
+        }
+        if let ups = uops {
+            for us in ups {
+                qasms.append(us.qasm())
             }
         }
         
-        if let bar = barrier,
-            let idlst = idlist {
-            if goplist == nil {
-                return "\(bar.qasm()) \(idlst.qasm())" // barrier idlist
-            } else {
-                var goplists: [String] = []
-                if let list = goplist {
-                    goplists = list.flatMap({ (node: Node) -> String in
-                        return node.qasm()
-                    })
-                }
-                return "\(goplists.joined(separator: ",")) \(bar.qasm()) \(idlst.qasm())" // goplist barrier idlist
-            }
-        }
-    
-        return ""
+         return "\(qasms.joined(separator: ","))"
     }
 }

@@ -50,8 +50,25 @@
 }
 
 +(Node*) createGoplistNode: (Node*) barrier uop: (Node*) uop idlist: (Node*) idlist goplist: (Node*) goplist {
-    NodeGoplist *node = [[NodeGoplist alloc] initWithBarrier:barrier uop: uop idlist:idlist goplist:goplist];
-    return node;
+  
+    if (goplist == nil) {
+        if (uop != nil) {
+            NodeGoplist *nodeGopList = [[NodeGoplist alloc] initWithUop:uop];
+            return nodeGopList;
+        } else if (barrier != nil && idlist != nil) {
+            NodeGoplist *nodeGopList = [[NodeGoplist alloc] initWithBarrier:barrier idlist:idlist];
+            return nodeGopList;
+       }
+    } else {
+        if (uop != nil) {
+            NodeGoplist *nodeGopList = (NodeGoplist*) goplist;
+            [nodeGopList addUopWithUop:uop];
+        } else if (barrier != nil && idlist != nil) {
+            NodeGoplist *nodeGopList = (NodeGoplist*) goplist;
+            [nodeGopList addBarrierIdlistWithBarrier:barrier idlist:idlist];
+        }
+    }
+    return goplist;
 }
 
 +(Node*) createQopNode: (Node*) o1 object2: (Node*) o2 object3: (Node*) o3 {
@@ -81,9 +98,21 @@
     return idlist;
 }
 
-+(Node*) createMixedlistNode: (Node*) listNode item2: (Node*) i1 item3: (Node*) i2 {
-    NodeMixedList *node = [[NodeMixedList alloc] initWithListNode:listNode item2:i1 item3:i2];
-    return node;
++(Node*) createMixedlistNode: (Node*) mixedList idlist: (Node*) idlist argument: (Node*) arg {
+
+    if (mixedList == nil) {
+        NodeMixedList *nodeMixedList = [[NodeMixedList alloc] initWithIdlist:idlist argument:arg];
+        return nodeMixedList;
+    } else {
+        NodeMixedList *nodeMixedList = (NodeMixedList*)mixedList;
+        if (idlist != nil) {
+            [nodeMixedList addIdListWithIdlist:idlist];
+        }
+        if (arg != nil) {
+            [nodeMixedList addArgumentWithArgument:arg];
+        }
+    }
+    return mixedList;
 }
 
 +(Node*) createIndexedIdNode: (Node*) identifier parameter: (Node*) nninteger {
