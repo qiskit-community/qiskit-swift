@@ -51,7 +51,7 @@ import Foundation
             if let a2 = arg2 {
                 return "\(operation.qasm()) ( \(a.qasm()) ) \(a2.qasm());"
             }
-            return "\(operation.qasm()) () \(a.qasm());"
+            return "\(operation.qasm()) \(a.qasm());"
         default:
             assertionFailure("Invalid NodeUniversalUnitary Operation")
             return ""

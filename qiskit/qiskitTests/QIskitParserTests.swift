@@ -44,7 +44,10 @@ class QIskitParserTests: XCTestCase {
         ParseSuccessBlock = { (node: Node?) -> Void in
             XCTAssertNotNil(node)
             if node is NodeMainProgram {
-                print(node!.qasm())
+                let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
+                let emittedQasm = node!.qasm().components(separatedBy: whitespaceCharacterSet).joined()
+                let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
+                XCTAssertEqual(emittedQasm, targetQasm)
                 asyncExpectation.fulfill()
             } else {
                 XCTFail("Main Program Node Type Expected!")
