@@ -13,12 +13,23 @@ import Foundation
     var barrier: Node?
     var uop: Node?
     var idlist: Node?
-    var goplist: Node?
+    var goplist: [Node]?
+    
     public init(barrier: Node?, uop: Node?, idlist: Node?, goplist: Node?) {
         super.init(type: .N_GOPLIST)
+        
         self.barrier = barrier
         self.uop = uop
-        self.goplist = goplist
+        self.idlist = idlist
+        
+        if let gplist = goplist as? NodeGoplist {
+            if gplist.goplist == nil {
+                gplist.goplist = []
+            } else {
+                 gplist.goplist!.append(self)
+            }
+        }
+
     }
     
     override public func qasm() -> String {

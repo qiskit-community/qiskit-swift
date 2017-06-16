@@ -10,10 +10,17 @@ import Foundation
 
 @objc public class NodeIdList: Node {
     
-    var identifier: Node?
+    public var idList: [Node]?
+
     public init(idList: Node?, identifier: Node?) {
         super.init(type: .N_IDLIST)
-        self.identifier = identifier
+        if let idlst = idList as? NodeIdList {
+            if idlst.idList == nil {
+                idlst.idList = []
+            } else {
+                idlst.idList!.append(self)
+            }
+        }
     }
     
     override public func qasm() -> String {

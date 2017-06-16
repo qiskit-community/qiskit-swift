@@ -47,6 +47,11 @@
     return node;
 }
 
++(Node*) createQopNode: (Node*) o1 object2: (Node*) o2 object3: (Node*) o3 {
+    NodeQop *node = [[NodeQop alloc] initWithObject1:o1 object2:o2 object3:o3];
+    return node;
+}
+
 +(Node*) createUniversalUnitary: (Node*) o1 object2: (Node*) o2 object3: (Node*) o3 {
     NodeUniversalUnitary *node = [[NodeUniversalUnitary alloc] initWithObject1:o1 object2:o2 object3:o3];
     return node;   
@@ -62,8 +67,8 @@
     return node;
 }
 
-+(Node*) createMixedlistNode: (Node*) i0 item2: (Node*) i1 item3: (Node*) i2 {
-    NodeMixedList *node = [[NodeMixedList alloc] initWithItem1:i0 item2:i1 item3:i2];
++(Node*) createMixedlistNode: (Node*) listNode item2: (Node*) i1 item3: (Node*) i2 {
+    NodeMixedList *node = [[NodeMixedList alloc] initWithListNode:listNode item2:i1 item3:i2];
     return node;
 }
 
@@ -72,8 +77,8 @@
     return node;
 }
 
-+(Node*) createExpressionList: (Node*) exp1 expression: (Node*) exp2 {
-    NodeExpressionList *node = [[NodeExpressionList alloc] initWithChildren: @[exp1, exp2]];
++(Node*) createExpressionList: (Node*) exp1 explist: (Node*) explist {
+    NodeExpressionList *node = [[NodeExpressionList alloc] initWithExpression:exp1 expressionList:explist];
     return node;
 }
     
@@ -88,7 +93,7 @@
 }
 
 +(Node*) createIdNodeWithValue: (NSString*) value {
-    NodeId *node = [[NodeId alloc] initWithName: value];
+    NodeId *node = [[NodeId alloc] initWithIdentifier: value];
     return node;
 }
 

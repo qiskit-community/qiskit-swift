@@ -121,6 +121,7 @@
 		DFBC4F711EC7384200027640 /* QiskitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4F701EC7384200027640 /* QiskitTests.swift */; };
 		DFBC4FBA1EC73BF800027640 /* qiskit.h in Headers */ = {isa = PBXBuildFile; fileRef = DFBC4FA51EC73BF800027640 /* qiskit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DFF0EAE81EF1D8A10005A02D /* NodeU.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFF0EAE71EF1D8A10005A02D /* NodeU.swift */; };
+		DFFB9BF51EF2DA6000965D6F /* NodeQop.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFFB9BF41EF2DA6000965D6F /* NodeQop.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -253,6 +254,7 @@
 		DFBC4FA11EC73BF800027640 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DFBC4FA51EC73BF800027640 /* qiskit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qiskit.h; sourceTree = "<group>"; };
 		DFF0EAE71EF1D8A10005A02D /* NodeU.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeU.swift; path = _node/NodeU.swift; sourceTree = "<group>"; };
+		DFFB9BF41EF2DA6000965D6F /* NodeQop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeQop.swift; path = _node/NodeQop.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -325,6 +327,7 @@
 				DF8E1D0A1EE7B05200DCC35C /* NodeMixedList.swift */,
 				699AAB531EE480160015DB83 /* Node.swift */,
 				DF8E1CE01EE5025C00DCC35C /* NodeOpaque.swift */,
+				DFFB9BF41EF2DA6000965D6F /* NodeQop.swift */,
 				DF8E1CDE1EE5024700DCC35C /* NodePrefix.swift */,
 				DF8E1CD21EE4A27B00DCC35C /* NodeProgram.swift */,
 				DF8E1CDA1EE5021400DCC35C /* NodeQreg.swift */,
@@ -728,6 +731,7 @@
 				695701341ED75C1C00C6CCAB /* Graph.swift in Sources */,
 				6913D0A21ECE41D6003C5FD3 /* InstructionSet.swift in Sources */,
 				692DBE041EE701890032F6CF /* Unroller.swift in Sources */,
+				DFFB9BF51EF2DA6000965D6F /* NodeQop.swift in Sources */,
 				69DE36131ECD18BE00EC4756 /* RY.swift in Sources */,
 				693109451EE9966D00CD2CD1 /* PrinterBackend.swift in Sources */,
 				69FEC8381ECB37E0002324E2 /* IBMQuantumExperienceError.swift in Sources */,

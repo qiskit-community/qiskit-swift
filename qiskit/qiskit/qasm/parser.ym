@@ -125,9 +125,9 @@ goplist : uop { $$ = [ParseTree createGoplistNode: nil uop: $1 idlist: nil gopli
 | goplist barrier idlist { $$ = [ParseTree createGoplistNode: $2 uop: nil idlist: $3 goplist: $1]; }
 
 qop : uop { $$ = $1; }
-| measure argument arrow argument ';' { $$ = [ParseTree createUniversalUnitary: $1 object2: $2 object3: $4]; }
-| measure '(' argument ')' arrow '(' argument ')' ';' { $$ = [ParseTree createUniversalUnitary: $1 object2: $3 object3: $7]; }
-| reset '(' argument ')' ';' { $$ = [ParseTree createUniversalUnitary: $1 object2: $3 object3: nil]; }
+| measure argument arrow argument ';' { $$ = [ParseTree createQopNode: $1 object2: $2 object3: $4]; }
+| measure '(' argument ')' arrow '(' argument ')' ';' { $$ = [ParseTree createQopNode: $1 object2: $3 object3: $7]; }
+| reset '(' argument ')' ';' { $$ = [ParseTree createQopNode: $1 object2: $3 object3: nil]; }
 
 uop : u '(' exp ')' argument ';' { $$ = [ParseTree createUniversalUnitary: $1 object2: $3 object3: $5]; }
 | cx argument ',' argument ';' { $$ = [ParseTree createUniversalUnitary: $1 object2: $2 object3: $4]; }
@@ -150,7 +150,7 @@ argument : id { $$ = [ParseTree createIndexedIdNode: $1 parameter: nil]; }
 | id '[' nninteger ']' { $$ = [ParseTree createIndexedIdNode: $1 parameter: $3]; }
 
 explist : exp { $$ = $1;  }
-| exp ',' explist { $$ = [ParseTree createExpressionList: $1 expression: $3]; }
+| exp ',' explist { $$ = [ParseTree createExpressionList: $1 explist: $3]; }
 
 exp : exp '+' exp { $$ = [ParseTree createBinaryOperation: @"+" operand1: $1 operand2: $3];  }
 | exp '-' exp { $$ = [ParseTree createBinaryOperation: @"-" operand1: $1 operand2: $3]; }
@@ -169,8 +169,8 @@ nninteger : NNINTEGER { $$ = [ParseTree createIntNodeWithValue: $1]; }
 
 real : REAL { $$ = [ParseTree createRealNodeWithValue: $1]; }
 pi : PI { $$ = [ParseTree createRealNodeWithValue: M_PI]; }
-
 id : ID { $$ = [ParseTree createIdNodeWithValue: $1]; }
+
 u : U { $$ = [ParseTree createUNode]; }
 cx: CX { $$ = [ParseTree createCXNode]; }
 creg: CREG { $$ = [ParseTree createCRegNode]; }
