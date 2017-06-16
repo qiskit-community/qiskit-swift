@@ -44,12 +44,14 @@ class QIskitParserTests: XCTestCase {
         ParseSuccessBlock = { (node: Node?) -> Void in
             XCTAssertNotNil(node)
             if node is NodeMainProgram {
+                print(node!.qasm())
                 asyncExpectation.fulfill()
             } else {
                 XCTFail("Main Program Node Type Expected!")
                 asyncExpectation.fulfill()
                 return
             }
+
         }
         
         ParseFailBlock = { (message: String?) -> Void in

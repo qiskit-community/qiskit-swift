@@ -10,13 +10,23 @@ import Foundation
 
 @objc public class NodeIndexedId: Node {
     public var identifer: Node?
+    public var parameter: Node?
     public init(identifier: Node, parameter: Node) {
         super.init(type: .N_INDEXEDID)
         self.identifer = identifier
-        self.children = [parameter]
+        self.parameter = parameter
     }
     
     override public func qasm() -> String {
-        preconditionFailure("qasm not implemented")
+        guard let ident = identifer else {
+            assertionFailure("Invalid NodeDecl Operation")
+            return ""
+        }
+        var qasm: String = "\(ident.qasm())"
+       
+        if let param = parameter {
+            qasm += "[\(param.qasm())]"
+        }
+        return qasm
     }
 }

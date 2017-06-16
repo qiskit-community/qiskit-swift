@@ -17,12 +17,38 @@ import Foundation
     public init(object1: Node?, object2: Node?, object3: Node?) {
         super.init(type: .N_QOP)
 
-        self.op = object1   // measure | reset
-        self.arg = object2  // argument
+        self.op = object1   // uop | measure | reset
+        self.arg = object2  // argument | nil
         self.arg2 = object3 // argument| nil
     }
     
     override public func qasm() -> String {
-        preconditionFailure("qasm not implemented")
+        
+        guard let operation = op else {
+            assertionFailure("Invalid NodeQop Operation")
+            return ""
+        }
+        
+        if operation.type == .N_UNIVERSALUNITARY {
+            return "\(operation.qasm())"
+        }
+
+        guard let arg1 = arg else {
+            assertionFailure("Invalid NodeQop Operation")
+            return ""
+        }
+
+        if operation.type == .N_MEASURE {
+       
+            guard let arg2 = arg2 else {
+                assertionFailure("Invalid NodeQop Operation")
+                return ""
+            }
+            
+            return "\(operation.qasm()) \(arg1.qasm()) -> \(arg2.qasm());"
+            
+        }
+        
+        return "\(operation.qasm()) \(arg1.qasm());"
     }
 }

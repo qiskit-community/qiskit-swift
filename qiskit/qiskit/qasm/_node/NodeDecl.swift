@@ -21,6 +21,19 @@ import Cocoa
     }
     
     override public func qasm() -> String {
-        preconditionFailure("qasm not implemented")
+        guard let reg = register else {
+            assertionFailure("Invalid NodeDecl Operation")
+            return ""
+        }
+        guard let ident = identifier else {
+            assertionFailure("Invalid NodeDecl Operation")
+            return ""
+        }
+        guard let integer = nninteger else {
+            assertionFailure("Invalid NodeDecl Operation")
+            return ""
+        }
+        return "\(reg.qasm()) \(ident.qasm()) [\(integer.qasm())];"
     }
+
 }

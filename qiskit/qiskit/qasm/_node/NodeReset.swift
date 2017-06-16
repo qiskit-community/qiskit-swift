@@ -11,10 +11,11 @@ import Foundation
 @objc public class NodeReset: Node {
     
     public init() {
-        super.init(type: .N_UNIVERSALUNITARY)
+        super.init(type: .N_RESET)
     }
     
     override public func qasm() -> String {
-        preconditionFailure("qasm not implemented")
+        let qasm: String = "reset"
+        return qasm
     }
 }

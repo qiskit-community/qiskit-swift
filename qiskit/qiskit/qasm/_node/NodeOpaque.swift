@@ -15,6 +15,7 @@ import Foundation
     }
     
     override public func qasm() -> String {
-        preconditionFailure("qasm not implemented")
+        let qasm: String = "opaque"
+        return qasm
     }
 }

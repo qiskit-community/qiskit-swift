@@ -23,6 +23,7 @@ import Foundation
     }
     
     override public func qasm() -> String {
-        preconditionFailure("qasm not implemented")
+        let operand = self.children[0]
+        return "\(op) (\(operand.qasm()))"
     }
 }

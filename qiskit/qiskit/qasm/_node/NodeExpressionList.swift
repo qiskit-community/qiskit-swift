@@ -25,6 +25,12 @@ import Foundation
     }
     
     override public func qasm() -> String {
-        preconditionFailure("qasm not implemented")
+        var qasms: [String] = []
+        if let list = expressionList {
+            qasms = list.flatMap({ (node: Node) -> String in
+                return node.qasm()
+            })
+        }
+        return qasms.joined(separator: ",")
     }
 }

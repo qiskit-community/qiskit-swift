@@ -32,7 +32,38 @@ import Foundation
 
     }
     
+
     override public func qasm() -> String {
-        preconditionFailure("qasm not implemented")
+        
+        if let up = uop {
+            if goplist == nil {
+                return "\(up.qasm())" // uop
+            } else {
+                var goplists: [String] = []
+                if let list = goplist {
+                    goplists = list.flatMap({ (node: Node) -> String in
+                        return node.qasm()
+                    })
+                }
+                return "\(goplists.joined(separator: ",")) \(up)" // goplist uop
+            }
+        }
+        
+        if let bar = barrier,
+            let idlst = idlist {
+            if goplist == nil {
+                return "\(bar.qasm()) \(idlst.qasm())" // barrier idlist
+            } else {
+                var goplists: [String] = []
+                if let list = goplist {
+                    goplists = list.flatMap({ (node: Node) -> String in
+                        return node.qasm()
+                    })
+                }
+                return "\(goplists.joined(separator: ",")) \(bar.qasm()) \(idlst.qasm())" // goplist barrier idlist
+            }
+        }
+    
+        return ""
     }
 }

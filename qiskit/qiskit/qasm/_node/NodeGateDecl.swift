@@ -23,6 +23,22 @@ import Foundation
     }
     
     override public func qasm() -> String {
-        preconditionFailure("qasm not implemented")
+        guard let g8 = gate else {
+            assertionFailure("Invalid NodeGateDecl Operation")
+            return ""
+        }
+        guard let ident = identifier else {
+            assertionFailure("Invalid NodeGateDecl Operation")
+            return ""
+        }
+        guard let list1 = idlist1 else {
+            assertionFailure("Invalid NodeGateDecl Operation")
+            return ""
+        }
+        if let list2 = idlist2 {
+            return "\(g8.qasm()) \(ident.qasm()) (\(list1.qasm())) \(list2.qasm()) {"
+        }
+        
+        return "\(g8.qasm()) \(list1.qasm()) {" // FIXME: figure out the correct parenthesis 
     }
 }

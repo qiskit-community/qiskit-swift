@@ -11,12 +11,18 @@ import Foundation
 @objc public class NodeExternal: Node {
 
     static let externalFunctions = ["sin", "cos", "tan", "exp", "ln", "sqrt"]
-    
+    var operation: String?
     public init(operation: String) {
         super.init(type: .N_EXTERNAL)
+        self.operation = operation
     }
     
     override public func qasm() -> String {
-        preconditionFailure("qasm not implemented")
+        guard let op = operation else {
+            assertionFailure("Invalid Enternal Operation")
+            return ""
+        }
+        return op
     }
+
 }

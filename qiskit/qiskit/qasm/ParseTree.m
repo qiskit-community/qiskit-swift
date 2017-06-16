@@ -18,8 +18,15 @@
 }
 
 +(Node*) createProgramNode: (Node*) program statement: (Node*) statement {
-    NodeProgram *node = [[NodeProgram alloc] initWithProgram: program statement: statement];
-    return node;
+    
+    if (program == nil) {
+        NodeProgram *nprogram = [[NodeProgram alloc] initWithProgram: program statement: statement];
+        return nprogram;
+    } else {
+        NodeProgram *p = (NodeProgram*)program;
+        [p addStatementWithStatement:statement];
+    }
+    return program;
 }
 
 +(Node*) createIncludeNode: (NSString*) file {
@@ -62,9 +69,16 @@
     return node;
 }
 
-+(Node*) createIdlistNode: (Node*) i0 identifier: (Node*) identifier {
-    NodeIdList *node = [[NodeIdList alloc] initWithIdList:i0 identifier:identifier];
-    return node;
++(Node*) createIdlistNode: (Node*) idlist identifier: (Node*) identifier {
+    
+    if (idlist == nil) {
+        NodeIdList *nodeIdList = [[NodeIdList alloc] initWithIdentifier: identifier];
+        return nodeIdList;
+    } else {
+        NodeIdList *nodeIdList = (NodeIdList*)idlist;
+        [nodeIdList addIdentifierWithIdentifier:identifier];
+    }
+    return idlist;
 }
 
 +(Node*) createMixedlistNode: (Node*) listNode item2: (Node*) i1 item3: (Node*) i2 {

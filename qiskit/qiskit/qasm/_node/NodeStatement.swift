@@ -25,6 +25,63 @@ import Cocoa
     }
     
     override public func qasm() -> String {
-        preconditionFailure("qasm not implemented")
+ 
+        guard let s1 = p1 else {
+            assertionFailure("Invalid NodeStatment Operation")
+            return ""
+        }
+        
+        switch s1.type {
+            case .N_DECL:
+                return "\(s1.qasm())"
+            case .N_GATEDECL:
+                if let s2 = p2 {
+                    return "\(s1.qasm()) \(s2.qasm()) }"
+                }
+                return "\(s1.qasm()) }"
+            case .N_OPAQUE:
+                    guard let s2 = p2 else {
+                        assertionFailure("Invalid NodeStatment Operation")
+                        return ""
+                    }
+
+                    guard let s3 = p3 else {
+                        assertionFailure("Invalid NodeStatment Operation")
+                        return ""
+                    }
+
+                    if let s4 = p4 {
+                      return "\(s1.qasm()) \(s2.qasm()) ( \(s3.qasm()) ) \(s4.qasm()) ;"
+                    }
+                    return "\(s1.qasm()) \(s2.qasm()) \(s3.qasm());"
+            case .N_QOP:
+                return "\(s1.qasm())"
+            case .N_IF:
+                guard let s2 = p2 else {
+                    assertionFailure("Invalid NodeStatment Operation")
+                    return ""
+                }
+                
+                guard let s3 = p3 else {
+                    assertionFailure("Invalid NodeStatment Operation")
+                    return ""
+                }
+                
+                guard let s4 = p4 else {
+                    assertionFailure("Invalid NodeStatment Operation")
+                    return ""
+                }
+            
+                return "\(s1.qasm()) ( \(s2.qasm()) == \(s3.qasm()) ) \(s4.qasm()) ;"
+            case .N_BARRIER:
+                guard let s2 = p2 else {
+                    assertionFailure("Invalid NodeStatment Operation")
+                    return ""
+                }
+                return "\(s1.qasm()) \(s2.qasm());"
+            default:
+                assertionFailure("Invalid NodeStatment Operation")
+                return ""
+        }
     }
 }

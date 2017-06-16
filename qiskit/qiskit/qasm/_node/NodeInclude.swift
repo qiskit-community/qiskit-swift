@@ -16,6 +16,7 @@ import Foundation
     }
     
     override public func qasm() -> String {
-        preconditionFailure("qasm not implemented")
+        let qasm: String = "include \(file)"
+        return qasm
     }
 }

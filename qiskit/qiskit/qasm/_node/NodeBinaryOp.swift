@@ -19,6 +19,15 @@ import Foundation
     }
     
     override public func qasm() -> String {
-        preconditionFailure("qasm not implemented")
+        let lhs = children[0]
+        let rhs = children[1]
+        if lhs.type == .N_BINARYOP {
+            return lhs.qasm()
+        }
+        if rhs.type == .N_BINARYOP {
+            return rhs.qasm()
+        }
+        return "\(lhs.qasm()) \(op) \(rhs.qasm())"
     }
+
 }

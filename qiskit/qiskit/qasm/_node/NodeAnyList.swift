@@ -17,6 +17,10 @@ import Cocoa
     }
     
     override public func qasm() -> String {
-        preconditionFailure("qasm not implemented")
+        guard let l = list else {
+            assertionFailure("Invalid NodeAnyList Operation")
+            return ""
+        }
+        return l.qasm()
     }
 }

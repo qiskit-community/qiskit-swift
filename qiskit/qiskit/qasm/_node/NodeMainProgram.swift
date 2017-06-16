@@ -26,6 +26,10 @@ import Foundation
     }
     
     override public func qasm() -> String {
-        preconditionFailure("qasm not implemented")
+        var qasm: String = magic?.qasm() ?? ""
+        qasm += "\(version?.qasm() ?? "");\n"
+        qasm += "\(incld?.qasm() ?? "");\n"
+        qasm += "\(program?.qasm() ?? "")\n"
+        return qasm
     }
 }

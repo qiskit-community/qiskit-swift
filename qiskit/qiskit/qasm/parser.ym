@@ -93,13 +93,13 @@ mainprogram : openqasm real ';' program {
     ParseSuccessBlock($$);
 }
 | openqasm real ';' include program {
-    $$ = [ParseTree createMainProgram: $1 version: $2 include: $4 program: $4];
+    $$ = [ParseTree createMainProgram: $1 version: $2 include: $4 program: $5];
     ParseSuccessBlock($$);
 }
 
 include : incld string ';' { $$ = [ParseTree createIncludeNode: $2]; }
 
-program : statment { $$ = [ ParseTree createProgramNode: $1 statement: nil]; }
+program : statment { $$ = [ ParseTree createProgramNode: nil statement: $1]; }
 | program statment { $$ = [ ParseTree createProgramNode: $1 statement: $2]; }
 
 statment : decl { $$ = [ ParseTree createStatmentNode: $1 p2: nil p3: nil p4: nil]; }
@@ -124,7 +124,7 @@ goplist : uop { $$ = [ParseTree createGoplistNode: nil uop: $1 idlist: nil gopli
 | goplist  uop { $$ = [ParseTree createGoplistNode: nil uop: $2 idlist: nil goplist: $1]; }
 | goplist barrier idlist { $$ = [ParseTree createGoplistNode: $2 uop: nil idlist: $3 goplist: $1]; }
 
-qop : uop { $$ = $1; }
+qop : uop { $$ = [ParseTree createQopNode: $1 object2: nil object3: nil]; }
 | measure argument arrow argument ';' { $$ = [ParseTree createQopNode: $1 object2: $2 object3: $4]; }
 | measure '(' argument ')' arrow '(' argument ')' ';' { $$ = [ParseTree createQopNode: $1 object2: $3 object3: $7]; }
 | reset '(' argument ')' ';' { $$ = [ParseTree createQopNode: $1 object2: $3 object3: nil]; }
@@ -138,7 +138,7 @@ uop : u '(' exp ')' argument ';' { $$ = [ParseTree createUniversalUnitary: $1 ob
 anylist: idlist { $$ = [ParseTree createAnylistNode: $1]; }
 | mixedlist { $$ = [ParseTree createAnylistNode: $1];  }
 
-idlist: id { $$ = $1; }
+idlist: id { $$ = [ParseTree createIdlistNode: nil identifier: $1]; }
 | idlist ',' id { $$ = [ParseTree createIdlistNode: $1 identifier: $3]; }
 
 mixedlist: argument { $$ = $1; }

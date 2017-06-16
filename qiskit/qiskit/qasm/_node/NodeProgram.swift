@@ -11,12 +11,19 @@ import Foundation
 @objc public class NodeProgram: Node  {
 
     public var program: [Node]?
-    public var statement: Node?
+    public var statements: [Node]?
     
     public init(program: Node?, statement: Node?) {
         super.init(type: .N_PROGRAM)
-        self.statement = statement
-    
+        
+        if let stmt = statement {
+            if self.statements == nil {
+                self.statements = [stmt]
+            } else {
+                self.statements?.append(stmt)
+            }
+        }
+        
         if let prgm = program as? NodeProgram {
             if prgm.program == nil {
                 prgm.program = []
@@ -25,7 +32,25 @@ import Foundation
         }
     }
     
+    public func addStatement(statement: Node) {
+        statements?.append(statement)
+    }
+    
     override public func qasm() -> String {
-        preconditionFailure("qasm not implemented")
+        
+        var qasms: [String] = []
+        if let prg = program {
+            qasms = prg.flatMap({ (node: Node) -> String in
+                return node.qasm()
+            })
+        }
+        
+        if let stmt = statements {
+            qasms += stmt.flatMap({ (node: Node) -> String in
+                        return node.qasm()
+                    })
+        }
+        return qasms.joined(separator: "\n")
+        
     }
 }

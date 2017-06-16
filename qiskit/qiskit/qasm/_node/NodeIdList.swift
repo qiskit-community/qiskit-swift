@@ -10,20 +10,32 @@ import Foundation
 
 @objc public class NodeIdList: Node {
     
-    public var idList: [Node]?
-
-    public init(idList: Node?, identifier: Node?) {
+    public var identifiers: [Node]?
+    
+    public init(identifier: Node?) {
         super.init(type: .N_IDLIST)
-        if let idlst = idList as? NodeIdList {
-            if idlst.idList == nil {
-                idlst.idList = []
+        
+        if let ident = identifier {
+            if identifiers == nil {
+                self.identifiers = [ident]
             } else {
-                idlst.idList!.append(self)
+                identifiers!.append(self)
             }
         }
     }
     
+    public func addIdentifier(identifier: Node) {
+        identifiers?.append(identifier)
+    }
+    
     override public func qasm() -> String {
-        preconditionFailure("qasm not implemented")
+        var qasms: [String] = []
+        if let list = identifiers {
+            qasms = list.flatMap({ (node: Node) -> String in
+                return node.qasm()
+            })
+        }
+        return qasms.joined(separator: ",")
     }
 }
+

@@ -23,6 +23,38 @@ import Foundation
     }
     
     override public func qasm() -> String {
-        preconditionFailure("qasm not implemented")
+       
+        guard let operation = op else {
+            assertionFailure("Invalid NodeUniversalUnitary Operation")
+            return ""
+        }
+
+        guard let a = arg else {
+            assertionFailure("Invalid NodeUniversalUnitary Operation")
+            return ""
+        }
+
+        switch operation.type {
+        case .N_U:
+            guard let a2 = arg2 else {
+                assertionFailure("Invalid NodeUniversalUnitary Operation")
+                return ""
+            }
+            return "\(operation.qasm()) ( \(a.qasm()) ) \(a2.qasm());"
+        case .N_CNOT:
+            guard let a2 = arg2 else {
+                assertionFailure("Invalid NodeUniversalUnitary Operation")
+                return ""
+            }
+            return "\(operation.qasm()) \(a.qasm()), \(a2.qasm());"
+        case .N_ID:
+            if let a2 = arg2 {
+                return "\(operation.qasm()) ( \(a.qasm()) ) \(a2.qasm());"
+            }
+            return "\(operation.qasm()) () \(a.qasm());"
+        default:
+            assertionFailure("Invalid NodeUniversalUnitary Operation")
+            return ""
+        }
     }
 }
