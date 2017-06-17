@@ -9,5 +9,5 @@
 #import "ParserBlocks.h"
 #import <qiskit/qiskit-Swift.h>
 
-void (^ParseSuccessBlock)(Node *node);
+void (^ParseSuccessBlock)(NSObject *node);
 void (^ParseFailBlock)(NSString *msg);

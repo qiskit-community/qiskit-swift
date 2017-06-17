@@ -40,6 +40,7 @@ public enum QISKitException: Error, CustomStringConvertible {
     case errorStatus(status: String)
     case errorLocalSimulator
     case missingJobId
+    case parserError(msg: String)
     case internalError(error: Error)
 
     public var description: String {
@@ -98,6 +99,8 @@ public enum QISKitException: Error, CustomStringConvertible {
             return "Not a local simulator"
         case .missingJobId():
             return "Missing JobId"
+        case .parserError(let msg):
+            return "QASM Parser error: \(msg)"
         case .internalError(let error):
             return error.localizedDescription
         }

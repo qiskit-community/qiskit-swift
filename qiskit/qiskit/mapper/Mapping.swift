@@ -251,7 +251,7 @@ final class Mapping {
             "qreg q[2];\n" +
             "cx_flipped q[0],q[1];\n"
 
-        let u = Unroller(Qasm(data: flipped_qasm).parse(),CircuitBackend(["cx", "h"]))
+        let u = Unroller(try Qasm(data: flipped_qasm).parse(),CircuitBackend(["cx", "h"]))
         try u.execute()
         let flipped_cx_circuit = (u.backend! as! CircuitBackend).circuit
         let cx_node_list = try circuit_graph.get_named_nodes("cx")
@@ -454,7 +454,7 @@ final class Mapping {
         }
         // Parse openqasm_output into Circuit object
         basis += ",swap"
-        let ast = Qasm(data: openqasm_output).parse()
+        let ast = try Qasm(data: openqasm_output).parse()
         let u = Unroller(ast, CircuitBackend(basis.components(separatedBy:",")))
         try u.execute()
         return ((u.backend as! CircuitBackend).circuit, initial_layout!)

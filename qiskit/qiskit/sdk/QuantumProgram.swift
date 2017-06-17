@@ -405,7 +405,7 @@ public final class QuantumProgram {
         if let b = basis_gates {
             basis = b
         }
-        let unrolled_circuit = Unroller(Qasm(data: circuitQasm).parse(),
+        let unrolled_circuit = Unroller(try Qasm(data: circuitQasm).parse(),
                                         CircuitBackend(basis.components(separatedBy:",")))
         try unrolled_circuit.execute()
 

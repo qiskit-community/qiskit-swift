@@ -10,6 +10,7 @@
 		690188721EE24343005B4419 /* GraphError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 690188711EE24343005B4419 /* GraphError.swift */; };
 		690188741EE269B0005B4419 /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 690188731EE269B0005B4419 /* Queue.swift */; };
 		6903A9BF1EE07211006E8190 /* Layer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6903A9BE1EE07211006E8190 /* Layer.swift */; };
+		6908D0351EF5AC0500F77905 /* SyncLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6908D0341EF5AC0500F77905 /* SyncLock.swift */; };
 		6913D0A21ECE41D6003C5FD3 /* InstructionSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6913D0A11ECE41D6003C5FD3 /* InstructionSet.swift */; };
 		692DBDFE1EE6E4440032F6CF /* Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692DBDFD1EE6E4440032F6CF /* Mapping.swift */; };
 		692DBE001EE6EA2C0032F6CF /* MappingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692DBDFF1EE6EA2C0032F6CF /* MappingError.swift */; };
@@ -138,6 +139,8 @@
 		690188711EE24343005B4419 /* GraphError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GraphError.swift; path = datastructures/graph/GraphError.swift; sourceTree = "<group>"; };
 		690188731EE269B0005B4419 /* Queue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Queue.swift; path = datastructures/Queue.swift; sourceTree = "<group>"; };
 		6903A9BE1EE07211006E8190 /* Layer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Layer.swift; path = circuit/Layer.swift; sourceTree = "<group>"; };
+		6908D0301EF5730200F77905 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; name = module.modulemap; path = module/module.modulemap; sourceTree = "<group>"; };
+		6908D0341EF5AC0500F77905 /* SyncLock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncLock.swift; path = datastructures/SyncLock.swift; sourceTree = "<group>"; };
 		6913D0A11ECE41D6003C5FD3 /* InstructionSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = InstructionSet.swift; path = sdk/InstructionSet.swift; sourceTree = "<group>"; };
 		692DBDFD1EE6E4440032F6CF /* Mapping.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Mapping.swift; path = mapper/Mapping.swift; sourceTree = "<group>"; };
 		692DBDFF1EE6EA2C0032F6CF /* MappingError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MappingError.swift; path = mapper/MappingError.swift; sourceTree = "<group>"; };
@@ -276,6 +279,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6908D02F1EF572C200F77905 /* module */ = {
+			isa = PBXGroup;
+			children = (
+				6908D0301EF5730200F77905 /* module.modulemap */,
+			);
+			name = module;
+			sourceTree = "<group>";
+		};
 		693C93031ED5EFAE00EA15B0 /* graph */ = {
 			isa = PBXGroup;
 			children = (
@@ -296,6 +307,7 @@
 				695701391ED75C8B00C6CCAB /* HashableTuple.swift */,
 				6931093E1EE98A6C00CD2CD1 /* RegBit.swift */,
 				697D36AD1EE3493B00557541 /* OrderedDictionary.swift */,
+				6908D0341EF5AC0500F77905 /* SyncLock.swift */,
 			);
 			name = "Data Structures";
 			sourceTree = "<group>";
@@ -466,6 +478,7 @@
 				69D310671ECA15D300B3E752 /* unroll */,
 				69D310681ECA16E400B3E752 /* sdk */,
 				DFBC4FA21EC73BF800027640 /* network */,
+				6908D02F1EF572C200F77905 /* module */,
 				DFBC4FA51EC73BF800027640 /* qiskit.h */,
 				DFBC4FA11EC73BF800027640 /* Info.plist */,
 			);
@@ -523,8 +536,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				DFBC4FBA1EC73BF800027640 /* qiskit.h in Headers */,
-				DFA7844E1ED746E0002BB240 /* SymbolTable.h in Headers */,
 				DF7973721ED3429D00C01457 /* ParseTree.h in Headers */,
+				DFA7844E1ED746E0002BB240 /* SymbolTable.h in Headers */,
 				DF7973611ED0747B00C01457 /* ParserBlocks.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -661,6 +674,7 @@
 				DF8E1CFD1EE503D300DCC35C /* NodeCnot.swift in Sources */,
 				DF8E1CD91EE501FD00DCC35C /* NodeReal.swift in Sources */,
 				693109411EE9953600CD2CD1 /* BackendException.swift in Sources */,
+				6908D0351EF5AC0500F77905 /* SyncLock.swift in Sources */,
 				693A9F461ECA369500112AC9 /* UBase.swift in Sources */,
 				6903A9BF1EE07211006E8190 /* Layer.swift in Sources */,
 				DFB5670E1EE9A647004D2B65 /* NodeStatement.swift in Sources */,
@@ -876,9 +890,12 @@
 				INFOPLIST_FILE = qiskit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "";
+				MODULEMAP_PRIVATE_FILE = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ibm.research.qiskit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/qiskit/module";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
@@ -902,9 +919,12 @@
 				INFOPLIST_FILE = qiskit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "";
+				MODULEMAP_PRIVATE_FILE = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ibm.research.qiskit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/qiskit/module";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 3.0;
 			};

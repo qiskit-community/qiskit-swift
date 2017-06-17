@@ -90,11 +90,11 @@ void yyerror(char *s);
 
 mainprogram : openqasm real ';' program {
     $$ = [ParseTree createMainProgram: $1 version: $2 include: nil program: $4];
-    ParseSuccessBlock($$);
+    ParseSuccessBlock((NSObject*)$$);
 }
 | openqasm real ';' include program {
     $$ = [ParseTree createMainProgram: $1 version: $2 include: $4 program: $5];
-    ParseSuccessBlock($$);
+    ParseSuccessBlock((NSObject*)$$);
 }
 
 include : incld string ';' { $$ = [ParseTree createIncludeNode: $2]; }

@@ -7,11 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ParseTree.h"
 
-@class Node;
-
-extern void (^ParseSuccessBlock)(Node *node);
+extern void (^ParseSuccessBlock)(NSObject *node);
 extern void (^ParseFailBlock)(NSString *msg);
 
 #ifndef FLEXINT_H

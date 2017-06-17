@@ -7,7 +7,7 @@
 //
 
 import XCTest
-import qiskit
+@testable import qiskit
 
 class QIskitParserTests: XCTestCase {
 
@@ -22,106 +22,54 @@ class QIskitParserTests: XCTestCase {
     }
 
     func testParser() {
-        
-        let asyncExpectation = self.expectation(description: "parser")
-        
-        let qasmProgram: String =
-            "OPENQASM 2.0;\n" +
-                "include \"qelib1.inc\";\n" +
-                "qreg q[5];\n" +
-                "creg c[5];\n" +
-                "x q[0];\n" +
-                "x q[1];\n" +
-                "h q[2];\n" +
-                "measure q[0] -> c[0];\n" +
-                "measure q[1] -> c[1];\n" +
-                "measure q[2] -> c[2];\n" +
-                "measure q[3] -> c[3];\n" +
-                "measure q[4] -> c[4];"
-        
-        let buf: YY_BUFFER_STATE = yy_scan_string(qasmProgram)
-        
-        ParseSuccessBlock = { (node: Node?) -> Void in
-            XCTAssertNotNil(node)
-            if node is NodeMainProgram {
-                let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
-                let emittedQasm = node!.qasm().components(separatedBy: whitespaceCharacterSet).joined()
-                let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
-                XCTAssertEqual(emittedQasm, targetQasm)
-                asyncExpectation.fulfill()
-            } else {
-                XCTFail("Main Program Node Type Expected!")
-                asyncExpectation.fulfill()
-                return
-            }
+        do {
+            let qasmProgram: String =
+                "OPENQASM 2.0;\n" +
+                    "include \"qelib1.inc\";\n" +
+                    "qreg q[5];\n" +
+                    "creg c[5];\n" +
+                    "x q[0];\n" +
+                    "x q[1];\n" +
+                    "h q[2];\n" +
+                    "measure q[0] -> c[0];\n" +
+                    "measure q[1] -> c[1];\n" +
+                    "measure q[2] -> c[2];\n" +
+                    "measure q[3] -> c[3];\n" +
+            "measure q[4] -> c[4];"
 
+            let parser = Qasm(data: qasmProgram)
+            let root = try parser.parse()
+            let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
+            let emittedQasm = root.qasm().components(separatedBy: whitespaceCharacterSet).joined()
+            let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
+            XCTAssertEqual(emittedQasm, targetQasm)
+        } catch let error {
+            XCTFail("\(error)")
         }
-        
-        ParseFailBlock = { (message: String?) -> Void in
-            if let msg = message {
-                XCTFail(msg)
-            } else {
-                XCTFail("Unknown Error")
-            }
-            asyncExpectation.fulfill()
-        }
-        
-        yyparse()
-        yy_delete_buffer(buf)
-        
-        self.waitForExpectations(timeout: 180, handler: { (error) in
-            XCTAssertNil(error, "Failure in parser")
-        })
     }
-    
+
     func testParserBell () {
         
-        let asyncExpectation = self.expectation(description: "parser")
-        
-        let qasmProgram: String =
-            "OPENQASM 2.0;\n" +
-                "include \"qelib1.inc\";\n" +
-                "qreg q[3];\n" +
-                "creg c[2];\n" +
-                "h q[0];\n" +
-                "cx q[0],q[2];\n" +
-                "measure q[0] -> c[0];\n" +
-                "measure q[2] -> c[1];"
-        
-        let buf: YY_BUFFER_STATE = yy_scan_string(qasmProgram)
-        
-        ParseSuccessBlock = { (node: Node?) -> Void in
-            XCTAssertNotNil(node)
-            if node is NodeMainProgram {
-                let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
-                let emittedQasm = node!.qasm().components(separatedBy: whitespaceCharacterSet).joined()
-                let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
-                XCTAssertEqual(emittedQasm, targetQasm)
-                asyncExpectation.fulfill()
-            } else {
-                XCTFail("Main Program Node Type Expected!")
-                asyncExpectation.fulfill()
-                return
-            }
+        do {
+            let qasmProgram: String =
+                "OPENQASM 2.0;\n" +
+                    "include \"qelib1.inc\";\n" +
+                    "qreg q[3];\n" +
+                    "creg c[2];\n" +
+                    "h q[0];\n" +
+                    "cx q[0],q[2];\n" +
+                    "measure q[0] -> c[0];\n" +
+                    "measure q[2] -> c[1];"
             
+            let parser = Qasm(data: qasmProgram)
+            let root = try parser.parse()
+            let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
+            let emittedQasm = root.qasm().components(separatedBy: whitespaceCharacterSet).joined()
+            let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
+            XCTAssertEqual(emittedQasm, targetQasm)
+        } catch let error {
+            XCTFail("\(error)")
         }
-        
-        ParseFailBlock = { (message: String?) -> Void in
-            if let msg = message {
-                XCTFail(msg)
-            } else {
-                XCTFail("Unknown Error")
-            }
-            asyncExpectation.fulfill()
-        }
-        
-        yyparse()
-        yy_delete_buffer(buf)
-        
-        self.waitForExpectations(timeout: 180, handler: { (error) in
-            XCTAssertNil(error, "Failure in parser")
-        })
-
     }
 
     func testParserRipple () {
@@ -174,11 +122,11 @@ class QIskitParserTests: XCTestCase {
         
         let buf: YY_BUFFER_STATE = yy_scan_string(qasmProgram)
         
-        ParseSuccessBlock = { (node: Node?) -> Void in
-            XCTAssertNotNil(node)
-            if node is NodeMainProgram {
+        ParseSuccessBlock = { (n: NSObject?) -> Void in
+            XCTAssertNotNil(n)
+            if let node = n as? NodeMainProgram {
                 let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
-                let emittedQasm = node!.qasm().components(separatedBy: whitespaceCharacterSet).joined()
+                let emittedQasm = node.qasm().components(separatedBy: whitespaceCharacterSet).joined()
                 let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
                 XCTAssertEqual(emittedQasm, targetQasm)
                 asyncExpectation.fulfill()

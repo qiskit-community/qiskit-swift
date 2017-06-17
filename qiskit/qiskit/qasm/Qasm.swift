@@ -7,14 +7,54 @@
 //
 
 import Foundation
+import qiskitPrivate
 
 final class Qasm {
 
+    private let data: String
+
     init(data: String) {
-        preconditionFailure("Qasm init not implemented")
+        self.data = data
     }
 
-    func parse() -> Node {
-        preconditionFailure("Qasm parse not implemented")
+    func parse() throws -> NodeMainProgram {
+        var root: NodeMainProgram? = nil
+        var errorMsg: String? = nil
+        SyncLock.synchronized(Qasm.self) {
+            let semaphore = DispatchSemaphore(value: 0)
+            let buf: YY_BUFFER_STATE = yy_scan_string(self.data)
+
+            ParseSuccessBlock = { (n: NSObject?) -> Void in
+                defer {
+                    semaphore.signal()
+                }
+                if let node = n as? NodeMainProgram {
+                    root = node
+                    return
+                }
+            }
+
+            ParseFailBlock = { (message: String?) -> Void in
+                defer {
+                    semaphore.signal()
+                }
+                if let msg = message {
+                    errorMsg = msg
+                } else {
+                    errorMsg = "Unknown Error"
+                }
+            }
+            
+            yyparse()
+            yy_delete_buffer(buf)
+            semaphore.wait()
+        }
+        if let error = errorMsg {
+            throw QISKitException.parserError(msg: error)
+        }
+        if root == nil {
+            throw QISKitException.parserError(msg: "Missing root node")
+        }
+        return root!
     }
 }
