@@ -11,7 +11,7 @@ import Foundation
 /**
  Exception for errors raised by unroller.
  */
-public enum UnrollerException: Error, CustomStringConvertible {
+public enum UnrollerException: LocalizedError, CustomStringConvertible {
     case errorregname(line: Int, file: String)
     case errorlocalbit(line: Int, file: String)
     case errorlocalparameter(line: Int, file: String)
@@ -25,6 +25,9 @@ public enum UnrollerException: Error, CustomStringConvertible {
     case errortype(type: String, line: Int, file: String)
     case errorbackend
 
+    public var errorDescription: String? {
+        return self.description
+    }
     public var description: String {
         switch self {
         case .errorregname(let line,let file):

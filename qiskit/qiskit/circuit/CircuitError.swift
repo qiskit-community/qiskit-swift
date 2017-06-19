@@ -11,7 +11,7 @@ import Foundation
 /**
  Exception for errors raised by the Circuit object.
  */
-public enum CircuitError: Error, CustomStringConvertible {
+public enum CircuitError: LocalizedError, CustomStringConvertible {
     case duplicateregister(name: String)
     case noregister(name: String)
     case duplicatewire(regBit: RegBit)
@@ -37,6 +37,9 @@ public enum CircuitError: Error, CustomStringConvertible {
     case missingname(name: String)
     case invalidoptype(type: String)
 
+    public var errorDescription: String? {
+        return self.description
+    }
     public var description: String {
         switch self {
         case .duplicateregister(let name):

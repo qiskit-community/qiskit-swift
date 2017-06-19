@@ -454,8 +454,7 @@ final class Mapping {
         }
         // Parse openqasm_output into Circuit object
         basis += ",swap"
-        let ast = try Qasm(data: openqasm_output).parse()
-        let u = Unroller(ast, CircuitBackend(basis.components(separatedBy:",")))
+        let u = Unroller(try Qasm(data: openqasm_output).parse(), CircuitBackend(basis.components(separatedBy:",")))
         try u.execute()
         return ((u.backend as! CircuitBackend).circuit, initial_layout!)
     }

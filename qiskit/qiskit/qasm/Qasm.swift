@@ -29,10 +29,10 @@ final class Qasm {
             let buf: YY_BUFFER_STATE = yy_scan_string(self.data)
 
             ParseSuccessBlock = { (n: NSObject?) -> Void in
-                defer {
-                    semaphore.signal()
-                }
                 if let node = n as? NodeMainProgram {
+                    defer {
+                        semaphore.signal()
+                    }
                     root = node
                     return
                 }

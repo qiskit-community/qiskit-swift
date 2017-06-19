@@ -11,7 +11,7 @@ import Foundation
 /**
  Quantum Experience Exceptions
  */
-public enum IBMQuantumExperienceError: Error, CustomStringConvertible {
+public enum IBMQuantumExperienceError: LocalizedError, CustomStringConvertible {
 
     case invalidURL(url: String)
     case nullResponse(url: String)
@@ -32,6 +32,9 @@ public enum IBMQuantumExperienceError: Error, CustomStringConvertible {
     case missingDevices
     case internalError(error: Error)
 
+    public var errorDescription: String? {
+        return self.description
+    }
     public var description: String {
         switch self {
         case .invalidURL(let url):

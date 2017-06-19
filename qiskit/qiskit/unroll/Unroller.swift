@@ -16,7 +16,7 @@ final class Unroller {
     /**
      Abstract syntax tree from parser
      */
-    private let ast: Node
+    private let ast: NodeMainProgram
     /**
      Backend object
      */
@@ -49,7 +49,7 @@ final class Unroller {
     /**
      Initialize interpreter's data.
      */
-    init(_ ast: Node, _ backend: UnrollerBackend? = nil) {
+    init(_ ast: NodeMainProgram, _ backend: UnrollerBackend? = nil) {
         self.ast = ast
         self.backend = backend
     }
@@ -363,6 +363,8 @@ final class Unroller {
      */
     private func _process_node(_ node: Node) throws -> [Double] {
         switch node.type {
+        case .N_MAINPROGRAM:
+            try self._process_children(node)
         case .N_PROGRAM:
             try self._process_children(node)
         case .N_QREG:
@@ -442,6 +444,7 @@ final class Unroller {
     func execute() throws {
         if self.backend != nil {
             _ = try self._process_node(self.ast)
+            return
         }
         throw UnrollerException.errorbackend
     }

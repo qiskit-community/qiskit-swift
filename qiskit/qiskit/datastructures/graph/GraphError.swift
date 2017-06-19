@@ -11,12 +11,15 @@ import Foundation
 /**
  Graph Exceptions
  */
-public enum GraphError: Error, CustomStringConvertible {
+public enum GraphError: LocalizedError, CustomStringConvertible {
 
     case isUndirected
     case isCyclic
     case connectEmptyGraph
 
+    public var errorDescription: String? {
+        return self.description
+    }
     public var description: String {
         switch self {
         case .isUndirected():

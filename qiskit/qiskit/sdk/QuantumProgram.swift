@@ -854,7 +854,10 @@ public final class QuantumProgram {
                              seed: seed)
             self.run(wait, timeout,responseHandler)
         } catch {
-            responseHandler(nil,error as? QISKitException)
+            if let err = error as? QISKitException {
+                responseHandler(nil,err)
+            }
+            responseHandler(nil,QISKitException.internalError(error: error))
         }
     }
 

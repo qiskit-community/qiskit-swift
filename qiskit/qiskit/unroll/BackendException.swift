@@ -11,11 +11,14 @@ import Foundation
 /**
  Exception for errors raised by unroller backends.
  */
-public enum BackendException: Error, CustomStringConvertible {
+public enum BackendException: LocalizedError, CustomStringConvertible {
     case erroropaque(name: String)
     case qregadded
     case ifnotsupported
 
+    public var errorDescription: String? {
+        return self.description
+    }
     public var description: String {
         switch self {
         case .erroropaque(let name):

@@ -11,7 +11,7 @@ import Foundation
 /**
  Exception for errors raised by the Mapping object.
  */
-public enum MappingError: Error, CustomStringConvertible {
+public enum MappingError: LocalizedError, CustomStringConvertible {
     case layouterror
     case unexpectedsignature(a: Int, b: Int, c: Int)
     case errorcouplinggraph(cxedge: TupleRegBit)
@@ -20,6 +20,9 @@ public enum MappingError: Error, CustomStringConvertible {
     case errorqubitincouplinggraph(regBit: RegBit)
     case swapmapperfailed(i: Int, j: Int, qasm: String)
 
+    public var errorDescription: String? {
+        return self.description
+    }
     public var description: String {
         switch self {
         case .layouterror:

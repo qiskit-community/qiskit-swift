@@ -11,12 +11,15 @@ import Foundation
 /**
  Exception for errors raised by the Coupling object.
  */
-public enum CouplingError: Error, CustomStringConvertible {
+public enum CouplingError: LocalizedError, CustomStringConvertible {
     case duplicateregbit(regBit: RegBit)
     case notconnected
     case distancenotcomputed
     case notincouplinggraph(regBit: RegBit)
-    
+
+    public var errorDescription: String? {
+        return self.description
+    }
     public var description: String {
         switch self {
         case .duplicateregbit(let regBit):

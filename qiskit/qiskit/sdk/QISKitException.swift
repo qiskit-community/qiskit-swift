@@ -11,7 +11,7 @@ import Foundation
 /**
  QISKit SDK Exceptions
  */
-public enum QISKitException: Error, CustomStringConvertible {
+public enum QISKitException: LocalizedError, CustomStringConvertible {
 
     case intructionCircuitNil
     case regexists(name: String)
@@ -43,6 +43,9 @@ public enum QISKitException: Error, CustomStringConvertible {
     case parserError(msg: String)
     case internalError(error: Error)
 
+    public var errorDescription: String? {
+        return self.description
+    }
     public var description: String {
         switch self {
         case .intructionCircuitNil():
