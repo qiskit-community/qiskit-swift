@@ -26,7 +26,7 @@
 +(Node*) createIdlistNode: (Node*) idlist identifier: (Node*) identifier;
 +(Node*) createMixedlistNode: (Node*) mixedList idlist: (Node*) idlist argument: (Node*) arg;
 +(Node*) createIndexedIdNode: (Node*) identifier parameter: (Node*) nninteger;
-+(Node*) createExpressionList: (Node*) exp1 explist: (Node*) explist;
++(Node*) createExpressionList: (Node*) elist expression: (Node*) exp;
 +(Node*) createBinaryOperation: (NSString*) op operand1: (Node*) o1 operand2: (Node*) o2;
 +(Node*) createPrefixOperation: (NSString*) op operand: (Node*) o;
 +(Node*) createIdNodeWithValue: (NSString*) value;

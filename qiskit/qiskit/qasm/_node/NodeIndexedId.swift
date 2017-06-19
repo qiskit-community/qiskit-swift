@@ -18,12 +18,15 @@ import Foundation
         self.identifer = identifier
         self.parameter = parameter
     }
+    
     public override var type: NodeType {
         return .N_INDEXEDID
     }
+    
     public override var children: [Node] {
         return []
     }
+    
     public override func qasm() -> String {
         guard let ident = identifer else {
             assertionFailure("Invalid NodeDecl Operation")

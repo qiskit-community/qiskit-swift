@@ -52,9 +52,11 @@ public enum NodeType: String {
     var name: String {
         return self.type.rawValue
     }
+    
     var type: NodeType {
         return .N_UNDEFINED
     }
+    
     var children: [Node] {
         preconditionFailure("Node children not implemented")
     }

@@ -148,8 +148,8 @@ mixedlist: argument { $$ = [ParseTree createMixedlistNode: nil idlist: nil argum
 argument : id { $$ = [ParseTree createIndexedIdNode: $1 parameter: nil]; }
 | id '[' nninteger ']' { $$ = [ParseTree createIndexedIdNode: $1 parameter: $3]; }
 
-explist : exp { $$ = $1;  }
-| exp ',' explist { $$ = [ParseTree createExpressionList: $1 explist: $3]; }
+explist : exp { $$ = [ParseTree createExpressionList: nil expression: $1];  }
+| exp ',' explist { $$ = [ParseTree createExpressionList: $3 expression: $1]; }
 
 exp : exp '+' exp { $$ = [ParseTree createBinaryOperation: @"+" operand1: $1 operand2: $3];  }
 | exp '-' exp { $$ = [ParseTree createBinaryOperation: @"-" operand1: $1 operand2: $3]; }

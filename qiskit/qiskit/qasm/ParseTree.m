@@ -120,9 +120,18 @@
     return node;
 }
 
-+(Node*) createExpressionList: (Node*) exp1 explist: (Node*) explist {
-    NodeExpressionList *node = [[NodeExpressionList alloc] initWithExpression:exp1 expressionList:explist];
-    return node;
++(Node*) createExpressionList: (Node*) elist expression: (Node*) exp {
+    
+    if (elist == nil) {
+        NodeExpressionList *nodeExpList = [[NodeExpressionList alloc] initWithExpression:exp];
+        return nodeExpList;
+    } else {
+        NodeExpressionList *nodeExpList = (NodeExpressionList*)elist;
+        if (nodeExpList != nil) {
+            [nodeExpList addExpressionWithExp:exp];
+        }
+    }
+    return elist;
 }
     
 +(Node*) createBinaryOperation: (NSString*) op operand1: (Node*) o1 operand2: (Node*) o2 {

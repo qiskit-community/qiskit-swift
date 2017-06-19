@@ -156,4 +156,65 @@ class QIskitParserTests: XCTestCase {
         
     }
     
+    func testParserExpressionList () {
+        
+        let asyncExpectation = self.expectation(description: "parser")
+        
+        do {
+            let qasmProgram: String =
+                    "OPENQASM 2.0;\n" +
+                    "include \"qelib1.inc\";\n" +
+                    "qreg qr[4];\n" +
+                    "creg cr[4];\n" +
+                    "h qr[0];\n" +
+                    "x qr[1];\n" +
+                    "y qr[2];\n" +
+                    "z qr[3];\n" +
+                    "cx qr[0],qr[2];\n" +
+                    "barrier qr[0],qr[1],qr[2],qr[3];\n" +
+                    "u1(0.3) qr[0];\n" +
+                    "u2(0.3,0.2) qr[1];\n" +
+                    "u3(0.3,0.2,0.1) qr[2];\n" +
+                    "s qr[0];\n" +
+                    "t qr[1];\n" +
+                    "id qr[1];\n" +
+                    "measure qr[0] -> cr[0];"
+            
+            let buf: YY_BUFFER_STATE = yy_scan_string(qasmProgram)
+            
+            ParseSuccessBlock = { (n: NSObject?) -> Void in
+                XCTAssertNotNil(n)
+                if let node = n as? NodeMainProgram {
+                    let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
+                    let emittedQasm = node.qasm().components(separatedBy: whitespaceCharacterSet).joined()
+                    let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
+                    XCTAssertEqual(emittedQasm, targetQasm)
+                    asyncExpectation.fulfill()
+                } else {
+                    XCTFail("Main Program Node Type Expected!")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                
+            }
+            
+            ParseFailBlock = { (message: String?) -> Void in
+                if let msg = message {
+                    XCTFail(msg)
+                } else {
+                    XCTFail("Unknown Error")
+                }
+                asyncExpectation.fulfill()
+            }
+            
+            yyparse()
+            yy_delete_buffer(buf)
+            
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in parser")
+            })
+            
+        }
+    }
+    
 }

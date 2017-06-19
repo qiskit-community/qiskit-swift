@@ -37,12 +37,15 @@ import Foundation
     public func addArgument(argument: Node) {
         indexedids?.append(argument)
     }
+    
     public override var type: NodeType {
         return .N_MIXEDLIST
     }
+    
     public override var children: [Node] {
         return []
     }
+    
     public override func qasm() -> String {
         var qasms: [String] = []
         

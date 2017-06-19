@@ -28,12 +28,15 @@ import Foundation
     public func addUop(uop: Node) {
         uops?.append(uop)
     }
+    
     public override var type: NodeType {
         return .N_GOPLIST
     }
+    
     public override var children: [Node] {
         return []
     }
+    
     public override func qasm() -> String {
         
         var qasms: [String] = []

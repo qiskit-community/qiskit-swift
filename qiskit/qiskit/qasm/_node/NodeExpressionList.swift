@@ -10,29 +10,37 @@ import Foundation
 
 @objc public final class NodeExpressionList: Node {
 
-    public let expressionList: [Node]? = nil
+    public var expressionList: [Node]? = nil
     
-    public init(expression: Node, expressionList: Node?) {
-    /*    if let exlist = expressionList as? NodeExpressionList {
-            if exlist.expressionList == nil {
-                exlist.expressionList = []
+    public init(expression: Node?) {
+        super.init()
+        if let exp = expression {
+            if expressionList == nil {
+                self.expressionList = [exp]
             } else {
-                exlist.expressionList!.append(self)
+                expressionList!.append(self)
             }
-        }*/
+        }
     }
+
+    public func addExpression(exp: Node) {
+        expressionList?.append(exp)
+    }
+    
     public override var type: NodeType {
         return .N_EXPRESSIONLIST
     }
+    
     public override var children: [Node] {
         if let list = self.expressionList {
             return list
         }
         return []
     }
+    
     public override func qasm() -> String {
         var qasms: [String] = []
-        if let list = expressionList {
+        if let list = expressionList?.reversed() {
             qasms = list.flatMap({ (node: Node) -> String in
                 return node.qasm()
             })

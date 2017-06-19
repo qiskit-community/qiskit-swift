@@ -21,12 +21,15 @@ import Foundation
         self.incld = incld
         self.program = program
     }
+    
     public override var type: NodeType {
         return .N_MAINPROGRAM
     }
+    
     public override var children: [Node] {
         return []
     }
+    
     public override func qasm() -> String {
         var qasm: String = magic?.qasm() ?? ""
         qasm += "\(version?.qasm() ?? "");\n"

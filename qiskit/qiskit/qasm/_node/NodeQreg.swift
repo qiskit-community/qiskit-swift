@@ -15,9 +15,11 @@ import Foundation
     public override var type: NodeType {
         return .N_QREG
     }
+    
     public override var children: [Node] {
         return []
     }
+    
     public override func qasm() -> String {
         let qasm: String = "qreg"
         return qasm

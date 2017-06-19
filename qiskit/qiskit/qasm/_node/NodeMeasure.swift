@@ -13,9 +13,11 @@ import Foundation
     public override var type: NodeType {
         return .N_MEASURE
     }
+    
     public override var children: [Node] {
         return []
     }
+    
     public override func qasm() -> String {
         let qasm: String = "measure"
         return qasm

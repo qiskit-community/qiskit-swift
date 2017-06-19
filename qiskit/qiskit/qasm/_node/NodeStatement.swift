@@ -21,12 +21,15 @@ import Foundation
         self.p3 = p3 // nil | idlist
         self.p4 = p4 // nil | idlist | nninteger | qop
     }
+    
     public override var type: NodeType {
         return .N_STATEMENT
     }
+    
     public override var children: [Node] {
         return []
     }
+    
     public override func qasm() -> String {
  
         guard let s1 = p1 else {

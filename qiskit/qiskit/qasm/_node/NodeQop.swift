@@ -19,12 +19,15 @@ import Foundation
         self.arg = object2  // argument | nil
         self.arg2 = object3 // argument| nil
     }
+    
     public override var type: NodeType {
         return .N_QOP
     }
+    
     public override var children: [Node] {
         return []
     }
+    
     public override func qasm() -> String {
         
         guard let operation = op else {

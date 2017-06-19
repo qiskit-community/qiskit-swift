@@ -34,12 +34,15 @@ import Foundation
     public func addStatement(statement: Node) {
         statements?.append(statement)
     }
+    
     public override var type: NodeType {
         return .N_PROGRAM
     }
+    
     public override var children: [Node] {
         return []
     }
+    
     public override func qasm() -> String {
         
         var qasms: [String] = []

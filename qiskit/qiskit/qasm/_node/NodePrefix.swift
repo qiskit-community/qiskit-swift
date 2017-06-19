@@ -24,12 +24,15 @@ import Foundation
         }
         self._children = children
     }
+    
     public override var type: NodeType {
         return .N_PREFIX
     }
+    
     public override var children: [Node] {
         return self._children
     }
+    
     public override func qasm() -> String {
         let operand = self.children[0]
         return "\(op) (\(operand.qasm()))"

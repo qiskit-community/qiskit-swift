@@ -15,12 +15,15 @@ import Foundation
     public init(value: Int) {
         self.value = value
     }
+    
     public override var type: NodeType {
         return .N_INT
     }
+    
     public override var children: [Node] {
         return []
     }
+    
     public override func qasm() -> String {
         let qasm: String = "\(value)"
         return qasm
