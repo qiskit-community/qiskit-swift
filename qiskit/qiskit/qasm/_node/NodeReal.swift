@@ -8,17 +8,21 @@
 
 import Foundation
 
-@objc public class NodeReal: Node {
+@objc public final class NodeReal: Node {
 
-    public var real: Float = Float.leastNonzeroMagnitude
+    public let value: Float
     
     public init(id: Float) {
-        super.init(type: .N_REAL)
-        real = id
+        self.value = id
     }
-    
-    override public func qasm() -> String {
-        let qasm: String = "\(real)"
+    public override var type: NodeType {
+        return .N_REAL
+    }
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
+        let qasm: String = "\(value)"
         return qasm
     }
 }

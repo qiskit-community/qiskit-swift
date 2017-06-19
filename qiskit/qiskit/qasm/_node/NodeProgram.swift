@@ -8,14 +8,13 @@
 
 import Foundation
 
-@objc public class NodeProgram: Node  {
+@objc public final class NodeProgram: Node  {
 
-    public var program: [Node]?
-    public var statements: [Node]?
+    public private(set) var program: [Node]?
+    public private(set) var statements: [Node]?
     
     public init(program: Node?, statement: Node?) {
-        super.init(type: .N_PROGRAM)
-        
+        super.init()
         if let stmt = statement {
             if self.statements == nil {
                 self.statements = [stmt]
@@ -35,8 +34,13 @@ import Foundation
     public func addStatement(statement: Node) {
         statements?.append(statement)
     }
-    
-    override public func qasm() -> String {
+    public override var type: NodeType {
+        return .N_PROGRAM
+    }
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
         
         var qasms: [String] = []
         if let prg = program {

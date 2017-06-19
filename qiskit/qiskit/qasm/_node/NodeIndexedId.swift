@@ -8,16 +8,23 @@
 
 import Foundation
 
-@objc public class NodeIndexedId: Node {
-    public var identifer: Node?
-    public var parameter: Node?
+@objc public final class NodeIndexedId: Node {
+
+    public let identifer: Node?
+    public let parameter: Node?
+    public let index: Int = 0
+
     public init(identifier: Node, parameter: Node) {
-        super.init(type: .N_INDEXEDID)
         self.identifer = identifier
         self.parameter = parameter
     }
-    
-    override public func qasm() -> String {
+    public override var type: NodeType {
+        return .N_INDEXEDID
+    }
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
         guard let ident = identifer else {
             assertionFailure("Invalid NodeDecl Operation")
             return ""

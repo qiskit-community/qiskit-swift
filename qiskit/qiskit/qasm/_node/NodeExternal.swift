@@ -8,21 +8,23 @@
 
 import Foundation
 
-@objc public class NodeExternal: Node {
+@objc public final class NodeExternal: Node {
 
-    static let externalFunctions = ["sin", "cos", "tan", "exp", "ln", "sqrt"]
-    var operation: String?
+    public static let externalFunctions = ["sin", "cos", "tan", "exp", "ln", "sqrt"]
+
+    public let operation: String
+
     public init(operation: String) {
-        super.init(type: .N_EXTERNAL)
         self.operation = operation
     }
-    
-    override public func qasm() -> String {
-        guard let op = operation else {
-            assertionFailure("Invalid Enternal Operation")
-            return ""
-        }
-        return op
+    public override var type: NodeType {
+        return .N_EXTERNAL
+    }
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
+        return operation
     }
 
 }

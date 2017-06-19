@@ -8,13 +8,15 @@
 
 import Foundation
 
-@objc public class NodeReset: Node {
+@objc public final class NodeReset: Node {
     
-    public init() {
-        super.init(type: .N_RESET)
+    public override var type: NodeType {
+        return .N_RESET
     }
-    
-    override public func qasm() -> String {
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
         let qasm: String = "reset"
         return qasm
     }

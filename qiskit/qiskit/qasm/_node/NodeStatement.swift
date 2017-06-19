@@ -8,23 +8,26 @@
 
 import Foundation
 
-@objc public class NodeStatment: Node {
+@objc public final class NodeStatment: Node {
     
-    public var p1: Node?
-    public var p2: Node?
-    public var p3: Node?
-    public var p4: Node?
+    public let p1: Node?
+    public let p2: Node?
+    public let p3: Node?
+    public let p4: Node?
     
     public init(p1: Node?, p2: Node?, p3: Node?, p4: Node?) {
-        super.init(type: .N_STATEMENT)
-
         self.p1 = p1 // decl | gatedecl | opqaue | qop | ifn | barrier
         self.p2 = p2 // nil | goplist | id | anylist
         self.p3 = p3 // nil | idlist
         self.p4 = p4 // nil | idlist | nninteger | qop
     }
-    
-    override public func qasm() -> String {
+    public override var type: NodeType {
+        return .N_STATEMENT
+    }
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
  
         guard let s1 = p1 else {
             assertionFailure("Invalid NodeStatment Operation")

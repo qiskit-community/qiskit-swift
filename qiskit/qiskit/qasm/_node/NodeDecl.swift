@@ -8,19 +8,34 @@
 
 import Foundation
 
-@objc public class NodeDecl: Node {
+@objc public final class NodeDecl: Node {
     
-    var register: Node?
-    var identifier: Node?
-    var nninteger: Node?
+    public let register: Node?
+    public let identifier: Node?
+    public let nninteger: Node?
+
     public init(register: Node?, identifier: Node?, nninteger: Node?) {
-        super.init(type: .N_DECL)
         self.register = register
         self.identifier = identifier
         self.nninteger = nninteger
     }
-    
-    override public func qasm() -> String {
+    public override var type: NodeType {
+        return .N_DECL
+    }
+    public override var children: [Node] {
+        var array: [Node] = []
+        if let node = self.register {
+            array.append(node)
+        }
+        if let node = self.identifier {
+            array.append(node)
+        }
+        if let node = self.nninteger {
+            array.append(node)
+        }
+        return array
+    }
+    public override func qasm() -> String {
         guard let reg = register else {
             assertionFailure("Invalid NodeDecl Operation")
             return ""

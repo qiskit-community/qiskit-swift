@@ -8,14 +8,20 @@
 
 import Foundation
 
-@objc public class NodeInclude: Node {
-    
+@objc public final class NodeInclude: Node {
+
+    public let file: String
+
     public init(file: String) {
-        super.init(type: .N_INCLUDE)
-        super.file = file
+        self.file = file
     }
-    
-    override public func qasm() -> String {
+    public override var type: NodeType {
+        return .N_INCLUDE
+    }
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
         let qasm: String = "include \(file)"
         return qasm
     }

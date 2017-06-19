@@ -47,42 +47,19 @@ public enum NodeType: String {
     case N_UNDEFINED = "undefined"
 }
 
-
 @objc public class Node : NSObject {
 
-    var root: Node?
-    var arguments: Node?
-    var bitlist: Node?
-    var body: Node?
-    
-    // I am not sure about types but those properties are being accessed in Unroller
-    var type: NodeType = .N_UNDEFINED
-    var children: [Node] = []
-  
-    var name: String = ""
-    var index: Int = 0
-    var line: Int = 0
-    var file: String = ""
-    var n_args: Int = 0
-    var n_bits: Int = 0
-    var value: String = ""
+    var name: String {
+        return self.type.rawValue
+    }
+    var type: NodeType {
+        return .N_UNDEFINED
+    }
+    var children: [Node] {
+        preconditionFailure("Node children not implemented")
+    }
 
-    public init(type: NodeType, children: [Node] = [], root: Node? = nil) {
-        super.init()
-        self.root = root
-        self.type = type
-        self.children = children
-    }
-    
-    public func qasm() -> String {
+    func qasm() -> String {
         preconditionFailure("Node qasm not implemented")
-    }
-    
-    func calls() -> [String] {
-        preconditionFailure("Node calls not implemented")
-    }
-    
-    public func copy(with zone: NSZone? = nil) -> Any {
-        preconditionFailure("Node copy not implemented")
     }
 }

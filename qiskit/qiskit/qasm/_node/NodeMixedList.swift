@@ -8,14 +8,12 @@
 
 import Foundation
 
-@objc public class NodeMixedList: Node {
+@objc public final class NodeMixedList: Node {
 
-    var idlists: [Node]?
-    var indexedids: [Node]?
+    public private(set) var idlists: [Node]?
+    public private(set) var indexedids: [Node]?
     
     public init(idlist: Node?, argument: Node?) {
-        super.init(type: .N_MIXEDLIST)
-        
         if let idlst = idlist {
             if idlists == nil {
                 idlists = [idlst]
@@ -23,7 +21,6 @@ import Foundation
                 idlists!.append(idlst)
             }
         }
-
         if let arg = argument {
             if indexedids == nil {
                 indexedids = [arg]
@@ -31,7 +28,6 @@ import Foundation
                 indexedids!.append(arg)
             }
         }
-
     }
     
     public func addIdList(idlist: Node) {
@@ -41,8 +37,13 @@ import Foundation
     public func addArgument(argument: Node) {
         indexedids?.append(argument)
     }
-
-    override public func qasm() -> String {
+    public override var type: NodeType {
+        return .N_MIXEDLIST
+    }
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
         var qasms: [String] = []
         
         if let idls = idlists {

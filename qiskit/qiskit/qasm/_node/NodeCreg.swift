@@ -8,13 +8,17 @@
 
 import Foundation
 
-@objc public class NodeCreg: Node {
-    
-    public init() {
-        super.init(type: .N_CREG)
+@objc public final class NodeCreg: Node {
+
+    public let index: Int = 0
+
+    public override var type: NodeType {
+        return .N_CREG
     }
-    
-    override public func qasm() -> String {
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
         let qasm: String = "creg"
         return qasm
     }

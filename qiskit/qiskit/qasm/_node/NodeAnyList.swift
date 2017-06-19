@@ -8,19 +8,20 @@
 
 import Foundation
 
-@objc public class NodeAnyList: Node {
+@objc public final class NodeAnyList: Node {
     
-    var list: Node?
+    public let list: Node
+
     public init(list: Node) {
-        super.init(type: .N_ANYLIST)
         self.list = list
     }
-    
-    override public func qasm() -> String {
-        guard let l = list else {
-            assertionFailure("Invalid NodeAnyList Operation")
-            return ""
-        }
-        return l.qasm()
+    public override var type: NodeType {
+        return .N_ANYLIST
+    }
+    public override var children: [Node] {
+        return [self.list]
+    }
+    public override func qasm() -> String {
+        return self.list.qasm()
     }
 }

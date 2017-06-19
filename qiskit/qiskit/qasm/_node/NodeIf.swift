@@ -8,13 +8,15 @@
 
 import Foundation
 
-@objc public class NodeIf: Node {
+@objc public final class NodeIf: Node {
 
-    public init() {
-        super.init(type: .N_IF)
+    public override var type: NodeType {
+        return .N_IF
     }
-    
-    override public func qasm() -> String {
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
         let qasm: String = "if"
         return qasm
     }

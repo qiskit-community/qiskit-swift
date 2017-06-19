@@ -8,16 +8,21 @@
 
 import Foundation
 
-@objc public class NodeNNInt: Node {
+@objc public final class NodeNNInt: Node {
 
-    public var nninteger: Int = Int.allZeros
+    public let value: Int
+
     public init(value: Int) {
-        super.init(type: .N_INT)
-        nninteger = value
+        self.value = value
     }
-    
-    override public func qasm() -> String {
-        let qasm: String = "\(nninteger)"
+    public override var type: NodeType {
+        return .N_INT
+    }
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
+        let qasm: String = "\(value)"
         return qasm
     }
 }

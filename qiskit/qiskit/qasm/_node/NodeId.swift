@@ -8,16 +8,20 @@
 
 import Foundation
 
-@objc public class NodeId: Node {
+@objc public final class NodeId: Node {
 
-    public var identifier: String = ""
+    public let identifier: String
     
     public init(identifier: String) {
-        super.init(type: .N_ID)
         self.identifier = identifier
     }
-    
-    override public func qasm() -> String {
+    public override var type: NodeType {
+        return .N_ID
+    }
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
         let qasm: String = identifier
         return qasm
     }

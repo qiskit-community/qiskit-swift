@@ -8,13 +8,15 @@
 
 import Foundation
 
-@objc public class NodeMagic: Node {
+@objc public final class NodeMagic:  Node {
 
-    public init() {
-        super.init(type: .N_MAGIC)
+    public override var type: NodeType {
+        return .N_MAGIC
     }
-    
-    override public func qasm() -> String {
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
         let qasm: String = "OPENQASM "
         return qasm
     }

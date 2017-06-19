@@ -8,22 +8,26 @@
 
 import Foundation
 
-@objc public class NodeMainProgram: Node {
+@objc public final class NodeMainProgram: Node {
     
-    var magic: Node?
-    var version: Node?
-    var incld: Node?
-    var program: Node?
+    public let magic: Node?
+    public let version: Node?
+    public let incld: Node?
+    public let program: Node?
     
     public init(magic: Node?, version: Node?, incld: Node?, program: Node?) {
-        super.init(type: .N_MAINPROGRAM)
         self.magic = magic
         self.version = version
         self.incld = incld
         self.program = program
     }
-    
-    override public func qasm() -> String {
+    public override var type: NodeType {
+        return .N_MAINPROGRAM
+    }
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
         var qasm: String = magic?.qasm() ?? ""
         qasm += "\(version?.qasm() ?? "");\n"
         qasm += "\(incld?.qasm() ?? "");\n"

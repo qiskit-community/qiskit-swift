@@ -8,17 +8,22 @@
 
 import Foundation
 
-@objc public class NodeBinaryOp: Node {
+@objc public final class NodeBinaryOp: Node {
 
-    public var op: String = ""
+    public let op: String
+    private let _children: [Node]
     
     public init(op: String, children: [Node]) {
-        super.init(type: .N_BINARYOP)
         self.op = op
-        self.children = children
+        self._children = children
     }
-    
-    override public func qasm() -> String {
+    public override var type: NodeType {
+        return .N_BINARYOP
+    }
+    public override var children: [Node] {
+        return self._children
+    }
+    public override func qasm() -> String {
         let lhs = children[0]
         let rhs = children[1]
         if lhs.type == .N_BINARYOP {

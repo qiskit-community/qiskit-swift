@@ -8,23 +8,29 @@
 
 import Foundation
 
-@objc public class NodeExpressionList: Node {
+@objc public final class NodeExpressionList: Node {
 
-    public var expressionList: [Node]?
+    public let expressionList: [Node]? = nil
     
     public init(expression: Node, expressionList: Node?) {
-        super.init(type: .N_EXPRESSIONLIST)
-        
-        if let exlist = expressionList as? NodeExpressionList {
+    /*    if let exlist = expressionList as? NodeExpressionList {
             if exlist.expressionList == nil {
                 exlist.expressionList = []
             } else {
                 exlist.expressionList!.append(self)
             }
-        }
+        }*/
     }
-    
-    override public func qasm() -> String {
+    public override var type: NodeType {
+        return .N_EXPRESSIONLIST
+    }
+    public override var children: [Node] {
+        if let list = self.expressionList {
+            return list
+        }
+        return []
+    }
+    public override func qasm() -> String {
         var qasms: [String] = []
         if let list = expressionList {
             qasms = list.flatMap({ (node: Node) -> String in

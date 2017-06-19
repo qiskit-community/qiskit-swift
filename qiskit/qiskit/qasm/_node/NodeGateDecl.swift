@@ -8,21 +8,39 @@
 
 import Foundation
 
-@objc public class NodeGateDecl: Node {
+@objc public final class NodeGateDecl: Node {
 
-    var gate: Node?
-    var identifier: Node?
-    var idlist1: Node?
-    var idlist2: Node?
+    public let gate: Node?
+    public let identifier: Node?
+    public let idlist1: Node?
+    public let idlist2: Node?
+
     public init(gate: Node?, identifier: Node?, idlist1: Node?, idlist2: Node?) {
-        super.init(type: .N_GATEDECL)
         self.gate = gate
         self.identifier = identifier
         self.idlist1 = idlist1
         self.idlist2 = idlist2
     }
-    
-    override public func qasm() -> String {
+    public override var type: NodeType {
+        return .N_GATEDECL
+    }
+    public override var children: [Node] {
+        var array: [Node] = []
+        if let node = self.gate {
+            array.append(node)
+        }
+        if let node = self.identifier {
+            array.append(node)
+        }
+        if let node = self.idlist1 {
+            array.append(node)
+        }
+        if let node = self.idlist2 {
+            array.append(node)
+        }
+        return array
+    }
+    public override func qasm() -> String {
         guard let g8 = gate else {
             assertionFailure("Invalid NodeGateDecl Operation")
             return ""

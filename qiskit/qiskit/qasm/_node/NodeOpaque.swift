@@ -8,13 +8,15 @@
 
 import Foundation
 
-@objc public class NodeOpaque: Node {
+@objc public final class NodeOpaque: Node {
 
-    public init() {
-        super.init(type: .N_OPAQUE)
+    public override var type: NodeType {
+        return .N_OPAQUE
     }
-    
-    override public func qasm() -> String {
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
         let qasm: String = "opaque"
         return qasm
     }

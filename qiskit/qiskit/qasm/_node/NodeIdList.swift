@@ -8,13 +8,12 @@
 
 import Foundation
 
-@objc public class NodeIdList: Node {
+@objc public final class NodeIdList: Node {
     
-    public var identifiers: [Node]?
-    
+    public private(set) var identifiers: [Node]?
+
     public init(identifier: Node?) {
-        super.init(type: .N_IDLIST)
-        
+        super.init()
         if let ident = identifier {
             if identifiers == nil {
                 self.identifiers = [ident]
@@ -27,8 +26,13 @@ import Foundation
     public func addIdentifier(identifier: Node) {
         identifiers?.append(identifier)
     }
-    
-    override public func qasm() -> String {
+    public override var type: NodeType {
+        return .N_IDLIST
+    }
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
         var qasms: [String] = []
         if let list = identifiers {
             qasms = list.flatMap({ (node: Node) -> String in

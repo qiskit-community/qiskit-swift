@@ -8,13 +8,15 @@
 
 import Foundation
 
-@objc public class NodeBarrier: Node {
+@objc public final class NodeBarrier: Node {
 
-    public init() {
-        super.init(type: .N_BARRIER)
+    public override var type: NodeType {
+        return .N_BARRIER
     }
-    
-    override public func qasm() -> String {
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
         let qasm: String = "barrier"
         return qasm
     }

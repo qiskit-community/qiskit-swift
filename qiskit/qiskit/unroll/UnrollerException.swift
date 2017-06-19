@@ -12,17 +12,17 @@ import Foundation
  Exception for errors raised by unroller.
  */
 public enum UnrollerException: LocalizedError, CustomStringConvertible {
-    case errorregname(line: Int, file: String)
-    case errorlocalbit(line: Int, file: String)
-    case errorlocalparameter(line: Int, file: String)
-    case errorundefinedgate(line: Int, file: String)
-    case errorqregsize(line: Int, file: String)
-    case errorbinop(line: Int, file: String)
-    case errorprefix(line: Int, file: String)
-    case errorregsize(line: Int, file: String)
-    case errorexternal(line: Int, file: String)
-    case errortypeindexed(line: Int, file: String)
-    case errortype(type: String, line: Int, file: String)
+    case errorregname(qasm: String)
+    case errorlocalbit(qasm: String)
+    case errorlocalparameter(qasm: String)
+    case errorundefinedgate(qasm: String)
+    case errorqregsize(qasm: String)
+    case errorbinop(qasm: String)
+    case errorprefix(qasm: String)
+    case errorregsize(qasm: String)
+    case errorexternal(qasm: String)
+    case errortypeindexed(qasm: String)
+    case errortype(type: String, qasm: String)
     case errorbackend
 
     public var errorDescription: String? {
@@ -30,28 +30,28 @@ public enum UnrollerException: LocalizedError, CustomStringConvertible {
     }
     public var description: String {
         switch self {
-        case .errorregname(let line,let file):
-            return "expected qreg or creg name: line=\(line) file=\(file)"
-        case .errorlocalbit(let line,let file):
-            return "excepted local bit name: line=\(line) file=\(file)"
-        case .errorlocalparameter(let line,let file):
-            return "expected local parameter name: line=\(line) file=\(file)"
-        case .errorundefinedgate(let line,let file):
-            return "internal error undefined gate: line=\(line) file=\(file)"
-        case .errorqregsize(let line,let file):
-            return "internal error: qreg size mismatch: line=\(line) file=\(file)"
-        case .errorbinop(let line,let file):
-            return "internal error: undefined binop: line=\(line) file=\(file)"
-        case .errorprefix(let line,let file):
-            return "internal error: undefined prefix: line=\(line) file=\(file)"
-        case .errorregsize(let line,let file):
-            return "internal error: reg size mismatch: line=\(line) file=\(file)"
-        case .errorexternal(let line,let file):
-            return "internal error: undefined external: line=\(line) file=\(file)"
-        case .errortypeindexed(let line,let file):
-            return "internal error n.type == indexed_id: line=\(line) file=\(file)"
-        case .errortype(let type,let line,let file):
-            return "internal error: undefined node type \(type): line=\(line) file=\(file)"
+        case .errorregname(let qasm):
+            return "expected qreg or creg name: qasm='\(qasm)"
+        case .errorlocalbit(let qasm):
+            return "excepted local bit name: qasm='\(qasm)'"
+        case .errorlocalparameter(let qasm):
+            return "expected local parameter name: qasm='\(qasm)'"
+        case .errorundefinedgate(let qasm):
+            return "internal error undefined gate: qasm='\(qasm)'"
+        case .errorqregsize(let qasm):
+            return "internal error: qreg size mismatch: qasm='\(qasm)'"
+        case .errorbinop(let qasm):
+            return "internal error: undefined binop: qasm='\(qasm)'"
+        case .errorprefix(let qasm):
+            return "internal error: undefined prefix: qasm='\(qasm)'"
+        case .errorregsize(let qasm):
+            return "internal error: reg size mismatch: qasm='\(qasm)'"
+        case .errorexternal(let qasm):
+            return "internal error: undefined external: qasm='\(qasm)'"
+        case .errortypeindexed(let qasm):
+            return "internal error n.type == indexed_id: qasm='\(qasm)'"
+        case .errortype(let type,let qasm):
+            return "internal error: undefined node type \(type): qasm='\(qasm)'"
         case .errorbackend():
             return "backend not attached"
         }

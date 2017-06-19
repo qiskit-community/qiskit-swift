@@ -8,13 +8,15 @@
 
 import Foundation
 
-@objc public class NodeU: Node {
+@objc public final class NodeU: Node {
     
-    public init() {
-        super.init(type: .N_U)
+    public override var type: NodeType {
+        return .N_U
     }
-    
-    override public func qasm() -> String {
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
         let qasm: String = "U"
         return qasm
     }

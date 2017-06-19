@@ -8,13 +8,15 @@
 
 import Foundation
 
-@objc public class NodeMeasure: Node {
+@objc public final class NodeMeasure: Node {
 
-    public init() {
-        super.init(type: .N_MEASURE)
+    public override var type: NodeType {
+        return .N_MEASURE
     }
-    
-    override public func qasm() -> String {
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
         let qasm: String = "measure"
         return qasm
     }

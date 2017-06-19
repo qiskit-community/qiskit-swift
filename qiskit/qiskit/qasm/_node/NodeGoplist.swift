@@ -8,28 +8,17 @@
 
 import Foundation
 
-@objc public class NodeGoplist: Node {
+@objc public final class NodeGoplist: Node {
     
-    var barrieridlist: [(barrier:Node, idlist:Node)]?
-    var uops: [Node]?
+    public private(set) var barrieridlist: [(barrier:Node, idlist:Node)]?
+    public private(set) var uops: [Node]?
 
     public init(barrier: Node, idlist: Node) {
-        super.init(type: .N_GOPLIST)
-        
-        if barrieridlist == nil {
-            barrieridlist = [(barrier, idlist)]
-        } else {
-            barrieridlist!.append((barrier, idlist))
-        }
+        barrieridlist = [(barrier, idlist)]
     }
 
     public init(uop: Node) {
-        super.init(type: .N_GOPLIST)
-        if uops == nil {
-            uops = [uop]
-        } else {
-            uops!.append(uop)
-        }
+        uops = [uop]
     }
 
     public func addBarrierIdlist(barrier: Node, idlist: Node) {
@@ -39,8 +28,13 @@ import Foundation
     public func addUop(uop: Node) {
         uops?.append(uop)
     }
-    
-    override public func qasm() -> String {
+    public override var type: NodeType {
+        return .N_GOPLIST
+    }
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
         
         var qasms: [String] = []
         if let bl = barrieridlist {

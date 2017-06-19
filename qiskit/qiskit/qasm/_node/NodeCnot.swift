@@ -8,13 +8,15 @@
 
 import Foundation
 
-@objc public class NodeCnot: Node {
+@objc public final class NodeCnot: Node {
 
-    public init() {
-        super.init(type: .N_CNOT)
+    public override var type: NodeType {
+        return .N_CNOT
     }
-    
-    override public func qasm() -> String {
+    public override var children: [Node] {
+        return []
+    }
+    public override func qasm() -> String {
         let qasm: String = "CX"
         return qasm
     }

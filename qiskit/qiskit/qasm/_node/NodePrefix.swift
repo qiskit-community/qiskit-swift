@@ -8,21 +8,29 @@
 
 import Foundation
 
-@objc public class NodePrefix: Node {
+@objc public final class NodePrefix: Node {
 
-    public var op: String = ""
-    public var external: NodeExternal?
+    public let op: String
+    public let external: NodeExternal?
+    private let _children: [Node]
 
     public init(op: String, children: [Node]) {
-        super.init(type: .N_PREFIX)
         self.op = op
         if NodeExternal.externalFunctions.contains(op) {
             external = NodeExternal(operation: op)
         }
-        self.children = children
+        else {
+            external = nil
+        }
+        self._children = children
     }
-    
-    override public func qasm() -> String {
+    public override var type: NodeType {
+        return .N_PREFIX
+    }
+    public override var children: [Node] {
+        return self._children
+    }
+    public override func qasm() -> String {
         let operand = self.children[0]
         return "\(op) (\(operand.qasm()))"
     }
