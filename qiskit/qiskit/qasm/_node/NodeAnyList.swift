@@ -15,12 +15,15 @@ import Foundation
     public init(list: Node) {
         self.list = list
     }
+    
     public override var type: NodeType {
         return .N_ANYLIST
     }
+    
     public override var children: [Node] {
         return [self.list]
     }
+    
     public override func qasm() -> String {
         return self.list.qasm()
     }

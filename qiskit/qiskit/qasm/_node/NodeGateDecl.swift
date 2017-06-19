@@ -21,9 +21,11 @@ import Foundation
         self.idlist1 = idlist1
         self.idlist2 = idlist2
     }
+    
     public override var type: NodeType {
         return .N_GATEDECL
     }
+    
     public override var children: [Node] {
         var array: [Node] = []
         if let node = self.gate {
@@ -40,6 +42,7 @@ import Foundation
         }
         return array
     }
+    
     public override func qasm() -> String {
         guard let g8 = gate else {
             assertionFailure("Invalid NodeGateDecl Operation")

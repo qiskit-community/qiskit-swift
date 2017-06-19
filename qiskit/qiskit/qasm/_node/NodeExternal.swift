@@ -17,12 +17,15 @@ import Foundation
     public init(operation: String) {
         self.operation = operation
     }
+    
     public override var type: NodeType {
         return .N_EXTERNAL
     }
+    
     public override var children: [Node] {
         return []
     }
+    
     public override func qasm() -> String {
         return operation
     }

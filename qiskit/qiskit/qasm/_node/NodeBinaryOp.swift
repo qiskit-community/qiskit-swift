@@ -17,12 +17,15 @@ import Foundation
         self.op = op
         self._children = children
     }
+    
     public override var type: NodeType {
         return .N_BINARYOP
     }
+    
     public override var children: [Node] {
         return self._children
     }
+    
     public override func qasm() -> String {
         let lhs = children[0]
         let rhs = children[1]
