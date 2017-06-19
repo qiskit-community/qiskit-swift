@@ -13,6 +13,10 @@ final class Qasm {
 
     private let data: String
 
+    init(filename: String) throws {
+        self.data  = try String(contentsOfFile: filename, encoding: String.Encoding.utf8)
+    }
+
     init(data: String) {
         self.data = data
     }

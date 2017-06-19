@@ -276,11 +276,11 @@ public final class QuantumProgram {
      Load qasm file
      qasm_file qasm file name
      */
-    public func load_qasm(name: String = "", qasm_file: String? = nil, basis: String? = nil) throws {
-    /*    guard let file = qasm_file else {
+    func load_qasm(name: String = "", qasm_file: String? = nil, basis: String? = nil) throws {
+   /*     guard let file = qasm_file else {
             throw QISKitException.missingFileName
         }
-        var basis_gates: String = "u1,u2,u3,cx,id"  // QE target basis
+         var basis_gates: String = "u1,u2,u3,cx,id"  // QE target basis
         if let b = basis {
             basis_gates = b
         }
@@ -288,10 +288,9 @@ public final class QuantumProgram {
         if n == "" {
             n = file
         }
-*/
-        //let circuit_object = qasm.Qasm(filename=qasm_file).parse() // Node (AST)
+        let circuit_object = try Qasm(filename:file).parse() // Node (AST)*/
 
-        // TODO: add method to convert to QuantumCircuit object from Node
+        //TODO: add method to convert to QuantumCircuit object from Node
         //self.__quantum_program.circuits[n] = QCircuit(n, circuit_object)
     }
 
