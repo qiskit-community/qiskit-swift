@@ -356,6 +356,7 @@ class QiskitTests: XCTestCase {
                 return
             }
             print(result!)
+            asyncExpectation.fulfill()
         }
         self.waitForExpectations(timeout: 180, handler: { (error) in
             XCTAssertNil(error, "Failure in runJob")
