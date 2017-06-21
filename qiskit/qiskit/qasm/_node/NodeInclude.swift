@@ -20,10 +20,6 @@ import Foundation
         return .N_INCLUDE
     }
     
-    public override var children: [Node] {
-        return []
-    }
-    
     public override func qasm() -> String {
         let qasm: String = "include \(file)"
         return qasm

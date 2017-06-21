@@ -14,33 +14,44 @@ import Foundation
     public let identifier: Node?
     public let idlist1: Node?
     public let idlist2: Node?
-
+    public var gateBody: NodeStatment?
+    public var bit_list: [(name: String, position: Int)] = []
+    
     public init(gate: Node?, identifier: Node?, idlist1: Node?, idlist2: Node?) {
         self.gate = gate
         self.identifier = identifier
         self.idlist1 = idlist1
         self.idlist2 = idlist2
+    
+        // # To help with scoping rules, so we know the id is a bit,
+        // # this flag is set to True when the id appears in a gate declaration
+        (self.identifier as? NodeId)?.is_bit = true
+        
+        // create the bit list - the bit list is an array of tuples representing the id names and their positions
+        if let l1 = self.idlist1 as? NodeIdList {
+            if let ids = l1.identifiers {
+                for index in 0..<ids.count {
+                    if let i = ids[index] as? NodeId{
+                        bit_list.append((i.name, index))
+                    }
+                }
+            }
+        }
+        
+        if let l2 = self.idlist2 as? NodeIdList {
+            if let ids = l2.identifiers {
+                for index in 0..<ids.count {
+                    if let i = ids[index] as? NodeId{
+                        bit_list.append((i.name, index))
+                    }
+                }
+            }
+        }
+        
     }
     
     public override var type: NodeType {
         return .N_GATEDECL
-    }
-    
-    public override var children: [Node] {
-        var array: [Node] = []
-        if let node = self.gate {
-            array.append(node)
-        }
-        if let node = self.identifier {
-            array.append(node)
-        }
-        if let node = self.idlist1 {
-            array.append(node)
-        }
-        if let node = self.idlist2 {
-            array.append(node)
-        }
-        return array
     }
     
     public override func qasm() -> String {

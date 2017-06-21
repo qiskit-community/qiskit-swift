@@ -11,17 +11,19 @@ import Foundation
 @objc public final class NodeId: Node {
 
     public let identifier: String
+    public let line: Int
+    public let file: String
+    public var is_bit: Bool = false
     
-    public init(identifier: String) {
+    public init(identifier: String, line: Int) {
         self.identifier = identifier
+        self.line = line
+        self.file = "" // FIXME find the name
+        self.is_bit = false
     }
     
     public override var type: NodeType {
         return .N_ID
-    }
-    
-    public override var children: [Node] {
-        return []
     }
     
     public override func qasm() -> String {

@@ -20,10 +20,6 @@ import Foundation
         return .N_REAL
     }
     
-    public override var children: [Node] {
-        return []
-    }
-    
     public override func qasm() -> String {
         let qasm: String = "\(value)"
         return qasm

@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
+extern int yylineno;
 extern void (^ParseSuccessBlock)(NSObject *node);
 extern void (^ParseFailBlock)(NSString *msg);
 

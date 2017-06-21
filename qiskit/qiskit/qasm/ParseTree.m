@@ -77,8 +77,14 @@
 }
 
 +(Node*) createUniversalUnitary: (Node*) o1 object2: (Node*) o2 object3: (Node*) o3 {
-    NodeUniversalUnitary *node = [[NodeUniversalUnitary alloc] initWithObject1:o1 object2:o2 object3:o3];
-    return node;   
+    
+    if ([o1 isKindOfClass: NodeId.class]) {
+        NodeCustomUnitary *node = [[NodeCustomUnitary alloc] initWithIdentifier:o1 anylist:o2 explist:o3];
+        return node;
+    }
+    
+    NodeUniversalUnitary *node = [[NodeUniversalUnitary alloc] initWithIdentifier:o1 explistorarg: o2 argument: o3];
+    return node;
 }
 
 +(Node*) createAnylistNode: (Node*) list {
@@ -144,8 +150,8 @@
     return node;
 }
 
-+(Node*) createIdNodeWithValue: (NSString*) value {
-    NodeId *node = [[NodeId alloc] initWithIdentifier: value];
++(Node*) createIdNode: (NSString*) identifer line: (int) line {
+    NodeId *node = [[NodeId alloc] initWithIdentifier:identifer line:line];
     return node;
 }
 

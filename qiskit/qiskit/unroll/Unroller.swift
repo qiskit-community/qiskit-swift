@@ -115,17 +115,23 @@ final class Unroller {
     /**
      Process a custom unitary node.
      */
-    private func _process_custom_unitary(_ node: NodeGate) throws {
+    private func _process_custom_unitary(_ node: NodeCustomUnitary) throws {
         let name = node.name
         var args: [Double] = []
-        if let arguments = node.arguments {
-            args = try self._process_node(arguments)
+        if let anylist = node.anylist {
+            args = try self._process_list(anylist)
         }
+        if let explist = node.explist {
+            args += try self._process_node(explist)
+        }
+        
         var bits: [[RegBit]] = []
-        let children = node.bitlist?.children ?? []
-        for node_element in children {
-            bits.append(try self._process_bit_id(node_element))
+        if let nodeId = (node.op as? NodeId) {
+            if nodeId.is_bit {
+                bits.append(try self._process_bit_id(nodeId))
+            }
         }
+        
         if let gate = self.gates[name] {
             let gargs = gate.args
             let gbits = gate.bits
@@ -173,7 +179,15 @@ final class Unroller {
                     try backend.start_gate(name,args,qubits)
                 }
                 if !gate.opaque && gbody != nil {
-                    try self._process_children(gbody!)
+                    if let idnode = gbody!.p2 {
+                        try self._process_node(idnode)
+                    }
+                    if let idlistnode1 = gbody!.p3 {
+                        try self._process_node(idlistnode1)
+                    }
+                    if let idlistnode2 = gbody!.p4 {
+                        try self._process_node(idlistnode2)
+                    }
                 }
                 if let backend = self.backend {
                     backend.end_gate(name,args,qubits)
@@ -186,65 +200,125 @@ final class Unroller {
         throw UnrollerException.errorundefinedgate(qasm: node.qasm())
     }
 
+
+    
     /**
-     Process a gate node.
+     Process a gate decl node.
      If opaque is True, process the node as an opaque gate node.
-     */
-    private func _process_gate(_ node: NodeGate, opaque: Bool = false) throws {
-        let opaque = opaque
-        let n_args = node.n_args
-        let n_bits = node.n_bits
+     """Process a gate node.
+    */
+    private func _process_gate_decl(_ node: NodeGateDecl, opaque: Bool = false) throws {
+        
         var args: [String] = []
-        if node.n_args > 0 {
-            for element in node.arguments!.children {
-                args.append(element.name)
+        if let idl1 = node.idlist1 as? NodeIdList {
+            if let ids = idl1.identifiers {
+                for i in ids {
+                    args.append(i.name)
+                }
             }
         }
+ 
+        if let idl2 = node.idlist2 as? NodeIdList {
+            if let ids = idl2.identifiers {
+                for i in ids {
+                    args.append(i.name)
+                }
+            }
+        }
+
         var bits: [String] = []
-        let children = node.bitlist?.children ?? []
-        for c in children {
+        for c in node.bit_list {
             bits.append(c.name)
         }
-        let body: NodeGate? = (opaque) ? nil : node.body
-        let gate = GateData(opaque,n_args,n_bits,args,bits,body)
+        
+        let body: NodeStatment? = (opaque) ? nil : node.gateBody
+        let gate = GateData(opaque, args.count, bits.count, args, bits, body)
         self.gates[node.name] = gate
         if let backend = self.backend {
             try backend.define_gate(node.name, gate.copy(with: nil) as! GateData)
         }
+        
     }
 
     /**
      Process a CNOT gate node.
      */
-    private func _process_cnot(_ node: NodeCnot) throws {
-        let id0 = try self._process_bit_id(node.children[0])
-        let id1 = try self._process_bit_id(node.children[1])
-        if !(id0.count == id1.count || id0.count == 1 || id1.count == 1) {
-            throw UnrollerException.errorqregsize(qasm: node.qasm())
+    private func _process_cnot(_ node: NodeUniversalUnitary) throws {
+        
+        if node.op?.type == .N_CNOT {
+            guard let argument1 = node.elistorarg as? NodeIdList else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
+            guard let argument2 = node.argument as? NodeIdList else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
+            
+            let id0 = try self._process_bit_id(argument1)
+            let id1 = try self._process_bit_id(argument2)
+            
+            if !(id0.count == id1.count || id0.count == 1 || id1.count == 1) {
+                throw UnrollerException.errorqregsize(qasm: node.qasm())
+            }
+            let maxidx = max(id0.count, id1.count)
+            if let backend = self.backend {
+                for idx in 0..<maxidx {
+                    if id0.count > 1 && id1.count > 1 {
+                        try backend.cx(id0[idx], id1[idx])
+                        continue
+                    }
+                    if id0.count > 1 {
+                        try backend.cx(id0[idx], id1[0])
+                        continue
+                    }
+                    try backend.cx(id0[0], id1[idx])
+                }
+            }
         }
-        let maxidx = max(id0.count, id1.count)
-        if let backend = self.backend {
-            for idx in 0..<maxidx {
-                if id0.count > 1 && id1.count > 1 {
-                    try backend.cx(id0[idx], id1[idx])
-                    continue
+    }
+
+
+    /**
+     Process a measurement node.
+     */
+    private func _process_measure(_ node: NodeQop) throws {
+        if node.op?.type == .N_MEASURE {
+            guard let argument1 = node.arg as? NodeIdList else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
+            guard let argument2 = node.arg2 as? NodeIdList else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
+            
+            let id0 = try self._process_bit_id(argument1)
+            let id1 = try self._process_bit_id(argument2)
+            if id0.count != id1.count {
+                throw UnrollerException.errorregsize(qasm: node.qasm())
+            }
+            if let backend = self.backend {
+                for i in 0..<id0.count {
+                    try backend.measure(id0[i], id1[i])
                 }
-                if id0.count > 1 {
-                    try backend.cx(id0[idx], id1[0])
-                    continue
-                }
-                try backend.cx(id0[0], id1[idx])
             }
         }
     }
 
     /**
+     Process an if node.
+     */
+    private func _process_if(_ node: NodeStatment) throws {
+        if node.opeation?.type == .N_IF {
+            if let arg1 = node.p2 as? NodeId,
+                let arg2 = node.p3 as? NodeNNInt,
+                let arg3 = node.p4 as? NodeUniversalUnitary {
+                if let backend = self.backend {
+                    backend.set_condition(arg1.name, arg2.value)
+                    _ = try self._process_node(arg3)
+                    backend.drop_condition()
+                }
+            }
+        }
+    }
+    
+    
+    /**
      Process a binary operation node.
      */
     private func _process_binop(_ node: NodeBinaryOp) throws -> Double {
         let operation = node.op
-        let lexpr = node.children[1]
-        let rexpr = node.children[2]
+        let lexpr = node._children[1]
+        let rexpr = node._children[2]
         if operation == "+" {
             return try self._process_node(lexpr)[0] + self._process_node(rexpr)[0]
         }
@@ -268,7 +342,7 @@ final class Unroller {
      */
     private func _process_prefix(_ node: NodePrefix) throws -> Double {
         let operation = node.op
-        let expr = node.children[1]
+        let expr = node._children[0]
         if operation == "+" {
             return try self._process_node(expr)[0]
         }
@@ -277,44 +351,22 @@ final class Unroller {
         }
         throw  UnrollerException.errorprefix(qasm: node.qasm())
     }
-
-    /**
-     Process a measurement node.
-     */
-    private func _process_measure(_ node: NodeMeasure) throws {
-        let id0 = try self._process_bit_id(node.children[0])
-        let id1 = try self._process_bit_id(node.children[1])
-        if id0.count != id1.count {
-            throw UnrollerException.errorregsize(qasm: node.qasm())
-        }
-        if let backend = self.backend {
-            for i in 0..<id0.count {
-                try backend.measure(id0[i], id1[i])
-            }
-        }
-    }
-
-    /**
-     Process an if node.
-     */
-    private func _process_if(_ node: NodeIf) throws {
-        if let backend = self.backend {
-            let creg = node.children[0].name
-            if let n = node.children[1] as? NodeNNInt {
-                backend.set_condition(creg, n.value)
-            }
-            _ = try self._process_node(node.children[2])
-            backend.drop_condition()
-        }
-    }
-
+    
     /**
      Process an external function node n.
      */
-    private func _process_external(_ node: NodeExternal) throws -> Double {
-        let op = node.children[0].name
-        let expr = node.children[1]
-        let value = try self._process_node(expr)[0]
+    private func _process_external(_ node: NodePrefix) throws -> Double {
+        guard let ext = node.external else { throw UnrollerException.errorexternal(qasm: node.qasm()) }
+        let child = node._children[0]
+        var value = Double.leastNormalMagnitude
+        if child.type == .N_REAL {
+            value = Double((child as! NodeReal).value)
+        }
+        if child.type == .N_INT {
+            value = Double((child as! NodeNNInt).value)
+        }
+
+        let op = ext.operation
         switch op {
         case "sin":
             return sin(value)
@@ -332,42 +384,66 @@ final class Unroller {
             break
         }
         throw UnrollerException.errorexternal(qasm: node.qasm())
-}
-
-    /**
-     Call process_node for all children of node.
-     */
-    private func _process_children(_ node: Node) throws {
-        for c in node.children {
-            _ = try self._process_node(c)
-        }
+    }
+    
+    
+    private func _process_list(_ node: Node) throws ->[Double] {
+        return []
     }
 
     /**
      Carry out the action associated with node n.
      */
     private func processNodeList(_ node: Node) throws -> [[RegBit]] {
-        if node.type != .N_PRIMARYLIST && node.type != .N_IDLIST {
-            throw UnrollerException.errortype(type: node.type.rawValue, qasm: node.qasm())
-        }
-        // We process id_list nodes when they are leaves of barriers
-        // primary list should only be called for a barrier.
-        var regBits: [[RegBit]] = []
-        for child in node.children {
-            regBits.append(try self._process_bit_id(child))
-        }
-        return regBits
+//        if node.type != .N_PRIMARYLIST && node.type != .N_IDLIST {
+//            throw UnrollerException.errortype(type: node.type.rawValue, qasm: node.qasm())
+//        }
+//        // We process id_list nodes when they are leaves of barriers
+//        // primary list should only be called for a barrier.
+//        var regBits: [[RegBit]] = []
+//        for child in node.children {
+//            regBits.append(try self._process_bit_id(child))
+//        }
+//        return regBits
+        return []
     }
 
     /**
      Carry out the action associated with node n.
      */
+    @discardableResult
     private func _process_node(_ node: Node) throws -> [Double] {
         switch node.type {
         case .N_MAINPROGRAM:
-            try self._process_children(node)
+            if let pnode = (node as! NodeMainProgram).program {
+                try self._process_node(pnode)
+            }
         case .N_PROGRAM:
-            try self._process_children(node)
+            let pnode = (node as! NodeProgram)
+            if let programs = pnode.program {
+                for p in programs {
+                    try self._process_node(p)
+                }
+            }
+            if let statements = pnode.statements {
+                for s in statements {
+                    try self._process_node(s)
+                }
+            }
+        case .N_STATEMENT:
+            let snode = node as! NodeStatment
+            if snode.opeation?.type == .N_BARRIER {
+                if let anylist = snode.p2 {
+                    let ids = try self.processNodeList(anylist)
+                    try self.backend!.barrier(ids)
+                }
+            } else if snode.opeation?.type == .N_IF {
+                try self._process_if(snode)
+            }
+            
+            /*else if snode.opeation?.type == .N_OPAQUE {
+                try self._process_gate(node as! NodeGate, opaque: true)
+            }*/
         case .N_QREG:
             let n = node as! NodeQreg
             self.qregs[node.name] = n.index
@@ -386,24 +462,47 @@ final class Unroller {
         case .N_REAL:
             let n = node as! NodeReal
             return [Double(n.value)]
+        
         case .N_INDEXEDID:
             // We should not get here.
             throw UnrollerException.errortypeindexed(qasm: node.qasm())
-        case .N_GATE:
-            try self._process_gate(node as! NodeGate)
+        
+        case .N_GATEDECL:
+            try self._process_gate_decl(node as! NodeGateDecl)
+            
         case .N_CUSTOMUNITARY:
-            try self._process_custom_unitary(node as! NodeGate)
+            try self._process_custom_unitary(node as! NodeCustomUnitary)
+        
         case .N_UNIVERSALUNITARY:
-            let args = try self._process_node(node.children[0])
-            let qid = try self._process_bit_id(node.children[1])
-            for element in qid {
-                try self.backend!.u((args[0], args[1], args[2]), element)
+            let unode = node as! NodeUniversalUnitary
+            if unode.op?.type == .N_CNOT {
+                try self._process_cnot(unode)
+            } else {
+                if let c0 = unode.elistorarg,
+                    let c1 = unode.argument {
+                    let args = try self._process_node(c0)
+                    let qid = try self._process_bit_id(c1)
+                    for element in qid {
+                        try self.backend!.u((args[0], args[1], args[2]), element)
+                    }
+                }
             }
-        case .N_CNOT:
-            try self._process_cnot(node as! NodeCnot)
+        case .N_QOP:
+            let qopnode = node as! NodeQop
+            if qopnode.op?.type == .N_MEASURE {
+                try self._process_measure(qopnode)
+            } else if qopnode.op?.type == .N_RESET {
+                if let arg = qopnode.arg {
+                    let id0 = try self._process_bit_id(arg)
+                    for idx in 0..<id0.count {
+                        try self.backend!.reset(id0[idx])
+                    }
+                }
+            }
         case .N_EXPRESSIONLIST:
+            guard let explist = (node as! NodeExpressionList).expressionList else { return [] }
             var values: [Double] = []
-            for child in node.children {
+            for child in explist {
                 values.append(contentsOf: try self._process_node(child))
             }
             return values
@@ -411,26 +510,10 @@ final class Unroller {
             return [try self._process_binop(node as! NodeBinaryOp)]
         case .N_PREFIX:
             return [try self._process_prefix(node as! NodePrefix)]
-        case .N_MEASURE:
-            try self._process_measure(node as! NodeMeasure)
         case .N_MAGIC:
             //self.version = Double(node.children[0].value)!
             //self.backend!.version(node.children[0].value)
             break
-        case .N_BARRIER:
-            let ids = try self.processNodeList(node.children[0])
-            try self.backend!.barrier(ids)
-        case .N_RESET:
-            let id0 = try self._process_bit_id(node.children[0])
-            for idx in 0..<id0.count {
-                try self.backend!.reset(id0[idx])
-            }
-        case .N_IF:
-            try self._process_if(node as! NodeIf)
-        case .N_OPAQUE:
-            try self._process_gate(node as! NodeGate, opaque: true)
-        case .N_EXTERNAL:
-            return [try self._process_external(node as! NodeExternal)]
         default:
             throw UnrollerException.errortype(type: node.type.rawValue, qasm: node.qasm())
         }

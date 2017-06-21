@@ -42,10 +42,6 @@ import Foundation
         return .N_MIXEDLIST
     }
     
-    public override var children: [Node] {
-        return []
-    }
-    
     public override func qasm() -> String {
         var qasms: [String] = []
         

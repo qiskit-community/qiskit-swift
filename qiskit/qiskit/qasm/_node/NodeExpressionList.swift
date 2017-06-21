@@ -31,13 +31,6 @@ import Foundation
         return .N_EXPRESSIONLIST
     }
     
-    public override var children: [Node] {
-        if let list = self.expressionList {
-            return list
-        }
-        return []
-    }
-    
     public override func qasm() -> String {
         var qasms: [String] = []
         if let list = expressionList?.reversed() {

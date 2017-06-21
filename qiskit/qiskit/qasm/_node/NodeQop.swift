@@ -24,28 +24,20 @@ import Foundation
         return .N_QOP
     }
     
-    public override var children: [Node] {
-        return []
-    }
-    
     public override func qasm() -> String {
         
         guard let operation = op else {
             assertionFailure("Invalid NodeQop Operation")
             return ""
         }
-        
-        if operation.type == .N_UNIVERSALUNITARY {
-            return "\(operation.qasm())"
-        }
-
-        guard let arg1 = arg else {
-            assertionFailure("Invalid NodeQop Operation")
-            return ""
-        }
 
         if operation.type == .N_MEASURE {
        
+            guard let arg1 = arg else {
+                assertionFailure("Invalid NodeQop Operation")
+                return ""
+            }
+            
             guard let arg2 = arg2 else {
                 assertionFailure("Invalid NodeQop Operation")
                 return ""
@@ -54,7 +46,17 @@ import Foundation
             return "\(operation.qasm()) \(arg1.qasm()) -> \(arg2.qasm());"
             
         }
-        
-        return "\(operation.qasm()) \(arg1.qasm());"
+       
+        if operation.type == .N_RESET {
+            
+            guard let arg1 = arg else {
+                assertionFailure("Invalid NodeQop Operation")
+                return ""
+            }
+            
+            return "\(operation.qasm()) \(arg1.qasm());"
+        }
+
+        return "\(operation.qasm())"
     }
 }

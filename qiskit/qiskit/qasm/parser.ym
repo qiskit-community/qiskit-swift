@@ -168,7 +168,8 @@ nninteger : NNINTEGER { $$ = [ParseTree createIntNodeWithValue: $1]; }
 
 real : REAL { $$ = [ParseTree createRealNodeWithValue: $1]; }
 pi : PI { $$ = [ParseTree createRealNodeWithValue: M_PI]; }
-id : ID { $$ = [ParseTree createIdNodeWithValue: $1]; }
+id : ID { $$ = [ParseTree createIdNode: $1 line: yylineno]; }
+
 
 u : U { $$ = [ParseTree createUNode]; }
 cx: CX { $$ = [ParseTree createCXNode]; }

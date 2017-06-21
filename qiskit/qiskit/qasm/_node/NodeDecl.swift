@@ -23,21 +23,7 @@ import Foundation
     public override var type: NodeType {
         return .N_DECL
     }
-    
-    public override var children: [Node] {
-        var array: [Node] = []
-        if let node = self.register {
-            array.append(node)
-        }
-        if let node = self.identifier {
-            array.append(node)
-        }
-        if let node = self.nninteger {
-            array.append(node)
-        }
-        return array
-    }
-    
+        
     public override func qasm() -> String {
         guard let reg = register else {
             assertionFailure("Invalid NodeDecl Operation")

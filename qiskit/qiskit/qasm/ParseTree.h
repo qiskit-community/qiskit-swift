@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SymbolTable.h"
 
 @class Node;
 
@@ -29,7 +28,7 @@
 +(Node*) createExpressionList: (Node*) elist expression: (Node*) exp;
 +(Node*) createBinaryOperation: (NSString*) op operand1: (Node*) o1 operand2: (Node*) o2;
 +(Node*) createPrefixOperation: (NSString*) op operand: (Node*) o;
-+(Node*) createIdNodeWithValue: (NSString*) value;
++(Node*) createIdNode: (NSString*) identifer line: (int) line;
 +(Node*) createIntNodeWithValue: (int) value;
 +(Node*) createRealNodeWithValue: (float) value;
 +(Node*) createBarrierNode;

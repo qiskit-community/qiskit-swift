@@ -14,10 +14,6 @@ import Foundation
         return .N_MAGIC
     }
     
-    public override var children: [Node] {
-        return []
-    }
-    
     public override func qasm() -> String {
         let qasm: String = "OPENQASM "
         return qasm

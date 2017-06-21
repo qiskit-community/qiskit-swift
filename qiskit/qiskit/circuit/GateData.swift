@@ -24,9 +24,9 @@ final class GateData: NSCopying {
     let n_bits: Int
     let args: [String]
     let bits: [String]
-    let body: NodeGate?
+    let body: NodeStatment?
 
-    init(_ opaque: Bool, _ n_args: Int, _ n_bits: Int, _ args: [String], _ bits: [String], _ body: NodeGate?) {
+    init(_ opaque: Bool, _ n_args: Int, _ n_bits: Int, _ args: [String], _ bits: [String], _ body: NodeStatment?) {
         self.opaque = opaque
         self.n_args = n_args
         self.n_bits = n_bits
