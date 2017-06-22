@@ -11,43 +11,10 @@ import Foundation
 @objc public final class NodeGateDecl: Node {
 
     public let gate: Node?
-    public let identifier: Node?
-    public let idlist1: Node?
-    public let idlist2: Node?
-    public var gateBody: NodeStatment?
-    public var bit_list: [(name: String, position: Int)] = []
     
     public init(gate: Node?, identifier: Node?, idlist1: Node?, idlist2: Node?) {
         self.gate = gate
-        self.identifier = identifier
-        self.idlist1 = idlist1
-        self.idlist2 = idlist2
-    
-        // # To help with scoping rules, so we know the id is a bit,
-        // # this flag is set to True when the id appears in a gate declaration
-        (self.identifier as? NodeId)?.is_bit = true
-        
-        // create the bit list - the bit list is an array of tuples representing the id names and their positions
-        if let l1 = self.idlist1 as? NodeIdList {
-            if let ids = l1.identifiers {
-                for index in 0..<ids.count {
-                    if let i = ids[index] as? NodeId{
-                        bit_list.append((i.name, index))
-                    }
-                }
-            }
-        }
-        
-        if let l2 = self.idlist2 as? NodeIdList {
-            if let ids = l2.identifiers {
-                for index in 0..<ids.count {
-                    if let i = ids[index] as? NodeId{
-                        bit_list.append((i.name, index))
-                    }
-                }
-            }
-        }
-        
+        (self.gate as? NodeGate)?.updateNode(identifier: identifier, idlist1: idlist1, idlist2: idlist2)
     }
     
     public override var type: NodeType {
@@ -59,18 +26,7 @@ import Foundation
             assertionFailure("Invalid NodeGateDecl Operation")
             return ""
         }
-        guard let ident = identifier else {
-            assertionFailure("Invalid NodeGateDecl Operation")
-            return ""
-        }
-        guard let list1 = idlist1 else {
-            assertionFailure("Invalid NodeGateDecl Operation")
-            return ""
-        }
-        if let list2 = idlist2 {
-            return "\(g8.qasm()) \(ident.qasm()) (\(list1.qasm())) \(list2.qasm()) {"
-        }
         
-        return "\(g8.qasm()) \(list1.qasm()) {" // FIXME: figure out the correct parenthesis 
+        return "\(g8.qasm()) {" // FIXME: figure out the correct parenthesis 
     }
 }

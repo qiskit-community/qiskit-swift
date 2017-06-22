@@ -40,7 +40,7 @@
 }
 
 +(Node*) createDeclNode: (Node*) reg identifier: (Node*) ident nninteger: (Node*) nninteger {
-    NodeDecl *node = [[NodeDecl alloc] initWithRegister:reg identifier:ident nninteger: nninteger];
+    NodeDecl *node = [[NodeDecl alloc] initWithOp:reg identifier:ident nninteger: nninteger];
     return node;
 }
 

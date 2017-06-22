@@ -48,6 +48,6 @@ import Foundation
             }
         }
         
-         return "\(qasms.joined(separator: ","))"
+         return "\(qasms.joined(separator: " "))"
     }
 }

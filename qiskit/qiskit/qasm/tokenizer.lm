@@ -87,16 +87,6 @@ reset {
     return RESET;
 }
 
-assign {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
-    return ASSIGN;
-}
-
-matches {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
-    return MATCHES;
-}
-
 barrier {
     yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
     return BARRIER;
@@ -139,6 +129,12 @@ U {
     yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
     return ARROW;
 }
+
+== {
+    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    return MATCHES;
+}
+
 
 [a-z][a-zA-Z0-9_]* {
     yylval.svalue = [NSString stringWithFormat:@"%s", yytext];

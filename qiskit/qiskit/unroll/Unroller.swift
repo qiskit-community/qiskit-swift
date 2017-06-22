@@ -209,34 +209,34 @@ final class Unroller {
     */
     private func _process_gate_decl(_ node: NodeGateDecl, opaque: Bool = false) throws {
         
-        var args: [String] = []
-        if let idl1 = node.idlist1 as? NodeIdList {
-            if let ids = idl1.identifiers {
-                for i in ids {
-                    args.append(i.name)
-                }
-            }
-        }
- 
-        if let idl2 = node.idlist2 as? NodeIdList {
-            if let ids = idl2.identifiers {
-                for i in ids {
-                    args.append(i.name)
-                }
-            }
-        }
-
-        var bits: [String] = []
-        for c in node.bit_list {
-            bits.append(c.name)
-        }
-        
-        let body: NodeStatment? = (opaque) ? nil : node.gateBody
-        let gate = GateData(opaque, args.count, bits.count, args, bits, body)
-        self.gates[node.name] = gate
-        if let backend = self.backend {
-            try backend.define_gate(node.name, gate.copy(with: nil) as! GateData)
-        }
+//        var args: [String] = []
+//        if let idl1 = node.idlist1 as? NodeIdList {
+//            if let ids = idl1.identifiers {
+//                for i in ids {
+//                    args.append(i.name)
+//                }
+//            }
+//        }
+// 
+//        if let idl2 = node.idlist2 as? NodeIdList {
+//            if let ids = idl2.identifiers {
+//                for i in ids {
+//                    args.append(i.name)
+//                }
+//            }
+//        }
+//
+//        var bits: [String] = []
+//        for c in node.bit_list {
+//            bits.append(c.name)
+//        }
+//        
+//        let body: NodeStatment? = (opaque) ? nil : node.gateBody
+//        let gate = GateData(opaque, args.count, bits.count, args, bits, body)
+//        self.gates[node.name] = gate
+//        if let backend = self.backend {
+//            try backend.define_gate(node.name, gate.copy(with: nil) as! GateData)
+//        }
         
     }
 

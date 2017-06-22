@@ -22,9 +22,6 @@ import Foundation
         self.p4 = p4 // nil | idlist | nninteger | qop
     
         super.init()
-        if let gateDecl = self.opeation as? NodeGateDecl {
-            gateDecl.gateBody = self
-        }
     }
     
     public override var type: NodeType {
@@ -114,7 +111,7 @@ import Foundation
                     return ""
                 }
             
-                return "\(op.qasm()) ( \(s2.qasm()) == \(s3.qasm()) ) \(s4.qasm()) ;"
+                return "\(op.qasm()) ( \(s2.qasm()) == \(s3.qasm()) ) \(s4.qasm())"
             case .N_BARRIER:
                 guard let s2 = p2 else {
                     assertionFailure("Invalid NodeStatment Operation")

@@ -55,6 +55,10 @@ public enum NodeType: String {
         return .N_UNDEFINED
     }
     
+    var children: [Node] {
+        preconditionFailure("Node children not implemented")
+    }
+    
     func qasm() -> String {
         preconditionFailure("Node qasm not implemented")
     }

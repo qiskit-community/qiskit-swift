@@ -14,6 +14,7 @@ import Foundation
     public let line: Int
     public let file: String
     public var is_bit: Bool = false
+    public var index: Int = 0
     
     public init(identifier: String, line: Int) {
         self.identifier = identifier

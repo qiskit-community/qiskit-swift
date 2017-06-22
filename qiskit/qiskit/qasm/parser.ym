@@ -30,7 +30,6 @@ void yyerror(char *s);
 %token <svalue> U
 %token <svalue> MEASURE
 %token <svalue> MAGIC
-%token <svalue> ASSIGN
 %token <svalue> MATCHES
 %token <svalue> ID
 %token <svalue> INCLD
@@ -76,7 +75,7 @@ void yyerror(char *s);
 %type <node> openqasm
 %type <svalue> unaryop
 %type <svalue> arrow
-%type <svalue> assign
+%type <svalue> matches
 %type <svalue> string
 %type <svalue> incld
 
@@ -109,7 +108,7 @@ statment : decl { $$ = [ ParseTree createStatmentNode: $1 p2: nil p3: nil p4: ni
 | opaque id '(' ')' idlist ';' { $$ = [ ParseTree createStatmentNode: $1 p2: $2 p3: $5 p4: nil]; }
 | opaque id '(' idlist ')' idlist ';' { $$ = [ ParseTree createStatmentNode: $1 p2: $2 p3: $4 p4: $6]; }
 | qop { $$ = [ ParseTree createStatmentNode: $1 p2: nil p3: nil p4: nil]; }
-| ifn '(' id assign nninteger ')' qop { $$ = [ ParseTree createStatmentNode: $1 p2: $3 p3: $5 p4: $7]; }
+| ifn '(' id matches nninteger ')' qop { $$ = [ ParseTree createStatmentNode: $1 p2: $3 p3: $5 p4: $7]; }
 | barrier anylist ';' { $$ = [ ParseTree createStatmentNode: $1 p2: $2 p3: nil p4: nil]; }
 
 decl : qreg id '[' nninteger ']' ';' { $$ = [ ParseTree createDeclNode: $1 identifier: $2 nninteger: $4]; }
@@ -184,7 +183,7 @@ ifn: IF { $$ = [ParseTree createIfNode]; }
 openqasm: OPENQASM { $$ = [ParseTree createMagicNode]; }
 
 arrow: ARROW { $$ = $1; }
-assign: ASSIGN { $$ = $1; }
+matches: MATCHES { $$ = $1; }
 string: STRING { $$ = $1; }
 incld: INCLD { $$ = $1; }
 
