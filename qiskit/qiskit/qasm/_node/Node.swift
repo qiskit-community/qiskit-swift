@@ -22,6 +22,7 @@ public enum NodeType: String {
     case N_GOPLIST = "goplist"
     case N_GATE = "gate"
     case N_GATEDECL = "gate_decl"
+    case N_GATEBODY = "gate_body"
     case N_ID = "id"
     case N_IDLIST = "id_list"
     case N_IF = "if"

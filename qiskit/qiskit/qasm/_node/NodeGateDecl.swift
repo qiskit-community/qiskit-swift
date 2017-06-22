@@ -11,10 +11,15 @@ import Foundation
 @objc public final class NodeGateDecl: Node {
 
     public let gate: Node?
+    public var gateBody: Node?
     
     public init(gate: Node?, identifier: Node?, idlist1: Node?, idlist2: Node?) {
         self.gate = gate
-        (self.gate as? NodeGate)?.updateNode(identifier: identifier, idlist1: idlist1, idlist2: idlist2)
+        (self.gate as? NodeGate)?.updateNode(identifier: identifier, list1: idlist1, list2: idlist2)
+    }
+    
+    public func updateNode(gateBody: Node) {
+        self.gateBody = gateBody
     }
     
     public override var type: NodeType {
@@ -26,7 +31,10 @@ import Foundation
             assertionFailure("Invalid NodeGateDecl Operation")
             return ""
         }
-        
-        return "\(g8.qasm()) {" // FIXME: figure out the correct parenthesis 
+        var qasm = g8.qasm()
+        if let gb = gateBody {
+            qasm += "{ \(gb.qasm()) }"
+        }
+        return qasm
     }
 }

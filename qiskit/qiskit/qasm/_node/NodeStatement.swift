@@ -10,17 +10,22 @@ import Foundation
 
 @objc public final class NodeStatment: Node {
     
-    public let opeation: Node?
+    public let op: Node?
     public let p2: Node?
     public let p3: Node?
     public let p4: Node?
     
     public init(p1: Node?, p2: Node?, p3: Node?, p4: Node?) {
-        self.opeation = p1 // decl | gatedecl | opqaue | qop | ifn | barrier
+        self.op = p1 // decl | gatedecl | opqaue | qop | ifn | barrier
         self.p2 = p2 // nil | goplist | id | anylist
         self.p3 = p3 // nil | idlist
         self.p4 = p4 // nil | idlist | nninteger | qop
     
+        if self.op?.type == .N_GATEDECL {
+            if let gop = self.p2 {
+                (self.op as? NodeGateDecl)?.updateNode(gateBody: gop)
+            }
+        }
         super.init()
     }
     
@@ -33,7 +38,7 @@ import Foundation
         
         var idNameList: [String] = []
         
-        if let op = opeation {
+        if let op = self.op {
             if op.type == .N_GATEDECL {
                 if let goplist = p2 as? NodeGoplist {
                     
@@ -65,7 +70,7 @@ import Foundation
     
     public override func qasm() -> String {
  
-        guard let op = opeation else {
+        guard let op = self.op else {
             assertionFailure("Invalid NodeStatment Operation")
             return ""
         }
@@ -74,10 +79,7 @@ import Foundation
             case .N_DECL:
                 return "\(op.qasm())"
             case .N_GATEDECL:
-                if let s2 = p2 {
-                    return "\(op.qasm()) \(s2.qasm()) }"
-                }
-                return "\(op.qasm()) }"
+                return "\(op.qasm())"
             case .N_OPAQUE:
                     guard let s2 = p2 else {
                         assertionFailure("Invalid NodeStatment Operation")

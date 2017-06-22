@@ -179,15 +179,7 @@ final class Unroller {
                     try backend.start_gate(name,args,qubits)
                 }
                 if !gate.opaque && gbody != nil {
-                    if let idnode = gbody!.p2 {
-                        try self._process_node(idnode)
-                    }
-                    if let idlistnode1 = gbody!.p3 {
-                        try self._process_node(idlistnode1)
-                    }
-                    if let idlistnode2 = gbody!.p4 {
-                        try self._process_node(idlistnode2)
-                    }
+                    try self._process_children(gbody!)
                 }
                 if let backend = self.backend {
                     backend.end_gate(name,args,qubits)
@@ -209,34 +201,33 @@ final class Unroller {
     */
     private func _process_gate_decl(_ node: NodeGateDecl, opaque: Bool = false) throws {
         
-//        var args: [String] = []
-//        if let idl1 = node.idlist1 as? NodeIdList {
-//            if let ids = idl1.identifiers {
-//                for i in ids {
-//                    args.append(i.name)
-//                }
-//            }
-//        }
-// 
-//        if let idl2 = node.idlist2 as? NodeIdList {
-//            if let ids = idl2.identifiers {
-//                for i in ids {
-//                    args.append(i.name)
-//                }
-//            }
-//        }
-//
-//        var bits: [String] = []
-//        for c in node.bit_list {
-//            bits.append(c.name)
-//        }
-//        
-//        let body: NodeStatment? = (opaque) ? nil : node.gateBody
-//        let gate = GateData(opaque, args.count, bits.count, args, bits, body)
-//        self.gates[node.name] = gate
-//        if let backend = self.backend {
-//            try backend.define_gate(node.name, gate.copy(with: nil) as! GateData)
-//        }
+        guard let gate: NodeGate = node.gate as? NodeGate else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
+  
+        var args: [String] = []
+        
+        if let arglist = gate.arguments as? NodeIdList {
+            if let ids = arglist.identifiers {
+                for i in ids {
+                    args.append(i.name)
+                }
+            }
+        }
+ 
+        var bits: [String] = []
+        if let bitlist = gate.bitlist as? NodeIdList {
+            if let ids = bitlist.identifiers {
+                for i in ids {
+                    bits.append(i.name)
+                }
+            }
+        }
+        
+        let body: NodeGateBody? = (opaque) ? nil : (node.gateBody as? NodeGateBody)
+        let gatedata = GateData(opaque, args.count, bits.count, args, bits, body)
+        self.gates[node.name] = gatedata
+        if let backend = self.backend {
+            try backend.define_gate(node.name, gatedata.copy(with: nil) as! GateData)
+        }
         
     }
 
@@ -298,17 +289,17 @@ final class Unroller {
      Process an if node.
      */
     private func _process_if(_ node: NodeStatment) throws {
-        if node.opeation?.type == .N_IF {
-            if let arg1 = node.p2 as? NodeId,
-                let arg2 = node.p3 as? NodeNNInt,
-                let arg3 = node.p4 as? NodeUniversalUnitary {
-                if let backend = self.backend {
-                    backend.set_condition(arg1.name, arg2.value)
-                    _ = try self._process_node(arg3)
-                    backend.drop_condition()
-                }
-            }
-        }
+//        if node.opeation?.type == .N_IF {
+//            if let arg1 = node.p2 as? NodeId,
+//                let arg2 = node.p3 as? NodeNNInt,
+//                let arg3 = node.p4 as? NodeUniversalUnitary {
+//                if let backend = self.backend {
+//                    backend.set_condition(arg1.name, arg2.value)
+//                    _ = try self._process_node(arg3)
+//                    backend.drop_condition()
+//                }
+//            }
+//        }
     }
     
     
@@ -392,6 +383,15 @@ final class Unroller {
     }
 
     /**
+     Call process_node for all children of node.
+     */
+     private func _process_children(_ node: Node) throws {
+        for c in node.children {
+            _ = try self._process_node(c)
+        }
+     }
+    
+    /**
      Carry out the action associated with node n.
      */
     private func processNodeList(_ node: Node) throws -> [[RegBit]] {
@@ -430,20 +430,6 @@ final class Unroller {
                     try self._process_node(s)
                 }
             }
-        case .N_STATEMENT:
-            let snode = node as! NodeStatment
-            if snode.opeation?.type == .N_BARRIER {
-                if let anylist = snode.p2 {
-                    let ids = try self.processNodeList(anylist)
-                    try self.backend!.barrier(ids)
-                }
-            } else if snode.opeation?.type == .N_IF {
-                try self._process_if(snode)
-            }
-            
-            /*else if snode.opeation?.type == .N_OPAQUE {
-                try self._process_gate(node as! NodeGate, opaque: true)
-            }*/
         case .N_QREG:
             let n = node as! NodeQreg
             self.qregs[node.name] = n.index
@@ -462,13 +448,12 @@ final class Unroller {
         case .N_REAL:
             let n = node as! NodeReal
             return [Double(n.value)]
-        
         case .N_INDEXEDID:
             // We should not get here.
             throw UnrollerException.errortypeindexed(qasm: node.qasm())
-        
         case .N_GATEDECL:
             try self._process_gate_decl(node as! NodeGateDecl)
+  
             
         case .N_CUSTOMUNITARY:
             try self._process_custom_unitary(node as! NodeCustomUnitary)
@@ -519,7 +504,7 @@ final class Unroller {
         }
         return []
     }
-
+    
     /**
      Set the backend object
      */
