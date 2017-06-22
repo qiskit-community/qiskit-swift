@@ -234,31 +234,29 @@ final class Unroller {
     /**
      Process a CNOT gate node.
      */
-    private func _process_cnot(_ node: NodeUniversalUnitary) throws {
+    private func _process_cnot(_ node: NodeCnot) throws {
         
-        if node.op?.type == .N_CNOT {
-            guard let argument1 = node.elistorarg as? NodeIdList else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
-            guard let argument2 = node.argument as? NodeIdList else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
-            
-            let id0 = try self._process_bit_id(argument1)
-            let id1 = try self._process_bit_id(argument2)
-            
-            if !(id0.count == id1.count || id0.count == 1 || id1.count == 1) {
-                throw UnrollerException.errorqregsize(qasm: node.qasm())
-            }
-            let maxidx = max(id0.count, id1.count)
-            if let backend = self.backend {
-                for idx in 0..<maxidx {
-                    if id0.count > 1 && id1.count > 1 {
-                        try backend.cx(id0[idx], id1[idx])
-                        continue
-                    }
-                    if id0.count > 1 {
-                        try backend.cx(id0[idx], id1[0])
-                        continue
-                    }
-                    try backend.cx(id0[0], id1[idx])
+        guard let argument1 = node.arg1 as? NodeIdList else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
+        guard let argument2 = node.arg2 as? NodeIdList else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
+        
+        let id0 = try self._process_bit_id(argument1)
+        let id1 = try self._process_bit_id(argument2)
+        
+        if !(id0.count == id1.count || id0.count == 1 || id1.count == 1) {
+            throw UnrollerException.errorqregsize(qasm: node.qasm())
+        }
+        let maxidx = max(id0.count, id1.count)
+        if let backend = self.backend {
+            for idx in 0..<maxidx {
+                if id0.count > 1 && id1.count > 1 {
+                    try backend.cx(id0[idx], id1[idx])
+                    continue
                 }
+                if id0.count > 1 {
+                    try backend.cx(id0[idx], id1[0])
+                    continue
+                }
+                try backend.cx(id0[0], id1[idx])
             }
         }
     }
@@ -454,24 +452,21 @@ final class Unroller {
         case .N_GATEDECL:
             try self._process_gate_decl(node as! NodeGateDecl)
   
-            
         case .N_CUSTOMUNITARY:
             try self._process_custom_unitary(node as! NodeCustomUnitary)
         
         case .N_UNIVERSALUNITARY:
             let unode = node as! NodeUniversalUnitary
-            if unode.op?.type == .N_CNOT {
-                try self._process_cnot(unode)
-            } else {
-                if let c0 = unode.elistorarg,
-                    let c1 = unode.argument {
-                    let args = try self._process_node(c0)
-                    let qid = try self._process_bit_id(c1)
-                    for element in qid {
-                        try self.backend!.u((args[0], args[1], args[2]), element)
-                    }
+            if let c0 = unode.elistorarg,
+                let c1 = unode.argument {
+                let args = try self._process_node(c0)
+                let qid = try self._process_bit_id(c1)
+                for element in qid {
+                    try self.backend!.u((args[0], args[1], args[2]), element)
                 }
             }
+        case .N_CNOT:
+            try self._process_cnot(node as! NodeCnot)
         case .N_QOP:
             let qopnode = node as! NodeQop
             if qopnode.op?.type == .N_MEASURE {

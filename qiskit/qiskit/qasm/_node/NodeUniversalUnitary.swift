@@ -18,6 +18,10 @@ import Foundation
         self.op = identifier            // u | cx
         self.elistorarg = explistorarg  // explist or argument
         self.argument = argument        // argument
+        
+        if self.op?.type == .N_CNOT {
+            (self.op as? NodeCnot)?.updateNode(arg1: self.elistorarg, arg2: self.argument)
+        }
     }
     
     public override var type: NodeType {
@@ -44,11 +48,7 @@ import Foundation
             }
             return "\(operation.qasm()) ( \(eora.qasm()) ) \(a.qasm());"
         case .N_CNOT:
-            guard let a = argument else {
-                assertionFailure("Invalid NodeUniversalUnitary Operation")
-                return ""
-            }
-            return "\(operation.qasm()) \(eora.qasm()), \(a.qasm());"
+            return "\(operation.qasm())"
         default:
             assertionFailure("Invalid NodeUniversalUnitary Operation")
             return ""
