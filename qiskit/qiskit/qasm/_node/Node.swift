@@ -13,12 +13,10 @@ public enum NodeType: String {
     case N_BARRIER = "barrier"
     case N_BINARYOP = "binop"
     case N_BITLIST = "bitlist"
-    case N_BODY = "body"
     case N_CNOT = "cnot"
     case N_CREG = "creg"
     case N_DECL = "decl"
     case N_U = "u"
-    case N_CUSTOMUNITARY = "custom_unitary"
     case N_EXPRESSIONLIST = "expression_list"
     case N_EXTERNAL = "external"
     case N_GOPLIST = "goplist"
@@ -37,13 +35,13 @@ public enum NodeType: String {
     case N_OPAQUE = "opaque"
     case N_QOP = "qop"
     case N_PREFIX = "prefix"
-    case N_PRIMARYLIST = "primary_list"
     case N_PROGRAM = "program"
     case N_QREG = "qreg"
     case N_REAL = "real"
     case N_RESET = "reset"
     case N_STATEMENT = "statment"
     case N_UNIVERSALUNITARY = "universal_unitary"
+    case N_CUSTOMUNITARY = "custom_unitary"
     case N_UNDEFINED = "undefined"
 }
 
@@ -60,7 +58,7 @@ public enum NodeType: String {
     var children: [Node] {
         preconditionFailure("Node children not implemented")
     }
-
+    
     func qasm() -> String {
         preconditionFailure("Node qasm not implemented")
     }

@@ -33,10 +33,6 @@ import Foundation
         return .N_GOPLIST
     }
     
-    public override var children: [Node] {
-        return []
-    }
-    
     public override func qasm() -> String {
         
         var qasms: [String] = []
@@ -52,6 +48,6 @@ import Foundation
             }
         }
         
-         return "\(qasms.joined(separator: ","))"
+         return "\(qasms.joined(separator: " "))"
     }
 }

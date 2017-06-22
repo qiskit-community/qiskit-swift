@@ -48,6 +48,41 @@ class QIskitParserTests: XCTestCase {
         }
     }
 
+    func testErrorCorrection() {
+        do {
+            let qasmProgram: String =
+                "OPENQASM 2.0;\n" +
+                    "include \"qelib1.inc\";\n" +
+                    "qreg q[3];\n" +
+                    "qreg a[2];\n" +
+                    "creg c[3];\n" +
+                    "creg syn[2];\n" +
+                    "gate syndrome d1, d2, d3, a1, a2\n" +
+                    "{\n" +
+                    "    cx d1, a1; cx d2, a1;\n" +
+                    "    cx d2, a2; cx d3, a2;\n" +
+                    "}\n" +
+                    "x q[0];\n" +
+                    "barrier q;\n" +
+                    "syndrome q[0],q[1],q[2],a[0],a[1];\n" +
+                    "measure a -> syn;\n" +
+                    "if(syn==1) x q[0];\n" +
+                    "if(syn==2) x q[2];\n" +
+                    "if(syn==3) x q[1];\n" +
+                    "measure q -> c;\n"
+
+            let parser = Qasm(data: qasmProgram)
+            let root = try parser.parse()
+            let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
+            let emittedQasm = root.qasm().components(separatedBy: whitespaceCharacterSet).joined()
+            let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
+            XCTAssertEqual(emittedQasm, targetQasm)
+        } catch let error {
+            XCTFail("\(error)")
+        }
+    }
+    
+
     func testParserBell () {
         
         do {

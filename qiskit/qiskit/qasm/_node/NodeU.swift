@@ -14,10 +14,6 @@ import Foundation
         return .N_U
     }
     
-    public override var children: [Node] {
-        return []
-    }
-    
     public override func qasm() -> String {
         let qasm: String = "U"
         return qasm

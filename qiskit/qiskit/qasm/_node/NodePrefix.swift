@@ -12,7 +12,7 @@ import Foundation
 
     public let op: String
     public let external: NodeExternal?
-    private let _children: [Node]
+    public let _children: [Node]
 
     public init(op: String, children: [Node]) {
         self.op = op
@@ -29,12 +29,9 @@ import Foundation
         return .N_PREFIX
     }
     
-    public override var children: [Node] {
-        return self._children
-    }
     
     public override func qasm() -> String {
-        let operand = self.children[0]
+        let operand = self._children[0]
         return "\(op) (\(operand.qasm()))"
     }
 }

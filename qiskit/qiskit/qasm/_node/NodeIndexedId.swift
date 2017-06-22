@@ -23,10 +23,6 @@ import Foundation
         return .N_INDEXEDID
     }
     
-    public override var children: [Node] {
-        return []
-    }
-    
     public override func qasm() -> String {
         guard let ident = identifer else {
             assertionFailure("Invalid NodeDecl Operation")

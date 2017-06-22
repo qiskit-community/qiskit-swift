@@ -11,21 +11,17 @@ import Foundation
 @objc public final class NodeUniversalUnitary: Node {
 
     public let op: Node?
-    public let arg: Node?
-    public let arg2: Node?
+    public let elistorarg: Node?
+    public let argument: Node?
     
-    public init(object1: Node?, object2: Node?, object3: Node?) {
-        self.op = object1   // u | cx | id
-        self.arg = object2  // exp, argument, anylist, explist
-        self.arg2 = object3 // argument | anylist | nil
+    public init(identifier: Node?, explistorarg: Node?, argument: Node?) {
+        self.op = identifier            // u | cx
+        self.elistorarg = explistorarg  // explist or argument
+        self.argument = argument        // argument
     }
     
     public override var type: NodeType {
         return .N_UNIVERSALUNITARY
-    }
-    
-    public override var children: [Node] {
-        return []
     }
     
     public override func qasm() -> String {
@@ -35,29 +31,24 @@ import Foundation
             return ""
         }
 
-        guard let a = arg else {
+        guard let eora = elistorarg else {
             assertionFailure("Invalid NodeUniversalUnitary Operation")
             return ""
         }
 
         switch operation.type {
         case .N_U:
-            guard let a2 = arg2 else {
+            guard let a = argument else {
                 assertionFailure("Invalid NodeUniversalUnitary Operation")
                 return ""
             }
-            return "\(operation.qasm()) ( \(a.qasm()) ) \(a2.qasm());"
+            return "\(operation.qasm()) ( \(eora.qasm()) ) \(a.qasm());"
         case .N_CNOT:
-            guard let a2 = arg2 else {
+            guard let a = argument else {
                 assertionFailure("Invalid NodeUniversalUnitary Operation")
                 return ""
             }
-            return "\(operation.qasm()) \(a.qasm()), \(a2.qasm());"
-        case .N_ID:
-            if let a2 = arg2 {
-                return "\(operation.qasm()) ( \(a.qasm()) ) \(a2.qasm());"
-            }
-            return "\(operation.qasm()) \(a.qasm());"
+            return "\(operation.qasm()) \(eora.qasm()), \(a.qasm());"
         default:
             assertionFailure("Invalid NodeUniversalUnitary Operation")
             return ""
