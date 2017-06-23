@@ -286,18 +286,16 @@ final class Unroller {
     /**
      Process an if node.
      */
-    private func _process_if(_ node: NodeStatment) throws {
-//        if node.opeation?.type == .N_IF {
-//            if let arg1 = node.p2 as? NodeId,
-//                let arg2 = node.p3 as? NodeNNInt,
-//                let arg3 = node.p4 as? NodeUniversalUnitary {
-//                if let backend = self.backend {
-//                    backend.set_condition(arg1.name, arg2.value)
-//                    _ = try self._process_node(arg3)
-//                    backend.drop_condition()
-//                }
-//            }
-//        }
+    private func _process_if(_ node: NodeIf) throws {
+        if let creg = node.nodeId as? NodeId,
+            let cval = node.nodeNNInt as? NodeNNInt,
+            let qop = node.nodeQop as? NodeQop {
+            if let backend = self.backend {
+                backend.set_condition(creg.name, cval.value)
+                _ = try self._process_node(qop)
+                backend.drop_condition()
+            }
+        }
     }
     
     

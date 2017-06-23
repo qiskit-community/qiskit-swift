@@ -21,9 +21,20 @@ import Foundation
         self.p3 = p3 // nil | idlist
         self.p4 = p4 // nil | idlist | nninteger | qop
     
-        if self.op?.type == .N_GATEDECL {
-            if let gop = self.p2 {
-                (self.op as? NodeGateDecl)?.updateNode(gateBody: gop)
+        if let type = self.op?.type {
+            switch type {
+            case .N_GATEDECL:
+                if let gop = self.p2 {
+                    (self.op as? NodeGateDecl)?.updateNode(gateBody: gop)
+                }
+            case .N_IF:
+                if let nid = self.p2,
+                    let idlist = self.p3,
+                    let qop = self.p4 {
+                    (self.op as? NodeIf)?.updateNode(identifier: nid, nninteger: idlist, qop: qop)
+                }
+            default:
+                break;
             }
         }
         super.init()
@@ -98,22 +109,7 @@ import Foundation
             case .N_QOP:
                 return "\(op.qasm())"
             case .N_IF:
-                guard let s2 = p2 else {
-                    assertionFailure("Invalid NodeStatment Operation")
-                    return ""
-                }
-                
-                guard let s3 = p3 else {
-                    assertionFailure("Invalid NodeStatment Operation")
-                    return ""
-                }
-                
-                guard let s4 = p4 else {
-                    assertionFailure("Invalid NodeStatment Operation")
-                    return ""
-                }
-            
-                return "\(op.qasm()) ( \(s2.qasm()) == \(s3.qasm()) ) \(s4.qasm())"
+                return "\(op.qasm())"
             case .N_BARRIER:
                 guard let s2 = p2 else {
                     assertionFailure("Invalid NodeStatment Operation")
