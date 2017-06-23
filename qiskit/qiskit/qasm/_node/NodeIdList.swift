@@ -31,6 +31,10 @@ import Foundation
         return .N_IDLIST
     }
     
+    public override var children: [Node] {
+        return (identifiers != nil) ? identifiers! : []
+    }
+    
     public override func qasm() -> String {
         var qasms: [String] = []
         if let list = identifiers {

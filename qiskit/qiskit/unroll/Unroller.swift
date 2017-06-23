@@ -415,17 +415,7 @@ final class Unroller {
                 try self._process_node(pnode)
             }
         case .N_PROGRAM:
-            let pnode = (node as! NodeProgram)
-            if let programs = pnode.program {
-                for p in programs {
-                    try self._process_node(p)
-                }
-            }
-            if let statements = pnode.statements {
-                for s in statements {
-                    try self._process_node(s)
-                }
-            }
+            try self._process_children(node)
         case .N_QREG:
             let n = node as! NodeQreg
             self.qregs[node.name] = n.index
@@ -447,6 +437,11 @@ final class Unroller {
         case .N_INDEXEDID:
             // We should not get here.
             throw UnrollerException.errortypeindexed(qasm: node.qasm())
+//        case .N_IDLIST:
+//            for child in (node as! NodeIdList).children {
+//                return try self._process_bit_id(child)
+//            }
+        
         case .N_GATEDECL:
             try self._process_gate_decl(node as! NodeGateDecl)
   
@@ -489,9 +484,10 @@ final class Unroller {
         case .N_PREFIX:
             return [try self._process_prefix(node as! NodePrefix)]
         case .N_MAGIC:
-            //self.version = Double(node.children[0].value)!
-            //self.backend!.version(node.children[0].value)
-            break
+            if let magicVersion = (node as! NodeMagic).nodeVersion{
+                self.version = Double(magicVersion.value)
+                self.backend!.version("\(magicVersion.value)")
+            }
         default:
             throw UnrollerException.errortype(type: node.type.rawValue, qasm: node.qasm())
         }

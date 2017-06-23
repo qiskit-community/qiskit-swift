@@ -10,12 +10,32 @@ import Foundation
 
 @objc public final class NodeMagic:  Node {
 
+    public var nodeVersion: NodeReal?
+    
     public override var type: NodeType {
         return .N_MAGIC
     }
     
+    public func updateNode(version: Node?) {
+        nodeVersion = (version as? NodeReal)
+    }
+    
+    public override var children: [Node] {
+        var _children: [Node] = []
+        
+        if let version = nodeVersion {
+            _children.append(version)
+        }
+        
+        return _children
+    }
+    
     public override func qasm() -> String {
-        let qasm: String = "OPENQASM "
+        var qasm: String = "OPENQASM"
+        if let version = nodeVersion {
+            qasm += " \(version.qasm())"
+        }
+        qasm += ";"
         return qasm
     }
 

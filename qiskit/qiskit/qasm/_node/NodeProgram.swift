@@ -39,6 +39,22 @@ import Foundation
         return .N_PROGRAM
     }
     
+    public override var children: [Node] {
+        var _children: [Node] = []
+        
+        if let programs = program {
+            for p in programs {
+                _children.append(p)
+            }
+        }
+        if let stmnts = statements {
+            for s in stmnts {
+                _children.append(s)
+            }
+        }
+        return _children
+    }
+    
     public override func qasm() -> String {
         
         var qasms: [String] = []
