@@ -27,6 +27,10 @@ import Foundation
         index = (nodeId as? NodeId)?.index ?? 0
     }
     
+    public override var name: String {
+        return (nodeId as? NodeId)?.identifier ?? super.name
+    }
+    
     public override var children: [Node] {
         var _children: [Node] = []
         

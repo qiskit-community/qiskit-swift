@@ -21,6 +21,10 @@ import Foundation
         return .N_QREG
     }
     
+    public override var name: String {
+        return (nodeId as? NodeId)?.identifier ?? super.name
+    }
+
     public func updateNode(identifier: Node?, nninteger: Node?) {
         nodeId = identifier
         nodeNNInt = nninteger

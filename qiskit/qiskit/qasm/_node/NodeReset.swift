@@ -10,12 +10,30 @@ import Foundation
 
 @objc public final class NodeReset: Node {
     
+    public var arg: Node?
+
     public override var type: NodeType {
         return .N_RESET
     }
     
-    public override func qasm() -> String {
-        let qasm: String = "reset"
-        return qasm
+    public func updateNode(arg: Node?) {
+        self.arg = arg
     }
+    
+    public override var children: [Node] {
+        var _children: [Node] = []
+        if let a = arg {
+            _children.append(a)
+        }
+        return _children
+    }
+
+    public override func qasm() -> String {
+        guard let a = arg else {
+            assertionFailure("Invalid NodeQop Operation")
+            return ""
+        }
+        return "reset \(a.qasm());"
+    }
+
 }

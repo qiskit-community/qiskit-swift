@@ -265,20 +265,18 @@ final class Unroller {
     /**
      Process a measurement node.
      */
-    private func _process_measure(_ node: NodeQop) throws {
-        if node.op?.type == .N_MEASURE {
-            guard let argument1 = node.arg as? NodeIdList else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
-            guard let argument2 = node.arg2 as? NodeIdList else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
-            
-            let id0 = try self._process_bit_id(argument1)
-            let id1 = try self._process_bit_id(argument2)
-            if id0.count != id1.count {
-                throw UnrollerException.errorregsize(qasm: node.qasm())
-            }
-            if let backend = self.backend {
-                for i in 0..<id0.count {
-                    try backend.measure(id0[i], id1[i])
-                }
+    private func _process_measure(_ node: NodeMeasure) throws {
+        guard let argument1 = node.arg1 as? NodeIdList else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
+        guard let argument2 = node.arg2 as? NodeIdList else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
+        
+        let id0 = try self._process_bit_id(argument1)
+        let id1 = try self._process_bit_id(argument2)
+        if id0.count != id1.count {
+            throw UnrollerException.errorregsize(qasm: node.qasm())
+        }
+        if let backend = self.backend {
+            for i in 0..<id0.count {
+                try backend.measure(id0[i], id1[i])
             }
         }
     }
@@ -409,6 +407,7 @@ final class Unroller {
      */
     @discardableResult
     private func _process_node(_ node: Node) throws -> [Double] {
+        print(node.type.rawValue)
         switch node.type {
         case .N_MAINPROGRAM:
             if let pnode = (node as! NodeMainProgram).program {
@@ -420,12 +419,12 @@ final class Unroller {
             try self._process_children(node)
         case .N_QREG:
             let n = node as! NodeQreg
-            self.qregs[node.name] = n.index
-            try self.backend!.new_qreg(node.name, n.index)
+            self.qregs[n.name] = n.index
+            try self.backend!.new_qreg(n.name, n.index)
         case .N_CREG:
             let n = node as! NodeCreg
-            self.cregs[node.name] = n.index
-            try self.backend!.new_creg(node.name, n.index)
+            self.cregs[n.name] = n.index
+            try self.backend!.new_creg(n.name, n.index)
         case .N_ID:
             return [try self._process_local_id(node as! NodeId)]
         case .N_INT:
@@ -439,10 +438,11 @@ final class Unroller {
         case .N_INDEXEDID:
             // We should not get here.
             throw UnrollerException.errortypeindexed(qasm: node.qasm())
-//        case .N_IDLIST:
+        case .N_IDLIST:
 //            for child in (node as! NodeIdList).children {
 //                return try self._process_bit_id(child)
 //            }
+        break
         case .N_DECL:
             try self._process_children(node)
 
@@ -465,17 +465,18 @@ final class Unroller {
         case .N_CNOT:
             try self._process_cnot(node as! NodeCnot)
         case .N_QOP:
-            let qopnode = node as! NodeQop
-            if qopnode.op?.type == .N_MEASURE {
-                try self._process_measure(qopnode)
-            } else if qopnode.op?.type == .N_RESET {
-                if let arg = qopnode.arg {
-                    let id0 = try self._process_bit_id(arg)
-                    for idx in 0..<id0.count {
-                        try self.backend!.reset(id0[idx])
-                    }
+            if node.type == .N_MEASURE || node.type == .N_RESET {
+                try self._process_children(node)
+            }
+        case .N_RESET:
+            if let arg = (node as! NodeReset).arg {
+                let id0 = try self._process_bit_id(arg)
+                for idx in 0..<id0.count {
+                    try self.backend!.reset(id0[idx])
                 }
             }
+        case .N_MEASURE:
+            try self._process_measure(node as! NodeMeasure)
         case .N_EXPRESSIONLIST:
             guard let explist = (node as! NodeExpressionList).expressionList else { return [] }
             var values: [Double] = []
