@@ -18,7 +18,7 @@ import Foundation
         (self.gate as? NodeGate)?.updateNode(identifier: identifier, list1: idlist1, list2: idlist2)
     }
     
-    public func updateNode(gateBody: Node) {
+    public func updateNode(gateBody: Node?) {
         self.gateBody = gateBody
     }
     

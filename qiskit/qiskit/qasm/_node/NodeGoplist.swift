@@ -10,11 +10,11 @@ import Foundation
 
 @objc public final class NodeGoplist: Node {
     
-    public private(set) var barrieridlist: [(barrier:Node, idlist:Node)]?
+    public private(set) var barriers: [Node]?
     public private(set) var uops: [Node]?
 
     public init(barrier: Node, idlist: Node) {
-        barrieridlist = [(barrier, idlist)]
+        (barrier as! NodeBarrier).updateNode(anylist: idlist)
     }
 
     public init(uop: Node) {
@@ -22,7 +22,8 @@ import Foundation
     }
 
     public func addBarrierIdlist(barrier: Node, idlist: Node) {
-        barrieridlist?.append((barrier, idlist))
+        (barrier as! NodeBarrier).updateNode(anylist: idlist)
+        barriers?.append(barrier)
     }
     
     public func addUop(uop: Node) {
@@ -36,10 +37,9 @@ import Foundation
     public override func qasm() -> String {
         
         var qasms: [String] = []
-        if let bl = barrieridlist {
+        if let bl = barriers {
             for child in bl {
-                qasms.append(child.barrier.qasm())
-                qasms.append(child.idlist.qasm())
+                qasms.append(child.qasm())
             }
         }
         if let ups = uops {

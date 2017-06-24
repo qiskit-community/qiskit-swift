@@ -10,7 +10,7 @@ import Foundation
 
 @objc public final class NodeDecl: Node {
     
-    public let op: Node?
+    public var op: Node?
     
     public init(op: Node?, identifier: Node?, nninteger: Node?) {
         self.op = op
@@ -27,7 +27,15 @@ import Foundation
     public override var type: NodeType {
         return .N_DECL
     }
-        
+    
+    public override var children: [Node] {
+        var _children: [Node] = []
+        if let o = op {
+            _children.append(o)
+        }
+        return _children
+    }
+    
     public override func qasm() -> String {
         guard let o = self.op else {
             assertionFailure("Invalid NodeDecl Operation")

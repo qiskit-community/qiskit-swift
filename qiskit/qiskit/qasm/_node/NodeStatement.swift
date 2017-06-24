@@ -24,15 +24,17 @@ import Foundation
         if let type = self.op?.type {
             switch type {
             case .N_GATEDECL:
-                if let gop = self.p2 {
-                    (self.op as? NodeGateDecl)?.updateNode(gateBody: gop)
-                }
+                (self.op as? NodeGateDecl)?.updateNode(gateBody: self.p2)
+            case .N_OPAQUE:
+                (self.op as? NodeOpaque)?.updateNode(identifier: self.p2,
+                                                     list1: self.p3,
+                                                     list2: self.p4)
             case .N_IF:
-                if let nid = self.p2,
-                    let idlist = self.p3,
-                    let qop = self.p4 {
-                    (self.op as? NodeIf)?.updateNode(identifier: nid, nninteger: idlist, qop: qop)
-                }
+                 (self.op as? NodeIf)?.updateNode(identifier: self.p2,
+                                                  nninteger: self.p3,
+                                                  qop: self.p4)
+            case .N_BARRIER:
+                (self.op as? NodeBarrier)?.updateNode(anylist: self.p2)
             default:
                 break;
             }
@@ -45,6 +47,16 @@ import Foundation
     }
     
     
+    public override var children: [Node] {
+        var _children: [Node] = []
+        
+        if let operation = op {
+            _children.append(operation)
+        }
+        return _children
+    }
+    
+
     public func calls() -> [String] {
         
         var idNameList: [String] = []
@@ -53,12 +65,14 @@ import Foundation
             if op.type == .N_GATEDECL {
                 if let goplist = p2 as? NodeGoplist {
                     
-                    if let bl = goplist.barrieridlist {
+                    if let bl = goplist.barriers {
                         for child in bl {
-                            if let ids = (child.idlist as? NodeIdList)?.identifiers {
-                                for i in ids {
-                                    if i.type == .N_CUSTOMUNITARY {
-                                        idNameList.append(i.name)
+                            if let list = (child as! NodeBarrier).list as? NodeIdList {
+                                if let ids = list.identifiers {
+                                    for i in ids {
+                                        if i.type == .N_CUSTOMUNITARY {
+                                            idNameList.append(i.name)
+                                        }
                                     }
                                 }
                             }
@@ -92,30 +106,13 @@ import Foundation
             case .N_GATEDECL:
                 return "\(op.qasm())"
             case .N_OPAQUE:
-                    guard let s2 = p2 else {
-                        assertionFailure("Invalid NodeStatment Operation")
-                        return ""
-                    }
-
-                    guard let s3 = p3 else {
-                        assertionFailure("Invalid NodeStatment Operation")
-                        return ""
-                    }
-
-                    if let s4 = p4 {
-                      return "\(op.qasm()) \(s2.qasm()) ( \(s3.qasm()) ) \(s4.qasm()) ;"
-                    }
-                    return "\(op.qasm()) \(s2.qasm()) \(s3.qasm());"
+                return "\(op.qasm())"
             case .N_QOP:
                 return "\(op.qasm())"
             case .N_IF:
                 return "\(op.qasm())"
             case .N_BARRIER:
-                guard let s2 = p2 else {
-                    assertionFailure("Invalid NodeStatment Operation")
-                    return ""
-                }
-                return "\(op.qasm()) \(s2.qasm());"
+                return "\(op.qasm())"
             default:
                 assertionFailure("Invalid NodeStatment Operation")
                 return ""

@@ -416,6 +416,8 @@ final class Unroller {
             }
         case .N_PROGRAM:
             try self._process_children(node)
+        case .N_STATEMENT:
+            try self._process_children(node)
         case .N_QREG:
             let n = node as! NodeQreg
             self.qregs[node.name] = n.index
@@ -441,7 +443,9 @@ final class Unroller {
 //            for child in (node as! NodeIdList).children {
 //                return try self._process_bit_id(child)
 //            }
-        
+        case .N_DECL:
+            try self._process_children(node)
+
         case .N_GATEDECL:
             try self._process_gate_decl(node as! NodeGateDecl)
   
