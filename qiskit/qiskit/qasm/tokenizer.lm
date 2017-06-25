@@ -127,7 +127,7 @@ U {
 
 -> {
     yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
-    return ARROW;
+    return ASSIGN;
 }
 
 == {

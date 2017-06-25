@@ -407,7 +407,6 @@ final class Unroller {
      */
     @discardableResult
     private func _process_node(_ node: Node) throws -> [Double] {
-        print(node.type.rawValue)
         switch node.type {
         case .N_MAINPROGRAM:
             if let pnode = (node as! NodeMainProgram).program {
@@ -465,9 +464,7 @@ final class Unroller {
         case .N_CNOT:
             try self._process_cnot(node as! NodeCnot)
         case .N_QOP:
-            if node.type == .N_MEASURE || node.type == .N_RESET {
-                try self._process_children(node)
-            }
+            try self._process_children(node)
         case .N_RESET:
             if let arg = (node as! NodeReset).arg {
                 let id0 = try self._process_bit_id(arg)

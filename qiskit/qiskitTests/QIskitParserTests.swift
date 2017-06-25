@@ -191,6 +191,46 @@ class QIskitParserTests: XCTestCase {
         
     }
     
+    func testParserRippleAdd () {
+        do {
+            let qasmProgram: String =
+            "OPENQASM 2.0;" +
+            "include \"qelib1.inc\";" +
+            "qreg a[2];" +
+            "qreg b[2];" +
+            "qreg cin[1];" +
+            "qreg cout[1];" +
+            "creg ans[3];" +
+            "x a[0];" +
+            "x b[0];" +
+            "x b[1];" +
+            "cx a[0],b[0];" +
+            "cx a[0],cin[0];" +
+            "ccx cin[0],b[0],a[0];" +
+            "cx a[1],b[1];" +
+            "cx a[1],a[0];" +
+            "ccx a[0],b[1],a[1];" +
+            "cx a[1],cout[0];" +
+            "ccx a[0],b[1],a[1];" +
+            "cx a[1],a[0];" +
+            "cx a[0],b[1];" +
+            "ccx cin[0],b[0],a[0];" +
+            "cx a[0],cin[0];" +
+            "cx cin[0],b[0];" +
+            "measure b[0] -> ans[0];" +
+            "measure b[1] -> ans[1];" +
+            "measure cout[0] -> ans[2];"
+            let parser = Qasm(data: qasmProgram)
+            let root = try parser.parse()
+            let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
+            let emittedQasm = root.qasm().components(separatedBy: whitespaceCharacterSet).joined()
+            let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
+            XCTAssertEqual(emittedQasm, targetQasm)
+        } catch let error {
+            XCTFail("\(error)")
+        }
+    }
+
     func testParserExpressionList () {
         
         let asyncExpectation = self.expectation(description: "parser")

@@ -23,7 +23,11 @@ import Foundation
         public override var type: NodeType {
             return .N_CUSTOMUNITARY
         }
-        
+    
+        public override var name: String {
+            return (self.op as? NodeId)?.identifier ?? super.name
+        }
+
         public override func qasm() -> String {
             
             guard let operation = op else {

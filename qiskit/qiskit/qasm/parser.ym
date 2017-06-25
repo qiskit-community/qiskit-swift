@@ -34,7 +34,7 @@ void yyerror(char *s);
 %token <svalue> ID
 %token <svalue> INCLD
 %token <svalue> STRING
-%token <svalue> ARROW
+%token <svalue> ASSIGN
 
 %token <svalue> SIN
 %token <svalue> COS
@@ -73,8 +73,8 @@ void yyerror(char *s);
 %type <node> reset
 %type <node> ifn
 %type <node> openqasm
-%type <svalue> unaryop
-%type <svalue> arrow
+%type <svalue> external
+%type <svalue> assign
 %type <svalue> matches
 %type <svalue> string
 %type <svalue> incld
@@ -124,8 +124,8 @@ goplist : uop { $$ = [ParseTree createGoplistNode: nil uop: $1 idlist: nil gopli
 | goplist barrier idlist { $$ = [ParseTree createGoplistNode: $2 uop: nil idlist: $3 goplist: $1]; }
 
 qop : uop { $$ = [ParseTree createQopNode: $1 object2: nil object3: nil]; }
-| measure argument arrow argument ';' { $$ = [ParseTree createQopNode: $1 object2: $2 object3: $4]; }
-| measure '(' argument ')' arrow '(' argument ')' ';' { $$ = [ParseTree createQopNode: $1 object2: $3 object3: $7]; }
+| measure argument assign argument ';' { $$ = [ParseTree createQopNode: $1 object2: $2 object3: $4]; }
+| measure '(' argument ')' assign '(' argument ')' ';' { $$ = [ParseTree createQopNode: $1 object2: $3 object3: $7]; }
 | reset '(' argument ')' ';' { $$ = [ParseTree createQopNode: $1 object2: $3 object3: nil]; }
 
 uop : u '(' exp ')' argument ';' { $$ = [ParseTree createUniversalUnitary: $1 object2: $3 object3: $5]; }
@@ -156,7 +156,7 @@ exp : exp '+' exp { $$ = [ParseTree createBinaryOperation: @"+" operand1: $1 ope
 | exp '/' exp { $$ = [ParseTree createBinaryOperation: @"/" operand1: $1 operand2: $3];  }
 | exp '^' exp { $$ = [ParseTree createBinaryOperation: @"^" operand1: $1 operand2: $3]; }
 | '-' exp %prec '-' { $$ = [ParseTree createPrefixOperation: @"-" operand: $2]; }
-| unaryop '(' exp ')' { $$ = [ParseTree createPrefixOperation: $1 operand: $3]; }
+| external '(' exp ')' { $$ = [ParseTree createPrefixOperation: $1 operand: $3]; }
 | '(' exp ')' { $$ = $2; }
 | real { $$ = $1; }
 | nninteger { $$ = $1; }
@@ -182,12 +182,12 @@ reset: RESET { $$ = [ParseTree createResetNode]; }
 ifn: IF { $$ = [ParseTree createIfNode]; }
 openqasm: OPENQASM { $$ = [ParseTree createMagicNode]; }
 
-arrow: ARROW { $$ = $1; }
+assign: ASSIGN { $$ = $1; }
 matches: MATCHES { $$ = $1; }
 string: STRING { $$ = $1; }
 incld: INCLD { $$ = $1; }
 
-unaryop : SIN { $$ = $1; }
+external : SIN { $$ = $1; }
 | COS { $$ = $1; }
 | TAN { $$ = $1; }
 | EXP { $$ = $1; }
