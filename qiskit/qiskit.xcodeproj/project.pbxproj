@@ -25,6 +25,7 @@
 		693109451EE9966D00CD2CD1 /* PrinterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693109441EE9966D00CD2CD1 /* PrinterBackend.swift */; };
 		693109471EE9969600CD2CD1 /* SimulatorBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693109461EE9969600CD2CD1 /* SimulatorBackend.swift */; };
 		693177A11EEAF42500B4CF9D /* UnrollerException.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693177A01EEAF42500B4CF9D /* UnrollerException.swift */; };
+		6932C2D51F0064E40057DDB6 /* qasm.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6932C2D41F0064E40057DDB6 /* qasm.bundle */; };
 		69339B171EFAE9E500AB0E5D /* UnrollerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69339B161EFAE9E500AB0E5D /* UnrollerTests.swift */; };
 		693A9F421ECA363D00112AC9 /* Barrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693A9F411ECA363D00112AC9 /* Barrier.swift */; };
 		693A9F441ECA366000112AC9 /* CX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693A9F431ECA366000112AC9 /* CX.swift */; };
@@ -158,6 +159,7 @@
 		693109441EE9966D00CD2CD1 /* PrinterBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PrinterBackend.swift; path = unroll/PrinterBackend.swift; sourceTree = "<group>"; };
 		693109461EE9969600CD2CD1 /* SimulatorBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SimulatorBackend.swift; path = unroll/SimulatorBackend.swift; sourceTree = "<group>"; };
 		693177A01EEAF42500B4CF9D /* UnrollerException.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UnrollerException.swift; path = unroll/UnrollerException.swift; sourceTree = "<group>"; };
+		6932C2D41F0064E40057DDB6 /* qasm.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = qasm.bundle; sourceTree = "<group>"; };
 		69339B161EFAE9E500AB0E5D /* UnrollerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnrollerTests.swift; sourceTree = "<group>"; };
 		693A9F411ECA363D00112AC9 /* Barrier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Barrier.swift; path = extensions/Barrier.swift; sourceTree = "<group>"; };
 		693A9F431ECA366000112AC9 /* CX.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CX.swift; path = extensions/CX.swift; sourceTree = "<group>"; };
@@ -496,6 +498,7 @@
 		DFBC4F6F1EC7384200027640 /* qiskitTests */ = {
 			isa = PBXGroup;
 			children = (
+				6932C2D41F0064E40057DDB6 /* qasm.bundle */,
 				6957013B1ED75E9100C6CCAB /* DataStructureTests.swift */,
 				DFBC4F701EC7384200027640 /* QiskitTests.swift */,
 				DF7F720C1ED863F50055D210 /* QIskitParserTests.swift */,
@@ -641,6 +644,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6932C2D51F0064E40057DDB6 /* qasm.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
