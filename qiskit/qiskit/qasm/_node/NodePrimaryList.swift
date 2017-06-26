@@ -1,21 +1,22 @@
 //
-//  IdList.swift
+//  NodePrimaryList.swift
 //  qiskit
 //
-//  Created by Joe Ligman on 6/4/17.
+//  Created by Joe Ligman on 6/6/17.
 //  Copyright © 2017 IBM. All rights reserved.
 //
 
 import Foundation
 
 /*
- Node for an OPENQASM idlist.
- children is a list of id nodes.
- */
-@objc public final class NodeIdList: Node {
+Node for an OPENQASM primarylist.
+children is a list of primary nodes. Primary nodes are indexedid or id.
+*/
+
+@objc public final class NodePrimaryList: Node {
     
     public private(set) var identifiers: [Node]?
-
+   
     public init(identifier: Node?) {
         super.init()
         if let ident = identifier {
@@ -32,7 +33,7 @@ import Foundation
     }
     
     public override var type: NodeType {
-        return .N_IDLIST
+        return .N_PRIMARYLIST
     }
     
     public override var children: [Node] {
@@ -49,4 +50,3 @@ import Foundation
         return qasms.joined(separator: ",")
     }
 }
-

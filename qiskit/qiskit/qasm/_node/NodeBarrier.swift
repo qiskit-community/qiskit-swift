@@ -7,7 +7,11 @@
 //
 
 import Foundation
-
+/*
+ class Barrier(Node):
+ Node for an OPENQASM barrier statement.
+ children[0] is a primarylist node.
+ */
 @objc public final class NodeBarrier: Node {
 
     public var list: Node?

@@ -8,12 +8,15 @@
 
 import Foundation
 
+/*
+Node for an OPENQASM program.
+children is a list of nodes (statements).
+*/
 @objc public final class NodeProgram: Node  {
 
-    public private(set) var program: [Node]?
     public private(set) var statements: [Node]?
     
-    public init(program: Node?, statement: Node?) {
+    public init(statement: Node?) {
         super.init()
         if let stmt = statement {
             if self.statements == nil {
@@ -21,13 +24,6 @@ import Foundation
             } else {
                 self.statements?.append(stmt)
             }
-        }
-        
-        if let prgm = program as? NodeProgram {
-            if prgm.program == nil {
-                prgm.program = []
-            }
-            prgm.program!.append(self)
         }
     }
     
@@ -41,12 +37,6 @@ import Foundation
     
     public override var children: [Node] {
         var _children: [Node] = []
-        
-        if let programs = program {
-            for p in programs {
-                _children.append(p)
-            }
-        }
         if let stmnts = statements {
             for s in stmnts {
                 _children.append(s)
@@ -58,18 +48,11 @@ import Foundation
     public override func qasm() -> String {
         
         var qasms: [String] = []
-        if let prg = program {
-            qasms = prg.flatMap({ (node: Node) -> String in
-                return node.qasm()
-            })
-        }
-        
         if let stmt = statements {
             qasms += stmt.flatMap({ (node: Node) -> String in
-                        return node.qasm()
-                    })
+                                    return node.qasm()
+                                    })
         }
         return qasms.joined(separator: "\n")
-        
     }
 }

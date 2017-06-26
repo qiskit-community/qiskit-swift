@@ -18,10 +18,6 @@ import Foundation
         self.magic = magic
         self.incld = incld
         self.program = program
-        
-        if self.magic?.type == .N_MAGIC {
-            (self.magic as? NodeMagic)?.updateNode(version: version)
-        }
     }
     
     public override var type: NodeType {

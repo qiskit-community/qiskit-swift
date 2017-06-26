@@ -8,6 +8,13 @@
 
 import Foundation
 
+/*
+ Node for an OPENQASM binary operation exprssion.
+ children[0] is the operation, as a character.
+ children[1] is the left expression.
+ children[2] is the right expression.
+ */
+
 @objc public final class NodeBinaryOp: Node {
 
     public let op: String

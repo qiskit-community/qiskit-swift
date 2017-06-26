@@ -8,22 +8,29 @@
 
 import Foundation
 
+/*
+ Node for an OPENQASM if statement.
+ children[0] is an id node.
+ children[1] is an integer.
+ children[2] is quantum operation node, including U, CX, custom_unitary,
+ measure, reset, (and BUG: barrier, if).
+ */
 @objc public final class NodeIf: Node {
   
-    public var nodeId: Node?
-    public var nodeNNInt: Node?
-    public var nodeQop: Node?
+    public let nodeId: Node?
+    public let nodeNNInt: Node?
+    public let nodeQop: Node?
     
-    public override var type: NodeType {
-        return .N_IF
-    }
-    
-    public func updateNode(identifier: Node?, nninteger: Node?, qop: Node?) {
+    public init(identifier: Node?, nninteger: Node?, qop: Node?) {
         nodeId = identifier
         nodeNNInt = nninteger
         nodeQop = qop
     }
     
+    public override var type: NodeType {
+        return .N_IF
+    }
+
     public override var children: [Node] {
         var _children: [Node] = []
         if let ident = nodeId {

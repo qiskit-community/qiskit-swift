@@ -8,16 +8,21 @@
 
 import Foundation
 
+/*
+Node for an OPENQASM file identifier/version statement ("magic number").
+children[0] is a floating point number (not a node).
+*/
+
 @objc public final class NodeMagic:  Node {
 
-    public var nodeVersion: NodeReal?
-    
+    public let nodeVersion: NodeReal?
+
+    public init(version: Node?) {
+        self.nodeVersion = (version as? NodeReal)
+    }
+
     public override var type: NodeType {
         return .N_MAGIC
-    }
-    
-    public func updateNode(version: Node?) {
-        nodeVersion = (version as? NodeReal)
     }
     
     public override var children: [Node] {
@@ -31,12 +36,11 @@ import Foundation
     }
     
     public override func qasm() -> String {
-        var qasm: String = "OPENQASM"
-        if let version = nodeVersion {
-            qasm += " \(version.qasm())"
+        guard let version = nodeVersion else {
+            assertionFailure("Invalid NodeMagic Operation")
+            return ""
         }
-        qasm += ";"
-        return qasm
+        return String(format: "OPENQASM %.1f;", version)
     }
 
 }

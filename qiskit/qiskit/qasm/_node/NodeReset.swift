@@ -8,32 +8,37 @@
 
 import Foundation
 
+/*
+Node for an OPENQASM reset statement.
+children[0] is a primary node (id or indexedid)
+*/
+
 @objc public final class NodeReset: Node {
     
-    public var arg: Node?
-
+    public let indexedid: Node?
+ 
+    public init(indexedid: Node?) {
+        self.indexedid = indexedid
+    }
+    
     public override var type: NodeType {
         return .N_RESET
     }
     
-    public func updateNode(arg: Node?) {
-        self.arg = arg
-    }
-    
     public override var children: [Node] {
         var _children: [Node] = []
-        if let a = arg {
+        if let a = indexedid {
             _children.append(a)
         }
         return _children
     }
 
     public override func qasm() -> String {
-        guard let a = arg else {
-            assertionFailure("Invalid NodeQop Operation")
+        guard let iid = indexedid else {
+            assertionFailure("Invalid NodeReset Operation")
             return ""
         }
-        return "reset \(a.qasm());"
+        return "reset \(iid.qasm());"
     }
 
 }

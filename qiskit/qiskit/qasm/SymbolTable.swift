@@ -8,17 +8,16 @@
 
 import Foundation
 
-struct SymbolEntry {
+public struct SymbolEntry {
 
     let name: String
     let type: NodeType
     let line: Int
     let file: String
-
 }
 
 extension SymbolEntry: Equatable {
-    static func == (lhs: SymbolEntry, rhs: SymbolEntry) -> Bool {
+    public static func == (lhs: SymbolEntry, rhs: SymbolEntry) -> Bool {
         return lhs.name == rhs.name &&
             lhs.type == rhs.type &&
             lhs.line == rhs.line &&
@@ -27,23 +26,22 @@ extension SymbolEntry: Equatable {
 }
 
 extension SymbolEntry: Hashable {
-    var hashValue: Int {
+    public var hashValue: Int {
         return name.hashValue ^ type.hashValue ^ line.hashValue ^ file.hashValue
     }
 }
 
-
-class SymbolTable {
+@objc public final class SymbolTable: NSObject {
     
     private var count = 100
     private var _symbolTable = [SymbolEntry?](repeating: nil, count:100)
     
-    func exists(entry: SymbolEntry) -> Bool {
+    public func exists(entry: SymbolEntry) -> Bool {
         let hash = entry.hashValue % count
         return _symbolTable[hash] == nil
     }
     
-    func insert(entry: SymbolEntry) throws {
+    public func insert(entry: SymbolEntry) throws {
         if exists(entry: entry) {
             throw QasmException.error(msg: "boogers")
         }
@@ -51,7 +49,7 @@ class SymbolTable {
         _symbolTable[hash] = entry
     }
     
-    func delete(entry: SymbolEntry) {
+    public func delete(entry: SymbolEntry) {
         let hash = entry.hashValue % count
         _symbolTable[hash] = nil
     }

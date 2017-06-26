@@ -8,6 +8,10 @@
 
 import Foundation
 
+/*
+Node for an OPENQASM expression list.
+children are expression nodes.
+*/
 @objc public final class NodeExpressionList: Node {
 
     public var expressionList: [Node]? = nil
@@ -29,6 +33,10 @@ import Foundation
     
     public override var type: NodeType {
         return .N_EXPRESSIONLIST
+    }
+    
+    public override var children: [Node] {
+        return (expressionList != nil) ? expressionList! : []
     }
     
     public override func qasm() -> String {
