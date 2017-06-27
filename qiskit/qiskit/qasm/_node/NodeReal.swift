@@ -26,7 +26,7 @@ This node has no children. The data is in the value field.
     }
 
     public override func qasm() -> String {
-        let qasm: String = String(format: "%0.15f", value)
+        let qasm: String = "\(value)"
         return qasm
     }
 }

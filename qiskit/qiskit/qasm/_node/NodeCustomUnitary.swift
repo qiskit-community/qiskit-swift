@@ -33,7 +33,7 @@ Has properties:
         self.arguments = arguments   // anylist
         self.bitlist = bitlist   // explist
     
-         if let _id = self.identifier as? NodeId{
+         if let _id = self.identifier as? NodeId {
             _name = _id._name
         }
     }

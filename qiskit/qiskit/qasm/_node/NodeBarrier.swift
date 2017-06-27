@@ -16,12 +16,12 @@ import Foundation
 
     public var list: Node?
     
+    public init(list: Node?) {
+        self.list = list
+    }
+
     public override var type: NodeType {
         return .N_BARRIER
-    }
-    
-    public func updateNode(anylist: Node?) {
-        self.list = anylist
     }
     
     public override var children: [Node] {

@@ -35,7 +35,7 @@ class QIskitParserTests: XCTestCase {
                     "measure q[1] -> c[1];\n" +
                     "measure q[2] -> c[2];\n" +
                     "measure q[3] -> c[3];\n" +
-            "measure q[4] -> c[4];"
+                    "measure q[4] -> c[4];"
 
             let parser = Qasm(data: qasmProgram)
             let root = try parser.parse()

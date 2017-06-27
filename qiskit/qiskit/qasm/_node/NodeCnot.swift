@@ -17,6 +17,10 @@ import Foundation
 
     public var arg1: Node?
     public var arg2: Node?
+    public init(arg1: Node?, arg2: Node?) {
+        self.arg1 = arg1
+        self.arg2 = arg2
+    }
     
     public override var type: NodeType {
         return .N_CNOT

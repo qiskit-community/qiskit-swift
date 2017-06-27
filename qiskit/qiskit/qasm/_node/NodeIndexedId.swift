@@ -19,11 +19,11 @@ children[1] is an integer (not a node).
     public var _name: String = ""
     public var line: Int = 0
     public var file: String = ""
-    public var index: Int = 0
+    public var index: Int = -1
     
-    public init(identifier: Node, index: Int) {
+    public init(identifier: Node, index: Node?) {
         self.identifer = identifier
-        self.index = index
+        self.index = (index as? NodeNNInt)?.value ?? -1
         if let _id = self.identifer as? NodeId{
             // Name of the qreg
             self._name = _id.name
@@ -32,6 +32,7 @@ children[1] is an integer (not a node).
             // Source file name
             self.file = _id.file
         }
+            
    }
 
     public override var type: NodeType {
@@ -48,7 +49,9 @@ children[1] is an integer (not a node).
             return ""
         }
         var qasm: String = "\(ident.qasm())"
-        qasm += " [\(index)]"
+        if index >= 0 {
+            qasm += " [\(index)]"
+        }
         return qasm
     }
     

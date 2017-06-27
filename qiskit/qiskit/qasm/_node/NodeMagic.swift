@@ -40,7 +40,7 @@ children[0] is a floating point number (not a node).
             assertionFailure("Invalid NodeMagic Operation")
             return ""
         }
-        return String(format: "OPENQASM %.1f;", version)
+        return String(format: "OPENQASM %.1f;", version.value)
     }
 
 }
