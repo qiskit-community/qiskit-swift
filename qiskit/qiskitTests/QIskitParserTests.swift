@@ -11,6 +11,52 @@ import XCTest
 
 class QIskitParserTests: XCTestCase {
 
+    private static let qasmProgram1: String =
+            "OPENQASM 2.0;\n" +
+            "include \"qelib1.inc\";\n" +
+            "qreg q[5];\n" +
+            "creg c[5];\n" +
+            "x q[0];\n" +
+            "x q[1];\n" +
+            "h q[2];\n" +
+            "measure q[0] -> c[0];\n" +
+            "measure q[1] -> c[1];\n" +
+            "measure q[2] -> c[2];\n" +
+            "measure q[3] -> c[3];\n" +
+            "measure q[4] -> c[4];"
+
+    private static let qasmProgram2: String =
+            "OPENQASM 2.0;\n" +
+            "include \"qelib1.inc\";\n" +
+            "qreg q[3];\n" +
+            "qreg a[2];\n" +
+            "creg c[3];\n" +
+            "creg syn[2];\n" +
+            "gate syndrome d1, d2, d3, a1, a2\n" +
+            "{\n" +
+            "    cx d1, a1; cx d2, a1;\n" +
+            "    cx d2, a2; cx d3, a2;\n" +
+            "}\n" +
+            "x q[0];\n" +
+            "barrier q;\n" +
+            "syndrome q[0],q[1],q[2],a[0],a[1];\n" +
+            "measure a -> syn;\n" +
+            "if(syn==1) x q[0];\n" +
+            "if(syn==2) x q[2];\n" +
+            "if(syn==3) x q[1];\n" +
+            "measure q -> c;\n"
+
+    private static let qasmProgram3: String =
+            "OPENQASM 2.0;\n" +
+            "include \"qelib1.inc\";\n" +
+            "qreg q[3];\n" +
+            "creg c[2];\n" +
+            "h q[0];\n" +
+            "cx q[0],q[2];\n" +
+            "measure q[0] -> c[0];\n" +
+            "measure q[2] -> c[1];"
+
+
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -21,26 +67,81 @@ class QIskitParserTests: XCTestCase {
         super.tearDown()
     }
 
+    private class func runParser(_ qasmProgram: String) throws -> String {
+        let parser = Qasm(data: qasmProgram)
+        let root = try parser.parse()
+        return root.qasm()
+    }
+
+
+    func testExamples() {
+        let bundle = Bundle(for: type(of: self))
+        guard let path = bundle.path(forResource: "qasm", ofType: "bundle") else {
+            XCTFail("Bundle qasm not founc")
+            return
+        }
+        guard let qasmBundle = Bundle(path: path) else {
+            XCTFail("Bundle not found \(path)")
+            return
+        }
+        guard var urls = qasmBundle.urls(forResourcesWithExtension: "qasm", subdirectory: "generic") else {
+            XCTFail("Bundle generic path not found")
+            return
+        }
+        guard let urlIBMqx2 = qasmBundle.urls(forResourcesWithExtension: "qasm", subdirectory: "ibmqx2") else {
+            XCTFail("Bundle generic path not found")
+            return
+        }
+        urls.append(contentsOf: urlIBMqx2)
+        var differences: [String: (String,String)] = [:]
+        for url in urls {
+            var qasmProgram = ""
+            do {
+                qasmProgram = try String(contentsOf: url, encoding: .utf8)
+                var lines: [String] = []
+                // eliminate comments
+                for var line in qasmProgram.components(separatedBy: CharacterSet.newlines) {
+                    line = line.replacingOccurrences(of:"pi", with:"3.14159")
+                    if let range = line.range(of: "//") {
+                        let start = range.lowerBound
+                        let newLine = line[line.startIndex..<start]
+                        if !newLine.isEmpty {
+                            lines.append(newLine)
+                        }
+                    }
+                    else {
+                        lines.append(line)
+                    }
+                }
+                qasmProgram = lines.joined()
+                let qasm = try QIskitParserTests.runParser(qasmProgram)
+                let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
+                let emittedQasm = qasm.components(separatedBy: whitespaceCharacterSet).joined()
+                let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
+                if emittedQasm != targetQasm {
+                    differences[url.lastPathComponent] = (emittedQasm,targetQasm)
+                }
+            } catch {
+                print("Error \(qasmProgram)")
+                XCTFail("\(url.lastPathComponent): \(error)")
+            }
+        }
+        if !differences.isEmpty {
+            for (name,difference) in differences {
+                print("File: \(name) doesn't match:")
+                print("Emmited: \(difference.0)")
+                print("Original: \(difference.1)")
+            }
+            XCTFail("Error not equal.")
+        }
+    }
+
     func testParser() {
         do {
-            let qasmProgram: String =
-                "OPENQASM 2.0;\n" +
-                    "include \"qelib1.inc\";\n" +
-                    "qreg q[5];\n" +
-                    "creg c[5];\n" +
-                    "x q[0];\n" +
-                    "x q[1];\n" +
-                    "h q[2];\n" +
-                    "measure q[0] -> c[0];\n" +
-                    "measure q[1] -> c[1];\n" +
-                    "measure q[2] -> c[2];\n" +
-                    "measure q[3] -> c[3];\n" +
-            "measure q[4] -> c[4];"
-
-            let parser = Qasm(data: qasmProgram)
-            let root = try parser.parse()
+            let qasmProgram = QIskitParserTests.qasmProgram1
+            let qasm = try QIskitParserTests.runParser(qasmProgram)
             let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
-            let emittedQasm = root.qasm().components(separatedBy: whitespaceCharacterSet).joined()
+            let emittedQasm = qasm.components(separatedBy: whitespaceCharacterSet).joined()
             let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
             XCTAssertEqual(emittedQasm, targetQasm)
         } catch let error {
@@ -50,56 +151,23 @@ class QIskitParserTests: XCTestCase {
 
     func testErrorCorrection() {
         do {
-            let qasmProgram: String =
-                "OPENQASM 2.0;\n" +
-                    "include \"qelib1.inc\";\n" +
-                    "qreg q[3];\n" +
-                    "qreg a[2];\n" +
-                    "creg c[3];\n" +
-                    "creg syn[2];\n" +
-                    "gate syndrome d1, d2, d3, a1, a2\n" +
-                    "{\n" +
-                    "    cx d1, a1; cx d2, a1;\n" +
-                    "    cx d2, a2; cx d3, a2;\n" +
-                    "}\n" +
-                    "x q[0];\n" +
-                    "barrier q;\n" +
-                    "syndrome q[0],q[1],q[2],a[0],a[1];\n" +
-                    "measure a -> syn;\n" +
-                    "if(syn==1) x q[0];\n" +
-                    "if(syn==2) x q[2];\n" +
-                    "if(syn==3) x q[1];\n" +
-                    "measure q -> c;\n"
-
-            let parser = Qasm(data: qasmProgram)
-            let root = try parser.parse()
+            let qasmProgram = QIskitParserTests.qasmProgram2
+            let qasm = try QIskitParserTests.runParser(qasmProgram)
             let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
-            let emittedQasm = root.qasm().components(separatedBy: whitespaceCharacterSet).joined()
+            let emittedQasm = qasm.components(separatedBy: whitespaceCharacterSet).joined()
             let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
             XCTAssertEqual(emittedQasm, targetQasm)
         } catch let error {
             XCTFail("\(error)")
         }
     }
-    
 
     func testParserBell () {
-        
         do {
-            let qasmProgram: String =
-                "OPENQASM 2.0;\n" +
-                    "include \"qelib1.inc\";\n" +
-                    "qreg q[3];\n" +
-                    "creg c[2];\n" +
-                    "h q[0];\n" +
-                    "cx q[0],q[2];\n" +
-                    "measure q[0] -> c[0];\n" +
-                    "measure q[2] -> c[1];"
-            
-            let parser = Qasm(data: qasmProgram)
-            let root = try parser.parse()
+            let qasmProgram = QIskitParserTests.qasmProgram3
+            let qasm = try QIskitParserTests.runParser(qasmProgram)
             let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
-            let emittedQasm = root.qasm().components(separatedBy: whitespaceCharacterSet).joined()
+            let emittedQasm = qasm.components(separatedBy: whitespaceCharacterSet).joined()
             let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
             XCTAssertEqual(emittedQasm, targetQasm)
         } catch let error {
