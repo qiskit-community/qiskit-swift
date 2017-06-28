@@ -8,6 +8,10 @@
 
 import Foundation
 
+/*
+Node for an OPENQASM integer.
+This node has no children. The data is in the value field.
+*/
 @objc public final class NodeNNInt: Node {
 
     public let value: Int

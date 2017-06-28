@@ -21,7 +21,7 @@ import Foundation
     }
     
     public override func qasm() -> String {
-        let qasm: String = "include \(file)"
+        let qasm: String = "include \(file);"
         return qasm
     }
 }

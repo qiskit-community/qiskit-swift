@@ -8,6 +8,11 @@
 
 import Foundation
 
+/*
+Node for an OPENQASM real number.
+This node has no children. The data is in the value field.
+*/
+
 @objc public final class NodeReal: Node {
 
     public let value: Float
@@ -19,7 +24,7 @@ import Foundation
     public override var type: NodeType {
         return .N_REAL
     }
-    
+
     public override func qasm() -> String {
         let qasm: String = "\(value)"
         return qasm

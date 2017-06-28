@@ -7,19 +7,23 @@
 //
 
 import Foundation
-
+/*
+ Node for an OPENQASM measure statement.
+ children[0] is a primary node (id or indexedid)
+ children[1] is a primary node (id or indexedid)
+ */
 @objc public final class NodeMeasure: Node {
 
     public var arg1: Node?
     public var arg2: Node?
     
-    public override var type: NodeType {
-        return .N_MEASURE
-    }
-    
-    public func updateNode(arg1: Node?, arg2: Node?) {
+    public init(arg1: Node?, arg2: Node?) {
         self.arg1 = arg1
         self.arg2 = arg2
+    }
+    
+    public override var type: NodeType {
+        return .N_MEASURE
     }
     
     public override var children: [Node] {

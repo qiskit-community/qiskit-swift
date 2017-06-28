@@ -8,19 +8,22 @@
 
 import Foundation
 
+/*
+ Node for an OPENQASM CNOT statement.
+ children[0], children[1] are id nodes if CX is inside a gate body,
+ otherwise they are primary nodes.
+ */
 @objc public final class NodeCnot: Node {
 
     public var arg1: Node?
     public var arg2: Node?
+    public init(arg1: Node?, arg2: Node?) {
+        self.arg1 = arg1
+        self.arg2 = arg2
+    }
     
     public override var type: NodeType {
         return .N_CNOT
-    }
-    
-    
-    public func updateNode(arg1: Node?, arg2: Node?) {
-        self.arg1 = arg1
-        self.arg2 = arg2
     }
     
     public override var children: [Node] {

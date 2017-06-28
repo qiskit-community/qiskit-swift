@@ -8,52 +8,55 @@
 
 import Foundation
 
+/*
+ Node for an OPENQASM qreg statement.
+ children[0] is an indexedid node.
+ */
 @objc public final class NodeQreg: Node {
 
-    public var nodeId: Node?
-    public var nodeNNInt: Node?
+    public let indexedid: Node?
+    public var _name: String = ""
     public var line: Int = 0
     public var file: String = ""
     public var index: Int = 0
     
-
+    public init(indexedid: Node?, line: Int, file: String) {
+        
+        self.indexedid = indexedid
+        if let _id = self.indexedid as? NodeId{
+            // Name of the qreg
+            self._name = _id.name
+            // Source line number
+            self.line = _id.line
+            // Source file name
+            self.file = _id.file
+            // Size of the register
+            self.index = _id.index
+        }
+    }
+    
     public override var type: NodeType {
         return .N_QREG
     }
     
     public override var name: String {
-        return (nodeId as? NodeId)?.identifier ?? super.name
+        return _name
     }
 
-    public func updateNode(identifier: Node?, nninteger: Node?) {
-        nodeId = identifier
-        nodeNNInt = nninteger
-        index = (nodeId as? NodeId)?.index ?? 0
-    }
-    
     public override var children: [Node] {
         var _children: [Node] = []
-        
-        if let ident = nodeId {
-            _children.append(ident)
+        if let a = indexedid {
+            _children.append(a)
         }
-        
-        if let nnint = nodeNNInt {
-            _children.append(nnint)
-        }
-        
         return _children
     }
     
     public override func qasm() -> String {
-        var qasm: String = "qreg"
-        if let nid = nodeId {
-            qasm += " \(nid.qasm())"
+        guard let iid = indexedid else {
+            assertionFailure("Invalid NodeQreg Operation")
+            return ""
         }
-        if let nnint = nodeNNInt {
-            qasm += " [\(nnint.qasm())]"
-        }
-        qasm += ";"
-        return qasm
+        return "qreg " + iid.qasm() + ";"
     }
+    
 }

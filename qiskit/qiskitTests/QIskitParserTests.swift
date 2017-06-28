@@ -12,39 +12,39 @@ import XCTest
 class QIskitParserTests: XCTestCase {
 
     private static let qasmProgram1: String =
-            "OPENQASM 2.0;\n" +
-            "include \"qelib1.inc\";\n" +
-            "qreg q[5];\n" +
-            "creg c[5];\n" +
-            "x q[0];\n" +
-            "x q[1];\n" +
-            "h q[2];\n" +
-            "measure q[0] -> c[0];\n" +
-            "measure q[1] -> c[1];\n" +
-            "measure q[2] -> c[2];\n" +
-            "measure q[3] -> c[3];\n" +
-            "measure q[4] -> c[4];"
+                "OPENQASM 2.0;\n" +
+                    "include \"qelib1.inc\";\n" +
+                    "qreg q[5];\n" +
+                    "creg c[5];\n" +
+                    "x q[0];\n" +
+                    "x q[1];\n" +
+                    "h q[2];\n" +
+                    "measure q[0] -> c[0];\n" +
+                    "measure q[1] -> c[1];\n" +
+                    "measure q[2] -> c[2];\n" +
+                    "measure q[3] -> c[3];\n" +
+                    "measure q[4] -> c[4];"
 
     private static let qasmProgram2: String =
-            "OPENQASM 2.0;\n" +
-            "include \"qelib1.inc\";\n" +
-            "qreg q[3];\n" +
-            "qreg a[2];\n" +
-            "creg c[3];\n" +
-            "creg syn[2];\n" +
-            "gate syndrome d1, d2, d3, a1, a2\n" +
-            "{\n" +
-            "    cx d1, a1; cx d2, a1;\n" +
-            "    cx d2, a2; cx d3, a2;\n" +
-            "}\n" +
-            "x q[0];\n" +
-            "barrier q;\n" +
-            "syndrome q[0],q[1],q[2],a[0],a[1];\n" +
-            "measure a -> syn;\n" +
-            "if(syn==1) x q[0];\n" +
-            "if(syn==2) x q[2];\n" +
-            "if(syn==3) x q[1];\n" +
-            "measure q -> c;\n"
+                "OPENQASM 2.0;\n" +
+                    "include \"qelib1.inc\";\n" +
+                    "qreg q[3];\n" +
+                    "qreg a[2];\n" +
+                    "creg c[3];\n" +
+                    "creg syn[2];\n" +
+                    "gate syndrome d1, d2, d3, a1, a2\n" +
+                    "{\n" +
+                    "    cx d1, a1; cx d2, a1;\n" +
+                    "    cx d2, a2; cx d3, a2;\n" +
+                    "}\n" +
+                    "x q[0];\n" +
+                    "barrier q;\n" +
+                    "syndrome q[0],q[1],q[2],a[0],a[1];\n" +
+                    "measure a -> syn;\n" +
+                    "if(syn==1) x q[0];\n" +
+                    "if(syn==2) x q[2];\n" +
+                    "if(syn==3) x q[1];\n" +
+                    "measure q -> c;\n"
 
     private static let qasmProgram3: String =
             "OPENQASM 2.0;\n" +
@@ -68,8 +68,8 @@ class QIskitParserTests: XCTestCase {
     }
 
     private class func runParser(_ qasmProgram: String) throws -> String {
-        let parser = Qasm(data: qasmProgram)
-        let root = try parser.parse()
+            let parser = Qasm(data: qasmProgram)
+            let root = try parser.parse()
         return root.qasm()
     }
 
@@ -115,9 +115,9 @@ class QIskitParserTests: XCTestCase {
                 }
                 qasmProgram = lines.joined()
                 let qasm = try QIskitParserTests.runParser(qasmProgram)
-                let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
+            let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
                 let emittedQasm = qasm.components(separatedBy: whitespaceCharacterSet).joined()
-                let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
+            let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
                 if emittedQasm != targetQasm {
                     differences[url.lastPathComponent] = (emittedQasm,targetQasm)
                 }
@@ -148,7 +148,7 @@ class QIskitParserTests: XCTestCase {
             XCTFail("\(error)")
         }
     }
-
+    
     func testErrorCorrection() {
         do {
             let qasmProgram = QIskitParserTests.qasmProgram2
@@ -359,5 +359,60 @@ class QIskitParserTests: XCTestCase {
             
         }
     }
-    
+ 
+    func testParserQPT () {
+        
+        let asyncExpectation = self.expectation(description: "parser")
+        
+        do {
+            let qasmProgram: String =
+            "OPENQASM 2.0;\n" +
+            "include \"qelib1.inc\";\n" +
+            "gate pre q { }\n" +
+            "gate post q { }\n" +
+            "qreg q[1];\n" +
+            "creg c[1];\n" +
+            "pre q[0];\n" +
+            "barrier q;\n" +
+            "h q[0];\n" +
+            "barrier q;\n" +
+            "post q[0];\n" +
+            "measure q[0] -> c[0];\n"
+            
+            let buf: YY_BUFFER_STATE = yy_scan_string(qasmProgram)
+            
+            ParseSuccessBlock = { (n: NSObject?) -> Void in
+                XCTAssertNotNil(n)
+                if let node = n as? NodeMainProgram {
+                    let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
+                    let emittedQasm = node.qasm().components(separatedBy: whitespaceCharacterSet).joined()
+                    let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
+                    XCTAssertEqual(emittedQasm, targetQasm)
+                    asyncExpectation.fulfill()
+                } else {
+                    XCTFail("Main Program Node Type Expected!")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                
+            }
+            
+            ParseFailBlock = { (message: String?) -> Void in
+                if let msg = message {
+                    XCTFail(msg)
+                } else {
+                    XCTFail("Unknown Error")
+                }
+                asyncExpectation.fulfill()
+            }
+            
+            yyparse()
+            yy_delete_buffer(buf)
+            
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in parser")
+            })
+            
+        }
+    }
 }

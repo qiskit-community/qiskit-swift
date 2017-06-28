@@ -14,14 +14,10 @@ import Foundation
     public let incld: Node?
     public let program: Node?
     
-    public init(magic: Node?, version: Node?, incld: Node?, program: Node?) {
+    public init(magic: Node?, incld: Node?, program: Node?) {
         self.magic = magic
         self.incld = incld
         self.program = program
-        
-        if self.magic?.type == .N_MAGIC {
-            (self.magic as? NodeMagic)?.updateNode(version: version)
-        }
     }
     
     public override var type: NodeType {
@@ -30,7 +26,7 @@ import Foundation
     
     public override func qasm() -> String {
         var qasm: String = magic?.qasm() ?? ""
-        qasm += "\(incld?.qasm() ?? "");\n"
+        qasm += "\(incld?.qasm() ?? "")\n"
         qasm += "\(program?.qasm() ?? "")\n"
         return qasm
     }
