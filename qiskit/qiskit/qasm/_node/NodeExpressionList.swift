@@ -41,10 +41,10 @@ children are expression nodes.
     
     public override func qasm() -> String {
         var qasms: [String] = []
-        if let list = expressionList?.reversed() {
-            qasms = list.flatMap({ (node: Node) -> String in
-                return node.qasm()
-            })
+        if let elist = expressionList?.reversed()  {
+            for node in elist {
+                qasms.append(node.qasm())
+            }
         }
         return qasms.joined(separator: ",")
     }

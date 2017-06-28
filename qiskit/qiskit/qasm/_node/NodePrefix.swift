@@ -33,6 +33,6 @@ children[1] is an expression node.
     
     public override func qasm() -> String {
         let operand = self._children[0]
-        return "\(op) (\(operand.qasm()))"
+        return "\(op) \(operand.qasm())"
     }
 }

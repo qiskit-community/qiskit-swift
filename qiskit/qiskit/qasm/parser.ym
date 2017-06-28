@@ -362,8 +362,8 @@ additive_expression : prefix_expression { $$ = $1; }
 | additive_expression '-' prefix_expression { $$ = [ParseTree createBinaryOperation: @"-" operand1: $1 operand2: $3];  }
 
 multiplicative_expression : additive_expression { $$ = $1; }
-| multiplicative_expression '*' additive_expression { [ParseTree createBinaryOperation: @"*" operand1: $1 operand2: $3]; }
-| multiplicative_expression '/' additive_expression { [ParseTree createBinaryOperation: @"/" operand1: $1 operand2: $3]; }
+| multiplicative_expression '*' additive_expression { $$ = [ParseTree createBinaryOperation: @"*" operand1: $1 operand2: $3]; }
+| multiplicative_expression '/' additive_expression { $$ = [ParseTree createBinaryOperation: @"/" operand1: $1 operand2: $3]; }
 
 expression : multiplicative_expression { $$ = $1; }
 | expression '^' multiplicative_expression { $$ = [ParseTree createBinaryOperation: @"^" operand1: $1 operand2: $3]; }

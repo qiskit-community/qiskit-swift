@@ -32,12 +32,6 @@ import Foundation
     public override func qasm() -> String {
         let lhs = _children[0]
         let rhs = _children[1]
-        if lhs.type == .N_BINARYOP {
-            return lhs.qasm()
-        }
-        if rhs.type == .N_BINARYOP {
-            return rhs.qasm()
-        }
         return "\(lhs.qasm()) \(op) \(rhs.qasm())"
     }
 
