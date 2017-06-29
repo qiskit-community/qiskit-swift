@@ -94,7 +94,11 @@ import Foundation
             qasm += " \(bits.qasm())\n"
         }
         if let bdy = self.body {
-            qasm += "{\n \(bdy.qasm()) }"
+            var bdyQasm = bdy.qasm()
+            if !bdyQasm.hasSuffix(";") {
+                bdyQasm += ";"
+            }
+            qasm += "{\n \(bdyQasm)) }"
         }
         return qasm
     }

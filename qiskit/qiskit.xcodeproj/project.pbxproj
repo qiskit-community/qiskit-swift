@@ -41,6 +41,7 @@
 		6957013A1ED75C8B00C6CCAB /* HashableTuple.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695701391ED75C8B00C6CCAB /* HashableTuple.swift */; };
 		6957013C1ED75E9100C6CCAB /* DataStructureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6957013B1ED75E9100C6CCAB /* DataStructureTests.swift */; };
 		6974E5951ECA1EF300D1AE97 /* QISKitException.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6974E5941ECA1EF300D1AE97 /* QISKitException.swift */; };
+		6977A01E1F05762A00CF52F2 /* libs.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6977A01D1F05762A00CF52F2 /* libs.bundle */; };
 		697BEDB11ED0844E00AB9A86 /* GatesTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697BEDB01ED0844E00AB9A86 /* GatesTools.swift */; };
 		697D36AE1EE3493B00557541 /* OrderedDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697D36AD1EE3493B00557541 /* OrderedDictionary.swift */; };
 		697F259C1ED45BED0065B106 /* Circuit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697F259B1ED45BED0065B106 /* Circuit.swift */; };
@@ -168,6 +169,7 @@
 		695701391ED75C8B00C6CCAB /* HashableTuple.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HashableTuple.swift; path = datastructures/HashableTuple.swift; sourceTree = "<group>"; };
 		6957013B1ED75E9100C6CCAB /* DataStructureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataStructureTests.swift; sourceTree = "<group>"; };
 		6974E5941ECA1EF300D1AE97 /* QISKitException.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QISKitException.swift; path = sdk/QISKitException.swift; sourceTree = "<group>"; };
+		6977A01D1F05762A00CF52F2 /* libs.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = libs.bundle; sourceTree = "<group>"; };
 		697BEDB01ED0844E00AB9A86 /* GatesTools.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GatesTools.swift; path = extensions/GatesTools.swift; sourceTree = "<group>"; };
 		697D36AD1EE3493B00557541 /* OrderedDictionary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OrderedDictionary.swift; path = datastructures/OrderedDictionary.swift; sourceTree = "<group>"; };
 		697F259B1ED45BED0065B106 /* Circuit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Circuit.swift; path = circuit/Circuit.swift; sourceTree = "<group>"; };
@@ -504,6 +506,7 @@
 		DFBC4FCA1EC73F8F00027640 /* qasm */ = {
 			isa = PBXGroup;
 			children = (
+				6977A01D1F05762A00CF52F2 /* libs.bundle */,
 				DF79735B1ED071F600C01457 /* parser.ym */,
 				DF79735C1ED071F600C01457 /* tokenizer.lm */,
 				DF79735F1ED0747B00C01457 /* ParserBlocks.h */,
@@ -616,6 +619,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6977A01E1F05762A00CF52F2 /* libs.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

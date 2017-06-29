@@ -67,17 +67,61 @@ class QIskitParserTests: XCTestCase {
         super.tearDown()
     }
 
-    private class func runParser(_ qasmProgram: String) throws -> String {
-            let parser = Qasm(data: qasmProgram)
-            let root = try parser.parse()
-        return root.qasm()
+    private static func firstDifferenceBetweenStrings(_ s1: String, _ s2: String) -> Int {
+        let len1 = s1.characters.count
+        let len2 = s2.characters.count
+
+        let lenMin = min(len1, len2)
+
+        for i in 0..<lenMin {
+            let c1 = s1[s1.index(s1.startIndex, offsetBy: i)]
+            let c2 = s2[s2.index(s2.startIndex, offsetBy: i)]
+            if  c1 !=  c2 {
+                print("\(c1) \(c2)")
+                return i
+            }
+        }
+
+        if len1 < len2 {
+            return len1
+        }
+
+        if len2 < len1 {
+            return len2
+        }
+        return 0
+    }
+
+
+    private class func runParser(_ qasmProgram: String) throws -> (String,String) {
+        let parser = try Qasm(data: qasmProgram)
+        let root = try parser.parse()
+        var qasmProgram = parser.data
+        var lines: [String] = []
+        // eliminate comments, substitute pi
+        for var line in qasmProgram.components(separatedBy: CharacterSet.newlines) {
+            line = line.replacingOccurrences(of:"pi", with:"3.14159")
+            if let range = line.range(of: "//") {
+                let start = range.lowerBound
+                let newLine = line[line.startIndex..<start]
+                if !newLine.isEmpty {
+                    lines.append(newLine)
+                }
+            }
+            else {
+                lines.append(line)
+            }
+        }
+        qasmProgram = lines.joined()
+        let qasm = root.qasm()
+        return (qasmProgram,qasm)
     }
 
 
     func testExamples() {
         let bundle = Bundle(for: type(of: self))
         guard let path = bundle.path(forResource: "qasm", ofType: "bundle") else {
-            XCTFail("Bundle qasm not founc")
+            XCTFail("Bundle qasm not found")
             return
         }
         guard let qasmBundle = Bundle(path: path) else {
@@ -113,11 +157,10 @@ class QIskitParserTests: XCTestCase {
                         lines.append(line)
                     }
                 }
-                qasmProgram = lines.joined()
-                let qasm = try QIskitParserTests.runParser(qasmProgram)
-            let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
+                let (qasmProgram,qasm) = try QIskitParserTests.runParser(qasmProgram)
+                let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
                 let emittedQasm = qasm.components(separatedBy: whitespaceCharacterSet).joined()
-            let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
+                let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
                 if emittedQasm != targetQasm {
                     differences[url.lastPathComponent] = (emittedQasm,targetQasm)
                 }
@@ -138,11 +181,13 @@ class QIskitParserTests: XCTestCase {
 
     func testParser() {
         do {
-            let qasmProgram = QIskitParserTests.qasmProgram1
-            let qasm = try QIskitParserTests.runParser(qasmProgram)
+            let (qasmProgram,qasm) = try QIskitParserTests.runParser(QIskitParserTests.qasmProgram1)
             let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
             let emittedQasm = qasm.components(separatedBy: whitespaceCharacterSet).joined()
             let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
+            let diff = QIskitParserTests.firstDifferenceBetweenStrings(emittedQasm,targetQasm)
+            print(emittedQasm.substring(to: emittedQasm.index(emittedQasm.startIndex, offsetBy: diff+1)))
+            print(targetQasm.substring(to: targetQasm.index(targetQasm.startIndex, offsetBy: diff+1)))
             XCTAssertEqual(emittedQasm, targetQasm)
         } catch let error {
             XCTFail("\(error)")
@@ -151,8 +196,7 @@ class QIskitParserTests: XCTestCase {
     
     func testErrorCorrection() {
         do {
-            let qasmProgram = QIskitParserTests.qasmProgram2
-            let qasm = try QIskitParserTests.runParser(qasmProgram)
+            let (qasmProgram,qasm) = try QIskitParserTests.runParser(QIskitParserTests.qasmProgram2)
             let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
             let emittedQasm = qasm.components(separatedBy: whitespaceCharacterSet).joined()
             let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
@@ -164,8 +208,7 @@ class QIskitParserTests: XCTestCase {
 
     func testParserBell () {
         do {
-            let qasmProgram = QIskitParserTests.qasmProgram3
-            let qasm = try QIskitParserTests.runParser(qasmProgram)
+            let (qasmProgram,qasm) = try QIskitParserTests.runParser(QIskitParserTests.qasmProgram3)
             let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
             let emittedQasm = qasm.components(separatedBy: whitespaceCharacterSet).joined()
             let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
@@ -288,7 +331,7 @@ class QIskitParserTests: XCTestCase {
             "measure b[0] -> ans[0];" +
             "measure b[1] -> ans[1];" +
             "measure cout[0] -> ans[2];"
-            let parser = Qasm(data: qasmProgram)
+            let parser = try Qasm(data: qasmProgram)
             let root = try parser.parse()
             let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
             let emittedQasm = root.qasm().components(separatedBy: whitespaceCharacterSet).joined()
