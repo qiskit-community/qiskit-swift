@@ -31,13 +31,13 @@ import Foundation
 
     public var n_args: Int {
         get{
-            return 0 // FIXME
+            return arguments?.children.count ?? 0
         }
     }
     
     public var n_bits: Int {
         get {
-            return 0 // FIXME
+            return bitlist?.children.count ?? 0
         }
     }
     

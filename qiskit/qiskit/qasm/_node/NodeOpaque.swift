@@ -25,6 +25,19 @@ import Foundation
     public var file: String = ""
     public var index: Int = 0
     
+    public var n_args: Int {
+        get{
+            return arguments?.children.count ?? 0
+        }
+    }
+    
+    public var n_bits: Int {
+        get {
+            return bitlist?.children.count ?? 0
+        }
+    }
+
+    
     public init(identifier: Node?, arguments: Node?, bitlist: Node?) {
         self.identifier = identifier
         self.arguments = arguments
