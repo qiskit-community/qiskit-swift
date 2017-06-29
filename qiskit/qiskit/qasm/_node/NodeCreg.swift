@@ -23,7 +23,7 @@ children[0] is an indexedid node.
     public init(indexedid: Node?, line: Int, file: String) {
         
         self.indexedid = indexedid
-        if let _id = self.indexedid as? NodeId{
+        if let _id = self.indexedid as? NodeIndexedId {
             // Name of the qreg
             self._name = _id.name
             // Source line number
