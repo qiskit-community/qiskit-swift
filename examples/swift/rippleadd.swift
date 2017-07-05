@@ -30,7 +30,7 @@ final class RippleAdd {
                                 ["name": "cout", "size": 1]
                             ],
                             "classical_registers": [
-                                ["name": "ans", "size": n + 1],
+                                ["name": "ans", "size": n + 1]
                             ]]]
                         ]
 

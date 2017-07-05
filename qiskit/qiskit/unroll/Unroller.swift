@@ -116,7 +116,7 @@ final class Unroller {
      Process a custom unitary node.
      */
     private func _process_custom_unitary(_ node: NodeCustomUnitary) throws {
-        
+
         let name = node.name
         var args: [Double] = []
         var bits: [[RegBit]] = []
@@ -459,14 +459,12 @@ final class Unroller {
         case .N_CNOT:
             try self._process_cnot(node as! NodeCnot)
         case .N_EXPRESSIONLIST:
-            var explist:[Double] = []
-            for child in (node as! NodeExpressionList).children {
-                let regbits = try self._process_bit_id(child)
-                for rb in regbits {
-                    explist.append(Double(rb.index))
-                }
+            var list:[Double] = []
+            for child in node.children {
+                let ret = try self._process_node(child)
+                list.append(contentsOf: ret)
             }
-            return explist
+            return list
         case .N_BINARYOP:
             return [try self._process_binop(node as! NodeBinaryOp)]
         case .N_PREFIX:
