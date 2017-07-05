@@ -254,8 +254,8 @@ final class Unroller {
      */
     private func _process_cnot(_ node: NodeCnot) throws {
         
-        guard let argument1 = node.arg1 as? NodeIdList else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
-        guard let argument2 = node.arg2 as? NodeIdList else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
+        guard let argument1 = node.arg1 else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
+        guard let argument2 = node.arg2 else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
         
         let id0 = try self._process_bit_id(argument1)
         let id1 = try self._process_bit_id(argument2)
@@ -284,8 +284,8 @@ final class Unroller {
      */
     private func _process_binop(_ node: NodeBinaryOp) throws -> Double {
         let operation = node.op
-        let lexpr = node._children[1]
-        let rexpr = node._children[2]
+        let lexpr = node._children[0]
+        let rexpr = node._children[1]
         if operation == "+" {
             return try self._process_node(lexpr)[0] + self._process_node(rexpr)[0]
         }
@@ -323,8 +323,8 @@ final class Unroller {
      Process a measurement node.
      */
     private func _process_measure(_ node: NodeMeasure) throws {
-        guard let argument1 = node.arg1 as? NodeIdList else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
-        guard let argument2 = node.arg2 as? NodeIdList else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
+        guard let argument1 = node.arg1 else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
+        guard let argument2 = node.arg2 else { throw UnrollerException.errorlocalparameter(qasm: node.qasm()) }
         
         let id0 = try self._process_bit_id(argument1)
         let id1 = try self._process_bit_id(argument2)
