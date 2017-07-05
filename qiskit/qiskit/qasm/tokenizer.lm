@@ -2,12 +2,10 @@
 
 #import "y.tab.h"
 #import "ParserBlocks.h"
-    
 void yyerror(char *s);
-
 %}
 
-%option yylineno
+%x INCLUDEFILE
 
 %%
 (([0-9]+|([0-9]+)?\.[0-9]+|[0-9]+\.)[eE][+-]?[0-9]+)|(([0-9]+)?\.[0-9]+|[0-9]+\.) {
@@ -103,9 +101,36 @@ opaque {
 }
 
 include {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
-    return INCLD;
+    BEGIN INCLUDEFILE;
 }
+
+<INCLUDEFILE>[ \t]*      /* eat the whitespace */
+<INCLUDEFILE>[^ \t]+; {
+    const char* includePath = getIncludePath(yytext);
+    yyin = fopen(includePath, "r" );
+    
+    if ( ! yyin ) {
+        yyterminate();
+    }
+    yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
+    yylineno = 1;
+    BEGIN(INITIAL);
+}
+
+<INCLUDEFILE>.|\n {
+    fprintf(stderr, "%4d bad include line\n", yylineno);
+    yyterminate();
+}
+
+
+<<EOF>> {
+    yypop_buffer_state();
+    if ( !YY_CURRENT_BUFFER ) {
+        yyterminate();
+    }
+}
+
+\n { yylineno++; }
 
 OPENQASM {
     yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
@@ -139,9 +164,6 @@ U {
 [a-z][a-zA-Z0-9_]* {
     yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
     return ID;
-}
-
-\n+ {
 }
 
 [ \t\r] {

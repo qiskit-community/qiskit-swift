@@ -47,7 +47,6 @@ children[1] is a primary node (id or indexedid).
             assertionFailure("Invalid NodeUniversalUnitary Operation")
             return ""
         }
-
-        return "U (\(el.qasm())) \(iid.qasm())"
+        return "U (\(el.qasm())) \(iid.qasm());"
     }
 }

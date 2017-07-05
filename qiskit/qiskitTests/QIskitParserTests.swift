@@ -54,7 +54,7 @@ class QIskitParserTests: XCTestCase {
             "measure q[2] -> c[1];"
 
 
-    private static let header: String = "OPENQASM2.0;gateu3(theta,phi,lambda)q{U(theta,phi,lambda)q;}gateu2(phi,lambda)q{U(pi/2,phi,lambda)q;}gateu1(lambda)q{U(0,0,lambda)q;}gatecxc,t{CXc,t;}gateida{U(0,0,0)a;}gateu0(gamma)q{U(0,0,0)q;}gatexa{u3(pi,0,pi)a;}gateya{u3(pi,pi/2,pi/2)a;}gateza{u1(pi)a;}gateha{u2(0,pi)a;}gatesa{u1(pi/2)a;}gatesdga{u1(-pi/2)a;}gateta{u1(pi/4)a;}gatetdga{u1(-pi/4)a;}gaterx(theta)a{u3(theta,-pi/2,pi/2)a;}gatery(theta)a{u3(theta,0,0)a;}gaterz(phi)a{u1(phi)a;}gatecza,b{hb;cxa,b;hb;}gatecya,b{sdgb;cxa,b;sb;}gatecha,b{hb;sdgb;cxa,b;hb;tb;cxa,b;tb;hb;sb;xb;sa;}gateccxa,b,c{hc;cxb,c;tdgc;cxa,c;tc;cxb,c;tdgc;cxa,c;tb;tc;hc;cxa,b;ta;tdgb;cxa,b;}gatecrz(lambda)a,b{u1(lambda/2)b;cxa,b;u1(-lambda/2)b;cxa,b;}gatecu1(lambda)a,b{u1(lambda/2)a;cxa,b;u1(-lambda/2)b;cxa,b;u1(lambda/2)b;}gatecu3(theta,phi,lambda)c,t{u1((lambda-phi)/2)t;cxc,t;u3(-theta/2,0,-(phi+lambda)/2)t;cxc,t;u3(theta/2,phi,0)t;}"
+    private static let header: String = "OPENQASM2.0;gateu3(theta,phi,lambda)q{U(theta,phi,lambda)q;}gateu2(phi,lambda)q{U(3.14159/2,phi,lambda)q;}gateu1(lambda)q{U(0,0,lambda)q;}gatecxc,t{CXc,t;}gateida{U(0,0,0)a;}gateu0(gamma)q{U(0,0,0)q;}gatexa{u3(3.14159,0,3.14159)a;}gateya{u3(3.14159,3.14159/2,3.14159/2)a;}gateza{u1(3.14159)a;}gateha{u2(0,3.14159)a;}gatesa{u1(3.14159/2)a;}gatesdga{u1(-3.14159/2)a;}gateta{u1(3.14159/4)a;}gatetdga{u1(-3.14159/4)a;}gaterx(theta)a{u3(theta,-3.14159/2,3.14159/2)a;}gatery(theta)a{u3(theta,0,0)a;}gaterz(phi)a{u1(phi)a;}gatecza,b{hb;cxa,b;hb;}gatecya,b{sdgb;cxa,b;sb;}gatecha,b{hb;sdgb;cxa,b;hb;tb;cxa,b;tb;hb;sb;xb;sa;}gateccxa,b,c{hc;cxb,c;tdgc;cxa,c;tc;cxb,c;tdgc;cxa,c;tb;tc;hc;cxa,b;ta;tdgb;cxa,b;}gatecrz(lambda)a,b{u1(lambda/2)b;cxa,b;u1(-lambda/2)b;cxa,b;}gatecu1(lambda)a,b{u1(lambda/2)a;cxa,b;u1(-lambda/2)b;cxa,b;u1(lambda/2)b;}gatecu3(theta,phi,lambda)c,t{u1((lambda-phi)/2)t;cxc,t;u3(-theta/2,0,-(phi+lambda)/2)t;cxc,t;u3(theta/2,phi,0)t;}"
         
         
     override func setUp() {
@@ -295,7 +295,6 @@ class QIskitParserTests: XCTestCase {
         }
         
         yyparse()
-        yy_delete_buffer(buf)
         
         self.waitForExpectations(timeout: 180, handler: { (error) in
             XCTAssertNil(error, "Failure in parser")
@@ -393,7 +392,6 @@ class QIskitParserTests: XCTestCase {
             }
             
             yyparse()
-            yy_delete_buffer(buf)
             
             self.waitForExpectations(timeout: 180, handler: { (error) in
                 XCTAssertNil(error, "Failure in parser")
@@ -448,7 +446,6 @@ class QIskitParserTests: XCTestCase {
             }
             
             yyparse()
-            yy_delete_buffer(buf)
             
             self.waitForExpectations(timeout: 180, handler: { (error) in
                 XCTAssertNil(error, "Failure in parser")

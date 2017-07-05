@@ -49,7 +49,6 @@ final class Qasm {
             }
             
             yyparse()
-            yy_delete_buffer(buf)
             semaphore.wait()
         }
         if let error = errorMsg {

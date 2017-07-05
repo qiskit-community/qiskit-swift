@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 
 extern int yylineno;
+extern const char* getIncludePath(char* yytext);
 extern void (^ParseSuccessBlock)(NSObject *node);
 extern void (^ParseFailBlock)(NSString *msg);
 
@@ -18,6 +19,5 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 YY_BUFFER_STATE  yy_scan_string(const char *s);
 
 int yyparse();
-void yy_delete_buffer(YY_BUFFER_STATE buf);
 
 #endif
