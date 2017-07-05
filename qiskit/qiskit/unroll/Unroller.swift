@@ -122,40 +122,40 @@ final class Unroller {
         var bits: [[RegBit]] = []
         if let list = node.arguments {
             args = try self._process_node(list)
-        } else {
-            if let blchildren = node.bitlist?.children {
-                for node_element in blchildren {
-                    bits.append(try self._process_bit_id(node_element))
+        }
+        var maxidx: Int = 0
+        if let blchildren = node.bitlist?.children {
+            for node_element in blchildren {
+                let bitList = try self._process_bit_id(node_element)
+                if maxidx < bitList.count {
+                    maxidx = bitList.count
                 }
+                bits.append(bitList)
             }
         }
+
         if let gate = self.gates[name] {
             let gargs = gate.args
             let gbits = gate.bits
             let gbody = gate.body
             // Loop over register arguments, if any.
-            var maxidx: Int = 0
-            for bitList in bits {
-                if maxidx < bitList.count {
-                    maxidx = bitList.count
-                }
-            }
             for idx in 0..<maxidx {
                 var map: [String:Double] = [:]
-                for j in 0..<gargs.count {
-                    map[gargs[j]] = args[j]
+                for (j, garg) in gargs.enumerated() {
+                    map[garg] = args[j]
                 }
                 self.arg_stack.push(map)
                 // Only index into register arguments.
                 var element: [Int] = []
-                for j in 0..<bits.count {
-                    if bits[j].count > 1 {
-                        element.append(idx * j)
-                    }
+                for bitList in bits {
+                    let condition = bitList.count > 1 ? 1 : 0
+                    element.append(idx * condition)
                 }
-                for j in 0..<gbits.count {
-                    self.bit_stack.push([gbits[j] : bits[j][element[j]]])
+                var regBitMap: [String:RegBit] = [:]
+                for (j, gbit) in gbits.enumerated() {
+                    regBitMap[gbit] = bits[j][element[j]]
                 }
+                self.bit_stack.push(regBitMap)
                 var args: [Double] = []
                 if let map = self.arg_stack.peek() {
                     for s in gargs {
