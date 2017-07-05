@@ -19,11 +19,7 @@ children are expression nodes.
     public init(expression: Node?) {
         super.init()
         if let exp = expression {
-            if expressionList == nil {
-                self.expressionList = [exp]
-            } else {
-                expressionList!.append(self)
-            }
+            self.expressionList = [exp]
         }
     }
 

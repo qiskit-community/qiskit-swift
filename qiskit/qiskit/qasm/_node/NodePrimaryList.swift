@@ -20,11 +20,7 @@ children is a list of primary nodes. Primary nodes are indexedid or id.
     public init(identifier: Node?) {
         super.init()
         if let ident = identifier {
-            if identifiers == nil {
-                self.identifiers = [ident]
-            } else {
-                identifiers!.append(self)
-            }
+            self.identifiers = [ident]
         }
     }
     

@@ -19,11 +19,7 @@ children is a list of nodes (statements).
     public init(statement: Node?) {
         super.init()
         if let stmt = statement {
-            if self.statements == nil {
-                self.statements = [stmt]
-            } else {
-                self.statements?.append(stmt)
-            }
+            self.statements = [stmt]
         }
     }
     

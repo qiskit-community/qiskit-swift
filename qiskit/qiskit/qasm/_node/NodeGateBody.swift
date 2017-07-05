@@ -21,11 +21,7 @@ import Foundation
     public init(gateop: Node?) {
         super.init()
         if let gop = gateop {
-            if gateops == nil {
-                self.gateops = [gop]
-            } else {
-                gateops!.append(self)
-            }
+            self.gateops = [gop]
         }
     }
     
