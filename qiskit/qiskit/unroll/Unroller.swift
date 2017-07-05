@@ -442,6 +442,8 @@ final class Unroller {
             return bitids
         case .N_GATE:
             try self._process_gate(node as! NodeGate)
+        case .N_GATEOPLIST:
+            try self._process_children(node)
         case .N_CUSTOMUNITARY:
             try self._process_custom_unitary(node as! NodeCustomUnitary)
         case .N_UNIVERSALUNITARY:

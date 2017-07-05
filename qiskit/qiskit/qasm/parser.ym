@@ -224,8 +224,8 @@ gate_decl : GATE id bit_list gate_body { $$ = [ParseTree createGate: $2 list1: n
 // Error handling: gete_op will throw if there's a problem so we won't
 //                 get here with in the gate_op_list
 // ----------------------------------------
-gate_body : '{' gate_op_list '}' { $$ = [ParseTree createGateBody: nil gate_op: $2]; }
-| '{' '}' { $$ = [ParseTree createGateBody: nil gate_op: nil]; }
+gate_body : '{' gate_op_list '}' { $$ = [ParseTree createGateBody: $2]; }
+| '{' '}' { $$ = [ParseTree createGateBody: nil]; }
 
 // ----------------------------------------
 //  gate_op_list : gate_op
@@ -234,8 +234,8 @@ gate_body : '{' gate_op_list '}' { $$ = [ParseTree createGateBody: nil gate_op: 
 // Error handling: gete_op will throw if there's a problem so we won't
 //                 get here with errors
 // ----------------------------------------
-gate_op_list : gate_op { $$ = [ParseTree createGateBody: nil gate_op: $1]; }
-| gate_op_list gate_op { $$ = [ParseTree createGateBody: $1 gate_op: $2]; }
+gate_op_list : gate_op { $$ = [ParseTree createGopList: nil gate_op: $1]; }
+| gate_op_list gate_op { $$ = [ParseTree createGopList: $1 gate_op: $2]; }
 
 
 // ----------------------------------------

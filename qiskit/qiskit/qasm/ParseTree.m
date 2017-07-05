@@ -61,14 +61,20 @@
     return node;
 }
 
-+(Node*) createGateBody: (Node*)goplist gate_op:(Node*) gop {
++(Node*) createGateBody: (Node*) goplist {
+    NodeGateBody *node = [[NodeGateBody alloc] initWithGoplist:goplist];
+    return node;
+}
+
+
++(Node*) createGopList: (Node*)goplist gate_op:(Node*) gop {
     if (goplist == nil) {
-        NodeGateBody *nodeGateBody = [[NodeGateBody alloc] initWithGateop:gop];
-        return nodeGateBody;
+        NodeGopList *nodeGoplist = [[NodeGopList alloc] initWithGateop: gop];
+        return nodeGoplist;
     } else {
-        NodeGateBody *nodeGateBody = (NodeGateBody*)goplist;
-        if (nodeGateBody != nil) {
-            [nodeGateBody addIdentifierWithGateop:gop];
+        NodeGopList *nodeGoplist = (NodeGopList*)goplist;
+        if (nodeGoplist != nil) {
+            [nodeGoplist addIdentifierWithGateop:gop];
         }
     }
     return goplist;

@@ -16,26 +16,22 @@ import Foundation
 
 @objc public final class NodeGateBody: Node {
     
-    public private(set) var gateops: [Node]?
+    public var goplist: Node?
     
-    public init(gateop: Node?) {
+    public init(goplist: Node?) {
         super.init()
-        if let gop = gateop {
-            self.gateops = [gop]
-        }
-    }
-    
-    public func addIdentifier(gateop: Node) {
-        gateops?.append(gateop)
+        self.goplist = goplist
     }
     
     public func calls() -> [String] {
         // Return a list of custom gate names in this gate body."""
         var _calls: [String] = []
-        if let gops = self.gateops {
-            for gop in gops {
-                if gop.type == .N_CUSTOMUNITARY {
-                    _calls.append(gop.name)
+        if let glist = goplist as? NodeGopList {
+            if let gops = glist.gateops {
+                for gop in gops {
+                    if gop.type == .N_CUSTOMUNITARY {
+                        _calls.append(gop.name)
+                    }
                 }
             }
         }
@@ -45,14 +41,18 @@ import Foundation
     public override var type: NodeType {
         return .N_GATEBODY
     }
+   
     public override var children: [Node] {
-        return (gateops != nil) ? gateops! : []
+        if let glist = goplist as? NodeGopList {
+            return glist.children
+        }
+        return []
     }
     
     public override func qasm() -> String {
         var qasms: [String] = []
-        if let list = gateops {
-            qasms = list.flatMap({ (node: Node) -> String in
+        if let glist = goplist as? NodeGopList {
+            qasms = glist.children.flatMap({ (node: Node) -> String in
                 return node.qasm()
             })
         }

@@ -21,7 +21,8 @@
 +(Node*) createExpressionList: (Node*) elist expression: (Node*) exp;
 +(Node*) createExternal: (Node*) identifier external: (NSString*) external;
 +(Node*) createGate: (Node*) identifier list1: (Node*) list1 list2: (Node*) list2 list3: (Node*) list3;
-+(Node*) createGateBody: (Node*)goplist gate_op:(Node*) gop;
++(Node*) createGateBody: (Node*) goplist;
++(Node*) createGopList: (Node*)goplist gate_op:(Node*) gop;
 +(Node*) createId: (NSString*) identifer line: (int) line;
 +(Node*) createIdlist: (Node*) idlist identifier: (Node*) identifier;
 +(Node*) createIf: (Node*) identifier nninteger: (Node*) integer quantum_op: (Node*) qop;
