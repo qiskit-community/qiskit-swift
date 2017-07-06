@@ -52,6 +52,7 @@ extension QuantumCircuit {
     /**
      Apply U to q
      */
+    @discardableResult
     public func u_base(_ params: [Double], _ q: QuantumRegisterTuple) throws -> UBase {
         try self._check_qubit(q)
         return try self._attach(UBase(params, q, self)) as! UBase
@@ -63,6 +64,7 @@ extension CompositeGate {
     /**
      Apply U to q
      */
+    @discardableResult
     public func u_base(_ params: [Double], _ q: QuantumRegisterTuple) throws -> UBase {
         try self._check_qubit(q)
         return try self._attach(UBase(params, q, self.circuit)) as! UBase

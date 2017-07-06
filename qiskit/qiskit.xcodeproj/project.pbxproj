@@ -120,6 +120,7 @@
 		DFBB499D1EFC1382001DE633 /* NodeGateBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBB499C1EFC1382001DE633 /* NodeGateBody.swift */; };
 		DFBB49E41F0109B8001DE633 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBB49E31F0109B8001DE633 /* Node.swift */; };
 		DFBB49E61F0D714D001DE633 /* NodeGopList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBB49E51F0D714D001DE633 /* NodeGopList.swift */; };
+		DFBB49E81F0E6A98001DE633 /* QiskitProgramTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBB49E71F0E6A98001DE633 /* QiskitProgramTests.swift */; };
 		DFBC4F6C1EC7384200027640 /* qiskit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFBC4F621EC7384100027640 /* qiskit.framework */; };
 		DFBC4F711EC7384200027640 /* QiskitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4F701EC7384200027640 /* QiskitTests.swift */; };
 		DFBC4FBA1EC73BF800027640 /* qiskit.h in Headers */ = {isa = PBXBuildFile; fileRef = DFBC4FA51EC73BF800027640 /* qiskit.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -252,6 +253,7 @@
 		DFBB499C1EFC1382001DE633 /* NodeGateBody.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeGateBody.swift; path = _node/NodeGateBody.swift; sourceTree = "<group>"; };
 		DFBB49E31F0109B8001DE633 /* Node.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Node.swift; path = _node/Node.swift; sourceTree = "<group>"; };
 		DFBB49E51F0D714D001DE633 /* NodeGopList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeGopList.swift; sourceTree = "<group>"; };
+		DFBB49E71F0E6A98001DE633 /* QiskitProgramTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QiskitProgramTests.swift; sourceTree = "<group>"; };
 		DFBC4F621EC7384100027640 /* qiskit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = qiskit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFBC4F6B1EC7384200027640 /* qiskitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = qiskitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFBC4F701EC7384200027640 /* QiskitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QiskitTests.swift; sourceTree = "<group>"; };
@@ -489,6 +491,7 @@
 				6957013B1ED75E9100C6CCAB /* DataStructureTests.swift */,
 				DFBC4F701EC7384200027640 /* QiskitTests.swift */,
 				DF7F720C1ED863F50055D210 /* QIskitParserTests.swift */,
+				DFBB49E71F0E6A98001DE633 /* QiskitProgramTests.swift */,
 				69339B161EFAE9E500AB0E5D /* UnrollerTests.swift */,
 				DFBC4F721EC7384200027640 /* Info.plist */,
 				DF7973681ED083F600C01457 /* qiskitTests-Bridging-Header.h */,
@@ -761,6 +764,7 @@
 				6957013C1ED75E9100C6CCAB /* DataStructureTests.swift in Sources */,
 				DFBC4F711EC7384200027640 /* QiskitTests.swift in Sources */,
 				DF7F720D1ED863F50055D210 /* QIskitParserTests.swift in Sources */,
+				DFBB49E81F0E6A98001DE633 /* QiskitProgramTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

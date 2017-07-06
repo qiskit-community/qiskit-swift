@@ -53,6 +53,7 @@ extension QuantumCircuit {
     /**
      Apply T to q.
      */
+    @discardableResult
     public func t(_ q: QuantumRegisterTuple) throws -> TGate {
         try  self._check_qubit(q)
         return self._attach(try TGate(q, self)) as! TGate
@@ -83,6 +84,7 @@ extension CompositeGate {
     /**
      Apply T to q.
      */
+    @discardableResult
     public func t(_ q: QuantumRegisterTuple) throws -> TGate {
         try  self._check_qubit(q)
         return self._attach(try TGate(q, self.circuit)) as! TGate

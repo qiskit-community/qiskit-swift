@@ -41,6 +41,7 @@ extension QuantumCircuit {
     /**
      Apply CZ to circuit.
      */
+    @discardableResult
     public func cz(_ ctl: QuantumRegisterTuple, _ tgt: QuantumRegisterTuple) throws -> CzGate {
         try  self._check_qubit(ctl)
         try self._check_qubit(tgt)
@@ -54,6 +55,7 @@ extension CompositeGate {
     /**
      Apply CZ to circuit.
      */
+    @discardableResult
     public func cz(_ ctl: QuantumRegisterTuple, _ tgt: QuantumRegisterTuple) throws -> CzGate {
         try  self._check_qubit(ctl)
         try self._check_qubit(tgt)

@@ -60,6 +60,7 @@ extension QuantumCircuit {
     /**
      Apply u3 q.
      */
+    @discardableResult
     public func u3(_ theta: Double, _ phi: Double, _ lam: Double, _ q: QuantumRegisterTuple) throws -> U3Gate {
         try  self._check_qubit(q)
         return self._attach(U3Gate(theta, phi, lam, q, self)) as! U3Gate
@@ -82,6 +83,7 @@ extension CompositeGate {
     /**
      Apply u3 q.
      */
+    @discardableResult
     public func u3(_ theta: Double, _ phi: Double, _ lam: Double, _ q: QuantumRegisterTuple) throws -> U3Gate {
         try  self._check_qubit(q)
         return self._attach(U3Gate(theta, phi, lam, q, self.circuit)) as! U3Gate

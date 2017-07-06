@@ -56,6 +56,7 @@ public class Instruction: CustomStringConvertible {
     /**
      Add classical control on register classical and value val.
      */
+    @discardableResult
     public func c_if(_ classical: ClassicalRegister, _ val: Int) throws -> Instruction {
         if val < 0 {
             throw QISKitException.controlValueNegative

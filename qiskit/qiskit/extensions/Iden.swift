@@ -52,6 +52,7 @@ extension QuantumCircuit {
     /**
      Apply Identity to q.
      */
+    @discardableResult
     public func iden(_ q: QuantumRegisterTuple) throws -> IdGate {
         try  self._check_qubit(q)
         return self._attach(IdGate(q, self)) as! IdGate
@@ -74,6 +75,7 @@ extension CompositeGate {
     /**
      Apply Identity to q.
      */
+    @discardableResult
     public func iden(_ q: QuantumRegisterTuple) throws -> IdGate {
         try  self._check_qubit(q)
         return self._attach(IdGate(q, self.circuit)) as! IdGate

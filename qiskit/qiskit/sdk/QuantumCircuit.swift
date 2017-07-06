@@ -190,6 +190,7 @@ public final class QuantumCircuit: CustomStringConvertible {
     /**
      Measure quantum register into circuit (tuples).
      */
+    @discardableResult
     public func measure(_ quantum_register: QuantumRegisterTuple, _ circuit: ClassicalRegisterTuple) throws -> Measure {
         try self._check_qubit(quantum_register)
         try self._check_creg(circuit.register)
@@ -208,6 +209,7 @@ public final class QuantumCircuit: CustomStringConvertible {
         return instructions
     }
 
+    @discardableResult
     public func reset(_ qTuple: QuantumRegisterTuple) throws -> Instruction {
         try self._check_qubit(qTuple)
         return self._attach(Reset(qTuple, self))

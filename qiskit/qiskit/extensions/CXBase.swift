@@ -41,6 +41,7 @@ extension QuantumCircuit {
     /**
      Apply CX from ctl, tgt.
      */
+    @discardableResult
     public func cx_base(_ ctl: QuantumRegisterTuple, _ tgt: QuantumRegisterTuple) throws -> CXBase {
         try  self._check_qubit(ctl)
         try self._check_qubit(tgt)
@@ -54,6 +55,7 @@ extension CompositeGate {
     /**
      Apply CX from ctl, tgt.
      */
+    @discardableResult
     public func cx_base(_ ctl: QuantumRegisterTuple, _ tgt: QuantumRegisterTuple) throws -> CXBase {
         try  self._check_qubit(ctl)
         try self._check_qubit(tgt)

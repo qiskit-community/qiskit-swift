@@ -54,6 +54,7 @@ extension QuantumCircuit {
     /**
      Apply u1 with angle theta to q.
      */
+    @discardableResult
     public func u1(_ theta: Double, _ q: QuantumRegisterTuple) throws -> U1Gate {
         try  self._check_qubit(q)
         return self._attach(U1Gate(theta, q, self)) as! U1Gate
@@ -76,6 +77,7 @@ extension CompositeGate {
     /**
      Apply u1 with angle theta to q.
      */
+    @discardableResult
     public func u1(_ theta: Double, _ q: QuantumRegisterTuple) throws -> U1Gate {
         try  self._check_qubit(q)
         return self._attach(U1Gate(theta, q, self.circuit)) as! U1Gate

@@ -41,6 +41,7 @@ extension QuantumCircuit {
     /**
      Apply CNOT from ctl to tgt.
      */
+    @discardableResult
     public func cx(_ ctl: QuantumRegisterTuple, _ tgt: QuantumRegisterTuple) throws -> CnotGate {
         try  self._check_qubit(ctl)
         try self._check_qubit(tgt)
@@ -54,6 +55,7 @@ extension CompositeGate {
     /**
      Apply CNOT from ctl to tgt.
      */
+    @discardableResult
     public func cx(_ ctl: QuantumRegisterTuple, _ tgt: QuantumRegisterTuple) throws -> CnotGate {
         try  self._check_qubit(ctl)
         try self._check_qubit(tgt)

@@ -67,6 +67,7 @@ extension QuantumCircuit {
     /**
      Apply barrier to QuantumRegister
      */
+    @discardableResult
     public func barrier(_ regs: [QuantumRegister] = []) throws -> Barrier {
         var registers = regs
         if registers.isEmpty { //TODO: implement this for all single qubit gates
@@ -94,6 +95,7 @@ extension QuantumCircuit {
     /**
      Apply barrier to tuples (reg, idx)
      */
+    @discardableResult
     public func barrier(_ qTuples: [QuantumRegisterTuple]) throws -> Barrier {
         var qubits: [QuantumRegisterTuple] = []
         if qTuples.isEmpty { //TODO: implement this for all single qubit gates
@@ -130,6 +132,7 @@ extension CompositeGate {
     /**
      Apply barrier to QuantumRegister
      */
+    @discardableResult
     public func barrier(_ regs: [QuantumRegister] = []) throws -> Barrier {
         if regs.isEmpty {
             throw QISKitException.noarguments
@@ -149,6 +152,7 @@ extension CompositeGate {
     /**
      Apply barrier to tuples (reg, idx)
      */
+    @discardableResult
     public func barrier(_ qTuples: [QuantumRegisterTuple]) throws -> Barrier {
         if qTuples.isEmpty {
             throw QISKitException.noarguments

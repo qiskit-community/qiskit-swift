@@ -39,6 +39,7 @@ extension QuantumCircuit {
     /**
      Apply FredkinGate to circuit.
      */
+    @discardableResult
     public func cswap(_ ctl: QuantumRegisterTuple, _ tgt1: QuantumRegisterTuple, _ tgt2:QuantumRegisterTuple) throws -> FredkinGate {
         try  self._check_qubit(ctl)
         try  self._check_qubit(tgt1)
@@ -53,6 +54,7 @@ extension CompositeGate {
     /**
      Apply FredkinGate to circuit.
      */
+    @discardableResult
     public func cswap(_ ctl: QuantumRegisterTuple, _ tgt1: QuantumRegisterTuple, _ tgt2:QuantumRegisterTuple) throws -> FredkinGate {
         try  self._check_qubit(ctl)
         try  self._check_qubit(tgt1)

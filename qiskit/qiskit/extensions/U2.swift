@@ -58,6 +58,7 @@ extension QuantumCircuit {
     /**
      Apply u2 q.
      */
+    @discardableResult
     public func u2(_ phi: Double, _ lam: Double, _ q: QuantumRegisterTuple) throws -> U2Gate {
         try  self._check_qubit(q)
         return self._attach(U2Gate(phi, lam, q, self)) as! U2Gate
@@ -80,6 +81,7 @@ extension CompositeGate {
     /**
      Apply u2 q.
      */
+    @discardableResult
     public func u2(_ phi: Double, _ lam: Double, _ q: QuantumRegisterTuple) throws -> U2Gate {
         try  self._check_qubit(q)
         return self._attach(U2Gate(phi, lam, q, self.circuit)) as! U2Gate

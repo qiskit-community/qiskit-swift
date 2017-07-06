@@ -41,6 +41,7 @@ extension QuantumCircuit {
     /**
      Apply CY to circuit.
      */
+    @discardableResult
     public func cy(_ ctl: QuantumRegisterTuple, _ tgt: QuantumRegisterTuple) throws -> CyGate {
         try  self._check_qubit(ctl)
         try self._check_qubit(tgt)
@@ -54,6 +55,7 @@ extension CompositeGate {
     /**
      Apply CY to circuit.
      */
+    @discardableResult
     public func cy(_ ctl: QuantumRegisterTuple, _ tgt: QuantumRegisterTuple) throws -> CyGate {
         try  self._check_qubit(ctl)
         try self._check_qubit(tgt)

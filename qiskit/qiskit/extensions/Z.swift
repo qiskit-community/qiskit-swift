@@ -52,6 +52,7 @@ extension QuantumCircuit {
     /**
      Apply z to q.
      */
+    @discardableResult
     public func z(_ q: QuantumRegisterTuple) throws -> ZGate {
         try  self._check_qubit(q)
         return self._attach(ZGate(q, self)) as! ZGate
@@ -74,6 +75,7 @@ extension CompositeGate {
     /**
      Apply z to q.
      */
+    @discardableResult
     public func z(_ q: QuantumRegisterTuple) throws -> ZGate {
         try  self._check_qubit(q)
         return self._attach(ZGate(q, self.circuit)) as! ZGate

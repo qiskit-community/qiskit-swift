@@ -43,6 +43,7 @@ extension QuantumCircuit {
     /**
      Apply Toffoli to circuit.
      */
+    @discardableResult
     public func ccx(_ ctl1: QuantumRegisterTuple, _ ctl2: QuantumRegisterTuple, _ tgt:QuantumRegisterTuple) throws -> ToffoliGate {
         try  self._check_qubit(ctl1)
         try  self._check_qubit(ctl2)
@@ -57,6 +58,7 @@ extension CompositeGate {
     /**
      Apply Toffoli to circuit.
      */
+    @discardableResult
     public func ccx(_ ctl1: QuantumRegisterTuple, _ ctl2: QuantumRegisterTuple, _ tgt:QuantumRegisterTuple) throws -> ToffoliGate {
         try  self._check_qubit(ctl1)
         try  self._check_qubit(ctl2)

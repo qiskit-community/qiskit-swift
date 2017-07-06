@@ -55,6 +55,7 @@ extension QuantumCircuit {
     /**
      Apply ry to q.
      */
+    @discardableResult
     public func ry(_ theta: Double, _ q: QuantumRegisterTuple) throws -> RYGate {
         try  self._check_qubit(q)
         return self._attach(RYGate(theta, q, self)) as! RYGate
@@ -77,6 +78,7 @@ extension CompositeGate {
     /**
      Apply ry to q.
      */
+    @discardableResult
     public func ry(_ theta: Double, _ q: QuantumRegisterTuple) throws -> RYGate {
         try  self._check_qubit(q)
         return self._attach(RYGate(theta, q, self.circuit)) as! RYGate
