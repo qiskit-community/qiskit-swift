@@ -30,6 +30,7 @@ public class Gate: Instruction {
     /**
      Invert this gate.
      */
+    @discardableResult
     public override func inverse() -> Gate {
         preconditionFailure("inverse not implemented")
     }

@@ -100,22 +100,22 @@ class UnrollerTests: XCTestCase {
         for j in 0..<(UnrollerTests.n-1) {
             try UnrollerTests.majority(adder_subcircuit, a[j], b[j + 1], a[j + 1])
         }
-        _ = try adder_subcircuit.cx(a[UnrollerTests.n - 1], cout[0])
+        try adder_subcircuit.cx(a[UnrollerTests.n - 1], cout[0])
         for j in (0..<(UnrollerTests.n-1)).reversed() {
             try UnrollerTests.unmajority(adder_subcircuit, a[j], b[j + 1], a[j + 1])
         }
         try UnrollerTests.unmajority(adder_subcircuit, cin[0], b[0], a[0])
 
         // Set the inputs to the adder
-        _ = try qc.x(a[0])  // Set input a = 0...0001
-        _ = try qc.x(b)   // Set input b = 1...1111
+        try qc.x(a[0])  // Set input a = 0...0001
+        try qc.x(b)   // Set input b = 1...1111
         // Apply the adder
         try qc += adder_subcircuit
         // Measure the output register in the computational basis
         for j in 0..<UnrollerTests.n {
-            _ = try qc.measure(b[j], ans[j])
+            try qc.measure(b[j], ans[j])
         }
-        _ = try qc.measure(cout[0], ans[UnrollerTests.n])
+        try qc.measure(cout[0], ans[UnrollerTests.n])
 
         //###############################################################
         //# Set up the API and execute the program.
@@ -155,18 +155,18 @@ class UnrollerTests: XCTestCase {
                                 _ a: QuantumRegisterTuple,
                                 _ b:QuantumRegisterTuple,
                                 _ c:QuantumRegisterTuple) throws {
-        _ = try p.cx(c, b)
-        _ = try p.cx(c, a)
-        _ = try p.ccx(a, b, c)
+        try p.cx(c, b)
+        try p.cx(c, a)
+        try p.ccx(a, b, c)
     }
 
     private class func unmajority(_ p: QuantumCircuit,
                                   _ a: QuantumRegisterTuple,
                                   _ b:QuantumRegisterTuple,
                                   _ c:QuantumRegisterTuple) throws {
-        _ = try p.ccx(a, b, c)
-        _ = try p.cx(c, a)
-        _ = try p.cx(a, b)
+        try p.ccx(a, b, c)
+        try p.cx(c, a)
+        try p.cx(a, b)
     }
 
     /*

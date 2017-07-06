@@ -15,9 +15,9 @@ public final class FredkinGate: CompositeGate {
 
     fileprivate init(_ ctl: QuantumRegisterTuple,_ tgt1: QuantumRegisterTuple, _ tgt2: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) throws {
         super.init("fredkin", [], [ctl,tgt1, tgt2], circuit)
-        _ = try self.cx(tgt2,tgt1)
-        _ = try self.ccx(ctl,tgt1,tgt2)
-        _ = try self.cx(tgt2,tgt1)
+        try self.cx(tgt2,tgt1)
+        try self.ccx(ctl,tgt1,tgt2)
+        try self.cx(tgt2,tgt1)
     }
 
     public override var description: String {

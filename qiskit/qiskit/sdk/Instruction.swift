@@ -65,6 +65,7 @@ public class Instruction: CustomStringConvertible {
         return self
     }
 
+    @discardableResult
     public func q_if(_ qregs:[QuantumRegister]) -> Instruction {
         preconditionFailure("q_if not implemented")
     }
@@ -78,7 +79,7 @@ public class Instruction: CustomStringConvertible {
             if !instruction.circuit!.has_register(self.control!.0) {
                 throw QISKitException.controlregnotfound(name: self.control!.0.name)
             }
-            let _ = try instruction.c_if(self.control!.0, self.control!.1)
+            try instruction.c_if(self.control!.0, self.control!.1)
         }
     }
 
@@ -92,6 +93,7 @@ public class Instruction: CustomStringConvertible {
         return "if(\(self.control!.0.name)==\(self.control!.1)) \(string)"
     }
 
+    @discardableResult
     public func inverse() -> Instruction {
         preconditionFailure("inverse not implemented")
     }

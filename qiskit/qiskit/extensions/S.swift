@@ -15,7 +15,7 @@ public final class SGate: CompositeGate {
 
     fileprivate init(_ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) throws {
         super.init("s", [], [qubit], circuit)
-        _ = try self.u1(Double.pi/2.0,qubit)
+        try self.u1(Double.pi/2.0,qubit)
     }
 
     public override var description: String {

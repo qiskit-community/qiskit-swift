@@ -41,6 +41,7 @@ extension QuantumCircuit {
     /**
      Apply H to q.
      */
+    @discardableResult
     public func h(_ q: QuantumRegister) throws -> InstructionSet {
         let gs = InstructionSet()
         for j in 0..<q.size {

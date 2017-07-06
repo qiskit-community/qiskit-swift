@@ -181,8 +181,8 @@ final class Unroller {
                 if let backend = self.backend {
                     backend.end_gate(name,args,qubits)
                 }
-                _ = self.arg_stack.pop()
-                _ = self.bit_stack.pop()
+                self.arg_stack.pop()
+                self.bit_stack.pop()
             }
             return
         }
@@ -346,7 +346,7 @@ final class Unroller {
             let cval = node.nodeNNInt as? NodeNNInt {
             if let backend = self.backend {
                 backend.set_condition(creg.name, cval.value)
-                _ = try self._process_node(node.children[2])
+                try self._process_node(node.children[2])
                 backend.drop_condition()
             }
         }
@@ -385,7 +385,7 @@ final class Unroller {
      */
     private func _process_children(_ node: Node) throws {
         for c in node.children {
-            _ = try self._process_node(c)
+            try self._process_node(c)
         }
     }
 
@@ -513,7 +513,7 @@ final class Unroller {
      */
     func execute() throws {
         if self.backend != nil {
-            _ = try self._process_node(self.ast)
+            try self._process_node(self.ast)
             return
         }
         throw UnrollerException.errorbackend

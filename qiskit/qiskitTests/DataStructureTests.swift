@@ -43,9 +43,9 @@ class DataStructureTests: XCTestCase {
             g.add_edge(3, 1)
 
             var str = try DataStructureTests.formatList(g.topological_sort())
-            XCTAssertEqual(str, "4 5 0 2 3 1")
+            XCTAssertEqual(str, "5 4 2 3 1 0")
             str = try DataStructureTests.formatList(g.topological_sort(reverse: true))
-            XCTAssertEqual(str, "1 3 2 0 5 4")
+            XCTAssertEqual(str, "0 1 3 2 4 5")
         } catch let error {
             XCTFail("\(error)")
         }

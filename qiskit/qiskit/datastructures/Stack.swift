@@ -17,6 +17,7 @@ struct Stack<Element> {
     mutating func push(_ item: Element) {
         items.append(item)
     }
+    @discardableResult
     mutating func pop() -> Element {
         return items.removeLast()
     }

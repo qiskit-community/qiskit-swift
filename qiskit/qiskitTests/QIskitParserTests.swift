@@ -145,7 +145,7 @@ class QIskitParserTests: XCTestCase {
                 var lines: [String] = []
                 // eliminate comments
                 for var line in qasmProgram.components(separatedBy: CharacterSet.newlines) {
-                    line = line.replacingOccurrences(of:"pi", with:"3.14159")
+                    line = line.replacingOccurrences(of:"pi", with:"3.141592653589793")
                     if let range = line.range(of: "//") {
                         let start = range.lowerBound
                         let newLine = line[line.startIndex..<start]
@@ -356,9 +356,9 @@ class QIskitParserTests: XCTestCase {
                     "z qr[3];\n" +
                     "cx qr[0],qr[2];\n" +
                     "barrier qr[0],qr[1],qr[2],qr[3];\n" +
-                    "u1(0.3) qr[0];\n" +
-                    "u2(0.3,0.2) qr[1];\n" +
-                    "u3(0.3,0.2,0.1) qr[2];\n" +
+                    "u1(0.3000000000000000) qr[0];\n" +
+                    "u2(0.3000000000000000,0.2000000000000000) qr[1];\n" +
+                    "u3(0.3000000000000000,0.2000000000000000,0.1000000000000000) qr[2];\n" +
                     "s qr[0];\n" +
                     "t qr[1];\n" +
                     "id qr[1];\n" +

@@ -81,6 +81,7 @@ public final class QuantumCircuit: CustomStringConvertible {
      Append rhs to self if self contains rhs's registers.
      Return self + rhs as a new object.
      */
+    @discardableResult
     public func extend(_ rhs: QuantumCircuit) throws -> QuantumCircuit {
         for register in rhs.regs {
             if !self.has_register(register) {
@@ -104,7 +105,7 @@ public final class QuantumCircuit: CustomStringConvertible {
      Overload += to implement self.extend.
      */
     public static func += (left: inout QuantumCircuit, right: QuantumCircuit) throws {
-        let _ = try left.extend(right)
+        try left.extend(right)
     }
 
     /**

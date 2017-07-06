@@ -24,7 +24,7 @@ public final class InstructionSet {
      */
     public func inverse() -> InstructionSet {
         for instruction in self.instructions {
-            _ = instruction.inverse()
+            instruction.inverse()
         }
         return self
     }
@@ -34,7 +34,7 @@ public final class InstructionSet {
      */
     public func q_if(_ qregs:[QuantumRegister]) -> InstructionSet {
         for instruction in self.instructions {
-            _ = instruction.q_if(qregs)
+            instruction.q_if(qregs)
         }
         return self
     }
@@ -44,7 +44,7 @@ public final class InstructionSet {
      */
     public func c_if(_ c: ClassicalRegister, _ val: Int) throws -> InstructionSet {
         for instruction in self.instructions {
-            _ = try instruction.c_if(c, val)
+            try instruction.c_if(c, val)
         }
         return self
     }

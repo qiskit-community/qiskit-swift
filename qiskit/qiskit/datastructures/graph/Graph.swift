@@ -57,6 +57,25 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
                                                 OrderedDictionary<TupleInt,GraphEdge<EdgeDataType>>()
     public private(set) var isDirected: Bool
 
+    public var vertexKeys: [Int] {
+        return self.vertices.keys.sorted()
+    }
+
+    public var edgeKeys: [TupleInt] {
+        return self.edges.keys.sorted() {
+            if $0.one < $1.one {
+                return true
+            }
+            if $0.one > $1.one {
+                return false
+            }
+            if $0.two < $1.two {
+                return true
+            }
+            return false
+        }
+    }
+
     public init(directed: Bool) {
         self.isDirected = directed
     }
@@ -91,6 +110,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         return vertex!
     }
 
+    @discardableResult
     public func add_vertex(_ key: Int, _ data: VertexDataType) -> GraphVertex<VertexDataType> {
         var vertex = self.vertex(key)
         if vertex == nil {
@@ -273,37 +293,47 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         if !self.isDirected {
             throw GraphError.isUndirected
         }
-        let state: DFSState = DFSState()
-        var queue = Queue<GraphVertex<VertexDataType>>()
-        var stack = Stack<GraphVertex<VertexDataType>>()
-        for i in 0..<self.vertices.count {
-            let vertex = self.vertices.value(i)
-            if !state.discovered.contains(vertex.key) {
-                try dfs(vertex, state) { (searchProcessType,vertex,edge,state) -> Void in
-                    if searchProcessType == SearchProcessType.vertexLate {
-                        stack.push(vertex!)
-                        queue.enqueue(vertex!)
-                        return
-                    }
-                    if searchProcessType == SearchProcessType.edge {
-                        let classification = Graph.edgeClassification(edge!,state)
-                        if classification == EdgeClassification.back {
+
+        var seen: Set<Int> = []
+        var order: [GraphVertex<VertexDataType>] = []
+        var explored: Set<Int> = []
+        for v in self.vertexKeys {
+            if explored.contains(v) {
+                continue
+            }
+            var fringe = [v]
+            while !fringe.isEmpty {
+                let w = fringe.last!
+                if explored.contains(w) {
+                    fringe.removeLast()
+                    continue
+                }
+                seen.update(with: w)
+                var new_nodes: [Int] = []
+                for n in self.successors(w) {
+                    if !explored.contains(n.key) {
+                        if seen.contains(n.key) {
                             throw GraphError.isCyclic
                         }
+                        new_nodes.append(n.key)
                     }
+                }
+                if !new_nodes.isEmpty {
+                    fringe.append(contentsOf: new_nodes)
+                }
+                else {
+                    explored.update(with: w)
+                    order.append(self.vertex(w)!)
+                    fringe.removeLast()
                 }
             }
         }
-        var vertices: [GraphVertex<VertexDataType>] = []
         if reverse {
-            while !queue.isEmpty {
-                vertices.append(queue.dequeue())
-            }
+            return order
         }
-        else {
-            while !stack.isEmpty {
-                vertices.append(stack.pop())
-            }
+        var vertices: [GraphVertex<VertexDataType>] = []
+        while !order.isEmpty {
+            vertices.append(order.removeLast())
         }
         return vertices
     }
@@ -336,11 +366,12 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
             if visited.contains(vertex.key) {
                 continue
             }
-            _ = Graph.ancestorsUtil(vertex, key, &visited, &list)
+            Graph.ancestorsUtil(vertex, key, &visited, &list)
         }
         return list
     }
 
+    @discardableResult
     private class func ancestorsUtil(_ vertex: GraphVertex<VertexDataType>,
                                  _ key: Int,
                                  _ visited: inout Set<Int>,

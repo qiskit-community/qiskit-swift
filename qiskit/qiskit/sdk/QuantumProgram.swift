@@ -132,6 +132,7 @@ public final class QuantumProgram {
     /**
      Create a new set of Quantum Register
      */
+    @discardableResult
     public func create_quantum_registers(_ name: String, _ size: Int) throws -> QuantumRegister {
         try self.__quantum_registers[name] = QuantumRegister(name, size)
         return self.__quantum_registers[name]!
@@ -157,6 +158,7 @@ public final class QuantumProgram {
     /**
      Create a new set of Classical Registers
      */
+    @discardableResult
     public func  create_classical_registers(_ name: String, _ size: Int) throws -> ClassicalRegister {
         try self.__classical_registers[name] = ClassicalRegister(name, size)
         return self.__classical_registers[name]!
@@ -185,6 +187,7 @@ public final class QuantumProgram {
      qregisters is a Array of Quantum Registers
      cregisters is a Array of Classical Registers
      */
+    @discardableResult
     public func create_circuit(_ name: String,
                                _ qregisters: [QuantumRegister] = [],
                                _ cregisters: [ClassicalRegister] = [],
@@ -212,6 +215,7 @@ public final class QuantumProgram {
      qregisters is a Array of Quantum Registers names
      cregisters is a Array of Classical Registers names
      */
+    @discardableResult
     public func create_circuit(_ name: String,
                                _ qregisters: [String] = [],
                                _ cregisters: [String] = [],
@@ -352,7 +356,7 @@ public final class QuantumProgram {
             if let n = specs["name"] as? String {
                 name = n
             }
-            _ = try self.create_circuit(name,[qReg!],[cReg!])
+            try self.create_circuit(name,[qReg!],[cReg!])
         }
     }
 
@@ -360,6 +364,7 @@ public final class QuantumProgram {
      Add a new circuit based in a Object representation.
      name is the name or index of one circuit.
      */
+    @discardableResult
     public func add_circuit(_ name: String, _ circuit_object: QuantumCircuit) -> QuantumCircuit {
         self.__quantum_program.circuits[name] = QCircuit(name, circuit_object)
         return circuit_object

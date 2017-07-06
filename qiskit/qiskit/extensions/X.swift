@@ -41,6 +41,7 @@ extension QuantumCircuit {
     /**
      Apply x to q.
      */
+    @discardableResult
     public func x(_ q: QuantumRegister) throws -> InstructionSet {
         let gs = InstructionSet()
         for j in 0..<q.size {
@@ -64,6 +65,7 @@ extension CompositeGate {
     /**
      Apply x to q.
      */
+    @discardableResult
     public func x(_ q: QuantumRegister) throws -> InstructionSet {
         let gs = InstructionSet()
         for j in 0..<q.size {

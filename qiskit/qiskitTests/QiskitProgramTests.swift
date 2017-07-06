@@ -139,7 +139,7 @@ class QiskitProgramTests: XCTestCase {
                 XCTFail("Quantum register not defined!")
                 return  }
             
-            _ = try qc.h(qr[1])
+            try qc.h(qr[1])
             let result = qc.qasm()
             XCTAssertEqual(result, "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nh qname[1];")
             
@@ -165,7 +165,7 @@ class QiskitProgramTests: XCTestCase {
                 return
             }
             
-             _ = try qc.h(qr[1])
+            try qc.h(qr[1])
             let result = try qprogram.get_qasm("circuitName")
             XCTAssertEqual(result, "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nh qname[1];")
             
@@ -176,6 +176,22 @@ class QiskitProgramTests: XCTestCase {
     
     func testAddGates() {
         do {
+            let str: String =
+            "OPENQASM 2.0;\n" +
+            "include \"qelib1.inc\";\n" +
+            "qreg qname[3];\n" +
+            "creg cname[3];\n" +
+            "u3(0.3000000000000000,0.2000000000000000,0.1000000000000000) qname[0];\n" +
+            "h qname[1];\n" +
+            "cx qname[1],qname[2];\n" +
+            "barrier qname[0],qname[1],qname[2];\n" +
+            "cx qname[0],qname[1];\n" +
+            "h qname[0];\n" +
+            "if(cname==1) z qname[2];\n" +
+            "if(cname==1) x qname[2];\n" +
+            "measure qname[0] -> cname[0];\n" +
+            "measure qname[1] -> cname[1];"
+            
             let qprogram = try QuantumProgram(specs: QiskitProgramTests.QPS_SPECS)
             guard let qc = qprogram.get_circuit("circuitName") else {
                 XCTFail("Quantum circuit not defined!")
@@ -203,7 +219,7 @@ class QiskitProgramTests: XCTestCase {
             try qc.measure(qr[1], cr[1])
             
             let result = try qprogram.get_qasm("circuitName")
-            XCTAssertEqual(result, "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nu3(0.300000000000000,0.200000000000000,0.100000000000000) qname[0];\nh qname[1];\ncx qname[1],qname[2];\nbarrier qname[0],qname[1],qname[2];\ncx qname[0],qname[1];\nh qname[0];\nif(cname==1) z qname[2];\nif(cname==1) x qname[2];\nmeasure qname[0] -> cname[0];\nmeasure qname[1] -> cname[1];")
+            XCTAssertEqual(str,result)
             
         } catch {
             XCTFail("\(error)")
@@ -215,10 +231,10 @@ class QiskitProgramTests: XCTestCase {
         do {
             let qprogram = try QuantumProgram(specs: QiskitProgramTests.QPS_SPECS)
 
-            let _ = qprogram.get_quantum_registers("qname")
-            let _ = qprogram.get_classical_registers("cname")
-            let _ = try qprogram.create_quantum_registers("qr", 3)
-            let _ = try qprogram.create_classical_registers("cr", 3)
+            qprogram.get_quantum_registers("qname")
+            qprogram.get_classical_registers("cname")
+            try qprogram.create_quantum_registers("qr", 3)
+            try qprogram.create_classical_registers("cr", 3)
             
             let result = try qprogram.create_circuit("qc2",
                                                  ["qname", "qr"],

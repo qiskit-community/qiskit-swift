@@ -10,7 +10,7 @@ void yyerror(char *s);
 
 %union {
     int ivalue;
-    float fvalue;
+    double fvalue;
     __unsafe_unretained NSString *svalue;
     __unsafe_unretained Node *node;
 }

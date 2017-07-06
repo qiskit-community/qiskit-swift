@@ -9,7 +9,7 @@ void yyerror(char *s);
 
 %%
 (([0-9]+|([0-9]+)?\.[0-9]+|[0-9]+\.)[eE][+-]?[0-9]+)|(([0-9]+)?\.[0-9]+|[0-9]+\.) {
-    float f = atof(yytext);
+    double f = atof(yytext);
     yylval.fvalue = f;
     return REAL;
 }

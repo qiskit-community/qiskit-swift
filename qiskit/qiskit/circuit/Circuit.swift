@@ -453,7 +453,7 @@ final class Circuit: NSCopying {
                               _ ncondition: RegBit?) {
         // Add a new operation node to the graph
         self.node_counter += 1
-        _ = self.multi_graph.add_vertex(self.node_counter,CircuitVertexOpData(nname,nqargs,ncargs,nparams,ncondition))
+        self.multi_graph.add_vertex(self.node_counter,CircuitVertexOpData(nname,nqargs,ncargs,nparams,ncondition))
     }
 
     /**

@@ -51,7 +51,7 @@ public class CompositeGate: Gate {
      */
     public func _modifiers(_ gate: Gate) throws {
         if self.inverse_flag {
-            _ = gate.inverse()
+            gate.inverse()
         }
         try super._modifiers(gate)
     }
@@ -147,8 +147,4 @@ public class CompositeGate: Gate {
         gate.circuit = self.circuit
         return self
     }
-/*
-    public static func += (left: inout CompositeGate, right: Gate) {
-        let _ = left.append(right)
-    }*/
 }
