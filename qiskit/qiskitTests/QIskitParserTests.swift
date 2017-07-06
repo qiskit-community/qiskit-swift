@@ -267,7 +267,7 @@ class QIskitParserTests: XCTestCase {
                 "measure b[3] -> ans[3];\n" +
                 "measure cout[0] -> ans[4];"
         
-        let buf: YY_BUFFER_STATE = yy_scan_string(qasmProgram)
+        yy_scan_string(qasmProgram)
         
         ParseSuccessBlock = { (n: NSObject?) -> Void in
             XCTAssertNotNil(n)
@@ -364,7 +364,7 @@ class QIskitParserTests: XCTestCase {
                     "id qr[1];\n" +
                     "measure qr[0] -> cr[0];"
             
-            let buf: YY_BUFFER_STATE = yy_scan_string(qasmProgram)
+            yy_scan_string(qasmProgram)
             
             ParseSuccessBlock = { (n: NSObject?) -> Void in
                 XCTAssertNotNil(n)
@@ -418,7 +418,7 @@ class QIskitParserTests: XCTestCase {
             "post q[0];\n" +
             "measure q[0] -> c[0];\n"
             
-            let buf: YY_BUFFER_STATE = yy_scan_string(qasmProgram)
+            yy_scan_string(qasmProgram)
             
             ParseSuccessBlock = { (n: NSObject?) -> Void in
                 XCTAssertNotNil(n)

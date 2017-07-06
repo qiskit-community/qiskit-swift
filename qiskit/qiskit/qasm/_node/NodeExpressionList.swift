@@ -24,7 +24,7 @@ children are expression nodes.
     }
 
     public func addExpression(exp: Node) {
-        expressionList?.append(exp)
+        expressionList?.insert(exp, at: 0)
     }
     
     public override var type: NodeType {
@@ -37,7 +37,7 @@ children are expression nodes.
     
     public override func qasm() -> String {
         var qasms: [String] = []
-        if let elist = expressionList?.reversed()  {
+        if let elist = expressionList  {
             for node in elist {
                 qasms.append(node.qasm())
             }
