@@ -21,10 +21,10 @@ public final class UBase: Gate {
     }
 
     public override var description: String {
-        let theta = String(format:"%.15f",self.params[0])
-        let phi = String(format:"%.15f",self.params[1])
-        let lamb = String(format:"%.15f",self.params[2])
-        return self._qasmif("\(name)(\(theta),\(phi),\(lamb)) \(self.args[0].identifier)")
+        let theta = self.params[0].format(15)
+        let phi = self.params[1].format(15)
+        let lam = self.params[2].format(15)
+        return self._qasmif("\(name)(\(theta),\(phi),\(lam)) \(self.args[0].identifier)")
     }
 
     /**

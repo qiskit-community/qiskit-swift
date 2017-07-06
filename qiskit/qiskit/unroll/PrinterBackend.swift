@@ -50,8 +50,7 @@ final class PrinterBackend: UnrollerBackend {
      Format a float f as a string with self.prec digits.
      */
     private func _fs(_ number: Double) -> String {
-        let format = "%.\(self.prec)f"
-        return String(format:format,number)
+        return number.format(self.prec)
     }
 
     /**

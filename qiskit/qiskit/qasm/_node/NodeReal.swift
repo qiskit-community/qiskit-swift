@@ -15,9 +15,9 @@ This node has no children. The data is in the value field.
 
 @objc public final class NodeReal: Node {
 
-    public let value: Float
+    public let value: Double
     
-    public init(id: Float) {
+    public init(id: Double) {
         self.value = id
     }
     
@@ -26,7 +26,6 @@ This node has no children. The data is in the value field.
     }
 
     public override func qasm() -> String {
-        let qasm: String = "\(value)"
-        return qasm
+        return self.value.format(15) // TODO: control the precision
     }
 }

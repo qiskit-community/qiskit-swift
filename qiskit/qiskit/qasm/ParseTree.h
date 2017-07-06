@@ -37,7 +37,7 @@
 +(Node*) createPrimaryList: (Node*) list primary: (Node*) primary;
 +(Node*) createProgram: (Node*) program statement: (Node*) statement;
 +(Node*) createQReg: (Node*) indexed_id;
-+(Node*) createReal: (float) real;
++(Node*) createReal: (double) real;
 +(Node*) createReset: (Node*) identifier;
 +(Node*) createUniversalUnitary: (Node*) list1 list2: (Node*) list2;
 

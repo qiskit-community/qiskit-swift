@@ -418,7 +418,7 @@ final class Unroller {
             return [Double(n.value)]
         case .N_REAL:
             let n = node as! NodeReal
-            return [Double(n.value)]
+            return [n.value]
         case .N_INDEXEDID:
             // We should not get here.
             throw UnrollerException.errortypeindexed(qasm: node.qasm())

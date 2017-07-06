@@ -231,8 +231,7 @@ final class Circuit: NSCopying {
      Format a float f as a string with self.prec digits.
      */
     public func fs(_ number: Double) -> String {
-        let format = "%.\(self.prec)f"
-        return String(format:format,number)
+        return number.format(self.prec)
     }
 
     /**
@@ -454,9 +453,7 @@ final class Circuit: NSCopying {
                               _ ncondition: RegBit?) {
         // Add a new operation node to the graph
         self.node_counter += 1
-        let node = self.multi_graph.add_vertex(self.node_counter)
-        // Update that operation node's data
-        node.data = CircuitVertexOpData(nname,nqargs,ncargs,nparams,ncondition)
+        _ = self.multi_graph.add_vertex(self.node_counter,CircuitVertexOpData(nname,nqargs,ncargs,nparams,ncondition))
     }
 
     /**
@@ -1045,7 +1042,7 @@ final class Circuit: NSCopying {
                         let qarg = args.joined(separator: ",")
                         if !dataOp.params.isEmpty {
                             let param = dataOp.params.joined(separator: ",")
-                            out += "\(nm)(\(param))) \(qarg);\n"
+                            out += "\(nm)(\(param)) \(qarg);\n"
                         }
                         else {
                             out += "\(nm) \(qarg);\n"

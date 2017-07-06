@@ -18,9 +18,9 @@ public final class U3Gate: Gate {
     }
 
     public override var description: String {
-        let theta = String(format:"%.15f",self.params[0])
-        let phi = String(format:"%.15f",self.params[1])
-        let lam = String(format:"%.15f",self.params[2])
+        let theta = self.params[0].format(15)
+        let phi = self.params[1].format(15)
+        let lam = self.params[2].format(15)
         return self._qasmif("\(name)(\(theta),\(phi),\(lam)) \(self.args[0].identifier)")
     }
 

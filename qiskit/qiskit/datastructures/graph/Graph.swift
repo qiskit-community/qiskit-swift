@@ -82,7 +82,16 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         return self.edges[TupleInt(sourceIndex,neighborIndex)]
     }
 
-    public func add_vertex(_ key: Int, _ data: VertexDataType? = nil) -> GraphVertex<VertexDataType> {
+    public func add_vertex(_ key: Int) -> GraphVertex<VertexDataType> {
+        var vertex = self.vertex(key)
+        if vertex == nil {
+            vertex = GraphVertex(key)
+            self.vertices[key] = vertex!
+        }
+        return vertex!
+    }
+
+    public func add_vertex(_ key: Int, _ data: VertexDataType) -> GraphVertex<VertexDataType> {
         var vertex = self.vertex(key)
         if vertex == nil {
             vertex = GraphVertex(key)

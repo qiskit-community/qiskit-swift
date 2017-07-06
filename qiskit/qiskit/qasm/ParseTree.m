@@ -170,7 +170,7 @@
     return node;
 }
 
-+(Node*) createReal: (float) real {
++(Node*) createReal: (double) real {
     NodeReal *node = [[NodeReal alloc] initWithId: real];
     return node;
 }

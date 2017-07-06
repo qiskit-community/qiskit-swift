@@ -454,6 +454,7 @@ public final class QuantumProgram {
             // TODO: The circuit object has to have .qasm() method (be careful)
             var (qasm_compiled, dag_unrolled) = try self.unroller_code(qCircuit.circuit.qasm(), basis_gates)
             if coupling_map != nil {
+                print("qasm compiled: \(qasm_compiled)")
                 print("pre-mapping properties: \(try dag_unrolled.property_summary())")
                 // Insert swap gates
                 let coupling = try Coupling(coupling_map)

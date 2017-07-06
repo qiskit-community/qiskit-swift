@@ -18,7 +18,7 @@ public final class U1Gate: Gate {
     }
 
     public override var description: String {
-        let theta = String(format:"%.15f",self.params[0])
+        let theta = self.params[0].format(15)
         return self._qasmif("\(name)(\(theta)) \(self.args[0].identifier)")
     }
 

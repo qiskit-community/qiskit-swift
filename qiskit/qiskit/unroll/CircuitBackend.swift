@@ -90,7 +90,8 @@ final class CircuitBackend: UnrollerBackend {
                 self.basis.append("U")
                 try self.circuit.add_basis_element("U", 1, 0, 3)
             }
-            try self.circuit.apply_operation_back("U", [qubit], [], [String(arg.0),String(arg.1),String(arg.2)], condition)
+            try self.circuit.apply_operation_back("U", [qubit], [],
+                                [arg.0.format(self.prec),arg.1.format(self.prec),arg.2.format(self.prec)], condition)
         }
     }
 
@@ -216,7 +217,7 @@ final class CircuitBackend: UnrollerBackend {
             try self.circuit.add_basis_element(name, qubits.count, 0, args.count)
             var params: [String] = []
             for arg in args {
-                params.append(String(arg))
+                params.append(arg.format(self.prec))
             }
             try self.circuit.apply_operation_back(name, qubits, [], params, condition)
         }

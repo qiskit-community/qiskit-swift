@@ -18,8 +18,8 @@ public final class U2Gate: Gate {
     }
 
     public override var description: String {
-        let phi = String(format:"%.15f",self.params[0])
-        let lam = String(format:"%.15f",self.params[1])
+        let phi = self.params[0].format(15)
+        let lam = self.params[1].format(15)
         return self._qasmif("\(name)(\(phi),\(lam)) \(self.args[0].identifier)")
     }
 
