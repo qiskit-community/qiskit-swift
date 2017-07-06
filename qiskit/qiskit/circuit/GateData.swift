@@ -17,7 +17,7 @@ import Foundation
  "body"   = GateBody AST node
  */
 
-final class GateData: NSCopying {
+final class GateData {
 
     let opaque: Bool
     let n_args: Int
@@ -33,9 +33,5 @@ final class GateData: NSCopying {
         self.args = args
         self.bits = bits
         self.body = body
-    }
-
-    public func copy(with zone: NSZone? = nil) -> Any {
-        return GateData(self.opaque, self.n_args, self.n_bits, self.args, self.bits, self.body)
     }
 }

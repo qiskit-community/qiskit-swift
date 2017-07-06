@@ -218,7 +218,7 @@ final class Unroller {
         let gatedata = GateData(false, n_args, n_bits, args, bits, body)
         self.gates[node.name] = gatedata
         if let backend = self.backend {
-            try backend.define_gate(node.name, gatedata.copy(with: nil) as! GateData)
+            try backend.define_gate(node.name, gatedata)
         }        
     }
 
@@ -242,10 +242,10 @@ final class Unroller {
             
         }
 
-        let gatedata = GateData(false, n_args, n_bits, args, bits, nil)
+        let gatedata = GateData(true, n_args, n_bits, args, bits, nil)
         self.gates[node.name] = gatedata
         if let backend = self.backend {
-            try backend.define_gate(node.name, gatedata.copy(with: nil) as! GateData)
+            try backend.define_gate(node.name, gatedata)
         }
     }
     
@@ -442,8 +442,9 @@ final class Unroller {
             return bitids
         case .N_GATE:
             try self._process_gate(node as! NodeGate)
-        case .N_GATEOPLIST:
-            try self._process_children(node)
+        //case .N_GATEOPLIST:
+        //    return []
+        //try self._process_children(node)
         case .N_CUSTOMUNITARY:
             try self._process_custom_unitary(node as! NodeCustomUnitary)
         case .N_UNIVERSALUNITARY:

@@ -13,6 +13,9 @@ extension Double {
         if self == 0.0 {
             return "0.0"
         }
+        if self < 1.0 {
+            return String(format: "%.\(f+1)f", self)
+        }
         return String(format: "%.\(f)f", self)
     }
 }

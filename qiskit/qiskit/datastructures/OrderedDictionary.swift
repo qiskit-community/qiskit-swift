@@ -10,7 +10,7 @@ import Foundation
 
 struct OrderedDictionary<KeyType: Hashable, ValueType>: CustomStringConvertible {
 
-    private var keys: [KeyType] = []
+    public private(set) var keys: [KeyType] = []
     private var values: [KeyType:ValueType] = [:]
 
     var count: Int {

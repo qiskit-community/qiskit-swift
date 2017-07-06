@@ -10,7 +10,7 @@ import Foundation
 
 public typealias TupleInt = HashableTuple<Int,Int>
 
-public struct HashableTuple<A:Hashable,B:Hashable> : Hashable, Equatable {
+public struct HashableTuple<A:Hashable,B:Hashable> : Hashable, Equatable, CustomStringConvertible {
     public let one: A
     public let two: B
 
@@ -22,6 +22,10 @@ public struct HashableTuple<A:Hashable,B:Hashable> : Hashable, Equatable {
         get {
             return self.one.hashValue &* 31 &+ self.two.hashValue
         }
+    }
+
+    public var description: String {
+        return "(\(self.one), \(self.two))"
     }
 
     public static func ==<A:Hashable,B:Hashable>(lhs: HashableTuple<A,B>, rhs: HashableTuple<A,B>) -> Bool {

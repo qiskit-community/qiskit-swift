@@ -560,11 +560,7 @@ final class Circuit: NSCopying {
      be *identical* to the gates in self
      */
     private func _make_union_gates(_ input_circuit: Circuit) throws -> [String:GateData] {
-        var union_gates: [String:GateData] = [:]
-        for (key,gateData) in self.gates {
-            let data = gateData.copy(with: nil) as! GateData
-            union_gates[key] = data
-        }
+        var union_gates: [String:GateData] = self.gates
         for (k, v) in input_circuit.gates {
             if union_gates[k] == nil {
                 union_gates[k] = v
@@ -1551,6 +1547,9 @@ final class Circuit: NSCopying {
      the desired behavior.
      */
     public func layers() throws -> [Layer] {
+        print(self.multi_graph.vertices.keys.sorted())
+        print(self.multi_graph.edges.keys.sorted { $0.one < $1.one })
+
         var layers_list: [Layer] = []
         // node_map contains an input node or previous layer node for
         // each wire in the circuit.
@@ -1569,8 +1568,7 @@ final class Circuit: NSCopying {
             }
             new_layer.basis = self.basis
             for (key,value) in self.gates {
-                let copy = value.copy(with: nil) as! GateData
-                new_layer.gates[key] = copy
+                new_layer.gates[key] = value
             }
             // Save the support of each operation we add to the layer
             var support_list: [[RegBit]] = []
@@ -1584,20 +1582,9 @@ final class Circuit: NSCopying {
             var emit: Bool = false
             for w in wires_loop {
                 let outEdges = self.multi_graph.out_edges_iter(node_map[w]!)
-                var oe: [GraphEdge<CircuitEdgeData>] = []
-                for edge in outEdges {
-                    let neighbor = self.multi_graph.vertex(edge.neighbor)!
-                    if let data = neighbor.data {
-                        if data.type == "in" || data.type == "out" {
-                            let dInOut = data as! CircuitVertexInOutData
-                            if dInOut.name == w {
-                                oe.append(edge)
-                            }
-                        }
-                    }
-                }
+                var oe: [GraphEdge<CircuitEdgeData>] = outEdges.filter { $0.data?.name == w }
                 assert(oe.count == 1, "should only be one out-edge per (qu)bit")
-                let nxt_nd = self.multi_graph.vertex(oe[0].source)!
+                let nxt_nd = self.multi_graph.vertex(oe[0].neighbor)!
                 // If we reach an output node, we are done with this wire.
                 if nxt_nd.data!.type == "out" {
                     wires_with_ops_remaining.remove(w)
@@ -1676,8 +1663,7 @@ final class Circuit: NSCopying {
             }
             new_layer.basis = self.basis
             for (key,value) in self.gates {
-                let copy = value.copy(with: nil) as! GateData
-                new_layer.gates[key] = copy
+                new_layer.gates[key] = value
             }
             // Save the support of the operation we add to the layer
             var support_list: [[RegBit]] = []
