@@ -531,7 +531,7 @@ public final class QuantumProgram {
      Print the compiled circuits that are ready to run.
      verbose controls how much is returned.
      */
-    func print_execution_list(_ verbose: Bool = false) {
+    public func print_execution_list(_ verbose: Bool = false) {
         for (device, jobs) in self.__to_execute {
             print("\(device)")
             for job in jobs {

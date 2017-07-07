@@ -20,7 +20,7 @@ final class Coupling: CustomStringConvertible {
     /**
     qubits is dict from qubit (regname,idx) tuples to node indices
      */
-    private var qubits: [RegBit:GraphVertex<CouplingVertexData>] = [:]
+    private var qubits: OrderedDictionary<RegBit,GraphVertex<CouplingVertexData>> = OrderedDictionary<RegBit,GraphVertex<CouplingVertexData>>()
 
     /**
      index_to_qubit is a dict from node indices to qubits
@@ -49,8 +49,10 @@ final class Coupling: CustomStringConvertible {
     public var description: String {
         var s = "qubits: "
         var list: [String] = []
-        for (k,v) in self.qubits    {
-            list.append("\(k.description) @ \(v.key)")
+        for k in self.qubits.keys {
+            if let v = self.qubits[k] {
+                list.append("\(k.description) @ \(v.key)")
+            }
         }
         s += list.joined(separator: ", ")
         s += "\nedges: "
@@ -76,7 +78,10 @@ final class Coupling: CustomStringConvertible {
     init(_ couplingdict: [Int:[Int]]? = nil) throws {
         // Add edges to the graph if the couplingdict is present
         if let dict = couplingdict {
-            for (v0, alist) in dict {
+            let dictSorted = dict.sorted(by:{ (n1: (key: Int, value: [Int]), n2: (key: Int, value: [Int])) -> Bool in
+                return n1.key < n2.key
+            })
+            for (v0, alist) in dictSorted {
                 for v1 in alist {
                     let regname = "q"
                     try self.add_edge(RegBit(regname, v0), RegBit(regname, v1))
@@ -97,15 +102,15 @@ final class Coupling: CustomStringConvertible {
      Return the qubits in this graph as (qreg, index) tuples
      */
     public func get_qubits() -> [RegBit] {
-        return Array<RegBit>(self.qubits.keys)
+        return self.qubits.keys
     }
 
     /**
      Return a list of edges in the coupling graph.
      Each edge is a pair of qubits and each qubit is a tuple (qreg, index).
      */
-    public func get_edges() -> Set<TupleRegBit> {
-        var edges: Set<TupleRegBit> = Set<TupleRegBit>()
+    public func get_edges() -> [TupleRegBit] {
+        var edges: [TupleRegBit] = []
         for i in 0..<self.G.edges.count {
             let edge = self.G.edges.value(i)
             guard let source = self.G.vertex(edge.source) else {
@@ -120,7 +125,7 @@ final class Coupling: CustomStringConvertible {
             guard let qubitNeighbor = self.index_to_qubit[neighbor] else {
                 continue
             }
-            edges.update(with: TupleRegBit(qubitSource,qubitNeighbor))
+            edges.append(TupleRegBit(qubitSource,qubitNeighbor))
         }
         return edges
     }
@@ -172,7 +177,7 @@ final class Coupling: CustomStringConvertible {
         }
         let lengths = self.G.to_undirected().all_pairs_shortest_path_length()
         self.dist = [:]
-        for (i,_) in self.qubits {
+        for i in self.qubits.keys {
             self.dist[i] = [:]
             guard let sourceVertex = self.qubits[i] else {
                 continue
@@ -180,7 +185,7 @@ final class Coupling: CustomStringConvertible {
             guard let lengthSource = lengths[sourceVertex] else {
                 continue
             }
-            for (j,_) in self.qubits {
+            for j in self.qubits.keys {
                 guard let endVertex = self.qubits[j] else {
                     continue
                 }

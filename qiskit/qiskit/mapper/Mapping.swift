@@ -141,10 +141,10 @@ final class Mapping {
                             // Compute the objective function
                             var new_cost: Double = 0
                             for g in gates {
-                                guard let r1 = trial_layout[g.0] else {
+                                guard let r1 = new_layout[g.0] else {
                                     continue
                                 }
-                                guard let r2 = trial_layout[g.1] else {
+                                guard let r2 = new_layout[g.1] else {
                                     continue
                                 }
                                 new_cost += xi[r1]![r2]!

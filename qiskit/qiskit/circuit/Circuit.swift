@@ -116,7 +116,10 @@ final class Circuit: NSCopying {
      */
     public func get_qubits() -> [RegBit] {
         var array:[RegBit] = []
-        for (name,index) in self.qregs {
+        let qRegsSorted = self.qregs.sorted(by:{ (n1: (key: String, value: Int), n2: (key: String, value: Int)) -> Bool in
+            return n1.key < n2.key
+        })
+        for (name,index) in qRegsSorted {
             for i in 0..<index {
                 array.append(RegBit(name,i))
             }

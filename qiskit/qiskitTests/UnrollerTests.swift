@@ -126,8 +126,8 @@ class UnrollerTests: XCTestCase {
         print(QASM_source)
 
         try qp.compile(["rippleadd"], device: UnrollerTests.device, shots: 1024, coupling_map: UnrollerTests.coupling_map)
-        // qp.print_execution_list(verbose=True)
-        let asyncExpectation = self.expectation(description: "runJob")
+        qp.print_execution_list(true)
+        /*let asyncExpectation = self.expectation(description: "runJob")
         qp.run() { (result,error) in
             do {
                 if error != nil {
@@ -148,7 +148,7 @@ class UnrollerTests: XCTestCase {
 
         self.waitForExpectations(timeout: 180, handler: { (error) in
             XCTAssertNil(error, "Failure in runJob")
-        })
+        })*/
     }
 
     private class func majority(_ p: QuantumCircuit,
