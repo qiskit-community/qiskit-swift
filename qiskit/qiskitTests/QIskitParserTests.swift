@@ -52,7 +52,7 @@ class QIskitParserTests: XCTestCase {
             "cx q[0],q[2];\n" +
             "measure q[0] -> c[0];\n" +
             "measure q[2] -> c[1];"
-  
+
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
