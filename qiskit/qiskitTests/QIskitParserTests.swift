@@ -52,11 +52,7 @@ class QIskitParserTests: XCTestCase {
             "cx q[0],q[2];\n" +
             "measure q[0] -> c[0];\n" +
             "measure q[2] -> c[1];"
-
-
-    private static let header: String = "OPENQASM2.0;gateu3(theta,phi,lambda)q{U(theta,phi,lambda)q;}gateu2(phi,lambda)q{U(3.14159/2,phi,lambda)q;}gateu1(lambda)q{U(0,0,lambda)q;}gatecxc,t{CXc,t;}gateida{U(0,0,0)a;}gateu0(gamma)q{U(0,0,0)q;}gatexa{u3(3.14159,0,3.14159)a;}gateya{u3(3.14159,3.14159/2,3.14159/2)a;}gateza{u1(3.14159)a;}gateha{u2(0,3.14159)a;}gatesa{u1(3.14159/2)a;}gatesdga{u1(-3.14159/2)a;}gateta{u1(3.14159/4)a;}gatetdga{u1(-3.14159/4)a;}gaterx(theta)a{u3(theta,-3.14159/2,3.14159/2)a;}gatery(theta)a{u3(theta,0,0)a;}gaterz(phi)a{u1(phi)a;}gatecza,b{hb;cxa,b;hb;}gatecya,b{sdgb;cxa,b;sb;}gatecha,b{hb;sdgb;cxa,b;hb;tb;cxa,b;tb;hb;sb;xb;sa;}gateccxa,b,c{hc;cxb,c;tdgc;cxa,c;tc;cxb,c;tdgc;cxa,c;tb;tc;hc;cxa,b;ta;tdgb;cxa,b;}gatecrz(lambda)a,b{u1(lambda/2)b;cxa,b;u1(-lambda/2)b;cxa,b;}gatecu1(lambda)a,b{u1(lambda/2)a;cxa,b;u1(-lambda/2)b;cxa,b;u1(lambda/2)b;}gatecu3(theta,phi,lambda)c,t{u1((lambda-phi)/2)t;cxc,t;u3(-theta/2,0,-(phi+lambda)/2)t;cxc,t;u3(theta/2,phi,0)t;}"
-        
-        
+  
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -94,13 +90,14 @@ class QIskitParserTests: XCTestCase {
 
 
     private class func runParser(_ qasmProgram: String) throws -> (String,String) {
-        let parser = Qasm(data: qasmProgram)
-        let root = try parser.parse()
-        var qasmProgram = parser.data
+        // eliminate comments, substitute pi, eliminate include
         var lines: [String] = []
-        // eliminate comments, substitute pi
         for var line in qasmProgram.components(separatedBy: CharacterSet.newlines) {
-            line = line.replacingOccurrences(of:"pi", with:"3.14159")
+            line = line.replacingOccurrences(of:"pi", with:"3.141592653589793")
+            line = line.replacingOccurrences(of:"include \"qelib1.inc\";", with:"")
+            if line.isEmpty {
+                continue
+            }
             if let range = line.range(of: "//") {
                 let start = range.lowerBound
                 let newLine = line[line.startIndex..<start]
@@ -112,9 +109,9 @@ class QIskitParserTests: XCTestCase {
                 lines.append(line)
             }
         }
-        qasmProgram = lines.joined()
-        let qasm = root.qasm()
-        return (qasmProgram,qasm)
+        let qasm = lines.joined()
+        let parser = Qasm(data: qasm)
+        return (qasm,try parser.parse().qasm())
     }
 
 
@@ -139,35 +136,17 @@ class QIskitParserTests: XCTestCase {
         urls.append(contentsOf: urlIBMqx2)
         var differences: [String: (String,String)] = [:]
         for url in urls {
-            var qasmProgram = ""
             do {
-                qasmProgram = try String(contentsOf: url, encoding: .utf8)
-                var lines: [String] = []
-                // eliminate comments
-                for var line in qasmProgram.components(separatedBy: CharacterSet.newlines) {
-                    line = line.replacingOccurrences(of:"pi", with:"3.141592653589793")
-                    if let range = line.range(of: "//") {
-                        let start = range.lowerBound
-                        let newLine = line[line.startIndex..<start]
-                        if !newLine.isEmpty {
-                            lines.append(newLine)
-                        }
-                    }
-                    else {
-                        lines.append(line)
-                    }
-                }
-                let (qasmProgram,qasm) = try QIskitParserTests.runParser(qasmProgram)
+                let (qasmProgram,qasm) = try QIskitParserTests.runParser(try String(contentsOf: url, encoding: .utf8))
                 let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
                 let emittedQasm = qasm.components(separatedBy: whitespaceCharacterSet).joined()
                 
-                let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined().replacingOccurrences(of: "OPENQASM2.0;include\"qelib1.inc\";", with: QIskitParserTests.header)
+                let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
                 
                 if emittedQasm != targetQasm {
                     differences[url.lastPathComponent] = (emittedQasm,targetQasm)
                 }
             } catch {
-                print("Error \(qasmProgram)")
                 XCTFail("\(url.lastPathComponent): \(error)")
             }
         }
