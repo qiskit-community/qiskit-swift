@@ -240,6 +240,7 @@ public final class QuantumProgram {
     /**
      Return a Quantum Register by nam
      */
+    @discardableResult
     public func get_quantum_registers(_ name: String) -> QuantumRegister? {
         return self.__quantum_registers[name]
     }
@@ -247,6 +248,7 @@ public final class QuantumProgram {
     /**
      Return a Classical Register by name
      */
+    @discardableResult
     public func get_classical_registers(_ name: String) -> ClassicalRegister? {
         return self.__classical_registers[name]
     }

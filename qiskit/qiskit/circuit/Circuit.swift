@@ -117,8 +117,9 @@ final class Circuit: NSCopying {
     public func get_qubits() -> [RegBit] {
         var array:[RegBit] = []
         for (name,index) in self.qregs {
-            array.append(RegBit(name,index))
-
+            for i in 0..<index {
+                array.append(RegBit(name,i))
+            }
         }
         return array
     }
@@ -1547,8 +1548,8 @@ final class Circuit: NSCopying {
      the desired behavior.
      */
     public func layers() throws -> [Layer] {
-        print(self.multi_graph.vertices.keys.sorted())
-        print(self.multi_graph.edges.keys.sorted { $0.one < $1.one })
+        print(self.multi_graph.vertexKeys)
+        print(self.multi_graph.edgeKeys)
 
         var layers_list: [Layer] = []
         // node_map contains an input node or previous layer node for
@@ -1632,7 +1633,7 @@ final class Circuit: NSCopying {
                 emit = false
             }
             else {
-                assert(!wires_with_ops_remaining.isEmpty, "not finished but empty?")
+                assert(wires_with_ops_remaining.isEmpty, "not finished but empty?")
             }
         }
         return layers_list

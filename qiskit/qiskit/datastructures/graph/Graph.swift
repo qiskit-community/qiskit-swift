@@ -217,8 +217,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
             try handler(SearchProcessType.vertexEarly,vertex,nil,state)
             for i in 0..<vertex.neighbors.count {
                 let neighbor = vertex.neighbors.value(i)
-                let edge = self.edge(vertex.key,neighbor.key)
-                try handler(SearchProcessType.edge,nil,edge,state)
+                try handler(SearchProcessType.edge,nil,self.edge(vertex.key,neighbor.key),state)
                 if !state.discovered.contains(neighbor.key) {
                     state.discovered.update(with: neighbor.key)
                     state.parent[neighbor.key] = vertex.key
@@ -243,10 +242,9 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         try handler(SearchProcessType.vertexEarly,vertex,nil,state)
         for i in 0..<vertex.neighbors.count {
             let neighbor = vertex.neighbors.value(i)
-            let edge = self.edge(vertex.key,neighbor.key)
             if !state.discovered.contains(neighbor.key) {
                 state.parent[neighbor.key] = vertex.key
-                try handler(SearchProcessType.edge,nil,edge,state)
+                try handler(SearchProcessType.edge,nil,self.edge(vertex.key,neighbor.key),state)
                 try self.dfs(neighbor, state, handler)
                 if state.finished {
                     return
@@ -583,31 +581,44 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         return paths
     }
 
-    public func weakly_connected_components() throws -> [[GraphVertex<VertexDataType>]] {
+    public func weakly_connected_components() throws -> [[Int]] {
         if !self.isDirected {
             throw GraphError.isUndirected
         }
-        var list: [[GraphVertex<VertexDataType>]] = []
-        // create undirect graph
-        let graph = self.to_undirected()
-        let state: DFSState = DFSState()
-        for i in 0..<graph.vertices.count {
-            let vertex = graph.vertices.value(i)
-            if !state.discovered.contains(vertex.key) {
-                var vertices: [GraphVertex<VertexDataType>] = []
-                try dfs(vertex, state) { (searchProcessType,vertex,edge,state) -> Void in
-                    if searchProcessType == SearchProcessType.vertexLate {
-                        vertices.append(vertex!)
-                        return
-                    }
-                }
-                if !vertices.isEmpty {
-                    list.append(vertices)
-                }
+        var list: [[Int]] = []
+        var seen: Set<Int> = []
+        for v in self.vertexKeys {
+            if !seen.contains(v) {
+                let vertices = self._plain_bfs(v)
+                list.append(vertices)
+                seen.formUnion(vertices)
             }
         }
         // longest components first
         return list.sorted { $0.count > $1.count }
+    }
+
+    private func _plain_bfs(_ source: Int) -> [Int] {
+        var list: [Int] = []
+        var seen: Set<Int> = []
+        var nextlevel: Set<Int> = [source]
+        while !nextlevel.isEmpty {
+            let thislevel = nextlevel
+            nextlevel = []
+            for v in thislevel {
+                if !seen.contains(v) {
+                    list.append(v)
+                    seen.update(with: v)
+                    for successor in self.successors(v) {
+                        nextlevel.update(with: successor.key)
+                    }
+                    for predecessor in self.predecessors(v) {
+                        nextlevel.update(with: predecessor.key)
+                    }
+                }
+            }
+        }
+        return list
     }
 
     public func number_weakly_connected_components() throws -> Int {
@@ -630,13 +641,13 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
 
     public func to_undirected() -> Graph {
         let graph = self.copy(with: nil) as! Graph<VertexDataType,EdgeDataType>
-        if !self.isDirected {
+        if !graph.isDirected {
             return graph
         }
         graph.isDirected = false
         for i in 0..<graph.edges.count {
-            let edge = self.edges.value(i)
-            var newEdge = self.edge(edge.neighbor,edge.source)
+            let edge = graph.edges.value(i)
+            var newEdge = graph.edge(edge.neighbor,edge.source)
             if newEdge == nil {
                 guard let source = graph.vertex(edge.source) else {
                     continue
@@ -647,7 +658,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
                 newEdge = GraphEdge(edge.neighbor,edge.source)
                 newEdge!.data = edge.data
                 neighbor.neighbors[source.key] = source
-                self.edges[TupleInt(newEdge!.source,newEdge!.neighbor)] = newEdge!
+                graph.edges[TupleInt(newEdge!.source,newEdge!.neighbor)] = newEdge!
             }
         }
         return graph

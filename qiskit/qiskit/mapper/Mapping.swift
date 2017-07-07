@@ -85,7 +85,7 @@ final class Mapping {
         var best_d: Int = Int.max  // initialize best depth
         var best_circ: String? = nil  // initialize best swap circuit
         var best_layout: [RegBit:RegBit]? = nil  // initialize best final layout
-        for _ in 1...trials {
+        for _ in 0..<trials {
             var trial_layout = layout
             var rev_trial_layout = rev_layout
             var trial_circ = ""  // circuit produced in this trial
