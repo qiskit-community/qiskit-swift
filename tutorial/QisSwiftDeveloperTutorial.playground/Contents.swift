@@ -77,20 +77,20 @@ let circuit = try QuantumCircuit([q,c])
  After you create the circuit with its registers you can add gates to manipulate the registers.
  - You can find extensive information about these gates and how use it into our [Quantum Experience User Guide]
 */
-    _ = try circuit.x(q[0])
-    _ = try circuit.x(q[1])
-    _ = try circuit.h(q[2])
-    _ = try circuit.measure(q[0], c[0])
-    _ = try circuit.measure(q[1], c[1])
-    _ = try circuit.measure(q[2], c[2])
-    _ = try circuit.measure(q[3], c[3])
-    _ = try circuit.measure(q[4], c[4])
+    try circuit.x(q[0])
+    try circuit.x(q[1])
+    try circuit.h(q[2])
+    try circuit.measure(q[0], c[0])
+    try circuit.measure(q[1], c[1])
+    try circuit.measure(q[2], c[2])
+    try circuit.measure(q[3], c[3])
+    try circuit.measure(q[4], c[4])
 
 /*:
  ### Extracting Qasm
 You obtain a QASM representation of your code by print your circuit any time as follows:
  */
-print(circuit.description)
+print(circuit.qasm())
 
 
 /*:
@@ -98,28 +98,16 @@ print(circuit.description)
  The following code initializes a quantum program compile, configures it with your API Token and API url, and runs the execution.
  */
 do {
-    var compile = QuantumProgram.QASMCompile()
-    compile.backend = "simulator"
-    let config = try Qconfig(apiToken: apitoken, url: testurl)
-    let program = QuantumProgram(config, compile, circuit)
-    
-    program.run { (result, error) in
+    let program = try QuantumProgram()
+    try program.set_api(token: apitoken, url: testurl)
+    program.add_circuit("test", circuit)
 
-    if let jobResult = result {
-        if let qasms = jobResult.qasms {
-            let qasm = qasms[0]
-            let idExecution = qasm.executionId!
-            program.getExecution(idExecution) { (execution, error) in
-                if error == nil {
-                    program.getResultFromExecution(idExecution) { (result, error) in
-                        if let resultData = result?.data?.dataP?.json {
-                            debugPrint(resultData)
-                        }
-                    }
-                }
-            }
+    program.execute(["test"], device: "simulator") { (result, error) in
+        if error != nil {
+            debugPrint(error!.description)
+            return
         }
-    }
+        debugPrint(result!)
     }
 
 } catch let error {

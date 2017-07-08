@@ -9,7 +9,7 @@
 import Foundation
 import qiskit
 
-final class RippleAdd {
+public final class RippleAdd {
 
     private static let device: String = "simulator"
     private static let coupling_map = [0: [1, 8], 1: [2, 9], 2: [3, 10], 3: [4, 11], 4: [5, 12],
@@ -33,6 +33,9 @@ final class RippleAdd {
                                 ["name": "ans", "size": n + 1]
                             ]]]
                         ]
+
+    private init() {
+    }
 
     public class func rippleAdd(qConfig: Qconfig) throws {
         let qp = try QuantumProgram(specs: QPS_SPECS)

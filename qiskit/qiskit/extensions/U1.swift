@@ -25,6 +25,7 @@ public final class U1Gate: Gate {
     /**
      Invert this gate.
      */
+    @discardableResult
     public override func inverse() -> Gate {
         self.params[0] = -self.params[0]
         return self

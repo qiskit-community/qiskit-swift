@@ -873,7 +873,7 @@ public final class QuantumProgram {
      Get the dict of labels and counts from the output of get_job.
      name is the name or index of one circuit."""
      */
-    public func get_counts(_ name: String , _ device: String? = nil) throws -> Int {
+    public func get_counts(_ name: String , device: String? = nil) throws -> Int {
         var dev: String = self.__last_device_backend
         if let d = device {
             dev = d

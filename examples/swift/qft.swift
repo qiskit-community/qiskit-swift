@@ -12,7 +12,7 @@ import qiskit
 /**
  Quantum Fourier Transform examples.
  */
-final class QFT {
+public final class QFT {
 
     private static let device: String = "ibmqx2"
 
@@ -46,88 +46,113 @@ final class QFT {
     //##############################################################
     // Set the device name and coupling map.
     //##############################################################
-    coupling_map = {0: [1, 2],
+    private static let coupling_map = [0: [1, 2],
         1: [2],
         2: [],
         3: [2, 4],
-        4: [2]}
+        4: [2]]
+
+    private init() {
+    }
 
     //##############################################################
     // Make a quantum program for the GHZ state.
     //##############################################################
 
-    def input_state(circ, q, n):
-    """n-qubit input state for QFT that produces output 1."""
-    for j in range(n):
-    circ.h(q[j])
-    circ.u1(math.pi/float(2**(j)), q[j]).inverse()
+    /**
+     n-qubit input state for QFT that produces output 1.
+     */
+    private class func input_state(_ circ: QuantumCircuit, _ q: QuantumRegister, _ n: Int) throws {
+        for j in 0..<n {
+            try circ.h(q[j])
+            try circ.u1(Double.pi/NSDecimalNumber(decimal:pow(2,j)).doubleValue, q[j]).inverse()
+        }
+    }
+    /**
+     n-qubit QFT on q in circ
+     */
+    private class func qft(_ circ: QuantumCircuit, _ q: QuantumRegister, _ n: Int) throws {
+        for j in 0..<n {
+            for k in 0..<j {
+                try circ.cu1(Double.pi/NSDecimalNumber(decimal:pow(2,j-k)).doubleValue, q[j], q[k])
+            }
+            try circ.h(q[j])
+        }
+    }
+
+    public class func qft(qConfig: Qconfig) throws {
+        let qp = try QuantumProgram(specs: QPS_SPECS)
+        guard let q = qp.get_quantum_registers("q") else { return }
+        guard let c = qp.get_classical_registers("c") else { return }
+
+        guard let qft3 = qp.get_circuit("qft3") else { return }
+        guard let qft4 = qp.get_circuit("qft4") else { return }
+        guard let qft5 = qp.get_circuit("qft5") else { return }
+
+        try input_state(qft3, q, 3)
+        try qft3.barrier()
+        try qft(qft3, q, 3)
+        try qft3.barrier()
+        for j in 0..<3 {
+            try qft3.measure(q[j], c[j])
+        }
+
+        try input_state(qft4, q, 4)
+        try qft4.barrier()
+        try qft(qft4, q, 4)
+        try qft4.barrier()
+        for j in 0..<4 {
+            try qft4.measure(q[j], c[j])
+        }
+
+        try input_state(qft5, q, 5)
+        try qft5.barrier()
+        try qft(qft5, q, 5)
+        try qft5.barrier()
+        for j in 0..<5 {
+            try qft5.measure(q[j], c[j])
+        }
+
+        print(qft3.qasm())
+        print(qft4.qasm())
+        print(qft5.qasm())
 
 
-    def qft(circ, q, n):
-    """n-qubit QFT on q in circ."""
-    for j in range(n):
-    for k in range(j):
-    circ.cu1(math.pi/float(2**(j-k)), q[j], q[k])
-    circ.h(q[j])
+        //##############################################################
+        // Set up the API and execute the program.
+        //##############################################################
+        try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
 
+        qp.execute(["qft3", "qft4", "qft5"], device:"simulator",shots: 1024, coupling_map: coupling_map) { (result,error) in
+            do {
+                if error != nil {
+                    print(error!.description)
+                    return
+                }
+                print(result!)
+                print(try qp.get_compiled_qasm("qft3"))
+                print(try qp.get_compiled_qasm("qft4"))
+                print(try qp.get_compiled_qasm("qft5"))
+                print(try qp.get_counts("qft3"))
+                print(try qp.get_counts("qft4"))
+                print(try qp.get_counts("qft5"))
 
-    qp = QuantumProgram(specs=QPS_SPECS)
-    q = qp.get_quantum_registers("q")
-    c = qp.get_classical_registers("c")
-
-    qft3 = qp.get_circuit("qft3")
-    qft4 = qp.get_circuit("qft4")
-    qft5 = qp.get_circuit("qft5")
-
-    input_state(qft3, q, 3)
-    qft3.barrier()
-    qft(qft3, q, 3)
-    qft3.barrier()
-    for j in range(3):
-    qft3.measure(q[j], c[j])
-
-    input_state(qft4, q, 4)
-    qft4.barrier()
-    qft(qft4, q, 4)
-    qft4.barrier()
-    for j in range(4):
-    qft4.measure(q[j], c[j])
-
-    input_state(qft5, q, 5)
-    qft5.barrier()
-    qft(qft5, q, 5)
-    qft5.barrier()
-    for j in range(5):
-    qft5.measure(q[j], c[j])
-
-    print(qft3.qasm())
-    print(qft4.qasm())
-    print(qft5.qasm())
-
-
-    //##############################################################
-    // Set up the API and execute the program.
-    //##############################################################
-    result = qp.set_api(Qconfig.APItoken, Qconfig.config["url"])
-    if not result:
-    print("Error setting API")
-    sys.exit(1)
-
-    result = qp.execute(["qft3", "qft4", "qft5"], device='simulator',
-    coupling_map=coupling_map, shots=1024)
-    print(result)
-    print(qp.get_compiled_qasm("qft3"))
-    print(qp.get_compiled_qasm("qft4"))
-    print(qp.get_compiled_qasm("qft5"))
-    print(qp.get_counts("qft3"))
-    print(qp.get_counts("qft4"))
-    print(qp.get_counts("qft5"))
-
-
-    result = qp.execute(["qft3"], device=device,
-    coupling_map=coupling_map, shots=1024, timeout=120)
-    print(result)
-    print(qp.get_compiled_qasm("qft3"))
-    print(qp.get_counts("qft3"))
-
+                qp.execute(["qft3"], device:device,shots: 1024, timeout:120, coupling_map: coupling_map) { (result,error) in
+                    do {
+                        if error != nil {
+                            print(error!.description)
+                            return
+                        }
+                        print(result!)
+                        print(try qp.get_compiled_qasm("qft3"))
+                        print(try qp.get_counts("qft3"))
+                    } catch {
+                        print(error.localizedDescription)
+                    }
+                }
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
+    }
 }

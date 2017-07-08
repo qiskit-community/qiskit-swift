@@ -12,7 +12,7 @@ import qiskit
 /**
  GHZ state example illustrating mapping onto the device
  */
-final class GHZ {
+public final class GHZ {
 
     private static let device: String = "ibmqx2"
     private static let QPS_SPECS: [String: Any] = [
@@ -30,65 +30,100 @@ final class GHZ {
     //#############################################################
     // Set the device name and coupling map.
     //#############################################################
-    coupling_map = {0: [1, 2],
+    private static let coupling_map = [0: [1, 2],
         1: [2],
         2: [],
         3: [2, 4],
-        4: [2]}
+        4: [2]]
+
+    private init() {
+    }
 
     //##############################################################
     // Make a quantum program for the GHZ state.
     //##############################################################
 
-    qp = QuantumProgram(specs=QPS_SPECS)
-    qc = qp.get_circuit("ghz")
-    q = qp.get_quantum_registers("q")
-    c = qp.get_classical_registers("c")
+    public class func ghz(qConfig: Qconfig) throws {
+        let qp = try QuantumProgram(specs: QPS_SPECS)
+        guard let qc = qp.get_circuit("ghz") else { return }
+        guard let q = qp.get_quantum_registers("q") else { return }
+        guard let c = qp.get_classical_registers("c") else { return }
 
-    # Create a GHZ state
-    qc.h(q[0])
-    for i in range(4):
-    qc.cx(q[i], q[i+1])
-    # Insert a barrier before measurement
-    qc.barrier()
-    # Measure all of the qubits in the standard basis
-    for i in range(5):
-    qc.measure(q[i], c[i])
+        // Create a GHZ state
+        try qc.h(q[0])
+        for i in 0..<4 {
+            try qc.cx(q[i], q[i+1])
+        }
+        // Insert a barrier before measurement
+        try qc.barrier()
+        // Measure all of the qubits in the standard basis
+        for i in 0..<5 {
+            try qc.measure(q[i], c[i])
+        }
 
-    //##############################################################
-    // Set up the API and execute the program.
-    //##############################################################
-    result = qp.set_api(Qconfig.APItoken, Qconfig.config["url"])
-    if not result:
-    print("Error setting API")
-    sys.exit(1)
+        //##############################################################
+        // Set up the API and execute the program.
+        //##############################################################
+        try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
 
-    // First version: not compiled
-    print("no compilation, simulator")
-    result = qp.execute(["ghz"], device='simulator',
-    coupling_map=None, shots=1024)
-    print(result)
-    print(qp.get_counts("ghz"))
+        // First version: not compiled
+        print("no compilation, simulator")
+        qp.execute(["ghz"], device: "simulator",shots: 1024, coupling_map: nil) { (result,error) in
+            do {
+                if error != nil {
+                    print(error!.description)
+                    return
+                }
+                print(result!)
+                print(try qp.get_counts("ghz"))
 
-    # Second version: compiled to qc5qv2 coupling graph
-    print("compilation to %s, simulator" % device)
-    result = qp.execute(["ghz"], device='simulator',
-    coupling_map=coupling_map, shots=1024)
-    print(result)
-    print(qp.get_counts("ghz"))
+                // Second version: compiled to qc5qv2 coupling graph
+                print("compilation to \(device), simulator")
+                qp.execute(["ghz"], device: "simulator",shots: 1024, coupling_map: coupling_map) { (result,error) in
+                    do {
+                        if error != nil {
+                            print(error!.description)
+                            return
+                        }
+                        print(result!)
+                        print(try qp.get_counts("ghz"))
 
-    // Third version: compiled to qc5qv2 coupling graph
-    print("compilation to %s, local qasm simulator" % device)
-    result = qp.execute(["ghz"], device='local_qasm_simulator',
-    coupling_map=coupling_map, shots=1024)
-    print(result)
-    print(qp.get_counts("ghz"))
+                        // Third version: compiled to qc5qv2 coupling graph
+                        print("compilation to \(device), local qasm simulator")
+                        qp.execute(["ghz"], device: "local_qasm_simulator",shots: 1024, coupling_map: coupling_map) { (result,error) in
+                            do {
+                                if error != nil {
+                                    print(error!.description)
+                                    return
+                                }
+                                print(result!)
+                                print(try qp.get_counts("ghz"))
 
-    // Fourth version: compiled to qc5qv2 coupling graph and run on qx5q
-    print("compilation to %s, device" % device)
-    result = qp.execute(["ghz"], device=device,
-    coupling_map=coupling_map, shots=1024, timeout=120)
-    print(result)
-    print(qp.get_counts("ghz"))
-
+                                // Fourth version: compiled to qc5qv2 coupling graph and run on qx5q
+                                print("compilation to \(device), device")
+                                qp.execute(["ghz"], device: device,shots: 1024, timeout:120, coupling_map: coupling_map) { (result,error) in
+                                    do {
+                                        if error != nil {
+                                            print(error!.description)
+                                            return
+                                        }
+                                        print(result!)
+                                        print(try qp.get_counts("ghz"))
+                                    } catch {
+                                        print(error.localizedDescription)
+                                    }
+                                }
+                            } catch {
+                                print(error.localizedDescription)
+                            }
+                        }
+                    } catch {
+                        print(error.localizedDescription)
+                    }
+                }
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
+    }
 }
