@@ -96,7 +96,7 @@ public final class Multiple {
                     return
                 }
                 // print(try qp.get_counts("bell")) // returns error, don't do this
-                print(try qp.get_counts("bell", device:"local_qasm_simulator"))
+                print(try qp.get_counts("bell", device:"simulator" /*"local_qasm_simulator"*/))
                 print(try qp.get_counts("ghz"))
             } catch {
                 print(error.localizedDescription)
