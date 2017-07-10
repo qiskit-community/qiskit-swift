@@ -30,7 +30,7 @@ final class BFSState {
 
 typealias BFSHandler<VertexDataType: NSCopying,EdgeDataType: NSCopying> = (SearchProcessType,
                         GraphVertex<VertexDataType>?,
-                        GraphEdge<EdgeDataType>?,
+                        [GraphEdge<EdgeDataType>],
                         BFSState) throws -> (Void)
 
 final class DFSState {
@@ -46,15 +46,15 @@ final class DFSState {
 
 typealias DFSHandler<VertexDataType: NSCopying,EdgeDataType: NSCopying> = (SearchProcessType,
                                                         GraphVertex<VertexDataType>?,
-                                                        GraphEdge<EdgeDataType>?,
+                                                        [GraphEdge<EdgeDataType>],
                                                         DFSState) throws -> (Void)
 
 final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying {
 
     public private(set) var vertices: OrderedDictionary<Int,GraphVertex<VertexDataType>> =
                                                 OrderedDictionary<Int,GraphVertex<VertexDataType>>()
-    public private(set) var edges: OrderedDictionary<TupleInt,GraphEdge<EdgeDataType>> =
-                                                OrderedDictionary<TupleInt,GraphEdge<EdgeDataType>>()
+    private var _edges: OrderedDictionary<TupleInt,[GraphEdge<EdgeDataType>]> =
+                                                OrderedDictionary<TupleInt,[GraphEdge<EdgeDataType>]>()
     public private(set) var isDirected: Bool
 
     public var vertexKeys: [Int] {
@@ -62,7 +62,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
     }
 
     public var edgeKeys: [TupleInt] {
-        return self.edges.keys.sorted() {
+        return self._edges.keys.sorted() {
             if $0.one < $1.one {
                 return true
             }
@@ -76,6 +76,18 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         }
     }
 
+    public var edges: [GraphEdge<EdgeDataType>] {
+        var edges: [GraphEdge<EdgeDataType>] = []
+        for key in self.edgeKeys {
+            if let multiEdges = self._edges[key] {
+                for edge in multiEdges {
+                    edges.append(edge)
+                }
+            }
+        }
+        return edges
+    }
+
     public init(directed: Bool) {
         self.isDirected = directed
     }
@@ -86,9 +98,14 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
             let vertex = self.vertices.value(i).copy(with: zone) as! GraphVertex<VertexDataType>
             copy.vertices[vertex.key] = vertex
         }
-        for i in 0..<self.edges.count {
-            let edge = self.edges.value(i).copy(with: zone) as! GraphEdge<EdgeDataType>
-            copy.edges[TupleInt(edge.source,edge.neighbor)] = edge
+        for i in 0..<self._edges.count {
+            let key = self._edges.keys[i]
+            var newMultiEdges: [GraphEdge<EdgeDataType>] = []
+            let multiEdges = self._edges.value(i)
+            for edge in multiEdges {
+                newMultiEdges.append(edge.copy(with: zone) as! GraphEdge<EdgeDataType>)
+            }
+            copy._edges[key] = newMultiEdges
         }
         return copy
     }
@@ -97,8 +114,8 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         return self.vertices[key]
     }
 
-    public func edge(_ sourceIndex: Int, _ neighborIndex: Int) -> GraphEdge<EdgeDataType>? {
-        return self.edges[TupleInt(sourceIndex,neighborIndex)]
+    public func edges(_ sourceIndex: Int, _ neighborIndex: Int) -> [GraphEdge<EdgeDataType>] {
+        return self._edges[TupleInt(sourceIndex,neighborIndex)] ?? []
     }
 
     public func add_vertex(_ key: Int) -> GraphVertex<VertexDataType> {
@@ -126,38 +143,30 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
     }
 
     public func add_edge(_ source: GraphVertex<VertexDataType>, _ neighbor: GraphVertex<VertexDataType>, _ data: EdgeDataType? = nil) {
-        var edge = self.edge(source.key,neighbor.key)
-        if edge == nil {
-            edge = GraphEdge(source.key,neighbor.key)
-            edge!.data = data
-            source.neighbors[neighbor.key] = neighbor
-            self.edges[TupleInt(source.key,neighbor.key)] = edge!
-        }
-        else {
-            edge!.data = data
-        }
+        var newEdge = GraphEdge<EdgeDataType>(source.key,neighbor.key)
+        newEdge.data = data
+        source.neighbors[neighbor.key] = neighbor
+        var grapMultiEdges = self.edges(newEdge.source,newEdge.neighbor)
+        grapMultiEdges.append(newEdge)
+        self._edges[TupleInt(source.key,neighbor.key)] = grapMultiEdges
+
         if !self.isDirected {
-            edge = self.edge(neighbor.key,source.key)
-            if edge == nil {
-                edge = GraphEdge(neighbor.key,source.key)
-                edge!.data = data
+            newEdge = GraphEdge<EdgeDataType>(neighbor.key,source.key)
+            newEdge.data = data
+            if self._edges[TupleInt(newEdge.source,newEdge.neighbor)] == nil {
                 neighbor.neighbors[source.key] = source
-                self.edges[TupleInt(neighbor.key,source.key)] = edge!
-            }
-            else {
-                edge!.data = data
+                self._edges[TupleInt(newEdge.source,newEdge.neighbor)] = [newEdge]
             }
         }
     }
 
-
     public func remove_edge(_ sourceIndex: Int, _ neighborIndex: Int) {
-        self.edges[TupleInt(sourceIndex,neighborIndex)] = nil
+        self._edges[TupleInt(sourceIndex,neighborIndex)] = nil
         if let source = self.vertex(sourceIndex) {
             source.neighbors[neighborIndex] = nil
         }
         if !self.isDirected {
-            self.edges[TupleInt(neighborIndex,sourceIndex)] = nil
+            self._edges[TupleInt(neighborIndex,sourceIndex)] = nil
             if let neighbor = self.vertex(neighborIndex) {
                 neighbor.neighbors[sourceIndex] = nil
             }
@@ -168,13 +177,13 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         if self.vertex(index) == nil {
             return
         }
-        self.edges[TupleInt(index,index)] = nil
+        self._edges[TupleInt(index,index)] = nil
         self.vertices[index] = nil
         for i in 0..<self.vertices.count {
             let vertex = self.vertices.value(i)
             vertex.neighbors[index] = nil
-            self.edges[TupleInt(index,vertex.key)] = nil
-            self.edges[TupleInt(vertex.key,index)] = nil
+            self._edges[TupleInt(index,vertex.key)] = nil
+            self._edges[TupleInt(vertex.key,index)] = nil
         }
     }
 
@@ -183,8 +192,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
             return []
         }
         var inEdges: [GraphEdge<EdgeDataType>] = []
-        for i in 0..<self.edges.count {
-            let edge = self.edges.value(i)
+        for edge in self.edges {
             if edge.neighbor == index {
                 inEdges.append(edge)
             }
@@ -197,8 +205,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
             return []
         }
         var outEdges: [GraphEdge<EdgeDataType>] = []
-        for i in 0..<self.edges.count {
-            let edge = self.edges.value(i)
+        for edge in self.edges {
             if edge.source == index {
                 outEdges.append(edge)
             }
@@ -214,10 +221,10 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         state.discovered.update(with: start.key)
         while !queue.isEmpty {
             let vertex = queue.dequeue()
-            try handler(SearchProcessType.vertexEarly,vertex,nil,state)
+            try handler(SearchProcessType.vertexEarly,vertex,[],state)
             for i in 0..<vertex.neighbors.count {
                 let neighbor = vertex.neighbors.value(i)
-                try handler(SearchProcessType.edge,nil,self.edge(vertex.key,neighbor.key),state)
+                try handler(SearchProcessType.edge,nil,self.edges(vertex.key,neighbor.key),state)
                 if !state.discovered.contains(neighbor.key) {
                     state.discovered.update(with: neighbor.key)
                     state.parent[neighbor.key] = vertex.key
@@ -225,7 +232,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
                 }
             }
             state.processed.update(with: vertex.key)
-            try handler(SearchProcessType.vertexLate,vertex,nil,state)
+            try handler(SearchProcessType.vertexLate,vertex,[],state)
         }
     }
 
@@ -239,19 +246,19 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         state.discovered.update(with: vertex.key)
         state.time += 1
         state.entryTime[vertex.key] = state.time
-        try handler(SearchProcessType.vertexEarly,vertex,nil,state)
+        try handler(SearchProcessType.vertexEarly,vertex,[],state)
         for i in 0..<vertex.neighbors.count {
             let neighbor = vertex.neighbors.value(i)
             if !state.discovered.contains(neighbor.key) {
                 state.parent[neighbor.key] = vertex.key
-                try handler(SearchProcessType.edge,nil,self.edge(vertex.key,neighbor.key),state)
+                try handler(SearchProcessType.edge,nil,self.edges(vertex.key,neighbor.key),state)
                 try self.dfs(neighbor, state, handler)
                 if state.finished {
                     return
                 }
             }
         }
-        try handler(SearchProcessType.vertexLate,vertex,nil,state)
+        try handler(SearchProcessType.vertexLate,vertex,[],state)
         state.time += 1
         state.exitTime[vertex.key] = state.time
         state.processed.update(with: vertex.key)
@@ -481,9 +488,9 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
             let vertex = self.vertices.value(i)
             if !state.discovered.contains(vertex.key) {
                 do {
-                    try self.dfs(vertex, state) { (searchProcessType,vertex,edge,state) -> Void in
+                    try self.dfs(vertex, state) { (searchProcessType,vertex,edges,state) -> Void in
                         if searchProcessType == SearchProcessType.edge {
-                            let classification = Graph.edgeClassification(edge!,state)
+                            let classification = Graph.edgeClassification(edges[0],state)
                             if classification == EdgeClassification.back {
                                 throw GraphError.isCyclic
                             }
@@ -645,20 +652,23 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
             return graph
         }
         graph.isDirected = false
-        for i in 0..<graph.edges.count {
-            let edge = graph.edges.value(i)
-            var newEdge = graph.edge(edge.neighbor,edge.source)
-            if newEdge == nil {
+        for i in 0..<graph._edges.count {
+            let multiEdges = graph._edges.value(i)
+            for edge in multiEdges {
                 guard let source = graph.vertex(edge.source) else {
                     continue
                 }
                 guard let neighbor = graph.vertex(edge.neighbor) else {
                     continue
                 }
-                newEdge = GraphEdge(edge.neighbor,edge.source)
-                newEdge!.data = edge.data
+                let newEdge = GraphEdge<EdgeDataType>(edge.neighbor,edge.source)
+                newEdge.data = edge.data
                 neighbor.neighbors[source.key] = source
-                graph.edges[TupleInt(newEdge!.source,newEdge!.neighbor)] = newEdge!
+                var grapMultiEdges = graph.edges(newEdge.source,newEdge.neighbor)
+                if grapMultiEdges.isEmpty {
+                    grapMultiEdges.append(newEdge)
+                    graph._edges[TupleInt(newEdge.source,newEdge.neighbor)] = grapMultiEdges
+                }
             }
         }
         return graph

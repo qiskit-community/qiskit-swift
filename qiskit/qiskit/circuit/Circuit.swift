@@ -203,8 +203,7 @@ final class Circuit: NSCopying {
             }
         }
         // eX = edge, d= data
-        for i in 0..<self.multi_graph.edges.count {
-            let edge = self.multi_graph.edges.value(i)
+        for edge in self.multi_graph.edges {
             guard let data = edge.data else {
                 continue
             }
@@ -280,15 +279,12 @@ final class Circuit: NSCopying {
         self.output_map[name] = self.node_counter 
         let in_node: Int = self.input_map[name]!
         let out_node: Int = self.output_map[name]!
-        self.multi_graph.add_edge(in_node, out_node)
+        self.multi_graph.add_edge(in_node, out_node,CircuitEdgeData(name))
         if let node = self.multi_graph.vertex(in_node) {
             node.data = CircuitVertexInData(name)
         }
         if let node = self.multi_graph.vertex(out_node) {
             node.data = CircuitVertexOutData(name)
-        }
-        if let edge = self.multi_graph.edge(in_node,out_node) {
-            edge.data = CircuitEdgeData(name)
         }
     }
 
@@ -1473,10 +1469,7 @@ final class Circuit: NSCopying {
             guard let succIndex = succ_map[w] else {
                 continue
             }
-            self.multi_graph.add_edge(predIndex, succIndex)
-            if let edge = self.multi_graph.edge(predIndex,succIndex) {
-                edge.data = CircuitEdgeData(w)
-            }
+            self.multi_graph.add_edge(predIndex, succIndex,CircuitEdgeData(w))
         }
     }
 

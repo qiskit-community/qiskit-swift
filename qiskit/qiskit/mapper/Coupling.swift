@@ -111,8 +111,7 @@ final class Coupling: CustomStringConvertible {
      */
     public func get_edges() -> [TupleRegBit] {
         var edges: [TupleRegBit] = []
-        for i in 0..<self.G.edges.count {
-            let edge = self.G.edges.value(i)
+        for edge in self.G.edges {
             guard let source = self.G.vertex(edge.source) else {
                 continue
             }

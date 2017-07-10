@@ -9,10 +9,26 @@
 import Foundation
 
 final class CircuitEdgeData: NSCopying {
-    public var name: RegBit
+    public var name: RegBit {
+        get{
+            return _name
+        }set(value) {
+           _name = value
+            if self._name.name == "q" && self._name.index == 0 {
+                var i:Int = 0
+                i += 1
+            }
+        }
+    }
+
+    private var _name: RegBit
 
     public init(_ name: RegBit) {
-        self.name = name
+        self._name = name
+        if self.name.name == "q" && self.name.index == 0 {
+            var i:Int = 0
+            i += 1
+        }
     }
 
     public func copy(with zone: NSZone? = nil) -> Any {

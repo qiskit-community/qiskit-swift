@@ -349,14 +349,20 @@ class QiskitTests: XCTestCase {
         try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
 
         let asyncExpectation = self.expectation(description: "runJob")
-        qp.execute(["circuit"], device: device) { (result, error) in
+        qp.execute(["circuit"], device: device) { (error) in
             if error != nil {
                 XCTFail("Failure in runJob: \(error!)")
                 asyncExpectation.fulfill()
                 return
             }
-            print(result!)
-            asyncExpectation.fulfill()
+            do {
+                print(try qp.get_compiled_qasm("circuit"))
+                print(try qp.get_counts("circuit"))
+                asyncExpectation.fulfill()
+            } catch let error {
+                XCTFail("Failure in runJob: \(error)")
+                asyncExpectation.fulfill()
+            }
         }
         self.waitForExpectations(timeout: 180, handler: { (error) in
             XCTAssertNil(error, "Failure in runJob")
