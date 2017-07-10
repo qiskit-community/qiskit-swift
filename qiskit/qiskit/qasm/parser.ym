@@ -2,6 +2,8 @@
 
 #import "ParserBlocks.h"
 #import "ParseTree.h"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunreachable-code"
 
 int yylex(void);
 void yyerror(char *s);
@@ -396,3 +398,6 @@ external : SIN { $$ = $1; }
 
 
 %%
+
+#pragma clang diagnostic pop
+

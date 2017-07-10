@@ -1,10 +1,16 @@
 %{
 
+#define YY_NO_INPUT 1
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdocumentation"
+
 #import "y.tab.h"
 #import "ParserBlocks.h"
+
 void yyerror(char *s);
 %}
 
+%option nounput
 %x INCLUDEFILE
 
 %%
@@ -186,3 +192,4 @@ void yyerror(char *s)
     ParseFailBlock([NSString stringWithFormat:@"%s line %d", s, yylineno]);
 }
 
+#pragma clang diagnostic pop
