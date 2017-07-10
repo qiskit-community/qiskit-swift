@@ -74,6 +74,7 @@ public final class GHZ {
                     print(error!.description)
                     return
                 }
+                print(try qp.get_compiled_qasm("ghz"))
                 print(try qp.get_counts("ghz"))
 
                 // Second version: compiled to qc5qv2 coupling graph
@@ -84,10 +85,11 @@ public final class GHZ {
                             print(error!.description)
                             return
                         }
+                        print(try qp.get_compiled_qasm("ghz"))
                         print(try qp.get_counts("ghz"))
 
                         // Third version: compiled to qc5qv2 coupling graph
-                        print("compilation to \(device), local qasm simulator")
+                      /*  print("compilation to \(device), local qasm simulator")
                         qp.execute(["ghz"], device: "local_qasm_simulator",shots: 1024, coupling_map: coupling_map) { (error) in
                             do {
                                 if error != nil {
@@ -112,7 +114,7 @@ public final class GHZ {
                             } catch {
                                 print(error.localizedDescription)
                             }
-                        }
+                        }*/
                     } catch {
                         print(error.localizedDescription)
                     }

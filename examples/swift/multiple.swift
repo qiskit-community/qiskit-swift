@@ -86,7 +86,7 @@ public final class Multiple {
         //##############################################################
         try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
 
-        try qp.compile(["bell"], device:"local_qasm_simulator", shots:1024)
+        try qp.compile(["bell"], device:"simulator" /*"local_qasm_simulator"*/, shots:1024)
         try qp.compile(["ghz"], device:"simulator", shots:1024,coupling_map:coupling_map)
 
         qp.run() { (error) in
