@@ -68,46 +68,42 @@ public final class GHZ {
 
         // First version: not compiled
         print("no compilation, simulator")
-        qp.execute(["ghz"], device: "simulator",shots: 1024, coupling_map: nil) { (result,error) in
+        qp.execute(["ghz"], device: "simulator",shots: 1024, coupling_map: nil) { (error) in
             do {
                 if error != nil {
                     print(error!.description)
                     return
                 }
-                print(result!)
                 print(try qp.get_counts("ghz"))
 
                 // Second version: compiled to qc5qv2 coupling graph
                 print("compilation to \(device), simulator")
-                qp.execute(["ghz"], device: "simulator",shots: 1024, coupling_map: coupling_map) { (result,error) in
+                qp.execute(["ghz"], device: "simulator",shots: 1024, coupling_map: coupling_map) { (error) in
                     do {
                         if error != nil {
                             print(error!.description)
                             return
                         }
-                        print(result!)
                         print(try qp.get_counts("ghz"))
 
                         // Third version: compiled to qc5qv2 coupling graph
                         print("compilation to \(device), local qasm simulator")
-                        qp.execute(["ghz"], device: "local_qasm_simulator",shots: 1024, coupling_map: coupling_map) { (result,error) in
+                        qp.execute(["ghz"], device: "local_qasm_simulator",shots: 1024, coupling_map: coupling_map) { (error) in
                             do {
                                 if error != nil {
                                     print(error!.description)
                                     return
                                 }
-                                print(result!)
                                 print(try qp.get_counts("ghz"))
 
                                 // Fourth version: compiled to qc5qv2 coupling graph and run on qx5q
                                 print("compilation to \(device), device")
-                                qp.execute(["ghz"], device: device,shots: 1024, timeout:120, coupling_map: coupling_map) { (result,error) in
+                                qp.execute(["ghz"], device: device,shots: 1024, timeout:120, coupling_map: coupling_map) { (error) in
                                     do {
                                         if error != nil {
                                             print(error!.description)
                                             return
                                         }
-                                        print(result!)
                                         print(try qp.get_counts("ghz"))
                                     } catch {
                                         print(error.localizedDescription)

@@ -84,7 +84,7 @@ public final class DataMove {
         try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
 
         // First version: not compiled
-        qp.execute(["swapping"], device: device,shots: 1024, coupling_map: nil) { (result,error) in
+        qp.execute(["swapping"], device: device,shots: 1024, coupling_map: nil) { (error) in
             do {
                 if error != nil {
                     print(error!.description)
@@ -94,7 +94,7 @@ public final class DataMove {
                 print(try qp.get_counts("swapping"))
 
                 // Second version: compiled to coupling graph
-                qp.execute(["swapping"], device: device,shots: 1024, coupling_map: coupling_map) { (result,error) in
+                qp.execute(["swapping"], device: device,shots: 1024, coupling_map: coupling_map) { (error) in
                     do {
                         if error != nil {
                             print(error!.description)

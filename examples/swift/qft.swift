@@ -123,13 +123,12 @@ public final class QFT {
         //##############################################################
         try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
 
-        qp.execute(["qft3", "qft4", "qft5"], device:"simulator",shots: 1024, coupling_map: coupling_map) { (result,error) in
+        qp.execute(["qft3", "qft4", "qft5"], device:"simulator",shots: 1024, coupling_map: coupling_map) { (error) in
             do {
                 if error != nil {
                     print(error!.description)
                     return
                 }
-                print(result!)
                 print(try qp.get_compiled_qasm("qft3"))
                 print(try qp.get_compiled_qasm("qft4"))
                 print(try qp.get_compiled_qasm("qft5"))
@@ -137,13 +136,12 @@ public final class QFT {
                 print(try qp.get_counts("qft4"))
                 print(try qp.get_counts("qft5"))
 
-                qp.execute(["qft3"], device:device,shots: 1024, timeout:120, coupling_map: coupling_map) { (result,error) in
+                qp.execute(["qft3"], device:device,shots: 1024, timeout:120, coupling_map: coupling_map) { (error) in
                     do {
                         if error != nil {
                             print(error!.description)
                             return
                         }
-                        print(result!)
                         print(try qp.get_compiled_qasm("qft3"))
                         print(try qp.get_counts("qft3"))
                     } catch {

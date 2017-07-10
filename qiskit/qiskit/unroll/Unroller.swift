@@ -8,6 +8,25 @@
 
 import Foundation
 
+final class ProcessNodesReturn {
+
+    let values: [Double]
+    let regBits: [[RegBit]]
+
+    init() {
+        self.values = []
+        self.regBits = []
+    }
+    init(_ values: [Double]) {
+        self.values = values
+        self.regBits = []
+    }
+    init(_ regBits: [[RegBit]]) {
+        self.values = []
+        self.regBits = regBits
+    }
+}
+
 /**
  OPENQASM interpreter object that unrolls subroutines and loops.
  */
@@ -121,7 +140,7 @@ final class Unroller {
         var args: [Double] = []
         var bits: [[RegBit]] = []
         if let list = node.arguments {
-            args = try self._process_node(list)
+            args = try self._process_node(list).values
         }
         var maxidx: Int = 0
         if let blchildren = node.bitlist?.children {
@@ -287,19 +306,19 @@ final class Unroller {
         let lexpr = node._children[0]
         let rexpr = node._children[1]
         if operation == "+" {
-            return try self._process_node(lexpr)[0] + self._process_node(rexpr)[0]
+            return try self._process_node(lexpr).values[0] + self._process_node(rexpr).values[0]
         }
         if operation == "-" {
-            return try self._process_node(lexpr)[0] - self._process_node(rexpr)[0]
+            return try self._process_node(lexpr).values[0] - self._process_node(rexpr).values[0]
         }
         if operation == "*" {
-            return try self._process_node(lexpr)[0] * self._process_node(rexpr)[0]
+            return try self._process_node(lexpr).values[0] * self._process_node(rexpr).values[0]
         }
         if operation == "/" {
-            return try self._process_node(lexpr)[0] / self._process_node(rexpr)[0]
+            return try self._process_node(lexpr).values[0] / self._process_node(rexpr).values[0]
         }
         if operation == "^" {
-            return try pow(self._process_node(lexpr)[0],self._process_node(rexpr)[0])
+            return try pow(self._process_node(lexpr).values[0],self._process_node(rexpr).values[0])
         }
         throw UnrollerException.errorbinop(qasm: node.qasm())
     }
@@ -311,10 +330,10 @@ final class Unroller {
         let operation = node.op
         let expr = node._children[0]
         if operation == "+" {
-            return try self._process_node(expr)[0]
+            return try self._process_node(expr).values[0]
         }
         if operation == "-" {
-            return try -self._process_node(expr)[0]
+            return try -self._process_node(expr).values[0]
         }
         throw  UnrollerException.errorprefix(qasm: node.qasm())
     }
@@ -359,7 +378,7 @@ final class Unroller {
  
         let op = node.children[0].name
         let expression = node.children[1]
-        if let value: Double = try self._process_node(expression).first {
+        if let value: Double = try self._process_node(expression).values.first {
             switch op {
             case "sin":
                 return sin(value)
@@ -393,7 +412,7 @@ final class Unroller {
      Carry out the action associated with node n.
      */
     @discardableResult
-    private func _process_node(_ node: Node) throws -> [Double] {
+    private func _process_node(_ node: Node) throws -> ProcessNodesReturn {
         switch node.type {
         case .N_MAINPROGRAM:
             if let pnode = (node as! NodeMainProgram).program {
@@ -410,48 +429,33 @@ final class Unroller {
             self.cregs[n.name] = n.index
             try self.backend!.new_creg(n.name, n.index)
         case .N_ID:
-            return [try self._process_local_id(node as! NodeId)]
+            return ProcessNodesReturn([try self._process_local_id(node as! NodeId)])
         case .N_INT:
             // We process int nodes when they are leaves of expressions
             // and cast them to float to avoid, for example, 3/2 = 1.
             let n = node as! NodeNNInt
-            return [Double(n.value)]
+            return ProcessNodesReturn([Double(n.value)])
         case .N_REAL:
             let n = node as! NodeReal
-            return [n.value]
+            return ProcessNodesReturn([n.value])
         case .N_INDEXEDID:
             // We should not get here.
             throw UnrollerException.errortypeindexed(qasm: node.qasm())
-        case .N_IDLIST:
-            var bitids:[Double] = []
-            for child in (node as! NodeIdList).children {
-                let regbits = try self._process_bit_id(child)
-                for rb in regbits {
-                    bitids.append(Double(rb.index))
-                }
+        case .N_IDLIST, .N_PRIMARYLIST:
+            var regBits:[[RegBit]] = []
+            for child in node.children {
+                regBits.append(try self._process_bit_id(child))
             }
-            return bitids
-        case .N_PRIMARYLIST:
-            var bitids:[Double] = []
-            for child in (node as! NodePrimaryList).children {
-                let regbits = try self._process_bit_id(child)
-                for rb in regbits {
-                    bitids.append(Double(rb.index))
-                }
-            }
-            return bitids
+            return ProcessNodesReturn(regBits)
         case .N_GATE:
             try self._process_gate(node as! NodeGate)
-        //case .N_GATEOPLIST:
-        //    return []
-        //try self._process_children(node)
         case .N_CUSTOMUNITARY:
             try self._process_custom_unitary(node as! NodeCustomUnitary)
         case .N_UNIVERSALUNITARY:
             let unode = node as! NodeUniversalUnitary
             if let c0 = unode.explist,
                 let c1 = unode.indexedid {
-                let args = try self._process_node(c0)
+                let args = try self._process_node(c0).values
                 let qid = try self._process_bit_id(c1)
                 for element in qid {
                     try self.backend!.u((args[0], args[1], args[2]), element)
@@ -463,13 +467,13 @@ final class Unroller {
             var list:[Double] = []
             for child in node.children {
                 let ret = try self._process_node(child)
-                list.append(contentsOf: ret)
+                list.append(contentsOf: ret.values)
             }
-            return list
+            return ProcessNodesReturn(list)
         case .N_BINARYOP:
-            return [try self._process_binop(node as! NodeBinaryOp)]
+            return ProcessNodesReturn([try self._process_binop(node as! NodeBinaryOp)])
         case .N_PREFIX:
-            return [try self._process_prefix(node as! NodePrefix)]
+            return ProcessNodesReturn([try self._process_prefix(node as! NodePrefix)])
         case .N_MEASURE:
             try self._process_measure(node as! NodeMeasure)
         case .N_MAGIC:
@@ -478,12 +482,7 @@ final class Unroller {
                 self.backend!.version("\(magicVersion.value)")
             }
         case .N_BARRIER:
-            let ids = try self._process_node((node as! NodeBarrier).children[0]) // FIXME ??
-            var regbits: [RegBit] = []
-            for i in ids {
-                regbits.append(RegBit("barrier", Int(i)))
-            }
-            try self.backend?.barrier([regbits])
+            try self.backend?.barrier(try self._process_node(node.children[0]).regBits)
         case .N_RESET:
             let id0 = try self._process_bit_id((node as! NodeReset).children[0])
             for idx in 0..<id0.count {
@@ -494,11 +493,11 @@ final class Unroller {
         case .N_OPAQUE:
             try self._process_opaque(node as! NodeOpaque)
         case .N_EXTERNAL:
-            return [try self._process_external(node as! NodeExternal)]
+            return ProcessNodesReturn([try self._process_external(node as! NodeExternal)])
         default:
             throw UnrollerException.errortype(type: node.type.rawValue, qasm: node.qasm())
         }
-        return []
+        return ProcessNodesReturn()
     }
     
     /**

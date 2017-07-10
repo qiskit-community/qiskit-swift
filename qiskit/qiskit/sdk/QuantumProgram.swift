@@ -567,19 +567,21 @@ public final class QuantumProgram {
      timeout is time until the execution stopa
      */
     public func run(_ wait: Int = 5, _ timeout: Int = 60,
-                    _ responseHandler: @escaping ((_:[String:Any]?, _:QISKitException?) -> Void)) {
+                    _ responseHandler: @escaping ((_:QISKitException?) -> Void)) {
         if let (backend,toExecute) = self.__to_execute.first {
             self.run(backend,toExecute,wait,timeout) { (result, error) -> Void in
                 if error != nil {
                     // Clear the list of compiled programs to execute
                     self.__to_execute = [:]
-                    responseHandler(result,error)
+                    responseHandler(error)
                     return
                 }
                 self.__to_execute.removeValue(forKey: backend)
                 self.run(wait,timeout,responseHandler)
             }
+            return
         }
+        responseHandler(nil)
     }
 
     private func run(_ backend: String,
@@ -851,7 +853,7 @@ public final class QuantumProgram {
                         basis_gates: String? = nil,
                         coupling_map: [Int:[Int]]? = nil,
                         seed: Double? = nil,
-                        _ responseHandler: @escaping ((_:[String:Any]?, _:QISKitException?) -> Void)) {
+                        _ responseHandler: @escaping ((_:QISKitException?) -> Void)) {
         do {
             try self.compile(name_of_circuits,
                              device: device,
@@ -863,9 +865,9 @@ public final class QuantumProgram {
             self.run(wait, timeout,responseHandler)
         } catch {
             if let err = error as? QISKitException {
-                responseHandler(nil,err)
+                responseHandler(err)
             }
-            responseHandler(nil,QISKitException.internalError(error: error))
+            responseHandler(QISKitException.internalError(error: error))
         }
     }
 
@@ -873,7 +875,7 @@ public final class QuantumProgram {
      Get the dict of labels and counts from the output of get_job.
      name is the name or index of one circuit."""
      */
-    public func get_counts(_ name: String , device: String? = nil) throws -> Int {
+    public func get_counts(_ name: String , device: String? = nil) throws -> [String:Int] {
         var dev: String = self.__last_device_backend
         if let d = device {
             dev = d
@@ -890,7 +892,7 @@ public final class QuantumProgram {
         guard let data = result["data"] as? [String:Any] else {
             throw QISKitException.missingCircuit
         }
-        guard let counts = data["counts"] as? Int else {
+        guard let counts = data["counts"] as? [String:Int] else {
             throw QISKitException.missingCircuit
         }
         return counts

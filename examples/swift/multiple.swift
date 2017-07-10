@@ -89,7 +89,7 @@ public final class Multiple {
         try qp.compile(["bell"], device:"local_qasm_simulator", shots:1024)
         try qp.compile(["ghz"], device:"simulator", shots:1024,coupling_map:coupling_map)
 
-        qp.run() { (result,error) in
+        qp.run() { (error) in
             do {
                 if error != nil {
                     print(error!.description)

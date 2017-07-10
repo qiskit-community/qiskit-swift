@@ -77,15 +77,15 @@ final class Request {
 
     func postInternal(url: URL, data: [String : Any] = [:],
                       responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
-        print(url.absoluteString)
+        //print(url.absoluteString)
         var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData,
                                  timeoutInterval: Request.CONNTIMEOUT)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: data, options: .prettyPrinted)
-            let dataString = String(data: request.httpBody!, encoding: .utf8)
-            print(dataString!)
+            //let dataString = String(data: request.httpBody!, encoding: .utf8)
+            //print(dataString!)
         } catch let error {
             DispatchQueue.main.async {
                 responseHandler(nil, IBMQuantumExperienceError.internalError(error: error))
@@ -118,9 +118,9 @@ final class Request {
                 return
             }
             do {
-                if let dataString = String(data: data!, encoding: .utf8) {
-                    print(dataString)
-                }
+                //if let dataString = String(data: data!, encoding: .utf8) {
+                //   print(dataString)
+                //}
                 let jsonAny = try JSONSerialization.jsonObject(with: data!, options: .allowFragments)
                 var msg = ""
                 if let json = jsonAny as? [String:Any] {
@@ -196,7 +196,7 @@ final class Request {
                 IBMQuantumExperienceError.invalidURL(url: "\(self.credential.config.url.description)\(fullPath)"))
             return
         }
-        print(url.absoluteString)
+        //print(url.absoluteString)
         var request = URLRequest(url:url, cachePolicy:.reloadIgnoringLocalCacheData,
                                  timeoutInterval:Request.CONNTIMEOUT)
         request.httpMethod = "GET"
@@ -218,9 +218,9 @@ final class Request {
                 return
             }
             do {
-                if let dataString = String(data: data!, encoding: .utf8) {
-                    print(dataString)
-                }
+               // if let dataString = String(data: data!, encoding: .utf8) {
+                //    print(dataString)
+                //}
                 let jsonAny = try JSONSerialization.jsonObject(with: data!, options: .allowFragments)
                 var msg = ""
                 if let json = jsonAny as? [String:Any] {

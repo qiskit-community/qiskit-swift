@@ -98,16 +98,17 @@ print(circuit.qasm())
  The following code initializes a quantum program compile, configures it with your API Token and API url, and runs the execution.
  */
 do {
-    let program = try QuantumProgram()
-    try program.set_api(token: apitoken, url: testurl)
-    program.add_circuit("test", circuit)
+    let qp = try QuantumProgram()
+    try qp.set_api(token: apitoken, url: testurl)
+    qp.add_circuit("test", circuit)
 
-    program.execute(["test"], device: "simulator") { (result, error) in
+    qp.execute(["test"], device: "simulator") { (error) in
         if error != nil {
             debugPrint(error!.description)
             return
         }
-        debugPrint(result!)
+        print(try qp.get_compiled_qasm("test"))
+        print(try qp.get_counts("test"))
     }
 
 } catch let error {

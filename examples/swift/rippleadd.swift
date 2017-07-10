@@ -88,24 +88,22 @@ public final class RippleAdd {
         try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
 
         // First version: not compiled
-        qp.execute(["rippleadd"], device: device,shots: 1024, coupling_map: nil) { (result,error) in
+        qp.execute(["rippleadd"], device: device,shots: 1024, coupling_map: nil) { (error) in
             do {
                 if error != nil {
                     print(error!.description)
                     return
                 }
-                print(result!)
                 print(try qp.get_counts("rippleadd"))
                 // Second version: compiled to 2x8 array coupling graph
                 try qp.compile(["rippleadd"], device: device, shots: 1024, coupling_map: coupling_map)
                 // qp.print_execution_list(verbose=True)
-                qp.run() { (result,error) in
+                qp.run() { (error) in
                     do {
                         if error != nil {
                             print(error!.description)
                             return
                         }
-                        print(result!)
                         print(try qp.get_compiled_qasm("rippleadd"))
                         print(try qp.get_counts("rippleadd"))
                         // Both versions should give the same distribution
