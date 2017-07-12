@@ -16,7 +16,7 @@ public class Instruction: CustomStringConvertible {
     let name: String
     var params: [Double]
     let args: [RegisterArgument]
-    var circuit: QuantumCircuit? = nil
+    weak var circuit: QuantumCircuit? = nil
     private var control: (ClassicalRegister, Int)? = nil
 
     public var description: String {
