@@ -145,7 +145,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
     public func add_edge(_ source: GraphVertex<VertexDataType>, _ neighbor: GraphVertex<VertexDataType>, _ data: EdgeDataType? = nil) {
         var newEdge = GraphEdge<EdgeDataType>(source.key,neighbor.key)
         newEdge.data = data
-        source.neighbors[neighbor.key] = neighbor
+        source.neighbors.update(with: neighbor.key)
         var grapMultiEdges = self.edges(newEdge.source,newEdge.neighbor)
         grapMultiEdges.append(newEdge)
         self._edges[TupleInt(source.key,neighbor.key)] = grapMultiEdges
@@ -154,7 +154,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
             newEdge = GraphEdge<EdgeDataType>(neighbor.key,source.key)
             newEdge.data = data
             if self._edges[TupleInt(newEdge.source,newEdge.neighbor)] == nil {
-                neighbor.neighbors[source.key] = source
+                neighbor.neighbors.update(with: source.key)
                 self._edges[TupleInt(newEdge.source,newEdge.neighbor)] = [newEdge]
             }
         }
@@ -163,12 +163,12 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
     public func remove_edge(_ sourceIndex: Int, _ neighborIndex: Int) {
         self._edges[TupleInt(sourceIndex,neighborIndex)] = nil
         if let source = self.vertex(sourceIndex) {
-            source.neighbors[neighborIndex] = nil
+            source.neighbors.remove(neighborIndex)
         }
         if !self.isDirected {
             self._edges[TupleInt(neighborIndex,sourceIndex)] = nil
             if let neighbor = self.vertex(neighborIndex) {
-                neighbor.neighbors[sourceIndex] = nil
+                neighbor.neighbors.remove(sourceIndex)
             }
         }
     }
@@ -181,7 +181,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         self.vertices[index] = nil
         for i in 0..<self.vertices.count {
             let vertex = self.vertices.value(i)
-            vertex.neighbors[index] = nil
+            vertex.neighbors.remove(index)
             self._edges[TupleInt(index,vertex.key)] = nil
             self._edges[TupleInt(vertex.key,index)] = nil
         }
@@ -222,8 +222,8 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         while !queue.isEmpty {
             let vertex = queue.dequeue()
             try handler(SearchProcessType.vertexEarly,vertex,[],state)
-            for i in 0..<vertex.neighbors.count {
-                let neighbor = vertex.neighbors.value(i)
+            for key in vertex.neighbors {
+                let neighbor = self.vertex(key)!
                 try handler(SearchProcessType.edge,nil,self.edges(vertex.key,neighbor.key),state)
                 if !state.discovered.contains(neighbor.key) {
                     state.discovered.update(with: neighbor.key)
@@ -247,8 +247,8 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         state.time += 1
         state.entryTime[vertex.key] = state.time
         try handler(SearchProcessType.vertexEarly,vertex,[],state)
-        for i in 0..<vertex.neighbors.count {
-            let neighbor = vertex.neighbors.value(i)
+        for key in vertex.neighbors {
+            let neighbor = self.vertex(key)!
             if !state.discovered.contains(neighbor.key) {
                 state.parent[neighbor.key] = vertex.key
                 try handler(SearchProcessType.edge,nil,self.edges(vertex.key,neighbor.key),state)
@@ -350,9 +350,8 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         var list: [GraphVertex<VertexDataType>] = []
         for i in 0..<self.vertices.count {
             let vertex = self.vertices.value(i)
-            for j in 0..<vertex.neighbors.count {
-                let neighbor = vertex.neighbors.value(j)
-                if neighbor.key == key {
+            for neighborKey in vertex.neighbors {
+                if neighborKey == key {
                     list.append(vertex)
                 }
             }
@@ -371,19 +370,19 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
             if visited.contains(vertex.key) {
                 continue
             }
-            Graph.ancestorsUtil(vertex, key, &visited, &list)
+            self.ancestorsUtil(vertex, key, &visited, &list)
         }
         return list
     }
 
     @discardableResult
-    private class func ancestorsUtil(_ vertex: GraphVertex<VertexDataType>,
+    private func ancestorsUtil(_ vertex: GraphVertex<VertexDataType>,
                                  _ key: Int,
                                  _ visited: inout Set<Int>,
                                  _ list: inout [GraphVertex<VertexDataType>]) -> Bool {
         visited.update(with: vertex.key)
-        for i in 0..<vertex.neighbors.count {
-            let neighbor = vertex.neighbors.value(i)
+        for i in vertex.neighbors {
+            let neighbor = self.vertex(i)!
             if visited.contains(neighbor.key) {
                 continue
             }
@@ -391,7 +390,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
                 list.append(vertex)
                 return true
             }
-            if Graph.ancestorsUtil(neighbor, key, &visited, &list) {
+            if self.ancestorsUtil(neighbor, key, &visited, &list) {
                 list.append(vertex)
                 return true
             }
@@ -422,8 +421,9 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
             return []
         }
         var list: [GraphVertex<VertexDataType>] = []
-        for i in 0..<vertex.neighbors.count {
-            list.append(vertex.neighbors.value(i))
+        for i in vertex.neighbors {
+            let neighbor = self.vertex(i)!
+            list.append(neighbor)
         }
         return list
     }
@@ -438,8 +438,8 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         }
         var vertices: [GraphVertex<VertexDataType>] = []
         let state: DFSState = DFSState()
-        for i in 0..<rootVertex.neighbors.count {
-            let neighbor = rootVertex.neighbors.value(i)
+        for i in rootVertex.neighbors {
+            let neighbor = self.vertex(i)!
             if !state.discovered.contains(neighbor.key) {
                 do {
                     try self.dfs(neighbor, state) { (searchProcessType,vertex,edge,state) -> Void in
@@ -555,21 +555,21 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         return path.count - 1
     }
 
-    public func single_source_shortest_path_length(_ source: Int) -> [GraphVertex<VertexDataType>:Int] {
+    public func single_source_shortest_path_length(_ source: Int) -> [Int:Int] {
         guard let vertex = self.vertex(source) else {
             return [:]
         }
-        var seen: [GraphVertex<VertexDataType>:Int] = [:]
+        var seen: [Int:Int] = [:]
         var level: Int = 0
         var nextlevel: [GraphVertex<VertexDataType>:Int] = [vertex:1]
         while !nextlevel.isEmpty {
             let thislevel = nextlevel
             nextlevel = [:]
             for (v,_) in thislevel {
-                if seen[v] == nil {
-                    seen[v] = level
-                    for i in 0..<v.neighbors.count {
-                        let neighbor = v.neighbors.value(i)
+                if seen[v.key] == nil {
+                    seen[v.key] = level
+                    for i in v.neighbors {
+                        let neighbor = self.vertex(i)!
                         nextlevel[neighbor] = 0
                     }
                 }
@@ -579,11 +579,11 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         return seen
     }
 
-    public func all_pairs_shortest_path_length() -> [GraphVertex<VertexDataType>: [GraphVertex<VertexDataType>:Int]] {
-        var paths: [GraphVertex<VertexDataType>: [GraphVertex<VertexDataType>:Int]] = [:]
+    public func all_pairs_shortest_path_length() -> [Int: [Int:Int]] {
+        var paths: [Int: [Int:Int]] = [:]
         for i in 0..<self.vertices.count {
             let vertex = self.vertices.value(i)
-            paths[vertex] = self.single_source_shortest_path_length(vertex.key)
+            paths[vertex.key] = self.single_source_shortest_path_length(vertex.key)
         }
         return paths
     }
@@ -663,7 +663,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
                 }
                 let newEdge = GraphEdge<EdgeDataType>(edge.neighbor,edge.source)
                 newEdge.data = edge.data
-                neighbor.neighbors[source.key] = source
+                neighbor.neighbors.update(with: source.key)
                 var grapMultiEdges = graph.edges(newEdge.source,newEdge.neighbor)
                 if grapMultiEdges.isEmpty {
                     grapMultiEdges.append(newEdge)

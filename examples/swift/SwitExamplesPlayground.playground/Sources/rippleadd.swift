@@ -94,6 +94,7 @@ public final class RippleAdd {
                     print(error!.description)
                     return
                 }
+                print(try qp.get_compiled_qasm("rippleadd"))
                 print(try qp.get_counts("rippleadd"))
                 // Second version: compiled to 2x8 array coupling graph
                 try qp.compile(["rippleadd"], device: device, shots: 1024, coupling_map: coupling_map)

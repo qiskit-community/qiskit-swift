@@ -51,6 +51,12 @@ final class Mapping {
                                   _ qubit_subset: [RegBit],
                                   _ coupling: Coupling,
                                   _ trials: Int) throws -> (Bool, String?, Int?, [RegBit:RegBit]?, Bool) {
+
+        //print("layer permutation")
+        //print("layer_partition",layer_partition)
+        //print("layout ",layout)
+        //print("qubit_subset ",qubit_subset)
+
         var rev_layout: [RegBit:RegBit] = [:]
         for (a,b) in layout {
             rev_layout[b] = a
@@ -98,6 +104,8 @@ final class Mapping {
             for i in coupling.get_qubits() {
                 for j in coupling.get_qubits() {
                     let scale: Double = 1.0 + Random().normal(mean: 0.0, standardDeviation: 1.0 / Double(n))
+                    //print(scale)
+                    //print(try coupling.distance(i, j))
                     xi[i]![j] = scale * pow(Double(try coupling.distance(i, j)),2)
                     xi[j]![i] = xi[i]![j]
                 }
@@ -222,6 +230,7 @@ final class Mapping {
         if best_circ == nil {
             return (false, nil, nil, nil, false)
         }
+        //print("layer permutation ends best_circ \(best_circ!)")
         return (true, best_circ, best_d, best_layout, false)
     }
 

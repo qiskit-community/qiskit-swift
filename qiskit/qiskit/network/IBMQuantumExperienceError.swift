@@ -16,7 +16,7 @@ public enum IBMQuantumExperienceError: LocalizedError, CustomStringConvertible {
     case invalidURL(url: String)
     case nullResponse(url: String)
     case invalidHTTPResponse(response: URLResponse)
-    case httpError(url: String, status: Int, msg: String)
+    case httpError(status: Int, msg: String)
     case nullResponseData(url: String)
     case invalidResponseData
     case missingTokenId
@@ -43,8 +43,8 @@ public enum IBMQuantumExperienceError: LocalizedError, CustomStringConvertible {
             return url
         case .invalidHTTPResponse(let response):
             return response.description
-        case .httpError(let url, let status, let msg):
-            return "\(url) Http status: \(status); \(msg)"
+        case .httpError(let status, let msg):
+            return "Http status: \(status); \(msg)"
         case .nullResponseData(let url):
             return url
         case .invalidResponseData:

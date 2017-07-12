@@ -461,12 +461,12 @@ public final class QuantumProgram {
             // TODO: The circuit object has to have .qasm() method (be careful)
             var (qasm_compiled, dag_unrolled) = try self.unroller_code(qCircuit.circuit.qasm(), basis_gates)
             if coupling_map != nil {
-                print("qasm compiled: \(qasm_compiled)")
-                print("pre-mapping properties: \(try dag_unrolled.property_summary())")
+                //print("qasm compiled: \(qasm_compiled)")
+                //print("pre-mapping properties: \(try dag_unrolled.property_summary())")
                 // Insert swap gates
                 let coupling = try Coupling(coupling_map)
-                var (dag_unrolled, final_layout) = try Mapping.swap_mapper(dag_unrolled, coupling)
-                print("layout: \(final_layout)")
+                var (dag_unrolled, _) = try Mapping.swap_mapper(dag_unrolled, coupling)
+                //print("layout: \(final_layout)")
                 // Expand swaps
                 (qasm_compiled, dag_unrolled) = try self.unroller_code(try dag_unrolled.qasm())
                 // Change cx directions
@@ -476,7 +476,7 @@ public final class QuantumProgram {
                 // Simplify single qubit gates
                 dag_unrolled = try Mapping.optimize_1q_gates(dag_unrolled)
                 qasm_compiled = try dag_unrolled.qasm(qeflag: true)
-                print("post-mapping properties: \(try dag_unrolled.property_summary())")
+                //print("post-mapping properties: \(try dag_unrolled.property_summary())")
             }
             // TODO: add timestamp, compilation
             var jobs: [[String:Any]] = []
@@ -626,7 +626,7 @@ public final class QuantumProgram {
                 }
             }
             // TODO have an option to print this.
-            print("running on backend: \(backend)")
+            //print("running on backend: \(backend)")
             self.__api.run_job(qasms: jobs, device: backend, shots: last_shots, maxCredits: last_max_credits) { (json, error) -> Void in
                 if error != nil {
                     responseHandler(nil,QISKitException.internalError(error: error!))
@@ -671,7 +671,7 @@ public final class QuantumProgram {
             }
 
             // TODO have an option to print this.
-            print("running on backend: \(backend)")
+            //print("running on backend: \(backend)")
             var job_result: [ String: [[String:Any]] ] = [:]
             if backend == "local_qasm_simulator" {
                 job_result = QuantumProgram.run_local_qasm_simulator(jobs)
@@ -758,7 +758,7 @@ public final class QuantumProgram {
                 responseHandler(nil, QISKitException.missingStatus)
                 return
             }
-            print("status = \(status) (\(elapsed) seconds)")
+            //print("status = \(status) (\(elapsed) seconds)")
             if status != "RUNNING" {
                 if status == "ERROR_CREATING_JOB" || status == "ERROR_RUNNING_JOB" {
                     responseHandler(nil, QISKitException.errorStatus(status: status))

@@ -12,7 +12,7 @@ final class GraphVertex<VertexDataType: NSCopying> : Hashable, Equatable {
 
     public let key: Int
     public var data: VertexDataType? = nil
-    var neighbors: OrderedDictionary<Int,GraphVertex<VertexDataType>> = OrderedDictionary<Int,GraphVertex<VertexDataType>>()
+    var neighbors: Set<Int> = []
 
     public var hashValue : Int {
         get {
@@ -30,10 +30,7 @@ final class GraphVertex<VertexDataType: NSCopying> : Hashable, Equatable {
             let d = self.data!.copy(with: zone) as! VertexDataType
             copy.data = d
         }
-        for i in 0..<self.neighbors.count {
-            let neighbor = self.neighbors.value(i).copy(with: zone) as! GraphVertex<VertexDataType>
-            copy.neighbors[neighbor.key] = neighbor
-        }
+        copy.neighbors =  self.neighbors
         return copy
     }
 

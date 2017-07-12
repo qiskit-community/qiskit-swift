@@ -349,7 +349,7 @@ public final class IBMQuantumExperience {
             responseHandler(nil, IBMQuantumExperienceError.missingStatus)
             return
         }
-        print("Status: \(status)")
+        //print("Status: \(status)")
         guard let id_execution = execution["id"] as? String else {
             responseHandler(nil, IBMQuantumExperienceError.missingExecutionId)
             return
@@ -465,6 +465,10 @@ public final class IBMQuantumExperience {
             data["backend"] = backendDict
 
             self.req.post(path: "Jobs", data: data) { (out, error) -> Void in
+                if error != nil {
+                    responseHandler(nil, error)
+                    return
+                }
                 guard let json = out as? [String:Any] else {
                     responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
                     return
