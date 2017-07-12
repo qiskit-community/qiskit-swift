@@ -45,6 +45,15 @@ func runRippleExample() {
     }
 }
 
+func runQFT() {
+    do {
+        let qconf = try Qconfig(APItoken: apitoken, url: testurl)
+        try QFT.qft(qConfig: qconf)
+    } catch {
+        debugPrint(error.localizedDescription)
+    }
+}
+
 
 //TODO run your example here
 PlaygroundPage.current.needsIndefiniteExecution = true

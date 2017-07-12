@@ -41,7 +41,7 @@ final class Request {
               responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
         self.postInternal(path: path, params: params, data: data) { (json, error) in
             if error != nil {
-                if case IBMQuantumExperienceError.httpError(_, let status, _) = error! {
+                if case IBMQuantumExperienceError.httpError(let status, _) = error! {
                         if status == 401 {
                             self.credential.obtainToken(request: self) { (error) -> Void in
                                 self.postInternal(path: path, params: params, data: data) { (json, error) in
@@ -138,8 +138,7 @@ final class Request {
                 }
                 if httpResponse.statusCode != Request.HTTPSTATUSOK {
                     DispatchQueue.main.async {
-                        responseHandler(nil, IBMQuantumExperienceError.httpError(url: url.absoluteString,
-                                                                             status: httpResponse.statusCode, msg: msg))
+                        responseHandler(nil, IBMQuantumExperienceError.httpError(status: httpResponse.statusCode, msg: msg))
                     }
                     return
                 }
@@ -159,7 +158,7 @@ final class Request {
              responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
         self.getInternal(path: path, params: params, with_token: with_token) { (json, error) in
             if error != nil {
-                if case IBMQuantumExperienceError.httpError(_, let status, _) = error! {
+                if case IBMQuantumExperienceError.httpError(let status, _) = error! {
                     if status == 401 {
                         self.credential.obtainToken(request: self) { (error) -> Void in
                             self.getInternal(path: path, params: params, with_token: true) { (json, error) in
@@ -237,8 +236,7 @@ final class Request {
                     }
                 }
                 if httpResponse.statusCode != Request.HTTPSTATUSOK {
-                    responseHandler(nil, IBMQuantumExperienceError.httpError(url: url.absoluteString,
-                                                                             status: httpResponse.statusCode, msg: msg))
+                    responseHandler(nil, IBMQuantumExperienceError.httpError(status: httpResponse.statusCode, msg: msg))
                     return
                 }
                 responseHandler(jsonAny, nil)

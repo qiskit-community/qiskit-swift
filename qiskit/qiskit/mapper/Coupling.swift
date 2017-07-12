@@ -181,14 +181,14 @@ final class Coupling: CustomStringConvertible {
             guard let sourceVertex = self.qubits[i] else {
                 continue
             }
-            guard let lengthSource = lengths[sourceVertex] else {
+            guard let lengthSource = lengths[sourceVertex.key] else {
                 continue
             }
             for j in self.qubits.keys {
                 guard let endVertex = self.qubits[j] else {
                     continue
                 }
-                guard let lengthEnd = lengthSource[endVertex] else {
+                guard let lengthEnd = lengthSource[endVertex.key] else {
                     continue
                 }
                 self.dist[i]![j] = lengthEnd
