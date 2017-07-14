@@ -41,6 +41,7 @@ public enum QISKitException: LocalizedError, CustomStringConvertible {
     case errorLocalSimulator
     case missingJobId
     case parserError(msg: String)
+    case missingBackend(backend: String)
     case internalError(error: Error)
 
     public var errorDescription: String? {
@@ -104,6 +105,8 @@ public enum QISKitException: LocalizedError, CustomStringConvertible {
             return "Missing JobId"
         case .parserError(let msg):
             return "QASM Parser error: \(msg)"
+        case .missingBackend(let backend):
+            return "Unrecognized \(backend)"
         case .internalError(let error):
             return error.localizedDescription
         }

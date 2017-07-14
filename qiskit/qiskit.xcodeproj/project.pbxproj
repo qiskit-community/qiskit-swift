@@ -46,6 +46,11 @@
 		697D36AE1EE3493B00557541 /* OrderedDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697D36AD1EE3493B00557541 /* OrderedDictionary.swift */; };
 		697F259C1ED45BED0065B106 /* Circuit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697F259B1ED45BED0065B106 /* Circuit.swift */; };
 		697F259E1ED45DD90065B106 /* CircuitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697F259D1ED45DD90065B106 /* CircuitError.swift */; };
+		698C0DFE1F191CAA00C99536 /* LocalSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698C0DFD1F191CAA00C99536 /* LocalSimulator.swift */; };
+		698C0E001F19253C00C99536 /* Simulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698C0DFF1F19253C00C99536 /* Simulator.swift */; };
+		698C0E021F19257C00C99536 /* QasmCppSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698C0E011F19257C00C99536 /* QasmCppSimulator.swift */; };
+		698C0E041F19259800C99536 /* UnitarySimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698C0E031F19259800C99536 /* UnitarySimulator.swift */; };
+		698C0E061F1925B400C99536 /* QasmSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698C0E051F1925B400C99536 /* QasmSimulator.swift */; };
 		69BD4B871F0DE4FE001A28F9 /* Double+Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69BD4B861F0DE4FE001A28F9 /* Double+Format.swift */; };
 		69D310771ECA180500B3E752 /* QuantumProgram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D3106A1ECA180500B3E752 /* QuantumProgram.swift */; };
 		69D3107B1ECA180500B3E752 /* Gate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D3106E1ECA180500B3E752 /* Gate.swift */; };
@@ -181,6 +186,11 @@
 		697D36AD1EE3493B00557541 /* OrderedDictionary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OrderedDictionary.swift; path = datastructures/OrderedDictionary.swift; sourceTree = "<group>"; };
 		697F259B1ED45BED0065B106 /* Circuit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Circuit.swift; path = circuit/Circuit.swift; sourceTree = "<group>"; };
 		697F259D1ED45DD90065B106 /* CircuitError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CircuitError.swift; path = circuit/CircuitError.swift; sourceTree = "<group>"; };
+		698C0DFD1F191CAA00C99536 /* LocalSimulator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LocalSimulator.swift; path = simulators/LocalSimulator.swift; sourceTree = "<group>"; };
+		698C0DFF1F19253C00C99536 /* Simulator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Simulator.swift; path = simulators/Simulator.swift; sourceTree = "<group>"; };
+		698C0E011F19257C00C99536 /* QasmCppSimulator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QasmCppSimulator.swift; path = simulators/QasmCppSimulator.swift; sourceTree = "<group>"; };
+		698C0E031F19259800C99536 /* UnitarySimulator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UnitarySimulator.swift; path = simulators/UnitarySimulator.swift; sourceTree = "<group>"; };
+		698C0E051F1925B400C99536 /* QasmSimulator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QasmSimulator.swift; path = simulators/QasmSimulator.swift; sourceTree = "<group>"; };
 		69BD4B861F0DE4FE001A28F9 /* Double+Format.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Double+Format.swift"; path = "datastructures/Double+Format.swift"; sourceTree = "<group>"; };
 		69D3106A1ECA180500B3E752 /* QuantumProgram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QuantumProgram.swift; path = sdk/QuantumProgram.swift; sourceTree = "<group>"; };
 		69D3106E1ECA180500B3E752 /* Gate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Gate.swift; path = sdk/Gate.swift; sourceTree = "<group>"; };
@@ -455,6 +465,11 @@
 		69D310691ECA179D00B3E752 /* simulators */ = {
 			isa = PBXGroup;
 			children = (
+				698C0DFD1F191CAA00C99536 /* LocalSimulator.swift */,
+				698C0DFF1F19253C00C99536 /* Simulator.swift */,
+				698C0E011F19257C00C99536 /* QasmCppSimulator.swift */,
+				698C0E031F19259800C99536 /* UnitarySimulator.swift */,
+				698C0E051F1925B400C99536 /* QasmSimulator.swift */,
 			);
 			name = simulators;
 			sourceTree = "<group>";
@@ -669,6 +684,7 @@
 				690188721EE24343005B4419 /* GraphError.swift in Sources */,
 				DFBB49E41F0109B8001DE633 /* Node.swift in Sources */,
 				69E335531ECA1BD20027271D /* ClassicalRegister.swift in Sources */,
+				698C0E001F19253C00C99536 /* Simulator.swift in Sources */,
 				69D3107C1ECA180500B3E752 /* QuantumCircuit.swift in Sources */,
 				DF8E1CFB1EE503BD00DCC35C /* NodeCreg.swift in Sources */,
 				DFBB499B1EF999D5001DE633 /* NodeCustomUnitary.swift in Sources */,
@@ -689,6 +705,7 @@
 				695701351ED75C1C00C6CCAB /* GraphVertex.swift in Sources */,
 				693109431EE9964500CD2CD1 /* OneRegisterBackend.swift in Sources */,
 				69D3108F1ECA192000B3E752 /* Instruction.swift in Sources */,
+				698C0E021F19257C00C99536 /* QasmCppSimulator.swift in Sources */,
 				69D3107E1ECA180500B3E752 /* Reset.swift in Sources */,
 				69DE361F1ECD197E00EC4756 /* Y.swift in Sources */,
 				DF8E1CFD1EE503D300DCC35C /* NodeCnot.swift in Sources */,
@@ -737,12 +754,14 @@
 				69458A2C1EE5B1320027F5A6 /* CouplingVertexData.swift in Sources */,
 				DFBB49991EF98011001DE633 /* QasmException.swift in Sources */,
 				693A9F481ECA38D100112AC9 /* Qconfig.swift in Sources */,
+				698C0E061F1925B400C99536 /* QasmSimulator.swift in Sources */,
 				693A9F441ECA366000112AC9 /* CX.swift in Sources */,
 				DFBB499D1EFC1382001DE633 /* NodeGateBody.swift in Sources */,
 				69DE360B1ECD153D00EC4756 /* CY.swift in Sources */,
 				DF8E1D011EE5040300DCC35C /* NodeBarrier.swift in Sources */,
 				6931093F1EE98A6C00CD2CD1 /* RegBit.swift in Sources */,
 				69DE36111ECD18AD00EC4756 /* RX.swift in Sources */,
+				698C0DFE1F191CAA00C99536 /* LocalSimulator.swift in Sources */,
 				69DE36071ECD150300EC4756 /* CSwap.swift in Sources */,
 				69D310881ECA182000B3E752 /* Request.swift in Sources */,
 				DFBB49E61F0D714D001DE633 /* NodeGopList.swift in Sources */,
@@ -753,6 +772,7 @@
 				69D310771ECA180500B3E752 /* QuantumProgram.swift in Sources */,
 				DF8E1CDB1EE5021400DCC35C /* NodeQreg.swift in Sources */,
 				692DBE001EE6EA2C0032F6CF /* MappingError.swift in Sources */,
+				698C0E041F19259800C99536 /* UnitarySimulator.swift in Sources */,
 				69E597B11ECA99B300A321F5 /* H.swift in Sources */,
 				69F7B61D1F107CB100FDE7C4 /* CRZ.swift in Sources */,
 				69D310891ECA182000B3E752 /* IBMQuantumExperience.swift in Sources */,

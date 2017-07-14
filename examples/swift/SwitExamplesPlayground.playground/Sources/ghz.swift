@@ -68,7 +68,7 @@ public final class GHZ {
 
         // First version: not compiled
         print("no compilation, simulator")
-        qp.execute(["ghz"], device: "simulator",shots: 1024, coupling_map: nil) { (error) in
+        qp.execute(["ghz"], backend: "ibmqx_qasm_simulator",shots: 1024, coupling_map: nil) { (error) in
             do {
                 if error != nil {
                     print(error!.description)
@@ -79,7 +79,7 @@ public final class GHZ {
 
                 // Second version: compiled to qc5qv2 coupling graph
                 print("compilation to \(device), simulator")
-                qp.execute(["ghz"], device: "simulator",shots: 1024, coupling_map: coupling_map) { (error) in
+                qp.execute(["ghz"], backend: "ibmqx_qasm_simulator",shots: 1024, coupling_map: coupling_map) { (error) in
                     do {
                         if error != nil {
                             print(error!.description)
@@ -90,7 +90,7 @@ public final class GHZ {
 
                         // Third version: compiled to qc5qv2 coupling graph
                       /*  print("compilation to \(device), local qasm simulator")
-                        qp.execute(["ghz"], device: "local_qasm_simulator",shots: 1024, coupling_map: coupling_map) { (error) in
+                        qp.execute(["ghz"], backend: "ibmqx_qasm_simulator",shots: 1024, coupling_map: coupling_map) { (error) in
                             do {
                                 if error != nil {
                                     print(error!.description)
@@ -100,7 +100,7 @@ public final class GHZ {
 
                                 // Fourth version: compiled to qc5qv2 coupling graph and run on qx5q
                                 print("compilation to \(device), device")
-                                qp.execute(["ghz"], device: device,shots: 1024, timeout:120, coupling_map: coupling_map) { (error) in
+                                qp.execute(["ghz"], backend: device,shots: 1024, timeout:120, coupling_map: coupling_map) { (error) in
                                     do {
                                         if error != nil {
                                             print(error!.description)

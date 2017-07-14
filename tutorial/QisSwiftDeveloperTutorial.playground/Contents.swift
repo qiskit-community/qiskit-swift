@@ -102,7 +102,7 @@ do {
     try qp.set_api(token: apitoken, url: testurl)
     qp.add_circuit("test", circuit)
 
-    qp.execute(["test"], device: "simulator") { (error) in
+    qp.execute(["test"], backend: "ibmqx_qasm_simulator") { (error) in
         if error != nil {
             debugPrint(error!.description)
             return

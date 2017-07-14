@@ -11,6 +11,58 @@ import Foundation
 /**
  Quantum Program Class
  */
+/**
+ Elements that are not python identifiers or string constants are denoted
+ by "--description (type)--". For example, a circuit's name is denoted by
+ "--circuit name (string)--" and might have the value "teleport".
+
+ __quantum_program = {
+ "circuits": {
+     --circuit name (string)--: {
+         "circuit": --circuit object (TBD)--,
+         "execution": {  #### FILLED IN AFTER RUN -- JAY WANTS THIS MOVED DOWN ONE LAYER ####
+             --backend name (string)--: {
+                 "coupling_map": --adjacency list (dict)--,
+                 "basis_gates": --comma separated gate names (string)--,
+                 "compiled_circuit": --compiled quantum circuit (currently QASM text)--,
+                 "shots": --shots (int)--,
+                 "max_credits": --credits (int)--,
+                 "result": {
+                     "data": {  #### DATA CAN BE A DIFFERENT DICTIONARY FOR EACH BACKEND ####
+                        "counts": {’00000’: XXXX, ’00001’: XXXXX},
+                        "time"  : xx.xxxxxxxx
+                     },
+                     "date"  : "2017−05−09Txx:xx:xx.xxxZ",
+                     "status": --status (string)--
+                 }
+             },
+         }
+     }
+ }
+
+ __to_execute = {
+     --backend name (string)--: [
+         {
+             "name": --circuit name (string)--,
+             "coupling_map": --adjacency list (dict)--,
+             "basis_gates": --comma separated gate names (string)--,
+             "compiled_circuit": --compiled quantum circuit (currently QASM text)--,
+             "shots": --shots (int)--,
+             "max_credits": --credits (int)--
+             "seed": --initial seed for the simulator (int) --
+         },
+         ...
+     ]
+ }
+ */
+/**
+ # -- FUTURE IMPROVEMENTS --
+ # TODO: for status results choose ALL_CAPS, or This but be consistent
+ # TODO: coupling_map, basis_gates will move to compiled_circuit object
+ # TODO: compiled_circuit is currently QASM text. In the future we will
+ #       make a method in the QuantumCircuit object that makes an object
+ #       to be passed to the runner and this will live in compiled_circuit.
+ */
 public final class QuantumProgram {
 
     final class QCircuit {
@@ -33,8 +85,7 @@ public final class QuantumProgram {
         var url: URL? = nil
     }
 
-    private static let __ONLINE_DEVICES = Set<String>(["real", "ibmqx2", "ibmqx3", "simulator", "ibmqx_qasm_simulator"])
-    private static let __LOCAL_DEVICES = Set<String>(["local_unitary_simulator", "local_qasm_simulator"])
+    private static let __LOCAL_BACKENDS: Set<String> = ["local_unitary_simulator", "local_qasm_simulator", "local_qasm_cpp_simulator"]
 
     public let name: String
     private var config: Qconfig
@@ -44,7 +95,7 @@ public final class QuantumProgram {
     private var __quantum_registers: [String: QuantumRegister] = [:]
     private var __classical_registers: [String: ClassicalRegister] = [:]
     private var __init_circuit: QuantumCircuit? = nil
-    private var __last_device_backend: String = ""
+    private var __last_backend: String = ""
     private var __to_execute: [String:[[String:Any]]] = [:]
 
     public init(specs: [String:Any]? = nil, name: String = "") throws {
@@ -103,30 +154,139 @@ public final class QuantumProgram {
         try self.set_api(url: url)
     }
 
-    /**
-     Return the online device status via QX API call
-     device is the name of the real chip
-    */
-    public func get_device_status(_ device: String,
-                                  responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
-        if QuantumProgram.__ONLINE_DEVICES.contains(device) {
-            self.__api.device_status(device,responseHandler:responseHandler)
-            return
+    public func get_api() -> IBMQuantumExperience {
+        return self.__api
+    }
+
+
+    // TODO: we would like API to use "backend"s instead of "device"s
+    public func online_backends(responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) {
+        self.__api.available_devices() { (backends,error) in
+            if error != nil {
+                responseHandler([],error)
+                return
+            }
+            var ret: Set<String> = []
+            for backend in backends {
+                if let name = backend["name"] as? String {
+                    ret.update(with: name)
+                }
+            }
+            responseHandler(ret,nil)
         }
-        responseHandler(nil,IBMQuantumExperienceError.errorDevice(device: device))
+    }
+
+    public func available_backends(responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) {
+        self.online_backends() { (backends,error) in
+            if error != nil {
+                responseHandler([],error)
+                return
+            }
+            var ret = backends
+            ret.formUnion(QuantumProgram.__LOCAL_BACKENDS)
+            responseHandler(ret,nil)
+        }
     }
 
     /**
-     Return the online device calibrations via QX API call
-     device is the name of the real chip
-     */
-    public func get_device_calibration(_ device: String,
-                                       responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
-        if QuantumProgram.__ONLINE_DEVICES.contains(device) {
-            self.__api.device_calibration(device,responseHandler:responseHandler)
-            return
+     Return the online backend status via QX API call or by local
+     backend is the name of the local or online simulator or experiment
+    */
+    public func get_backend_status(_ backend: String,
+                                  responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
+        self.online_backends() { (backends,error) in
+            if error != nil {
+                responseHandler(nil,error)
+                return
+            }
+            if backends.contains(backend) {
+                self.__api.device_status(backend,responseHandler: responseHandler)
+                return
+            }
+            if QuantumProgram.__LOCAL_BACKENDS.contains(backend) {
+                responseHandler(["available" : true],nil)
+                return
+            }
+            responseHandler(nil,IBMQuantumExperienceError.errorDevice(device: backend))
         }
-        responseHandler(nil,IBMQuantumExperienceError.errorDevice(device: device))
+    }
+
+    /**
+     Return the configuration of the backend
+     */
+    public func get_backend_configuration(_ backend: String,
+                                   responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
+        self.__api.available_devices() { (backends,error) in
+            if error != nil {
+                responseHandler(nil,error)
+                return
+            }
+            for test_backend in backends {
+                if let name = test_backend["name"] as? String {
+                    if name == backend {
+                        responseHandler(test_backend,nil)
+                        return
+                    }
+                }
+            }
+            for test_backend in LocalSimulator.local_configuration {
+                if let name = test_backend["name"] as? String {
+                    if name == backend {
+                        responseHandler(test_backend,nil)
+                        return
+                    }
+                }
+            }
+            responseHandler(nil,IBMQuantumExperienceError.errorDevice(device: backend))
+        }
+    }
+
+    /**
+     Return the online backend calibrations via QX API call
+     backend is the name of the experiment
+     */
+    public func get_backend_calibration(_ backend: String,
+                                       responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
+        self.online_backends() { (backends,error) in
+            if error != nil {
+                responseHandler(nil,error)
+                return
+            }
+            if backends.contains(backend) {
+                // TODO: we would like API to use "backend" instead of "device"
+                self.__api.device_calibration(backend,responseHandler: responseHandler)
+                return
+            }
+            if QuantumProgram.__LOCAL_BACKENDS.contains(backend) {
+                responseHandler(["calibrations" : "NA"],nil)
+                return
+            }
+            responseHandler(nil,IBMQuantumExperienceError.errorDevice(device: backend))
+        }
+    }
+
+    /**
+     Return the online backend parameters via QX API call
+     backend is the name of the experiment
+     */
+    public func get_backend_parameters(_ backend: String,
+                                        responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
+        self.online_backends() { (backends,error) in
+            if error != nil {
+                responseHandler(nil,error)
+                return
+            }
+            if backends.contains(backend) {
+                // TODO: we would like API to use "backend" instead of "device"
+                self.__api.device_parameters(backend,responseHandler: responseHandler)
+                return
+            }
+            if QuantumProgram.__LOCAL_BACKENDS.contains(backend) {
+                responseHandler(["parameters" : "NA"],nil)
+                return
+            }
+            responseHandler(nil,IBMQuantumExperienceError.errorDevice(device: backend))
+        }
     }
 
     /**
@@ -264,6 +424,13 @@ public final class QuantumProgram {
     }
 
     /**
+     Return all circuit names
+     */
+    public func get_circuit_names() -> [String] {
+        return Array<String>(self.__quantum_program.circuits.keys)
+    }
+
+    /**
      Return the basic elements, Circuit, Quantum Registers, Classical Registers    
      */
     public func get_quantum_elements(_ specs:[String: Any] = [:]) -> (QuantumCircuit?,QuantumRegister?,ClassicalRegister?) {
@@ -282,11 +449,12 @@ public final class QuantumProgram {
      Load qasm file
      qasm_file qasm file name
      */
+    /*
     func load_qasm(name: String = "", qasm_file: String? = nil, basis: String? = nil) throws {
-   /*     guard let file = qasm_file else {
+        guard let file = qasm_file else {
             throw QISKitException.missingFileName
         }
-         var basis_gates: String = "u1,u2,u3,cx,id"  // QE target basis
+        var basis_gates: String = "u1,u2,u3,cx,id"  // QE target basis
         if let b = basis {
             basis_gates = b
         }
@@ -294,11 +462,12 @@ public final class QuantumProgram {
         if n == "" {
             n = file
         }
-        let circuit_object = try Qasm(filename:file).parse() // Node (AST)*/
+        let circuit_object = try Qasm(filename:file).parse() // Node (AST)
 
         //TODO: add method to convert to QuantumCircuit object from Node
         //self.__quantum_program.circuits[n] = QCircuit(n, circuit_object)
     }
+    */
 
     /**
      Populate the Quantum Program Object with initial Specs
@@ -443,7 +612,7 @@ public final class QuantumProgram {
      }
      */
     public func compile(_ name_of_circuits: [String],
-                 device: String = "local_qasm_simulator",
+                 backend: String = "local_qasm_simulator",
                  shots: Int = 1024,
                  max_credits: Int = 3,
                  basis_gates: String? = nil,
@@ -480,7 +649,7 @@ public final class QuantumProgram {
             }
             // TODO: add timestamp, compilation
             var jobs: [[String:Any]] = []
-            if let arr = self.__to_execute[device] {
+            if let arr = self.__to_execute[backend] {
                 jobs = arr
             }
             var job: [String:Any] = [:]
@@ -502,7 +671,7 @@ public final class QuantumProgram {
                 job["seed"] = seed! 
             }
             jobs.append(job)
-            self.__to_execute[device] = jobs
+            self.__to_execute[backend] = jobs
         }
     }
 
@@ -510,9 +679,9 @@ public final class QuantumProgram {
      Get the compiled qasm for the named circuit and device.
      If device is None, it defaults to the last device.
     */
-    public func get_compiled_qasm(_ name: String, _ device: String? = nil) throws -> Any {
-        var dev = self.__last_device_backend
-        if let d = device {
+    public func get_compiled_qasm(_ name: String, _ backend: String? = nil) throws -> Any {
+        var dev = self.__last_backend
+        if let d = backend {
             dev = d
         }
         guard let qCircuit = self.__quantum_program.circuits[name] else {
@@ -566,32 +735,40 @@ public final class QuantumProgram {
      wait time is how long to check if the job is completed
      timeout is time until the execution stopa
      */
-    public func run(_ wait: Int = 5, _ timeout: Int = 60,
+    public func run(_ wait: Int = 5, _ timeout: Int = 60, _ silent: Bool = false,
                     _ responseHandler: @escaping ((_:QISKitException?) -> Void)) {
-        if let (backend,toExecute) = self.__to_execute.first {
-            self.run(backend,toExecute,wait,timeout) { (result, error) -> Void in
-                if error != nil {
-                    // Clear the list of compiled programs to execute
-                    self.__to_execute = [:]
-                    responseHandler(error)
-                    return
-                }
-                self.__to_execute.removeValue(forKey: backend)
-                self.run(wait,timeout,responseHandler)
+        self.online_backends() { (onlineBackends,error) in
+            if error != nil {
+                responseHandler(QISKitException.internalError(error:error!))
+                return
             }
-            return
+            if let (backend,toExecute) = self.__to_execute.first {
+                self.run(backend,onlineBackends,toExecute,wait,timeout,silent) { (result, error) -> Void in
+                    if error != nil {
+                        // Clear the list of compiled programs to execute
+                        self.__to_execute = [:]
+                        responseHandler(error)
+                        return
+                    }
+                    self.__to_execute.removeValue(forKey: backend)
+                    self.run(wait,timeout,silent,responseHandler)
+                }
+                return
+            }
+            responseHandler(nil)
         }
-        responseHandler(nil)
     }
 
     private func run(_ backend: String,
+                     _ onlineBackends: Set<String>,
                      _ toExecute: [[String:Any]],
                      _ wait: Int,
                      _ timeout: Int,
+                     _ silent: Bool,
                      _ responseHandler: @escaping ((_:[String:Any]?, _:QISKitException?) -> Void)) {
 
-        self.__last_device_backend = backend
-        if QuantumProgram.__ONLINE_DEVICES.contains(backend) {
+        self.__last_backend = backend
+        if onlineBackends.contains(backend) {
             var last_shots = -1
             var last_max_credits = -1
             var jobs: [[String:Any]] = []
@@ -669,30 +846,25 @@ public final class QuantumProgram {
                     jobs.append(["seed": seed ])
                 }
             }
-
-            // TODO have an option to print this.
-            //print("running on backend: \(backend)")
-            var job_result: [ String: [[String:Any]] ] = [:]
-            if backend == "local_qasm_simulator" {
-                job_result = QuantumProgram.run_local_qasm_simulator(jobs)
+            if !silent {
+                print("running on backend: \(backend)")
             }
-            else {
-                if backend == "local_unitary_simulator" {
-                    job_result = QuantumProgram.run_local_unitary_simulator(jobs)
+            do {
+                var job_result: [ String: [[String:Any]] ] = [:]
+                if QuantumProgram.__LOCAL_BACKENDS.contains(backend) {
+                    job_result = try QuantumProgram.run_local_simulator(backend,jobs)
                 }
                 else {
                     responseHandler(nil,QISKitException.errorLocalSimulator)
                     return
                 }
-            }
-            do {
                 try self.postRun(backend,toExecute, job_result)
+                responseHandler(job_result,nil)
             }
             catch {
                 responseHandler(nil,error as? QISKitException)
                 return
             }
-            responseHandler(job_result,nil)
         }
     }
 
@@ -778,61 +950,31 @@ public final class QuantumProgram {
     }
 
     /**
-     run_local_qasm_simulator, run a program (precompile of quantum circuits).
-     jobs is list of dicts {"compiled_circuit": simulator input data, "shots": integer num shots}
-     returns
-     job_results = {
-         "qasms": [
-             {
-                "result": DATA,
-                "status": DATA,
-             },
-            ...
-         ]
-     }
-     */
-    private class func run_local_qasm_simulator(_ jobs: [[String:Any]]) -> [ String: [[String:Any]] ] {
-        preconditionFailure("run_local_qasm_simulator not implemented")
-        /*var job_results:  [ String: [[String:Any]] ] = ["qasms": []]
-        for _ in jobs {
-            var one_result: [String:Any] = ["status": "Error" ]
-            let qasm_circuit: [String:Any] = [:] //QasmSimulator(job["compiled_circuit"], job["shots"], job["seed"]).run()
-            var result: [String:Any] = [:]
-            result["data"] = qasm_circuit["data"]!
-            one_result["result"] = result 
-            one_result["status"] = qasm_circuit["status"]!
-            job_results["qasms"]!.append(one_result)
-        }
-        return job_results*/
-    }
+     Run a program of compiled quantum circuits on the local machine.
 
-    /**
-     run_local_unitary_simulator, run a program (precompile of quantum circuits).
-     jobs is list of dicts {"compiled_circuit": simulator input data}
-     returns
-     job_results = {
-         "qasms": [
-             {
-                "result": DATA,
-                "status": DATA,
-             },
-             ...
+     Args:
+         backend (str): the name of the local simulator to run
+         jobs: list of dicts {"compiled_circuit": simulator input data, "shots": integer num shots}
+
+         Returns:
+         Dictionary of form,
+         job_results = [
+             "qasms": [
+                 [
+                    "result": DATA,
+                    "status": DATA,
+                 ],
+                 ...
+             ]
          ]
-     }
      */
-    private class func run_local_unitary_simulator(_ jobs: [[String:Any]]) -> [ String: [[String:Any]] ] {
-        preconditionFailure("run_local_unitary_simulator not implemented")
-       /* var job_results: [ String: [[String:Any]] ] = ["qasms": []]
-        for _ in jobs {
-            var one_result: [String:Any] = ["status": "Error" ]
-            let unitary_circuit: [String:Any] = [:] //UnitarySimulator(job["compiled_circuit"]).run()
-            var result: [String:Any] = [:]
-            result["data"] = unitary_circuit["data"]!
-            one_result["result"] = result 
-            one_result["status"] = unitary_circuit["status"]!
-            job_results["qasms"]!.append(one_result)
+    private class func run_local_simulator(_ backend: String, _ jobs: [[String:Any]]) throws -> [String: [[String:Any]] ] {
+        var job_results: [[String:Any]] = []
+        for job in jobs {
+            let local_simulator = LocalSimulator(backend, job)
+            job_results.append(try local_simulator.run())
         }
-        return job_results*/
+        return ["qasms" : job_results ]
     }
 
     /**
@@ -845,24 +987,25 @@ public final class QuantumProgram {
      basis_gates are the base gates, which by default are: u1,u2,u3,cx,id
      */
     public func execute(_ name_of_circuits: [String],
-                        device: String = "local_qasm_simulator",
+                        backend: String = "local_qasm_simulator",
                         shots: Int = 1024,
                         max_credits: Int = 3,
                         wait: Int = 5,
                         timeout: Int = 60,
+                        silent: Bool = false,
                         basis_gates: String? = nil,
                         coupling_map: [Int:[Int]]? = nil,
                         seed: Double? = nil,
                         _ responseHandler: @escaping ((_:QISKitException?) -> Void)) {
         do {
             try self.compile(name_of_circuits,
-                             device: device,
+                             backend: backend,
                              shots: shots,
                              max_credits: max_credits,
                              basis_gates: basis_gates,
                              coupling_map: coupling_map,
                              seed: seed)
-            self.run(wait, timeout,responseHandler)
+            self.run(wait,timeout,silent,responseHandler)
         } catch {
             if let err = error as? QISKitException {
                 responseHandler(err)
@@ -872,12 +1015,11 @@ public final class QuantumProgram {
     }
 
     /**
-     Get the dict of labels and counts from the output of get_job.
-     name is the name or index of one circuit."""
+     Method to process the data
      */
-    public func get_counts(_ name: String , device: String? = nil) throws -> [String:Int] {
-        var dev: String = self.__last_device_backend
-        if let d = device {
+    public func get_result(_ name: String , backend: String? = nil) throws -> [String:Any] {
+        var dev: String = self.__last_backend
+        if let d = backend {
             dev = d
         }
         guard let qCircuit = self.__quantum_program.circuits[name] else {
@@ -889,12 +1031,55 @@ public final class QuantumProgram {
         guard let result = deviceMap["result"] as? [String:Any] else {
             throw QISKitException.missingCircuit
         }
+        return result
+    }
+
+    /**
+     Get the dict of labels and counts from the output of get_job.
+     results are the list of results
+     name is the name or index of one circuit
+     */
+    public func get_data(_ name: String , backend: String? = nil) throws -> [String:Any] {
+        let result = try self.get_result(name,backend: backend)
         guard let data = result["data"] as? [String:Any] else {
             throw QISKitException.missingCircuit
         }
+        return data
+    }
+
+    /**
+     Get the dict of labels and counts from the output of get_job.
+     name is the name or index of one circuit.
+     */
+    public func get_counts(_ name: String , backend: String? = nil) throws -> [String:Int] {
+        let data = try self.get_data(name,backend: backend)
         guard let counts = data["counts"] as? [String:Int] else {
             throw QISKitException.missingCircuit
         }
         return counts
+    }
+
+    /**
+     Compute the mean value of an diagonal observable.
+
+     Takes in an observable in dictionary format and then
+     calculates the sum_i value(i) P(i) where value(i) is the value of
+     the observable for state i.
+
+     returns a double
+     */
+    public func average_data(_ name: String, _ observable: [String:Double]) throws -> Double {
+        let counts = try self.get_counts(name)
+        var tot: Double = 0
+        for (_,count) in counts {
+            tot += Double(count)
+        }
+        var temp: Double = 0.0
+        for (key,count) in counts {
+            if let value = observable[key] {
+                temp += Double(count) * value / tot
+            }
+        }
+        return temp
     }
 }

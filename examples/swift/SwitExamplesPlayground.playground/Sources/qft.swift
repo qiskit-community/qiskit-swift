@@ -123,7 +123,7 @@ public final class QFT {
         //##############################################################
         try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
 
-        qp.execute(["qft3", "qft4", "qft5"], device:"simulator",shots: 1024, coupling_map: coupling_map) { (error) in
+        qp.execute(["qft3", "qft4", "qft5"], backend:"ibmqx_qasm_simulator",shots: 1024, coupling_map: coupling_map) { (error) in
             do {
                 if error != nil {
                     print(error!.description)
@@ -136,7 +136,7 @@ public final class QFT {
                 print(try qp.get_counts("qft4"))
                 print(try qp.get_counts("qft5"))
 
-                qp.execute(["qft3"], device:device,shots: 1024, timeout:120, coupling_map: coupling_map) { (error) in
+                qp.execute(["qft3"], backend:device,shots: 1024, timeout:120, coupling_map: coupling_map) { (error) in
                     do {
                         if error != nil {
                             print(error!.description)

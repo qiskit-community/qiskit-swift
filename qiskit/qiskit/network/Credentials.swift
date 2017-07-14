@@ -10,13 +10,22 @@ import Foundation
 
 final class Credentials {
 
-    private let token_unique: String
+    /**
+     Configuration setted to connect with QX Platform
+     */
     let config: Qconfig
+    private let token_unique: String
     private(set) var data_credentials: [String:Any] = [:]
 
+    /**
+     Get Authenticated Token to connect with QX Platform
+     */
     var token: String? {
         return self.data_credentials["id"] as? String
     }
+    /**
+     Get User Id in QX Platform
+     */
     var userId: String? {
         return self.data_credentials["userId"] as? String
     }

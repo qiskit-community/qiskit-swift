@@ -579,19 +579,19 @@ public final class IBMQuantumExperience {
     /**
      Get the devices availables to use in the QX Platform
      */
-    public func available_devices(responseHandler: @escaping ((_:[[String:Any]]?, _:IBMQuantumExperienceError?) -> Void)) {
+    public func available_devices(responseHandler: @escaping ((_:[[String:Any]], _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
-                responseHandler(nil, error)
+                responseHandler([], error)
                 return
             }
             self.req.get(path: "Backends") { (out, error) -> Void in
                 if error != nil {
-                    responseHandler(nil, error)
+                    responseHandler([], error)
                     return
                 }
                 guard let devices = out as? [[String:Any]] else {
-                    responseHandler(nil,IBMQuantumExperienceError.missingDevices)
+                    responseHandler([],IBMQuantumExperienceError.missingDevices)
                     return
                 }
                 var ret: [[String:Any]] = []

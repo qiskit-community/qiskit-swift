@@ -37,25 +37,42 @@ final class Request {
         self.urlSession = URLSession(configuration: sessionConfig)
     }
 
+    private func check_token(_ error: IBMQuantumExperienceError?,
+                             responseHandler: @escaping ((_:Bool, _:IBMQuantumExperienceError?) -> Void)) {
+        if error != nil {
+            if case IBMQuantumExperienceError.httpError(let status, _) = error! {
+                if status == 401 {
+                    self.credential.obtainToken(request: self) { (error) -> Void in
+                        responseHandler(true,error)
+                    }
+                    return
+                }
+            }
+        }
+        responseHandler(false,error)
+    }
+
     func post(path: String, params: String = "", data: [String : Any] = [:],
               responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
         self.postInternal(path: path, params: params, data: data) { (json, error) in
-            if error != nil {
-                if case IBMQuantumExperienceError.httpError(let status, _) = error! {
-                        if status == 401 {
-                            self.credential.obtainToken(request: self) { (error) -> Void in
-                                self.postInternal(path: path, params: params, data: data) { (json, error) in
-                                    DispatchQueue.main.async {
-                                        responseHandler(json, error)
-                                    }
-                                }
-                            }
-                            return
-                        }
+            self.check_token(error) { (retry, error) in
+                if error != nil {
+                    DispatchQueue.main.async {
+                        responseHandler(nil, error)
+                    }
+                    return
                 }
-            }
-            DispatchQueue.main.async {
-                responseHandler(json, error)
+                if !retry {
+                    DispatchQueue.main.async {
+                        responseHandler(json, error)
+                    }
+                    return
+                }
+                self.postInternal(path: path, params: params, data: data) { (json, error) in
+                    DispatchQueue.main.async {
+                        responseHandler(json, error)
+                    }
+                }
             }
         }
     }
@@ -157,27 +174,29 @@ final class Request {
     func get(path: String, params: String = "", with_token: Bool = true,
              responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
         self.getInternal(path: path, params: params, with_token: with_token) { (json, error) in
-            if error != nil {
-                if case IBMQuantumExperienceError.httpError(let status, _) = error! {
-                    if status == 401 {
-                        self.credential.obtainToken(request: self) { (error) -> Void in
-                            self.getInternal(path: path, params: params, with_token: true) { (json, error) in
-                                DispatchQueue.main.async {
-                                    responseHandler(json, error)
-                                }
-                            }
-                        }
-                        return
+            self.check_token(error) { (retry, error) in
+                if error != nil {
+                    DispatchQueue.main.async {
+                        responseHandler(nil, error)
+                    }
+                    return
+                }
+                if !retry {
+                    DispatchQueue.main.async {
+                        responseHandler(json, error)
+                    }
+                    return
+                }
+                self.getInternal(path: path, params: params, with_token: with_token) { (json, error) in
+                    DispatchQueue.main.async {
+                        responseHandler(json, error)
                     }
                 }
-            }
-            DispatchQueue.main.async {
-                responseHandler(json, error)
             }
         }
     }
 
-    private func getInternal(path: String, params: String = "", with_token: Bool = true,
+    private func getInternal(path: String, params: String = "", with_token: Bool,
                              responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
         var access_token = ""
         if with_token {
