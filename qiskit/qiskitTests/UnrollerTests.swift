@@ -125,7 +125,7 @@ class UnrollerTests: XCTestCase {
         let QASM_source = try qp.get_qasm("rippleadd")
         print(QASM_source)
 
-        try qp.compile(["rippleadd"], device: UnrollerTests.device, shots: 1024, coupling_map: UnrollerTests.coupling_map)
+        try qp.compile(["rippleadd"], backend: UnrollerTests.device, shots: 1024, coupling_map: UnrollerTests.coupling_map)
         qp.print_execution_list(true)
         /*let asyncExpectation = self.expectation(description: "runJob")
         qp.run() { (result,error) in

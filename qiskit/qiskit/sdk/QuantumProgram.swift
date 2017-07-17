@@ -802,8 +802,9 @@ public final class QuantumProgram {
                     }
                 }
             }
-            // TODO have an option to print this.
-            //print("running on backend: \(backend)")
+            if !silent {
+                print("running on backend: \(backend)")
+            }
             self.__api.run_job(qasms: jobs, device: backend, shots: last_shots, maxCredits: last_max_credits) { (json, error) -> Void in
                 if error != nil {
                     responseHandler(nil,QISKitException.internalError(error: error!))
@@ -834,22 +835,33 @@ public final class QuantumProgram {
             }
         }
         else {
-            var jobs: [[String:Any]] = []
-            for job in toExecute {
-                if let compiled_circuit = job["compiled_circuit"] as? String {
-                    jobs.append(["compiled_circuit": compiled_circuit ])
-                }
-                if let shots = job["shots"] as? Int {
-                    jobs.append(["shots": shots ])
-                }
-                if let seed = job["seed"] as? Int {
-                    jobs.append(["seed": seed ])
-                }
-            }
-            if !silent {
-                print("running on backend: \(backend)")
-            }
             do {
+                var jobs: [[String:Any]] = []
+                for job in toExecute {
+                    // this will get pushed into the compiler when online supports json
+                    guard let compiled_circuit = job["compiled_circuit"] as? String else {
+                        continue
+                    }
+                    let basis_gates: [String] = []  // unroll to base gates
+                    let unroller = Unroller(try Qasm(data: compiled_circuit).parse(),JsonBackend(basis_gates))
+                    try unroller.execute()
+                    let json_circuit = (unroller.backend as! JsonBackend).circuit
+                    // converts qasm circuit to json circuit
+                    var job: [String:Any] = [:]
+                    job["compiled_circuit"] = json_circuit
+                    if let shots = job["shots"] as? Int {
+                        job["shots"] = shots
+                    }
+                    if let seed = job["seed"] as? Int {
+                        job["seed"] = seed
+                    }
+                    jobs.append(job)
+
+                }
+                if !silent {
+                    print("running on backend: \(backend)")
+                }
+
                 var job_result: [ String: [[String:Any]] ] = [:]
                 if QuantumProgram.__LOCAL_BACKENDS.contains(backend) {
                     job_result = try QuantumProgram.run_local_simulator(backend,jobs)
@@ -910,12 +922,12 @@ public final class QuantumProgram {
      timeout is how long we wait before failing, in seconds
      Returns an list of results that correspond to the jobids
     */
-    public func wait_for_job(jobId: String, wait: Int = 5, timeout: Int = 60,
+    public func wait_for_job(jobId: String, wait: Int = 5, timeout: Int = 60,_ silent: Bool = false,
                              _ responseHandler: @escaping ((_:[String:Any]?, _:QISKitException?) -> Void)) {
-        self.wait_for_job(jobId, wait, timeout, 0, responseHandler)
+        self.wait_for_job(jobId, wait, timeout, silent, 0, responseHandler)
     }
 
-    private func wait_for_job(_ jobid: String, _ wait: Int, _ timeout: Int, _ elapsed: Int,
+    private func wait_for_job(_ jobid: String, _ wait: Int, _ timeout: Int, _ silent: Bool, _ elapsed: Int,
                             _ responseHandler: @escaping ((_:[String:Any]?, _:QISKitException?) -> Void)) {
         self.__api.get_job(jobId: jobid) { (result, error) -> Void in
             if error != nil {
@@ -930,7 +942,9 @@ public final class QuantumProgram {
                 responseHandler(nil, QISKitException.missingStatus)
                 return
             }
-            //print("status = \(status) (\(elapsed) seconds)")
+            if !silent {
+                print("status = \(status) (\(elapsed) seconds)")
+            }
             if status != "RUNNING" {
                 if status == "ERROR_CREATING_JOB" || status == "ERROR_RUNNING_JOB" {
                     responseHandler(nil, QISKitException.errorStatus(status: status))
@@ -944,7 +958,7 @@ public final class QuantumProgram {
                 return
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(wait)) {
-                self.wait_for_job(jobid, wait, timeout, elapsed + wait, responseHandler)
+                self.wait_for_job(jobid, wait, timeout, silent, elapsed + wait, responseHandler)
             }
         }
     }
