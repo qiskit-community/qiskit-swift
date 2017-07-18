@@ -13,9 +13,9 @@ import Foundation
  */
 public final class IBMQuantumExperience {
 
-    private static let __names_device_ibmqxv2 = Set<String>(["ibmqx5qv2", "ibmqx2", "qx5qv2", "qx5q", "real"])
-    private static let __names_device_ibmqxv3 = Set<String>(["ibmqx3"])
-    private static let __names_device_simulator = Set<String>(["simulator", "sim_trivial_2", "ibmqx_qasm_simulator"])
+    private static let __names_backend_ibmqxv2 = Set<String>(["ibmqx5qv2", "ibmqx2", "qx5qv2", "qx5q", "real"])
+    private static let __names_backend_ibmqxv3 = Set<String>(["ibmqx3"])
+    private static let __names_backend_simulator = Set<String>(["simulator", "sim_trivial_2", "ibmqx_qasm_simulator"])
 
     let req: Request
 
@@ -25,8 +25,8 @@ public final class IBMQuantumExperience {
      - parameter token: API token
      - parameter config: Qconfig object
      */
-    public init(_ token: String, _ config: Qconfig? = nil) throws {
-        self.req = try Request(token,config)
+    public init(_ token: String, _ config: Qconfig? = nil, verify: Bool = true) throws {
+        self.req = try Request(token,config,verify)
     }
 
     init() throws {
@@ -34,55 +34,85 @@ public final class IBMQuantumExperience {
     }
 
     /**
-     Check if the name of a device is valid to run in QX Platform
+     Check if the name of a backend is valid to run in QX Platform
      */
-    private func _check_device(_ dev: String, _ endpoint: String) -> String? {
-        let device = dev.lowercased()
+    private func _check_backend(_ back: String,
+                                _ endpoint: String,
+                                _ responseHandler: @escaping ((_:String?, _:IBMQuantumExperienceError?) -> Void)) {
+        // First check against hacks for old backend names
+        let original_backend = back
+        let backend = back.lowercased()
+         var ret: String? = nil
         if endpoint == "experiment" {
-            if IBMQuantumExperience.__names_device_ibmqxv2.contains(device) {
-                return "real"
+            if IBMQuantumExperience.__names_backend_ibmqxv2.contains(backend) {
+                ret = "real"
             }
-            if IBMQuantumExperience.__names_device_ibmqxv3.contains(device) {
-                return "ibmqx3"
+            else if IBMQuantumExperience.__names_backend_ibmqxv3.contains(backend) {
+                ret = "ibmqx3"
             }
-            if IBMQuantumExperience.__names_device_simulator.contains(device) {
-                return "sim_trivial_2"
-            }
-            return nil
-        }
-        if endpoint == "job" {
-            if IBMQuantumExperience.__names_device_ibmqxv2.contains(device) {
-                return "real"
-            }
-            if IBMQuantumExperience.__names_device_ibmqxv3.contains(device) {
-                return "ibmqx3"
-            }
-            if IBMQuantumExperience.__names_device_simulator.contains(device) {
-                return "simulator"
-            }
-            return nil
-        }
-        if endpoint == "status" {
-            if IBMQuantumExperience.__names_device_ibmqxv2.contains(device) {
-                return "chip_real"
-            }
-            if IBMQuantumExperience.__names_device_ibmqxv3.contains(device) {
-                return "ibmqx3"
-            }
-            if IBMQuantumExperience.__names_device_simulator.contains(device) {
-                return "chip_simulator"
-            }
-            return nil
-        }
-        if endpoint == "calibration" {
-            if IBMQuantumExperience.__names_device_ibmqxv2.contains(device) {
-                return "Real5Qv2"
-            }
-            if IBMQuantumExperience.__names_device_ibmqxv3.contains(device) {
-                return "ibmqx3"
+            else if IBMQuantumExperience.__names_backend_simulator.contains(backend) {
+                ret = "sim_trivial_2"
             }
         }
-        return nil
+        else if endpoint == "job" {
+            if IBMQuantumExperience.__names_backend_ibmqxv2.contains(backend) {
+                ret = "ibmqx2"
+            }
+            else if IBMQuantumExperience.__names_backend_ibmqxv3.contains(backend) {
+                ret = "ibmqx3"
+            }
+            else if IBMQuantumExperience.__names_backend_simulator.contains(backend) {
+                ret = "simulator"
+            }
+        }
+        else if endpoint == "status" {
+            if IBMQuantumExperience.__names_backend_ibmqxv2.contains(backend) {
+                ret = "chip_real"
+            }
+            else if IBMQuantumExperience.__names_backend_ibmqxv3.contains(backend) {
+                ret = "ibmqx3"
+            }
+            else if IBMQuantumExperience.__names_backend_simulator.contains(backend) {
+                ret = "chip_simulator"
+            }
+        }
+        else if endpoint == "calibration" {
+            if IBMQuantumExperience.__names_backend_ibmqxv2.contains(backend) {
+                ret = "ibmqx2"
+            }
+            else if IBMQuantumExperience.__names_backend_ibmqxv3.contains(backend) {
+                ret = "ibmqx3"
+            }
+        }
+        if ret != nil {
+            responseHandler(ret,nil)
+            return
+        }
+        // Check for new-style backends
+        self.available_backends() { (backends,error) -> Void in
+            if error != nil {
+                responseHandler(nil,error)
+                return
+            }
+            for backend in backends {
+                guard let name = backend["name"] as? String else {
+                    continue
+                }
+                if name != original_backend {
+                    continue
+                }
+                if let simulator = backend["simulator"] as? Bool {
+                    if simulator {
+                        responseHandler("chip_simulator",nil)
+                        return
+                    }
+                }
+                responseHandler(original_backend,nil)
+                return
+            }
+            // backend unrecognized
+            responseHandler(nil,nil)
+        }
     }
 
     private func checkCredentials(request: Request, responseHandler: @escaping ((_:IBMQuantumExperienceError?) -> Void)) {
@@ -175,6 +205,9 @@ public final class IBMQuantumExperience {
                             result["extraInfo"] = additionalData
                         }
                     }
+                }
+                if let calibration = execution["calibration"] as? [String:Any] {
+                    result["calibration"] = calibration
                 }
                 responseHandler(result, error)
             }
@@ -270,7 +303,7 @@ public final class IBMQuantumExperience {
      Runs an experiment. Asynchronous.
      */
     public func run_experiment(qasm: String,
-                               device: String = "simulator",
+                               backend: String = "simulator",
                                shots: Int = 1,
                                name: String? = nil,
                                seed: Double? = nil,
@@ -281,52 +314,57 @@ public final class IBMQuantumExperience {
                 responseHandler(nil, error)
                 return
             }
-            var data: [String : Any] = [:]
-            var q: String = qasm.replacingOccurrences(of: "IBMQASM 2.0;", with: "")
-            q = q.replacingOccurrences(of: "OPENQASM 2.0;", with: "")
-            data["qasm"] = q 
-            data["codeType"] = "QASM2" 
-            if let n = name {
-                data["name"] = n 
-            } else {
-                let date = Date()
-                let calendar = Calendar.current
-                let c = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
-                data["name"] = "Experiment #\(c.year!)\(c.month!)\(c.day!)\(c.hour!)\(c.minute!)\(c.second!))"
-                    
-            }
-            guard let device_type = self._check_device(device, "experiment") else {
-                responseHandler(nil,IBMQuantumExperienceError.missingDevice(device: device))
-                return
-            }
-            if !IBMQuantumExperience.__names_device_simulator.contains(device) && seed != nil {
-                responseHandler(nil,IBMQuantumExperienceError.errorSeed(device: device))
-                return
-            }
-            if seed != nil {
-                if String(seed!).characters.count >= 11 {
-                    responseHandler(nil,IBMQuantumExperienceError.errorSeedLength)
+            self._check_backend(backend, "experiment") { (backend_type,error) -> Void in
+                if error != nil {
+                    responseHandler(nil, error)
                     return
                 }
-                self.req.post(path: "codes/execute",
-                              params: "&shots=\(shots)&seed=\(seed!)&deviceRunType=\(device_type)",
-                data: data) { (out, error) -> Void in
-                    guard let execution = out as? [String:Any] else {
-                        responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
-                        return
-                    }
-                    self.post_run_experiment(execution,error,timeout,responseHandler)
+                if backend_type == nil {
+                    responseHandler(nil,IBMQuantumExperienceError.missingBackend(backend: backend))
+                    return
                 }
-            }
-            else {
-                self.req.post(path: "codes/execute",
-                              params: "&shots=\(shots)&deviceRunType=\(device_type)",
-                data: data) { (out, error) -> Void in
-                    guard let execution = out as? [String:Any] else {
-                        responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                if !IBMQuantumExperience.__names_backend_simulator.contains(backend) && seed != nil {
+                    responseHandler(nil,IBMQuantumExperienceError.errorSeed(backend: backend))
+                    return
+                }
+                var data: [String : Any] = [:]
+                if let n = name {
+                    data["name"] = n
+                } else {
+                    let date = Date()
+                    let calendar = Calendar.current
+                    let c = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
+                    data["name"] = "Experiment #\(c.year!)\(c.month!)\(c.day!)\(c.hour!)\(c.minute!)\(c.second!))"
+
+                }
+                data["qasm"] = qasm.replacingOccurrences(of: "IBMQASM 2.0;", with: "").replacingOccurrences(of: "OPENQASM 2.0;", with: "")
+                data["codeType"] = "QASM2"
+
+                if seed != nil {
+                    if String(seed!).characters.count >= 11 {
+                        responseHandler(nil,IBMQuantumExperienceError.errorSeedLength)
                         return
                     }
-                    self.post_run_experiment(execution,error,timeout,responseHandler)
+                    self.req.post(path: "codes/execute",
+                                  params: "&shots=\(shots)&seed=\(seed!)&deviceRunType=\(backend_type!)",
+                    data: data) { (out, error) -> Void in
+                        guard let execution = out as? [String:Any] else {
+                            responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                            return
+                        }
+                        self.post_run_experiment(execution,error,timeout,responseHandler)
+                    }
+                }
+                else {
+                    self.req.post(path: "codes/execute",
+                                  params: "&shots=\(shots)&deviceRunType=\(backend_type!)",
+                    data: data) { (out, error) -> Void in
+                        guard let execution = out as? [String:Any] else {
+                            responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                            return
+                        }
+                        self.post_run_experiment(execution,error,timeout,responseHandler)
+                    }
                 }
             }
         }
@@ -358,6 +396,9 @@ public final class IBMQuantumExperience {
         respond["status"] = status
         respond["idExecution"] = id_execution
         respond["idCode"] = execution["codeId"]
+        if let infoQueue = execution["infoQueue"] as? [String:Any] {
+            respond["infoQueue"] = infoQueue
+        }
 
         if status == "DONE" {
             if let executionResult = execution["result"] as? [String:Any] {
@@ -372,15 +413,18 @@ public final class IBMQuantumExperience {
                         result["bloch"] = valsxyz
                     }
                     respond["result"] = result
+                    respond.removeValue(forKey: "infoQueue")
                 }
             }
             responseHandler(respond, nil)
             return
         }
         if status == "ERROR" {
+            respond.removeValue(forKey: "infoQueue")
             responseHandler(respond, nil)
             return
         }
+        //print("Waiting for results...")
         self.getCompleteResultFromExecution(id_execution, ((timeout > 300) ? 300 : timeout)) { (out, error) in
             if error != nil {
                 responseHandler(nil, error)
@@ -389,6 +433,10 @@ public final class IBMQuantumExperience {
             if let result = out {
                 respond["status"] = "DONE"
                 respond["result"] = result
+                if let calibration = result["calibration"] {
+                    respond["calibration"] = calibration
+                }
+                respond.removeValue(forKey: "infoQueue")
             }
             responseHandler(respond, error)
         }
@@ -421,7 +469,7 @@ public final class IBMQuantumExperience {
      Runs a job. Asynchronous.
      */
     public func run_job(qasms: [[String:Any]],
-                        device: String = "simulator",
+                        backend: String = "simulator",
                         shots: Int = 1,
                         maxCredits: Int = 3,
                         seed: Double? = nil,
@@ -432,6 +480,7 @@ public final class IBMQuantumExperience {
                 responseHandler(nil, error)
                 return
             }
+
             var data: [String : Any] = [:]
             var qasmArray: [[String:Any]] = []
             for var dict in qasms {
@@ -445,36 +494,44 @@ public final class IBMQuantumExperience {
             data["shots"] = shots 
             data["maxCredits"] = maxCredits
 
-            guard let device_type = self._check_device(device, "job") else {
-                responseHandler(nil,IBMQuantumExperienceError.missingDevice(device: device))
-                return
-            }
-            if !IBMQuantumExperience.__names_device_simulator.contains(device) && seed != nil {
-                responseHandler(nil,IBMQuantumExperienceError.errorSeed(device: device))
-                return
-            }
-            if seed != nil {
-                if String(seed!).characters.count >= 11 {
-                    responseHandler(nil,IBMQuantumExperienceError.errorSeedLength)
-                    return
-                }
-                data["seed"] = seed!
-            }
-            var backendDict: [String:String] = [:]
-            backendDict["name"] = device_type
-            data["backend"] = backendDict
-
-            self.req.post(path: "Jobs", data: data) { (out, error) -> Void in
+            self._check_backend(backend, "job") { (backend_type,error) -> Void in
                 if error != nil {
                     responseHandler(nil, error)
                     return
                 }
-                guard let json = out as? [String:Any] else {
-                    responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                if backend_type == nil {
+                    responseHandler(nil,IBMQuantumExperienceError.missingBackend(backend: backend))
                     return
                 }
-                responseHandler(json, error)
+                if !IBMQuantumExperience.__names_backend_simulator.contains(backend) && seed != nil {
+                    responseHandler(nil,IBMQuantumExperienceError.errorSeed(backend: backend))
+                    return
+                }
+                if seed != nil {
+                    if String(seed!).characters.count >= 11 {
+                        responseHandler(nil,IBMQuantumExperienceError.errorSeedLength)
+                        return
+                    }
+                    data["seed"] = seed!
+                }
+                var backendDict: [String:String] = [:]
+                backendDict["name"] = backend_type!
+                data["backend"] = backendDict
+
+                self.req.post(path: "Jobs", data: data) { (out, error) -> Void in
+                    if error != nil {
+                        responseHandler(nil, error)
+                        return
+                    }
+                    guard let json = out as? [String:Any] else {
+                        responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                        return
+                    }
+                    responseHandler(json, error)
+                }
+
             }
+
         }
     }
 
@@ -501,48 +558,81 @@ public final class IBMQuantumExperience {
     }
 
     /**
-     Get the status of a chip
+     Gets jobs information. Asynchronous.
+     -limit: max result
+     - parameter responseHandler: Closure to be called upon completion
      */
-    public func device_status(_ device: String = "ibmqx2",
-                       responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
-        guard let device_type = self._check_device(device, "status") else {
-            responseHandler(nil,IBMQuantumExperienceError.missingDevice(device: device))
-            return
-        }
-        self.req.get(path:"Status/queue?device=\(device_type)",with_token: false) { (out, error) -> Void in
-            guard let json = out as? [String:Any] else {
-                responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+    public func get_jobs(limit: Int = 50,responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
+        self.checkCredentials(request: self.req) { (error) -> Void in
+            if error != nil {
+                responseHandler(nil, error)
                 return
             }
-            responseHandler(["available" : (json["state"] != nil) ], error)
+            self.req.get(path: "Jobs", params: "&filter={\"limit\":\(limit)}") { (out, error) -> Void in
+                guard let json = out as? [String:Any] else {
+                    responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                    return
+                }
+                responseHandler(json, error)
+            }
+        }
+    }
+
+    /**
+     Get the status of a chip
+     */
+    public func backend_status(_ backend: String = "ibmqx2",
+                       responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
+        self._check_backend(backend, "status") { (backend_type,error) -> Void in
+            if error != nil {
+                responseHandler(nil, error)
+                return
+            }
+            if backend_type == nil {
+                responseHandler(nil,IBMQuantumExperienceError.missingBackend(backend: backend))
+                return
+            }
+            self.req.get(path:"Status/queue?backend=\(backend_type!)",with_token: false) { (out, error) -> Void in
+                guard let json = out as? [String:Any] else {
+                    responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                    return
+                }
+                responseHandler(["available" : (json["state"] != nil) ], error)
+            }
         }
     }
 
     /**
      Get the calibration of a real chip
      */
-    public func device_calibration(_ device: String = "ibmqx2",
+    public func backend_calibration(_ backend: String = "ibmqx2",
                             responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
                 responseHandler(nil, error)
                 return
             }
-            guard let device_type = self._check_device(device, "calibration") else {
-                responseHandler(nil,IBMQuantumExperienceError.missingRealDevice(device: device))
-                return
-            }
-            self.req.get(path:"Backends/\(device_type)/calibration") { (out, error) -> Void in
+            self._check_backend(backend, "calibration") { (backend_type,error) -> Void in
                 if error != nil {
                     responseHandler(nil, error)
                     return
                 }
-                guard var ret = out as? [String:Any] else {
-                    responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                if backend_type == nil {
+                    responseHandler(nil,IBMQuantumExperienceError.missingBackend(backend: backend))
                     return
                 }
-                ret["device"] = device_type
-                responseHandler(ret,error)
+                self.req.get(path:"Backends/\(backend_type!)/calibration") { (out, error) -> Void in
+                    if error != nil {
+                        responseHandler(nil, error)
+                        return
+                    }
+                    guard var ret = out as? [String:Any] else {
+                        responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                        return
+                    }
+                    ret["backend"] = backend_type!
+                    responseHandler(ret,error)
+                }
             }
         }
     }
@@ -550,36 +640,42 @@ public final class IBMQuantumExperience {
     /**
      Get the parameters of calibration of a real chip
      */
-    public func device_parameters(_ device: String = "ibmqx2",
+    public func backend_parameters(_ backend: String = "ibmqx2",
                                   responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
                 responseHandler(nil, error)
                 return
             }
-            guard let device_type = self._check_device(device, "calibration") else {
-                responseHandler(nil,IBMQuantumExperienceError.missingRealDevice(device: device))
-                return
-            }
-            self.req.get(path:"Backends/\(device_type)/parameters") { (out, error) -> Void in
+            self._check_backend(backend, "calibration") { (backend_type,error) -> Void in
                 if error != nil {
                     responseHandler(nil, error)
                     return
                 }
-                guard var ret = out as? [String:Any] else {
-                    responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                if backend_type == nil {
+                    responseHandler(nil,IBMQuantumExperienceError.missingBackend(backend: backend))
                     return
                 }
-                ret["device"] = device_type
-                responseHandler(ret,error)
+                self.req.get(path:"Backends/\(backend_type!)/parameters") { (out, error) -> Void in
+                    if error != nil {
+                        responseHandler(nil, error)
+                        return
+                    }
+                    guard var ret = out as? [String:Any] else {
+                        responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
+                        return
+                    }
+                    ret["backend"] = backend_type!
+                    responseHandler(ret,error)
+                }
             }
         }
     }
 
     /**
-     Get the devices availables to use in the QX Platform
+     Get the backends availables to use in the QX Platform
      */
-    public func available_devices(responseHandler: @escaping ((_:[[String:Any]], _:IBMQuantumExperienceError?) -> Void)) {
+    public func available_backends(responseHandler: @escaping ((_:[[String:Any]], _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
             if error != nil {
                 responseHandler([], error)
@@ -590,20 +686,41 @@ public final class IBMQuantumExperience {
                     responseHandler([], error)
                     return
                 }
-                guard let devices = out as? [[String:Any]] else {
-                    responseHandler([],IBMQuantumExperienceError.missingDevices)
+                guard let backends = out as? [[String:Any]] else {
+                    responseHandler([],IBMQuantumExperienceError.missingBackends)
                     return
                 }
                 var ret: [[String:Any]] = []
-                for device in devices {
-                    if let status = device["status"] as? String {
+                for backend in backends {
+                    if let status = backend["status"] as? String {
                         if "on" == status {
-                            ret.append(device)
+                            ret.append(backend)
                         }
                     }
                 }
                 responseHandler(ret, nil)
             }
+        }
+    }
+
+    /**
+     Get the backend simulators available to use in the QX Platform
+     */
+    public func available_backend_simulators(responseHandler: @escaping ((_:[[String:Any]], _:IBMQuantumExperienceError?) -> Void)) {
+        self.available_backends() { (backends,error) -> Void in
+            if error != nil {
+                responseHandler([], error)
+                return
+            }
+            var ret: [[String:Any]] = []
+            for backend in backends {
+                if let simulator = backend["simulator"] as? Bool {
+                    if simulator {
+                        ret.append(backend)
+                    }
+                }
+            }
+            responseHandler(ret, nil)
         }
     }
 }

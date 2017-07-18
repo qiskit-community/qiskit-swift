@@ -24,6 +24,7 @@ public enum UnrollerException: LocalizedError, CustomStringConvertible {
     case errortypeindexed(qasm: String)
     case errortype(type: String, qasm: String)
     case errorbackend
+    case invalidcircuit
 
     public var errorDescription: String? {
         return self.description
@@ -54,6 +55,8 @@ public enum UnrollerException: LocalizedError, CustomStringConvertible {
             return "internal error: undefined node type \(type): qasm='\(qasm)'"
         case .errorbackend():
             return "backend not attached"
+        case .invalidcircuit:
+            return "Invalid circuit! Has the Qasm parsing been called?. e.g: unroller.execute()"
         }
     }
 }

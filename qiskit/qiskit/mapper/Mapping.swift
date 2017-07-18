@@ -262,7 +262,7 @@ final class Mapping {
 
         let u = Unroller(try Qasm(data: flipped_qasm).parse(),CircuitBackend(["cx", "h"]))
         try u.execute()
-        let flipped_cx_circuit = (u.backend! as! CircuitBackend).circuit
+        let flipped_cx_circuit: Circuit = (u.backend as! CircuitBackend).circuit
         let cx_node_list = try circuit_graph.get_named_nodes("cx")
         let cg_edges = coupling_graph.get_edges()
         for cx_node in cx_node_list {
@@ -465,7 +465,8 @@ final class Mapping {
         basis += ",swap"
         let u = Unroller(try Qasm(data: openqasm_output).parse(), CircuitBackend(basis.components(separatedBy:",")))
         try u.execute()
-        return ((u.backend as! CircuitBackend).circuit, initial_layout!)
+        let circuit: Circuit = (u.backend as! CircuitBackend).circuit
+        return (circuit, initial_layout!)
     }
 
     /**
@@ -670,8 +671,8 @@ final class Mapping {
         let qx_basis = ["u1", "u2", "u3", "cx", "id"]
         let urlr = try Unroller(Qasm(data: circuit.qasm(qeflag: true)).parse(), CircuitBackend(qx_basis))
         try urlr.execute()
-        let unrolled = (urlr.backend as! CircuitBackend).circuit
-
+        let unrolled: Circuit = (urlr.backend as! CircuitBackend).circuit  
+       
         let runs = try unrolled.collect_runs(["u1", "u2", "u3", "id"])
         for run in runs {
             let qname = (run[0].data as! CircuitVertexOpData).qargs[0]

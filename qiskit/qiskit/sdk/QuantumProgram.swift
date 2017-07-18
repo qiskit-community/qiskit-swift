@@ -158,10 +158,8 @@ public final class QuantumProgram {
         return self.__api
     }
 
-
-    // TODO: we would like API to use "backend"s instead of "device"s
     public func online_backends(responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) {
-        self.__api.available_devices() { (backends,error) in
+        self.__api.available_backends() { (backends,error) in
             if error != nil {
                 responseHandler([],error)
                 return
@@ -200,14 +198,14 @@ public final class QuantumProgram {
                 return
             }
             if backends.contains(backend) {
-                self.__api.device_status(backend,responseHandler: responseHandler)
+                self.__api.backend_status(backend,responseHandler: responseHandler)
                 return
             }
             if QuantumProgram.__LOCAL_BACKENDS.contains(backend) {
                 responseHandler(["available" : true],nil)
                 return
             }
-            responseHandler(nil,IBMQuantumExperienceError.errorDevice(device: backend))
+            responseHandler(nil,IBMQuantumExperienceError.errorBackend(backend: backend))
         }
     }
 
@@ -216,7 +214,7 @@ public final class QuantumProgram {
      */
     public func get_backend_configuration(_ backend: String,
                                    responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
-        self.__api.available_devices() { (backends,error) in
+        self.__api.available_backends() { (backends,error) in
             if error != nil {
                 responseHandler(nil,error)
                 return
@@ -229,15 +227,15 @@ public final class QuantumProgram {
                     }
                 }
             }
-            for test_backend in LocalSimulator.local_configuration {
-                if let name = test_backend["name"] as? String {
+            for configuration in LocalSimulator.local_configurations {
+                if let name = configuration["name"] as? String {
                     if name == backend {
-                        responseHandler(test_backend,nil)
+                        responseHandler(configuration,nil)
                         return
                     }
                 }
             }
-            responseHandler(nil,IBMQuantumExperienceError.errorDevice(device: backend))
+            responseHandler(nil,IBMQuantumExperienceError.errorBackend(backend: backend))
         }
     }
 
@@ -254,14 +252,14 @@ public final class QuantumProgram {
             }
             if backends.contains(backend) {
                 // TODO: we would like API to use "backend" instead of "device"
-                self.__api.device_calibration(backend,responseHandler: responseHandler)
+                self.__api.backend_calibration(backend,responseHandler: responseHandler)
                 return
             }
             if QuantumProgram.__LOCAL_BACKENDS.contains(backend) {
                 responseHandler(["calibrations" : "NA"],nil)
                 return
             }
-            responseHandler(nil,IBMQuantumExperienceError.errorDevice(device: backend))
+            responseHandler(nil,IBMQuantumExperienceError.errorBackend(backend: backend))
         }
     }
 
@@ -278,14 +276,14 @@ public final class QuantumProgram {
             }
             if backends.contains(backend) {
                 // TODO: we would like API to use "backend" instead of "device"
-                self.__api.device_parameters(backend,responseHandler: responseHandler)
+                self.__api.backend_parameters(backend,responseHandler: responseHandler)
                 return
             }
             if QuantumProgram.__LOCAL_BACKENDS.contains(backend) {
                 responseHandler(["parameters" : "NA"],nil)
                 return
             }
-            responseHandler(nil,IBMQuantumExperienceError.errorDevice(device: backend))
+            responseHandler(nil,IBMQuantumExperienceError.errorBackend(backend: backend))
         }
     }
 
@@ -583,8 +581,7 @@ public final class QuantumProgram {
         let unrolled_circuit = Unroller(try Qasm(data: circuitQasm).parse(),
                                         CircuitBackend(basis.components(separatedBy:",")))
         try unrolled_circuit.execute()
-
-        let circuit_unrolled = (unrolled_circuit.backend as! CircuitBackend).circuit  // circuit DAG
+        let circuit_unrolled: Circuit = (unrolled_circuit.backend as! CircuitBackend).circuit  // circuit DAG
         let qasm_source = try circuit_unrolled.qasm(qeflag: true)
         return (qasm_source, circuit_unrolled)
     }
@@ -805,7 +802,7 @@ public final class QuantumProgram {
             if !silent {
                 print("running on backend: \(backend)")
             }
-            self.__api.run_job(qasms: jobs, device: backend, shots: last_shots, maxCredits: last_max_credits) { (json, error) -> Void in
+            self.__api.run_job(qasms: jobs, backend: backend, shots: last_shots, maxCredits: last_max_credits) { (json, error) -> Void in
                 if error != nil {
                     responseHandler(nil,QISKitException.internalError(error: error!))
                     return
@@ -845,7 +842,8 @@ public final class QuantumProgram {
                     let basis_gates: [String] = []  // unroll to base gates
                     let unroller = Unroller(try Qasm(data: compiled_circuit).parse(),JsonBackend(basis_gates))
                     try unroller.execute()
-                    let json_circuit = (unroller.backend as! JsonBackend).circuit
+                    let json_circuit: [String:Any] = (unroller.backend as! JsonBackend).circuit
+                    
                     // converts qasm circuit to json circuit
                     var job: [String:Any] = [:]
                     job["compiled_circuit"] = json_circuit
@@ -985,8 +983,9 @@ public final class QuantumProgram {
     private class func run_local_simulator(_ backend: String, _ jobs: [[String:Any]]) throws -> [String: [[String:Any]] ] {
         var job_results: [[String:Any]] = []
         for job in jobs {
-            let local_simulator = LocalSimulator(backend, job)
-            job_results.append(try local_simulator.run())
+            let local_simulator = try LocalSimulator(backend, job)
+            try local_simulator.run()
+            job_results.append(local_simulator.result)
         }
         return ["qasms" : job_results ]
     }

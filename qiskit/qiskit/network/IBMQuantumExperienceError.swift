@@ -24,12 +24,13 @@ public enum IBMQuantumExperienceError: LocalizedError, CustomStringConvertible {
     case missingExecutionId
     case missingStatus
     case timeout
-    case missingDevice(device: String)
-    case missingRealDevice(device: String)
-    case errorDevice(device: String)
-    case errorSeed(device: String)
+    case missingBackend(backend: String)
+    case errorBackend(backend: String)
+    case errorSeed(backend: String)
     case errorSeedLength
-    case missingDevices
+    case missingBackends
+    case badBackendError(backend: String)
+    case retriesPositive
     case internalError(error: Error)
 
     public var errorDescription: String? {
@@ -59,18 +60,20 @@ public enum IBMQuantumExperienceError: LocalizedError, CustomStringConvertible {
             return "Missing Status"
         case .timeout():
             return "Timeout"
-        case .missingDevice(let device):
-            return "Device \(device) does not exits in Quantum Experience. Only allow ibmqx2 or simulator"
-        case .missingRealDevice(let device):
-            return "Device \(device) does not exits in Quantum Experience Real Devices. Only allow ibmqx2"
-        case .errorDevice(let device):
-            return "Device \(device) does not exits"
-        case .errorSeed(let device):
-            return "No seed allowed in \(device)"
+        case .missingBackend(let backend):
+            return "Backend \(backend) does not exits in Quantum Experience."
+        case .errorBackend(let backend):
+            return "Backend \(backend) does not exits"
+        case .errorSeed(let backend):
+            return "No seed allowed in \(backend)"
         case .errorSeedLength():
             return "No seed allowed. Max 10 digits."
-        case .missingDevices():
-            return "Missing devices"
+        case .missingBackends():
+            return "Missing backends"
+        case .badBackendError(let backend):
+            return "Could not find backend '\(backend)' available."
+        case .retriesPositive():
+            return "post retries must be positive integer"
         case .internalError(let error):
             return error.localizedDescription
         }

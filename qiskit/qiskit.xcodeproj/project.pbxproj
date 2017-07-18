@@ -33,6 +33,7 @@
 		69458A281EE5A1760027F5A6 /* Coupling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69458A271EE5A1760027F5A6 /* Coupling.swift */; };
 		69458A2A1EE5A6A10027F5A6 /* CouplingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69458A291EE5A6A10027F5A6 /* CouplingError.swift */; };
 		69458A2C1EE5B1320027F5A6 /* CouplingVertexData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69458A2B1EE5B1320027F5A6 /* CouplingVertexData.swift */; };
+		694E4B841F1E4C1B00C2EE49 /* SimulatorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694E4B831F1E4C1B00C2EE49 /* SimulatorError.swift */; };
 		695701341ED75C1C00C6CCAB /* Graph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695701311ED75C1C00C6CCAB /* Graph.swift */; };
 		695701351ED75C1C00C6CCAB /* GraphVertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695701321ED75C1C00C6CCAB /* GraphVertex.swift */; };
 		695701361ED75C1C00C6CCAB /* GraphEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695701331ED75C1C00C6CCAB /* GraphEdge.swift */; };
@@ -173,6 +174,7 @@
 		69458A271EE5A1760027F5A6 /* Coupling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Coupling.swift; path = mapper/Coupling.swift; sourceTree = "<group>"; };
 		69458A291EE5A6A10027F5A6 /* CouplingError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CouplingError.swift; path = mapper/CouplingError.swift; sourceTree = "<group>"; };
 		69458A2B1EE5B1320027F5A6 /* CouplingVertexData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CouplingVertexData.swift; path = mapper/CouplingVertexData.swift; sourceTree = "<group>"; };
+		694E4B831F1E4C1B00C2EE49 /* SimulatorError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SimulatorError.swift; path = simulators/SimulatorError.swift; sourceTree = "<group>"; };
 		695701311ED75C1C00C6CCAB /* Graph.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Graph.swift; path = datastructures/graph/Graph.swift; sourceTree = "<group>"; };
 		695701321ED75C1C00C6CCAB /* GraphVertex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GraphVertex.swift; path = datastructures/graph/GraphVertex.swift; sourceTree = "<group>"; };
 		695701331ED75C1C00C6CCAB /* GraphEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GraphEdge.swift; path = datastructures/graph/GraphEdge.swift; sourceTree = "<group>"; };
@@ -470,6 +472,7 @@
 				698C0E051F1925B400C99536 /* QasmSimulator.swift */,
 				698C0E031F19259800C99536 /* UnitarySimulator.swift */,
 				698C0DFF1F19253C00C99536 /* Simulator.swift */,
+				694E4B831F1E4C1B00C2EE49 /* SimulatorError.swift */,
 			);
 			name = simulators;
 			sourceTree = "<group>";
@@ -771,6 +774,7 @@
 				693177A11EEAF42500B4CF9D /* UnrollerException.swift in Sources */,
 				69D310771ECA180500B3E752 /* QuantumProgram.swift in Sources */,
 				DF8E1CDB1EE5021400DCC35C /* NodeQreg.swift in Sources */,
+				694E4B841F1E4C1B00C2EE49 /* SimulatorError.swift in Sources */,
 				692DBE001EE6EA2C0032F6CF /* MappingError.swift in Sources */,
 				698C0E041F19259800C99536 /* UnitarySimulator.swift in Sources */,
 				69E597B11ECA99B300A321F5 /* H.swift in Sources */,

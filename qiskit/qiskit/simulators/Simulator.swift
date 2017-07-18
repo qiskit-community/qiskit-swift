@@ -10,7 +10,7 @@ import Foundation
 
 protocol Simulator {
 
-    var result: [String:Any] { get }
+    static var __configuration : [String:Any] {get}
 
     func run() throws -> [String:Any]
 }

@@ -90,9 +90,9 @@ public enum QISKitException: LocalizedError, CustomStringConvertible {
         case .missingCompiledQasm():
             return "No compiled qasm for this circuit"
         case .errorShots():
-            return "Online devices only support job batches with equal numbers of shots"
+            return "Online backends only support job batches with equal numbers of shots"
         case .errorMaxCredit():
-            return "Online devices only support job batches with equal max credit"
+            return "Online backends only support job batches with equal max credit"
         case .missingStatus():
             return "Missing Status"
         case .timeout():

@@ -10,17 +10,21 @@ import Foundation
 
 final class QasmCppSimulator: Simulator {
 
-    private var _result: [String:Any] = [:]
+    static let __configuration: [String:Any] = [
+        "name": "local_qasm_cpp_simulator",
+        "url": "https://github.com/IBM/qiskit-sdk-py",
+        "simulator": true,
+        "description": "A python simulator for qasm files",
+        "nQubits": 10,
+        "couplingMap": "all-to-all",
+        "gateset": "SU2+CNOT"
+    ]
 
-    var result: [String:Any] {
-        return self._result
-    }
-
-    init(_ compiled_circuit: String, _ shots: Int = 1024, _ seed: Double?) {
+    init(_ job: [String:Any], _ threads: Int = 1,_ config: [String:Any]? = nil, _ exe: String = "qasm_simulator") {
 
     }
     
     func run() throws -> [String:Any] {
-        return self._result
+        return [:]
     }
 }

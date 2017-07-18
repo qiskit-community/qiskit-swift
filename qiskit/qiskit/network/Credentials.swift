@@ -14,6 +14,7 @@ final class Credentials {
      Configuration setted to connect with QX Platform
      */
     let config: Qconfig
+    private let verify: Bool
     private let token_unique: String
     private(set) var data_credentials: [String:Any] = [:]
 
@@ -33,10 +34,12 @@ final class Credentials {
     init() throws {
         self.token_unique = ""
         self.config = try Qconfig()
+        self.verify = true
     }
     
-    init(_ token: String, _ config: Qconfig? = nil) throws {
+    init(_ token: String, _ config: Qconfig? = nil, _ verify: Bool = true) throws {
         self.token_unique = token
+        self.verify = verify
         if let c = config {
             self.config = c
         }
@@ -53,7 +56,7 @@ final class Credentials {
             }
             return
         }
-        request.postInternal(url: url, data: ["apiToken": self.token_unique]) { (out, error) -> Void in
+        request.postInternal(url: url, data: ["apiToken": self.token_unique], verify: self.verify) { (out, error) -> Void in
             if error != nil {
                 responseHandler(error)
                 return
