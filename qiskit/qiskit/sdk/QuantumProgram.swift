@@ -845,15 +845,18 @@ public final class QuantumProgram {
                     let json_circuit: [String:Any] = (unroller.backend as! JsonBackend).circuit
                     
                     // converts qasm circuit to json circuit
-                    var job: [String:Any] = [:]
-                    job["compiled_circuit"] = json_circuit
+                    var newJob: [String:Any] = [:]
+                    newJob["compiled_circuit"] = json_circuit
                     if let shots = job["shots"] as? Int {
-                        job["shots"] = shots
+                        newJob["shots"] = shots
                     }
-                    if let seed = job["seed"] as? Int {
-                        job["seed"] = seed
+                    if let seed = job["seed"] as? Double {
+                        newJob["seed"] = seed
                     }
-                    jobs.append(job)
+                    if let config = job["config"] as? Int {
+                        newJob["config"] = config
+                    }
+                    jobs.append(newJob)
 
                 }
                 if !silent {

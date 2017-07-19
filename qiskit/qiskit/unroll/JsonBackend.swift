@@ -151,7 +151,7 @@ final class JsonBackend: UnrollerBackend {
             }
             var operation: [String:Any] = [:]
             operation["name"] = "U"
-            operation["parms"] = [arg.0,arg.1,arg.2]
+            operation["params"] = [arg.0,arg.1,arg.2]
             operation["qubits"] = qubit_indices
             operations.append(operation)
             self.circuit["operations"] = operations

@@ -86,7 +86,7 @@ public final class Multiple {
         //##############################################################
         try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
 
-        try qp.compile(["bell"], backend:"ibmqx_qasm_simulator" /*"local_qasm_simulator"*/, shots:1024)
+        try qp.compile(["bell"], backend:"local_qasm_simulator", shots:1024)
         try qp.compile(["ghz"], backend:"ibmqx_qasm_simulator", shots:1024,coupling_map:coupling_map)
 
         qp.run() { (error) in
@@ -96,7 +96,7 @@ public final class Multiple {
                     return
                 }
                 // print(try qp.get_counts("bell")) // returns error, don't do this
-                print(try qp.get_counts("bell", backend:"ibmqx_qasm_simulator" /*"local_qasm_simulator"*/))
+                print(try qp.get_counts("bell", backend:"local_qasm_simulator"))
                 print(try qp.get_counts("ghz"))
             } catch {
                 print(error.localizedDescription)
