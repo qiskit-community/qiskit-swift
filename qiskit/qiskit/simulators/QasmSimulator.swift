@@ -309,6 +309,28 @@ final class QasmSimulator: Simulator {
         }
     }
 
+    /**
+     Apply a single qubit gate to the qubit.
+
+     Args:
+     gate(str): the single qubit gate name
+     params(list): the operation parameters op['params']
+     Returns:
+     a tuple of U gate parameters (theta, phi, lam)
+     */
+    private static func _qasm_single_params(_ gate: String, _ params: [Double]) -> (Double,Double,Double) {
+        if gate == "U" || gate == "u3" {
+            return (params[0], params[1], params[2])
+        }
+        else if gate == "u2" {
+            return (Double.pi/2, params[0], params[1])
+        }
+        else if gate == "u1" {
+            return (0.0, 0.0, params[0])
+        }
+        return (0.0,0.0,0.0)
+    }
+
     func run() throws -> [String:Any] {
         var outcomes: [String] = []
         // Do each shot
@@ -325,13 +347,11 @@ final class QasmSimulator: Simulator {
                         return self.result
                     }
                     // Check if single  gate
-                    if name == "U" {
+                    if ["U", "u1", "u2", "u3"].contains(name) {
                         if let qubits = operation["qubits"] as? [Int] {
                             if let params = operation["params"] as? [Double] {
                                 let qubit = qubits[0]
-                                let theta = params[0]
-                                let phi = params[1]
-                                let lam = params[2]
+                                let (theta, phi, lam) = QasmSimulator._qasm_single_params(name, params)
                                 let gate: [[Complex]] = [[
                                              Complex(real:cos(theta/2.0)),
                                              Complex(imag: lam).exp() * -sin(theta/2.0)
@@ -346,7 +366,7 @@ final class QasmSimulator: Simulator {
                         }
                     }
                     // Check if CX gate
-                    else if name == "CX" {
+                    else if name == "CX" || name == "cx" {
                         if let qubits = operation["qubits"] as? [Int] {
                             self._add_qasm_cx(qubits[0], qubits[1])
                         }
@@ -365,7 +385,7 @@ final class QasmSimulator: Simulator {
                             self._add_qasm_reset(qubits[0])
                         }
                     }
-                    else if name == "barrier" {
+                    else if name == "barrier" || name == "id" {
                     }
                     else {
                         self.result["status"] = "ERROR"

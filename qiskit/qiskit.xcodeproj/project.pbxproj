@@ -52,6 +52,8 @@
 		698C0E061F1925B400C99536 /* QasmSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698C0E051F1925B400C99536 /* QasmSimulator.swift */; };
 		69AE98BF1F1D09670026FA66 /* JsonBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69AE98BE1F1D09670026FA66 /* JsonBackend.swift */; };
 		69BD4B871F0DE4FE001A28F9 /* Double+Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69BD4B861F0DE4FE001A28F9 /* Double+Format.swift */; };
+		69CCAFC81F24D51D00CA4605 /* SimulatorTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69CCAFC71F24D51D00CA4605 /* SimulatorTools.swift */; };
+		69CCAFCA1F24D99A00CA4605 /* NumUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69CCAFC91F24D99A00CA4605 /* NumUtilities.swift */; };
 		69CED61A1F1FA2B100FA8180 /* Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69CED6191F1FA2B100FA8180 /* Random.swift */; };
 		69CED61C1F1FAA3200FA8180 /* Complex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69CED61B1F1FAA3200FA8180 /* Complex.swift */; };
 		69D310771ECA180500B3E752 /* QuantumProgram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D3106A1ECA180500B3E752 /* QuantumProgram.swift */; };
@@ -194,6 +196,8 @@
 		698C0E051F1925B400C99536 /* QasmSimulator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QasmSimulator.swift; path = simulators/QasmSimulator.swift; sourceTree = "<group>"; };
 		69AE98BE1F1D09670026FA66 /* JsonBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = JsonBackend.swift; path = unroll/JsonBackend.swift; sourceTree = "<group>"; };
 		69BD4B861F0DE4FE001A28F9 /* Double+Format.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Double+Format.swift"; path = "datastructures/Double+Format.swift"; sourceTree = "<group>"; };
+		69CCAFC71F24D51D00CA4605 /* SimulatorTools.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SimulatorTools.swift; path = simulators/SimulatorTools.swift; sourceTree = "<group>"; };
+		69CCAFC91F24D99A00CA4605 /* NumUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NumUtilities.swift; path = datastructures/NumUtilities.swift; sourceTree = "<group>"; };
 		69CED6191F1FA2B100FA8180 /* Random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Random.swift; path = datastructures/Random.swift; sourceTree = "<group>"; };
 		69CED61B1F1FAA3200FA8180 /* Complex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Complex.swift; path = datastructures/Complex.swift; sourceTree = "<group>"; };
 		69D3106A1ECA180500B3E752 /* QuantumProgram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QuantumProgram.swift; path = sdk/QuantumProgram.swift; sourceTree = "<group>"; };
@@ -329,6 +333,7 @@
 				69BD4B861F0DE4FE001A28F9 /* Double+Format.swift */,
 				693C93031ED5EFAE00EA15B0 /* graph */,
 				695701391ED75C8B00C6CCAB /* HashableTuple.swift */,
+				69CCAFC91F24D99A00CA4605 /* NumUtilities.swift */,
 				697D36AD1EE3493B00557541 /* OrderedDictionary.swift */,
 				690188731EE269B0005B4419 /* Queue.swift */,
 				69CED6191F1FA2B100FA8180 /* Random.swift */,
@@ -473,9 +478,10 @@
 				698C0DFD1F191CAA00C99536 /* LocalSimulator.swift */,
 				698C0E011F19257C00C99536 /* QasmCppSimulator.swift */,
 				698C0E051F1925B400C99536 /* QasmSimulator.swift */,
-				698C0E031F19259800C99536 /* UnitarySimulator.swift */,
 				698C0DFF1F19253C00C99536 /* Simulator.swift */,
 				694E4B831F1E4C1B00C2EE49 /* SimulatorError.swift */,
+				69CCAFC71F24D51D00CA4605 /* SimulatorTools.swift */,
+				698C0E031F19259800C99536 /* UnitarySimulator.swift */,
 			);
 			name = simulators;
 			sourceTree = "<group>";
@@ -724,6 +730,7 @@
 				DF8E1CD51EE501D000DCC35C /* NodeUniversalUnitary.swift in Sources */,
 				69DE36171ECD190E00EC4756 /* S.swift in Sources */,
 				DF8E1CD71EE501E700DCC35C /* NodeReset.swift in Sources */,
+				69CCAFC81F24D51D00CA4605 /* SimulatorTools.swift in Sources */,
 				DF7973731ED3429D00C01457 /* ParseTree.m in Sources */,
 				69DE361D1ECD195600EC4756 /* U3.swift in Sources */,
 				DF8E1CE51EE5028800DCC35C /* NodeMagic.swift in Sources */,
@@ -783,6 +790,7 @@
 				692DBE001EE6EA2C0032F6CF /* MappingError.swift in Sources */,
 				698C0E041F19259800C99536 /* UnitarySimulator.swift in Sources */,
 				69E597B11ECA99B300A321F5 /* H.swift in Sources */,
+				69CCAFCA1F24D99A00CA4605 /* NumUtilities.swift in Sources */,
 				69F7B61D1F107CB100FDE7C4 /* CRZ.swift in Sources */,
 				69D310891ECA182000B3E752 /* IBMQuantumExperience.swift in Sources */,
 				69F7B6211F107D0100FDE7C4 /* CU3.swift in Sources */,
