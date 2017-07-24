@@ -107,7 +107,7 @@ public final class RippleAdd {
                         }
                         print(try qp.get_compiled_qasm("rippleadd"))
                         print(try qp.get_counts("rippleadd"))
-                        // Both versions should give the same distribution
+                        print("Both versions should give the same distribution")
                     } catch {
                         print(error.localizedDescription)
                     }

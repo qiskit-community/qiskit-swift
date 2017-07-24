@@ -159,9 +159,14 @@ final class QasmSimulator: Simulator {
     /**
      Initialize the QasmSimulator object
      */
-    init(_ job: [String:Any]) {
-        if let compiled_circuit = job["compiled_circuit"] as? [String:Any] {
-            self.circuit = compiled_circuit
+    init(_ job: [String:Any]) throws {
+        if let compiled_circuit = job["compiled_circuit"] as? String {
+            if let data = compiled_circuit.data(using: .utf8) {
+                let jsonAny = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+                if let json = jsonAny as? [String:Any] {
+                    self.circuit = json
+                }
+            }
         }
         if let header = self.circuit["header"]  as? [String:Any] {
             if let number_of_qubits = header["number_of_qubits"] as? Int {
@@ -176,7 +181,7 @@ final class QasmSimulator: Simulator {
         if let shots = job["shots"] as? Int {
             self._shots = shots
         }
-        if let seed = job["seed"] as? Double {
+        if let seed = job["seed"] as? Int {
             srand48(Int(seed))
         }
         if let operations = self.circuit["operations"]  as? [[String:Any]] {

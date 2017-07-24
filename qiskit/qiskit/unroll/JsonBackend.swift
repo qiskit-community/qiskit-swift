@@ -39,7 +39,7 @@ import Foundation
  */
 final class JsonBackend: UnrollerBackend {
 
-    private(set) var circuit: [String:Any] = [:]
+    private var circuit: [String:Any] = [:]
     private var _number_of_qubits: Int = 0
     private var _number_of_cbits: Int = 0
     private var _qubit_order: [RegBit] = []
@@ -99,7 +99,7 @@ final class JsonBackend: UnrollerBackend {
             header = head
         }
         header["number_of_qubits"] = self._number_of_qubits
-        header["qubit_labels"] = self._qubit_order
+        header["qubit_labels"] = self._qubit_order.map { [$0.name,$0.index] }
         self.circuit["header"] = header
     }
 
@@ -121,7 +121,7 @@ final class JsonBackend: UnrollerBackend {
             header = head
         }
         header["number_of_clbits"] = self._number_of_cbits
-        header["clbit_labels"] = self._cbit_order
+        header["clbit_labels"] = self._cbit_order.map { [$0.name,$0.index] }
         self.circuit["header"] = header
     }
 
@@ -356,5 +356,30 @@ final class JsonBackend: UnrollerBackend {
             self.in_gate = ""
             self.listen = true
         }
+    }
+
+    /**
+     Returns the generated circuit.
+     */
+    func get_output() throws -> Any? {
+        assert(self._is_circuit_valid(), "Invalid circuit! Has the Qasm parsing been called?. e.g: unroller.execute()")
+        if JSONSerialization.isValidJSONObject(self.circuit) {
+            let data = try JSONSerialization.data(withJSONObject: self.circuit)
+            return String(data: data, encoding: .utf8)
+        }
+        throw UnrollerException.invalidJSON
+    }
+
+    /**
+     Checks whether the circuit object is a valid one or not.
+     */
+    private func _is_circuit_valid() -> Bool {
+        guard let header = self.circuit["header"] as? [String:Any] else {
+            return false
+        }
+        guard let operations = self.circuit["operations"] as? [[String:Any]] else {
+            return false
+        }
+        return !header.isEmpty && !operations.isEmpty
     }
 }

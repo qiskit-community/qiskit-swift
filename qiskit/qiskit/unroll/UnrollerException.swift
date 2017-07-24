@@ -25,6 +25,7 @@ public enum UnrollerException: LocalizedError, CustomStringConvertible {
     case errortype(type: String, qasm: String)
     case errorbackend
     case invalidcircuit
+    case invalidJSON
 
     public var errorDescription: String? {
         return self.description
@@ -57,6 +58,8 @@ public enum UnrollerException: LocalizedError, CustomStringConvertible {
             return "backend not attached"
         case .invalidcircuit:
             return "Invalid circuit! Has the Qasm parsing been called?. e.g: unroller.execute()"
+        case .invalidJSON():
+            return "Invalid JSON Object in backend"
         }
     }
 }

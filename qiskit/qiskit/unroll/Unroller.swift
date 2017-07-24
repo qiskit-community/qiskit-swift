@@ -39,7 +39,7 @@ final class Unroller {
     /**
      Backend object
      */
-    private(set) var backend: UnrollerBackend?
+    private var backend: UnrollerBackend?
     /**
      OPENQASM version number
      */
@@ -138,10 +138,10 @@ final class Unroller {
 
         let name = node.name
         var args: [Double] = []
-        var bits: [[RegBit]] = []
         if let list = node.arguments {
             args = try self._process_node(list).values
         }
+        var bits: [[RegBit]] = []
         var maxidx: Int = 0
         if let blchildren = node.bitlist?.children {
             for node_element in blchildren {
@@ -510,10 +510,10 @@ final class Unroller {
     /**
      Interpret OPENQASM and make appropriate backend calls.
      */
-    func execute() throws {
+    func execute() throws -> Any? {
         if self.backend != nil {
             try self._process_node(self.ast)
-            return
+            return try self.backend!.get_output()
         }
         throw UnrollerException.errorbackend
     }

@@ -322,4 +322,12 @@ final class PrinterBackend: UnrollerBackend {
             print("// end \(name), \(sargs.joined(separator:",")), \(squbits.joined(separator:","))")
         }
     }
+
+    /**
+     Returns the generated circuit.
+     This backend will return nothing, as the output has been directly written to screen
+     */
+    func get_output() throws -> Any? {
+        return nil
+    }
 }

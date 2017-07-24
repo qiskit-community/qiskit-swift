@@ -12,14 +12,14 @@ import Foundation
  Layout module to assist with mapping circuit qubits onto physical qubits.
  */
 /**
- Notes:
- Measurements may occur and be followed by swaps that result in repeated
- measurement of the same qubit. Near-term experiments cannot implement
- these circuits, so we may need to modify the algorithm.
- It can happen that a swap in a deeper layer can be removed by permuting
- qubits in the layout. We don't do this.
- It can happen that initial swaps can be removed or partly simplified
- because the initial state is zero. We don't do this.
+ # Notes:
+ # Measurements may occur and be followed by swaps that result in repeated
+ # measurement of the same qubit. Near-term experiments cannot implement
+ # these circuits, so we may need to modify the algorithm.
+ # It can happen that a swap in a deeper layer can be removed by permuting
+ # qubits in the layout. We don't do this.
+ # It can happen that initial swaps can be removed or partly simplified
+ # because the initial state is zero. We don't do this.
  */
 final class Mapping {
 
@@ -28,9 +28,12 @@ final class Mapping {
 
     /**
      Find a swap circuit that implements a permutation for this layer.
+
      The goal is to swap qubits such that qubits in the same two-qubit gates
      are adjacent.
+
      Based on Sergey Bravyi's algorithm.
+
      The layer_partition is a list of (qu)bit lists and each qubit is a
      tuple (qreg, index).
      The layout is a dict mapping qubits in the circuit to qubits in the
@@ -39,14 +42,16 @@ final class Mapping {
      we have chosen to map into.
      The coupling is a CouplingGraph.
      TRIALS is the number of attempts the randomized algorithm makes.
+
      Returns: success_flag, best_circ, best_d, best_layout, trivial_flag
+
      If success_flag is True, then best_circ contains an OPENQASM string with
      the swap circuit, best_d contains the depth of the swap circuit, and
      best_layout contains the new positions of the data qubits after the
      swap circuit has been applied. The trivial_flag is set if the layer
      has no multi-qubit gates.
      */
-    static func layer_permutation(_ layer_partition: [[RegBit]],
+    static private func layer_permutation(_ layer_partition: [[RegBit]],
                                   _ layout: [RegBit:RegBit],
                                   _ qubit_subset: [RegBit],
                                   _ coupling: Coupling,
@@ -74,13 +79,7 @@ final class Mapping {
         // Can we already apply the gates?
         var dist: Int = 0
         for g in gates {
-            guard let r1 = layout[g.0] else {
-                continue
-            }
-            guard let r2 = layout[g.1] else {
-                continue
-            }
-            dist += try coupling.distance(r1,r2)
+            dist += try coupling.distance(layout[g.0]!,layout[g.1]!)
         }
         if dist == gates.count {
             return (true, "", 0, layout, gates.isEmpty)
@@ -104,7 +103,7 @@ final class Mapping {
             for i in coupling.get_qubits() {
                 for j in coupling.get_qubits() {
                     let scale: Double = 1.0 + Random().normal(mean: 0.0, standardDeviation: 1.0 / Double(n))
-                    //print(scale)
+                    //print("scale \(scale")
                     //print(try coupling.distance(i, j))
                     xi[i]![j] = scale * pow(Double(try coupling.distance(i, j)),2)
                     xi[j]![i] = xi[i]![j]
@@ -121,13 +120,7 @@ final class Mapping {
                     // Compute the objective function
                     var min_cost: Double = 0
                     for g in gates {
-                        guard let r1 = trial_layout[g.0] else {
-                            continue
-                        }
-                        guard let r2 = trial_layout[g.1] else {
-                            continue
-                        }
-                        min_cost += xi[r1]![r2]!
+                        min_cost += xi[trial_layout[g.0]!]![trial_layout[g.1]!]!
                     }
                     //min_cost = sum([xi[trial_layout[g[0]]][trial_layout[g[1]]] for g in gates])
                     // Try to decrease objective function
@@ -149,13 +142,7 @@ final class Mapping {
                             // Compute the objective function
                             var new_cost: Double = 0
                             for g in gates {
-                                guard let r1 = new_layout[g.0] else {
-                                    continue
-                                }
-                                guard let r2 = new_layout[g.1] else {
-                                    continue
-                                }
-                                new_cost += xi[r1]![r2]!
+                                new_cost += xi[new_layout[g.0]!]![new_layout[g.1]!]!
                             }
                             //new_cost = sum([xi[new_layout[g[0]]][new_layout[g[1]]] for g in gates])
                             // Record progress if we succceed
@@ -171,14 +158,11 @@ final class Mapping {
 
                     // Were there any good choices?
                     if progress_made {
-                        guard let e = opt_edge else {
-                            break
-                        }
-                        qubit_set.remove(e.one)
-                        qubit_set.remove(e.two)
+                        qubit_set.remove(opt_edge!.one)
+                        qubit_set.remove(opt_edge!.two)
                         trial_layout = opt_layout
                         rev_trial_layout = rev_opt_layout
-                        circ += "swap \(e.one.description),\(e.two.description); "
+                        circ += "swap \(opt_edge!.one.description),\(opt_edge!.two.description); "
                     }
                     else {
                         break
@@ -188,13 +172,7 @@ final class Mapping {
                 // Compute the coupling graph distance
                 var dist: Int = 0
                 for g in gates {
-                    guard let r1 = trial_layout[g.0] else {
-                        continue
-                    }
-                    guard let r2 = trial_layout[g.1] else {
-                        continue
-                    }
-                    dist += try coupling.distance(r1,r2)
+                    dist += try coupling.distance(trial_layout[g.0]!,trial_layout[g.1]!)
                 }
                 //dist = sum([coupling.distance(trial_layout[g[0]],trial_layout[g[1]]) for g in gates])
                 // If all gates can be applied now, we are finished
@@ -210,13 +188,7 @@ final class Mapping {
             // Either we have succeeded at some depth d < dmax or failed
             var dist: Int = 0
             for g in gates {
-                guard let r1 = trial_layout[g.0] else {
-                    continue
-                }
-                guard let r2 = trial_layout[g.1] else {
-                    continue
-                }
-                dist += try coupling.distance(r1,r2)
+                dist += try coupling.distance(trial_layout[g.0]!,trial_layout[g.1]!)
             }
             //dist = sum([coupling.distance(trial_layout[g[0]],trial_layout[g[1]]) for g in gates])
             if dist == gates.count {
@@ -261,8 +233,7 @@ final class Mapping {
             "cx_flipped q[0],q[1];\n"
 
         let u = Unroller(try Qasm(data: flipped_qasm).parse(),CircuitBackend(["cx", "h"]))
-        try u.execute()
-        let flipped_cx_circuit: Circuit = (u.backend as! CircuitBackend).circuit
+        let flipped_cx_circuit = try u.execute() as! Circuit
         let cx_node_list = try circuit_graph.get_named_nodes("cx")
         let cg_edges = coupling_graph.get_edges()
         for cx_node in cx_node_list {
@@ -289,36 +260,98 @@ final class Mapping {
     }
 
     /**
+     Update the QASM string for an iteration of swap_mapper.
+
+     i = layer number
+     first_layer = True if this is the first layer with multi-qubit gates
+     best_layout = layout returned from swap algorithm
+     best_d = depth returns from swap algorithm
+     best_circ = swap circuit returned from swap algorithm
+     circuit_graph = original input circuit
+     layer_list = list of circuit objects for each layer
+     verbose = set True for more print output
+
+     Return openqasm_output, the QASM string to append.
+    */
+    static func update_qasm(_ i: Int,
+                            _ first_layer: Bool,
+                            _ best_layout: [RegBit:RegBit],
+                            _ best_d: Int,
+                            _ best_circ: String,
+                            _ circuit_graph: Circuit,
+                            _ layer_list: [Layer],
+                            _ verbose: Bool = false) throws -> String {
+        var openqasm_output = ""
+        let layout = best_layout
+
+        // If this is the first layer with multi-qubit gates,
+        // output all layers up to this point and ignore any
+        // swap gates. Set the initial layout.
+        if first_layer {
+            if verbose {
+                print("update_qasm_and_layout: first multi-qubit gate layer")
+            }
+            // Output all layers up to this point
+            openqasm_output += try circuit_graph.qasm(decls_only: true, add_swap: true,aliases: layout)
+            for j in 0..<(i+1) {
+                openqasm_output += try layer_list[j].graph.qasm(no_decls: true,aliases: layout)
+            }
+        }
+        // Otherwise, we output the current layer and the associated swap gates.
+        else {
+            // Output any swaps
+            if best_d > 0 {
+                if verbose {
+                    print("update_qasm_and_layout: swaps in this layer, depth \(best_d)")
+                }
+                openqasm_output += best_circ
+            }
+            else {
+                if verbose {
+                    print("update_qasm_and_layout: no swaps in this layer")
+                }
+            }
+            // Output this layer
+            openqasm_output += try layer_list[i].graph.qasm(no_decls: true,aliases: layout)
+        }
+        return openqasm_output
+    }
+
+    /**
      Map a Circuit onto a CouplingGraph using swap gates.
+
      circuit_graph = input Circuit
      coupling_graph = CouplingGraph to map onto
      initial_layout = dict from qubits of circuit_graph to qubits
      of coupling_graph (optional)
      basis = basis string specifying basis of output Circuit
      verbose = optional flag to print more information
+
      Returns a Circuit object containing a circuit equivalent to
      circuit_graph that respects couplings in coupling_graph, and
      a layout dict mapping qubits of circuit_graph into qubits
      of coupling_graph. The layout may differ from the initial_layout
      if the first layer of gates cannot be executed on the
+     initial_layout.cannot be executed on the
      initial_layout.
      */
     static func swap_mapper(_ circuit_graph: Circuit,
                             _ coupling_graph: Coupling,
                             _ init_layout: [RegBit:RegBit]? = nil,
                             _ b: String = "cx,u1,u2,u3,id",
-                            _ verbose: Bool = false) throws -> (Circuit, [RegBit:RegBit]) {
+                            verbose: Bool = false,
+                            trials: Int = 20) throws -> (Circuit, [RegBit:RegBit]) {
         if circuit_graph.width() > coupling_graph.size() {
             throw MappingError.errorqubitscouplinggraph
         }
-        var initial_layout = init_layout
         var basis = b
+
         // Schedule the input circuit
         let layerlist = try circuit_graph.layers()
         if verbose {
             print("schedule:")
-            for i in 0..<layerlist.count {
-                let partition = layerlist[i].partition
+            for (i,layer) in layerlist.enumerated() {
+                let partition = layer.partition
                 var array: [String] = []
                 for regBit in partition {
                     array.append(regBit.description)
@@ -329,6 +362,7 @@ final class Mapping {
 
         // Check input layout and create default layout if necessary
         var qubit_subset: [RegBit] = []
+        var initial_layout = init_layout
         if let init_layout = initial_layout {
             let circ_qubits = circuit_graph.get_qubits()
             let coup_qubits = coupling_graph.get_qubits()
@@ -363,109 +397,96 @@ final class Mapping {
         var layout = initial_layout!
         var openqasm_output = ""
         var first_layer = true  // True until first layer is output
-        var first_swapping_layer = true  // True until first swap layer is output
+        if verbose {
+            print("initial_layout = ", layout)
+        }
         // Iterate over layers
-        for i in 0..<layerlist.count {
+        for (i,layer) in layerlist.enumerated() {
             // Attempt to find a permutation for this layer
             let (success_flag, best_circ, best_d, best_layout, trivial_flag) =
-                try Mapping.layer_permutation(layerlist[i].partition, layout, qubit_subset, coupling_graph, 20)
+                try Mapping.layer_permutation(layer.partition, layout, qubit_subset, coupling_graph, trials)
+            if verbose {
+                print("swap_mapper: layer \(i)")
+                print("swap_mapper: success_flag=\(success_flag),best_d=\(best_d ?? 0),trivial_flag=\(trivial_flag)")
+            }
+            // If this layer is only single-qubit gates,
+            // and we have yet to see multi-qubit gates,
+            // continue to the next iteration
+            if trivial_flag && first_layer {
+                if verbose {
+                    print("swap_mapper: skip to next layer")
+                }
+                continue
+            }
+
             // If this fails, try one gate at a time in this layer
             if !success_flag {
                 if verbose {
                     print("swap_mapper: failed, layer \(i), retrying sequentially")
                 }
-                let serial_layerlist = try layerlist[i].graph.serial_layers()
+                let serial_layerlist = try layer.graph.serial_layers()
+
                 // Go through each gate in the layer
-                for j in 0..<serial_layerlist.count {
+                for (j,serial_layer) in serial_layerlist.enumerated() {
                     let (success_flag, best_circ, best_d, best_layout, trivial_flag) =
-                            try Mapping.layer_permutation(serial_layerlist[j].partition,
-                                    layout, qubit_subset, coupling_graph,20)
+                            try Mapping.layer_permutation(serial_layer.partition,
+                                                          layout, qubit_subset, coupling_graph,trials)
+                    if verbose {
+                        print("swap_mapper: layer \(i), sublayer \(j)")
+                        print("swap_mapper: success_flag=\(success_flag) best_d=\(best_d ?? 0),trivial_flag=\(trivial_flag)")
+                    }
+
                     // Give up if we fail again
                     if !success_flag {
                         throw MappingError.swapmapperfailed(i: i, j: j, qasm: try serial_layerlist[j].graph.qasm(no_decls: true,aliases:layout))
                     }
-                    else {
-                        // Update the qubit positions each iteration
-                        let layout = best_layout
-                        if best_d == 0 {
-                            // Output qasm without swaps
-                            if first_layer {
-                                openqasm_output += try circuit_graph.qasm(decls_only: true, add_swap: true,aliases: layout)
-                                first_layer = false
-                            }
-                            if !trivial_flag && first_swapping_layer {
-                                initial_layout = layout
-                                first_swapping_layer = false
-                            }
+                    // If this layer is only single-qubit gates,
+                    // and we have yet to see multi-qubit gates,
+                    // continue to the next inner iteration
+                    if trivial_flag && first_layer {
+                        if verbose {
+                            print("swap_mapper: skip to next sublayer")
                         }
-                        else {
-                            // Output qasm with swaps
-                            if first_layer {
-                                openqasm_output += try circuit_graph.qasm(decls_only: true, add_swap: true,aliases: layout)
-                                first_layer = false
-                                initial_layout = layout
-                                first_swapping_layer = false
-                            }
-                            else {
-                                if !first_swapping_layer {
-                                    if verbose {
-                                        print("swap_mapper: layer \(i) \(j)), depth \(String(describing: best_d))")
-                                    }
-                                    openqasm_output += best_circ ?? ""
-                                }
-                                else {
-                                    initial_layout = layout
-                                    first_swapping_layer = false
-                                }
-                            }
-                            openqasm_output += try serial_layerlist[j].graph.qasm(no_decls: true,aliases: layout)
-                        }
+                        continue
+                    }
+                    // Update the record of qubit positions for each inner iteration
+                    let layout = best_layout!
+                    // Update the QASM
+                    openqasm_output += try Mapping.update_qasm(j, first_layer, best_layout!, best_d!, best_circ!, circuit_graph, serial_layerlist, verbose)
+                    // Update initial layout
+                    if first_layer {
+                        initial_layout = layout
+                        first_layer = false
                     }
                 }
             }
             else {
                 // Update the qubit positions each iteration
                 layout = best_layout!
-                if best_d == 0 {
-                    // Output qasm without swaps
-                    if first_layer {
-                        openqasm_output += try circuit_graph.qasm(decls_only: true, add_swap: true,aliases: layout)
-                        first_layer = false
-                    }
-                    if !trivial_flag && first_swapping_layer {
-                        initial_layout = layout
-                        first_swapping_layer = false
-                    }
+                // Update the QASM
+                openqasm_output += try update_qasm(i, first_layer, best_layout!, best_d!, best_circ!, circuit_graph, layerlist, verbose)
+                // Update initial layout
+                if first_layer {
+                    initial_layout = layout
+                    first_layer = false
                 }
-                else {
-                    // Output qasm with swaps
-                    if first_layer {
-                        openqasm_output += try circuit_graph.qasm(decls_only: true, add_swap: true,aliases: layout)
-                        first_layer = false
-                        initial_layout = layout
-                        first_swapping_layer = false
-                    }
-                    else {
-                        if !first_swapping_layer {
-                            if verbose {
-                                print("swap_mapper: layer \(i), depth \(String(describing: best_d))")
-                            }
-                            openqasm_output += best_circ ?? ""
-                        }
-                        else {
-                            initial_layout = layout
-                            first_swapping_layer = false
-                        }
-                    }
-                }
-                openqasm_output += try layerlist[i].graph.qasm(no_decls: true,aliases: layout)
             }
         }
+
+        // If first_layer is still set, the circuit only has single-qubit gates
+        // so we can use the initial layout to output the entire circuit
+        if first_layer {
+            let layout = initial_layout
+            openqasm_output += try circuit_graph.qasm(decls_only: true, add_swap: true,aliases: layout)
+            for layer in layerlist {
+                openqasm_output += try layer.graph.qasm(no_decls: true,aliases: layout)
+            }
+        }
+
         // Parse openqasm_output into Circuit object
         basis += ",swap"
         let u = Unroller(try Qasm(data: openqasm_output).parse(), CircuitBackend(basis.components(separatedBy:",")))
-        try u.execute()
-        let circuit: Circuit = (u.backend as! CircuitBackend).circuit
+        let circuit = try u.execute() as! Circuit
         return (circuit, initial_layout!)
     }
 
@@ -507,82 +528,79 @@ final class Mapping {
         if abs(cos(xi)) < eps / 10 {
             solutions.append((theta2 - theta1, xi, 0.0))
         }
-        else {
-            if abs(sin(theta1 + theta2)) < eps / 10.0 {
-                let phi_minus_lambda: [Double] = [Double.pi / 2.0 , 3.0 * Double.pi / 2.0, Double.pi / 2.0, 3.0 * Double.pi / 2.0]
-                let stheta_1: Double = asin(sin(xi) * sin(-theta1 + theta2))
-                let stheta_2: Double = asin(-sin(xi) * sin(-theta1 + theta2))
-                let stheta_3: Double = Double.pi - stheta_1
-                let stheta_4: Double = Double.pi - stheta_2
-                let stheta: [Double] = [stheta_1, stheta_2, stheta_3, stheta_4]
-                var phi_plus_lambda: [Double] = []
-                for x in stheta {
-                    phi_plus_lambda.append(acos(cos(theta1 + theta2) * cos(xi) / cos(x)))
-                }
-                var sphi: [Double] = []
-                var slam: [Double] = []
-                for i in 0..<phi_plus_lambda.count {
-                    if i < phi_minus_lambda.count {
-                        sphi.append((phi_plus_lambda[i] + phi_minus_lambda[i]) / 2.0)
-                        slam.append((phi_plus_lambda[i] - phi_minus_lambda[i]) / 2.0)
-                    }
-                    else {
-                        break
-                    }
-                }
-                for i in 0..<stheta.count {
-                    if i < sphi.count && i < slam.count {
-                        solutions.append((stheta[i],sphi[i],slam[i]))
-                    }
-                    else {
-                        break
-                    }
-                }
+        else if abs(sin(theta1 + theta2)) < eps / 10.0 {
+            let phi_minus_lambda: [Double] = [Double.pi / 2.0 , 3.0 * Double.pi / 2.0, Double.pi / 2.0, 3.0 * Double.pi / 2.0]
+            let stheta_1: Double = asin(sin(xi) * sin(-theta1 + theta2))
+            let stheta_2: Double = asin(-sin(xi) * sin(-theta1 + theta2))
+            let stheta_3: Double = Double.pi - stheta_1
+            let stheta_4: Double = Double.pi - stheta_2
+            let stheta: [Double] = [stheta_1, stheta_2, stheta_3, stheta_4]
+            var phi_plus_lambda: [Double] = []
+            for x in stheta {
+                phi_plus_lambda.append(acos(cos(theta1 + theta2) * cos(xi) / cos(x)))
             }
-            else {
-                if abs(cos(theta1 + theta2)) < eps / 10.0 {
-                    let phi_plus_lambda: [Double] = [Double.pi / 2.0, 3.0 * Double.pi / 2.0, Double.pi / 2.0, 3.0 * Double.pi / 2.0]
-                    let stheta_1: Double = acos(sin(xi) * cos(theta1 - theta2))
-                    let stheta_2: Double = acos(-sin(xi) * cos(theta1 - theta2))
-                    let stheta_3: Double = -stheta_1
-                    let stheta_4: Double = -stheta_2
-                    let stheta: [Double] = [stheta_1, stheta_2, stheta_3, stheta_4]
-                    var phi_minus_lambda: [Double] = []
-                    for x in stheta {
-                        phi_minus_lambda.append(acos(sin(theta1 + theta2) * cos(xi) / sin(x)))
-                    }
-                    var sphi: [Double] = []
-                    var slam: [Double] = []
-                    for i in 0..<phi_plus_lambda.count {
-                        if i < phi_minus_lambda.count {
-                            sphi.append((phi_plus_lambda[i] + phi_minus_lambda[i]) / 2.0)
-                            slam.append((phi_plus_lambda[i] - phi_minus_lambda[i]) / 2.0)
-                        }
-                        else {
-                            break
-                        }
-                    }
-                    for i in 0..<stheta.count {
-                        if i < sphi.count && i < slam.count {
-                            solutions.append((stheta[i],sphi[i],slam[i]))
-                        }
-                        else {
-                            break
-                        }
-                    }
+            var sphi: [Double] = []
+            var slam: [Double] = []
+            for i in 0..<phi_plus_lambda.count {
+                if i < phi_minus_lambda.count {
+                    sphi.append((phi_plus_lambda[i] + phi_minus_lambda[i]) / 2.0)
+                    slam.append((phi_plus_lambda[i] - phi_minus_lambda[i]) / 2.0)
                 }
                 else {
-                    let phi_plus_lambda: Double = atan(sin(xi) * cos(theta1 - theta2) / (cos(xi) * cos(theta1 + theta2)))
-                    let phi_minus_lambda: Double = atan(sin(xi) * sin(-theta1 + theta2) / (cos(xi) * sin(theta1 + theta2)))
-                    let sphi: Double = (phi_plus_lambda + phi_minus_lambda) / 2.0
-                    let slam: Double = (phi_plus_lambda - phi_minus_lambda) / 2.0
-                    solutions.append((acos(cos(xi) * cos(theta1 + theta2) / cos(sphi + slam)), sphi, slam))
-                    solutions.append((acos(cos(xi) * cos(theta1 + theta2) / cos(sphi + slam + Double.pi)), sphi + Double.pi / 2.0, slam + Double.pi / 2.0))
-                    solutions.append((acos(cos(xi) * cos(theta1 + theta2) / cos(sphi + slam)), sphi + Double.pi / 2.0, slam - Double.pi / 2.0))
-                    solutions.append((acos(cos(xi) * cos(theta1 + theta2) / cos(sphi + slam + Double.pi)), sphi + Double.pi, slam))
+                    break
+                }
+            }
+            for i in 0..<stheta.count {
+                if i < sphi.count && i < slam.count {
+                    solutions.append((stheta[i],sphi[i],slam[i]))
+                }
+                else {
+                    break
                 }
             }
         }
+        else if abs(cos(theta1 + theta2)) < eps / 10.0 {
+            let phi_plus_lambda: [Double] = [Double.pi / 2.0, 3.0 * Double.pi / 2.0, Double.pi / 2.0, 3.0 * Double.pi / 2.0]
+            let stheta_1: Double = acos(sin(xi) * cos(theta1 - theta2))
+            let stheta_2: Double = acos(-sin(xi) * cos(theta1 - theta2))
+            let stheta_3: Double = -stheta_1
+            let stheta_4: Double = -stheta_2
+            let stheta: [Double] = [stheta_1, stheta_2, stheta_3, stheta_4]
+            var phi_minus_lambda: [Double] = []
+            for x in stheta {
+                phi_minus_lambda.append(acos(sin(theta1 + theta2) * cos(xi) / sin(x)))
+            }
+            var sphi: [Double] = []
+            var slam: [Double] = []
+            for i in 0..<phi_plus_lambda.count {
+                if i < phi_minus_lambda.count {
+                    sphi.append((phi_plus_lambda[i] + phi_minus_lambda[i]) / 2.0)
+                    slam.append((phi_plus_lambda[i] - phi_minus_lambda[i]) / 2.0)
+                }
+                else {
+                    break
+                }
+            }
+            for i in 0..<stheta.count {
+                if i < sphi.count && i < slam.count {
+                    solutions.append((stheta[i],sphi[i],slam[i]))
+                }
+                else {
+                    break
+                }
+            }
+        }
+        else {
+            let phi_plus_lambda: Double = atan(sin(xi) * cos(theta1 - theta2) / (cos(xi) * cos(theta1 + theta2)))
+            let phi_minus_lambda: Double = atan(sin(xi) * sin(-theta1 + theta2) / (cos(xi) * sin(theta1 + theta2)))
+            let sphi: Double = (phi_plus_lambda + phi_minus_lambda) / 2.0
+            let slam: Double = (phi_plus_lambda - phi_minus_lambda) / 2.0
+            solutions.append((acos(cos(xi) * cos(theta1 + theta2) / cos(sphi + slam)), sphi, slam))
+            solutions.append((acos(cos(xi) * cos(theta1 + theta2) / cos(sphi + slam + Double.pi)), sphi + Double.pi / 2.0, slam + Double.pi / 2.0))
+            solutions.append((acos(cos(xi) * cos(theta1 + theta2) / cos(sphi + slam)), sphi + Double.pi / 2.0, slam - Double.pi / 2.0))
+            solutions.append((acos(cos(xi) * cos(theta1 + theta2) / cos(sphi + slam + Double.pi)), sphi + Double.pi, slam))
+        }
+
         // Select the first solution with the required accuracy
         var deltas: [Double] = []
         for x in solutions {
@@ -670,8 +688,7 @@ final class Mapping {
     static func optimize_1q_gates(_ circuit: Circuit) throws -> Circuit {
         let qx_basis = ["u1", "u2", "u3", "cx", "id"]
         let urlr = try Unroller(Qasm(data: circuit.qasm(qeflag: true)).parse(), CircuitBackend(qx_basis))
-        try urlr.execute()
-        let unrolled: Circuit = (urlr.backend as! CircuitBackend).circuit  
+        let unrolled = try urlr.execute() as! Circuit
        
         let runs = try unrolled.collect_runs(["u1", "u2", "u3", "id"])
         for run in runs {
@@ -689,19 +706,15 @@ final class Mapping {
                 if left_name == "u1" {
                     left_parameters = (0.0, 0.0, Double(nd.params[0])!)
                 }
+                else if left_name == "u2" {
+                    left_parameters = (Double.pi / 2.0, Double(nd.params[0])!, Double(nd.params[1])!)
+                }
+                else if left_name == "u3" {
+                    left_parameters = (Double(nd.params[0])!, Double(nd.params[1])!, Double(nd.params[2])!)
+                }
                 else {
-                    if left_name == "u2" {
-                        left_parameters = (Double.pi / 2.0, Double(nd.params[0])!, Double(nd.params[1])!)
-                    }
-                    else {
-                        if left_name == "u3" {
-                            left_parameters = (Double(nd.params[0])!, Double(nd.params[1])!, Double(nd.params[2])!)
-                        }
-                        else {
-                            left_name = "u1"  // replace id with u1
-                            left_parameters = (0.0, 0.0, 0.0)
-                        }
-                    }
+                    left_name = "u1"  // replace id with u1
+                    left_parameters = (0.0, 0.0, 0.0)
                 }
                 // Compose gates
                 let name_tuple = (left_name, right_name)
@@ -709,55 +722,45 @@ final class Mapping {
                     // u1(lambda1) * u1(lambda2) = u1(lambda1 + lambda2)
                     right_parameters = (0.0, 0.0, right_parameters.2 + left_parameters.2)
                 }
+                else if name_tuple == ("u1", "u2") {
+                    // u1(lambda1) * u2(phi2, lambda2) = u2(phi2 + lambda1, lambda2)
+                    right_parameters = (Double.pi / 2, right_parameters.1 + left_parameters.2, right_parameters.2)
+                }
+                else if name_tuple == ("u2", "u1") {
+                    // u2(phi1, lambda1) * u1(lambda2) = u2(phi1, lambda1 + lambda2)
+                    right_name = "u2"
+                    right_parameters = (Double.pi / 2.0, left_parameters.1, right_parameters.2 + left_parameters.2)
+                }
+                else if name_tuple == ("u1", "u3") {
+                    // u1(lambda1) * u3(theta2, phi2, lambda2) =
+                    //     u3(theta2, phi2 + lambda1, lambda2)
+                    right_parameters = (right_parameters.0, right_parameters.1 + left_parameters.2, right_parameters.2)
+                }
+                else if name_tuple == ("u3", "u1") {
+                    // u3(theta1, phi1, lambda1) * u1(lambda2) =
+                    //    u3(theta1, phi1, lambda1 + lambda2)
+                    right_name = "u3"
+                    right_parameters = (left_parameters.0, left_parameters.1, right_parameters.2 + left_parameters.2)
+                }
+                else if name_tuple == ("u2", "u2") {
+                    // Using Ry(pi/2).Rz(2*lambda).Ry(pi/2) =
+                    //    Rz(pi/2).Ry(pi-2*lambda).Rz(pi/2),
+                    // u2(phi1, lambda1) * u2(phi2, lambda2) =
+                    //    u3(pi - lambda1 - phi2, phi1 + pi/2, lambda2 + pi/2)
+                    right_name = "u3"
+                    right_parameters = (Double.pi - left_parameters.2 - right_parameters.1, left_parameters.1 + Double.pi / 2.0, right_parameters.2 + Double.pi / 2)
+                }
                 else {
-                    if name_tuple == ("u1", "u2") {
-                        // u1(lambda1) * u2(phi2, lambda2) = u2(phi2 + lambda1, lambda2)
-                        right_parameters = (Double.pi / 2, right_parameters.1 + left_parameters.2, right_parameters.2)
-                    }
-                    else {
-                        if name_tuple == ("u2", "u1") {
-                            // u2(phi1, lambda1) * u1(lambda2) = u2(phi1, lambda1 + lambda2)
-                            right_name = "u2"
-                            right_parameters = (Double.pi / 2.0, left_parameters.1, right_parameters.2 + left_parameters.2)
-                        }
-                        else {
-                            if name_tuple == ("u1", "u3") {
-                                // u1(lambda1) * u3(theta2, phi2, lambda2) =
-                                //     u3(theta2, phi2 + lambda1, lambda2)
-                                right_parameters = (right_parameters.0, right_parameters.1 + left_parameters.2, right_parameters.2)
-                            }
-                            else {
-                                if name_tuple == ("u3", "u1") {
-                                    // u3(theta1, phi1, lambda1) * u1(lambda2) =
-                                    //    u3(theta1, phi1, lambda1 + lambda2)
-                                    right_name = "u3"
-                                    right_parameters = (left_parameters.0, left_parameters.1, right_parameters.2 + left_parameters.2)
-                                }
-                                else {
-                                    if name_tuple == ("u2", "u2") {
-                                        // Using Ry(pi/2).Rz(2*lambda).Ry(pi/2) =
-                                        //    Rz(pi/2).Ry(pi-2*lambda).Rz(pi/2),
-                                        // u2(phi1, lambda1) * u2(phi2, lambda2) =
-                                        //    u3(pi - lambda1 - phi2, phi1 + pi/2, lambda2 + pi/2)
-                                        right_name = "u3"
-                                        right_parameters = (Double.pi - left_parameters.2 - right_parameters.1, left_parameters.1 + Double.pi / 2.0, right_parameters.2 + Double.pi / 2)
-                                    }
-                                    else {
-                                        // For composing u3's or u2's with u3's, use
-                                        // u2(phi, lambda) = u3(pi/2, phi, lambda)
-                                        // together with the qiskit.mapper.compose_u3 method.
-                                        right_name = "u3"
-                                        right_parameters = Mapping.compose_u3(left_parameters.0,
-                                                                        left_parameters.1,
-                                                                        left_parameters.2,
-                                                                        right_parameters.0,
-                                                                        right_parameters.1,
-                                                                        right_parameters.2)
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    // For composing u3's or u2's with u3's, use
+                    // u2(phi, lambda) = u3(pi/2, phi, lambda)
+                    // together with the qiskit.mapper.compose_u3 method.
+                    right_name = "u3"
+                    right_parameters = Mapping.compose_u3(left_parameters.0,
+                                                    left_parameters.1,
+                                                    left_parameters.2,
+                                                    right_parameters.0,
+                                                    right_parameters.1,
+                                                    right_parameters.2)
                 }
                 // Here down, when we simplify, we add f(theta) to lambda to correct
                 // the global phase when f(theta) is 2*pi. This isn't necessary but

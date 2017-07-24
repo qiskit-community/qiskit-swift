@@ -145,7 +145,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
     public func add_edge(_ source: GraphVertex<VertexDataType>, _ neighbor: GraphVertex<VertexDataType>, _ data: EdgeDataType? = nil) {
         var newEdge = GraphEdge<EdgeDataType>(source.key,neighbor.key)
         newEdge.data = data
-        source.neighbors.update(with: neighbor.key)
+        source.addNeighbor(neighbor.key)
         var grapMultiEdges = self.edges(newEdge.source,newEdge.neighbor)
         grapMultiEdges.append(newEdge)
         self._edges[TupleInt(source.key,neighbor.key)] = grapMultiEdges
@@ -154,7 +154,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
             newEdge = GraphEdge<EdgeDataType>(neighbor.key,source.key)
             newEdge.data = data
             if self._edges[TupleInt(newEdge.source,newEdge.neighbor)] == nil {
-                neighbor.neighbors.update(with: source.key)
+                neighbor.addNeighbor(source.key)
                 self._edges[TupleInt(newEdge.source,newEdge.neighbor)] = [newEdge]
             }
         }
@@ -163,12 +163,12 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
     public func remove_edge(_ sourceIndex: Int, _ neighborIndex: Int) {
         self._edges[TupleInt(sourceIndex,neighborIndex)] = nil
         if let source = self.vertex(sourceIndex) {
-            source.neighbors.remove(neighborIndex)
+            source.removeNeighbor(neighborIndex)
         }
         if !self.isDirected {
             self._edges[TupleInt(neighborIndex,sourceIndex)] = nil
             if let neighbor = self.vertex(neighborIndex) {
-                neighbor.neighbors.remove(sourceIndex)
+                neighbor.removeNeighbor(sourceIndex)
             }
         }
     }
@@ -181,7 +181,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         self.vertices[index] = nil
         for i in 0..<self.vertices.count {
             let vertex = self.vertices.value(i)
-            vertex.neighbors.remove(index)
+            vertex.removeNeighbor(index)
             self._edges[TupleInt(index,vertex.key)] = nil
             self._edges[TupleInt(vertex.key,index)] = nil
         }
@@ -663,7 +663,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
                 }
                 let newEdge = GraphEdge<EdgeDataType>(edge.neighbor,edge.source)
                 newEdge.data = edge.data
-                neighbor.neighbors.update(with: source.key)
+                neighbor.addNeighbor(source.key)
                 var grapMultiEdges = graph.edges(newEdge.source,newEdge.neighbor)
                 if grapMultiEdges.isEmpty {
                     grapMultiEdges.append(newEdge)

@@ -16,7 +16,7 @@ final class CircuitBackend: UnrollerBackend {
     private let prec: Int = 15
     private var creg:String? = nil
     private var cval:Int? = nil
-    let circuit: Circuit = Circuit()
+    private let circuit: Circuit = Circuit()
     private var basis: [String]
     private var listen: Bool = true
     private var in_gate: String = ""
@@ -234,5 +234,12 @@ final class CircuitBackend: UnrollerBackend {
             self.in_gate = ""
             self.listen = true
         }
+    }
+
+    /**
+     Returns the generated circuit.
+     */
+    func get_output() throws -> Any? {
+        return self.circuit
     }
 }

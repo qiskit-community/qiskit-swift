@@ -12,49 +12,51 @@ import Foundation
  Quantum Program Class
  */
 /**
- Elements that are not python identifiers or string constants are denoted
- by "--description (type)--". For example, a circuit's name is denoted by
- "--circuit name (string)--" and might have the value "teleport".
+Elements that are not python identifiers or string constants are denoted
+by "--description (type)--". For example, a circuit's name is denoted by
+"--circuit name (string)--" and might have the value "teleport".
 
- __quantum_program = {
- "circuits": {
-     --circuit name (string)--: {
-         "circuit": --circuit object (TBD)--,
-         "execution": {  #### FILLED IN AFTER RUN -- JAY WANTS THIS MOVED DOWN ONE LAYER ####
-             --backend name (string)--: {
-                 "coupling_map": --adjacency list (dict)--,
-                 "basis_gates": --comma separated gate names (string)--,
-                 "compiled_circuit": --compiled quantum circuit (currently QASM text)--,
-                 "shots": --shots (int)--,
-                 "max_credits": --credits (int)--,
-                 "result": {
-                     "data": {  #### DATA CAN BE A DIFFERENT DICTIONARY FOR EACH BACKEND ####
-                        "counts": {’00000’: XXXX, ’00001’: XXXXX},
-                        "time"  : xx.xxxxxxxx
-                     },
-                     "date"  : "2017−05−09Txx:xx:xx.xxxZ",
-                     "status": --status (string)--
-                 }
-             },
-         }
-     }
- }
+__quantum_program = {
+    "circuits": {
+        --circuit name (string)--: {
+            "circuit": --circuit object (TBD)--,
+            "execution": {  #### FILLED IN AFTER RUN -- JAY WANTS THIS MOVED DOWN ONE LAYER ####
+                --backend name (string)--: {
+                    "coupling_map": --adjacency list (dict)--,
+                    "basis_gates": --comma separated gate names (string)--,
+                    "compiled_circuit": --compiled quantum circuit (currently QASM text)--,
+                    "layout": --layout computed by mapper (dict)--,
+                    "shots": --shots (int)--,
+                    "max_credits": --credits (int)--,
+                    "result": {
+                        "data": {  #### DATA CAN BE A DIFFERENT DICTIONARY FOR EACH BACKEND ####
+                            "counts": {’00000’: XXXX, ’00001’: XXXXX},
+                            "time"  : xx.xxxxxxxx
+                        },
+                        "date"  : "2017−05−09Txx:xx:xx.xxxZ",
+                        "status": --status (string)--
+                    }
+                },
+            }
+        }
+    }
 
- __to_execute = {
-     --backend name (string)--: [
-         {
-             "name": --circuit name (string)--,
-             "coupling_map": --adjacency list (dict)--,
-             "basis_gates": --comma separated gate names (string)--,
-             "compiled_circuit": --compiled quantum circuit (currently QASM text)--,
-             "shots": --shots (int)--,
-             "max_credits": --credits (int)--
-             "seed": --initial seed for the simulator (int) --
-         },
-         ...
-     ]
- }
+    __to_execute = {
+        --backend name (string)--: [
+        {
+        "name": --circuit name (string)--,
+        "coupling_map": --adjacency list (dict)--,
+        "basis_gates": --comma separated gate names (string)--,
+        "compiled_circuit": --compiled quantum circuit (currently QASM text)--,
+        "shots": --shots (int)--,
+        "max_credits": --credits (int)--
+        "seed": --initial seed for the simulator (int) --
+        },
+        ...
+        ]
+    }
  */
+
 /**
  # -- FUTURE IMPROVEMENTS --
  # TODO: for status results choose ALL_CAPS, or This but be consistent
@@ -85,7 +87,7 @@ public final class QuantumProgram {
         var url: URL? = nil
     }
 
-    private static let __LOCAL_BACKENDS: Set<String> = ["local_unitary_simulator", "local_qasm_simulator", "local_qasm_cpp_simulator"]
+    private var __LOCAL_BACKENDS: [String]? = nil
 
     public let name: String
     private var config: Qconfig
@@ -158,6 +160,14 @@ public final class QuantumProgram {
         return self.__api
     }
 
+    /**
+     Queries network API if it exists.
+
+     Returns
+     -------
+     List of online backends if the online api has been set or an empty
+     list of it has not been set.
+    */
     public func online_backends(responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) {
         self.__api.available_backends() { (backends,error) in
             if error != nil {
@@ -174,6 +184,65 @@ public final class QuantumProgram {
         }
     }
 
+    /**
+     Gets online simulators via QX API calls.
+
+     Returns
+     -------
+     List of online simulator names.
+     */
+    public func online_simulators(responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) {
+        self.__api.available_backends() { (backends,error) in
+            if error != nil {
+                responseHandler([],error)
+                return
+            }
+            var ret: Set<String> = []
+            for backend in backends {
+                guard let simulator = backend["simulator"] as? Bool else {
+                    continue
+                }
+                if simulator {
+                    if let name = backend["name"] as? String {
+                        ret.update(with: name)
+                    }
+                }
+            }
+            responseHandler(ret,nil)
+        }
+    }
+
+    /**
+     Gets online devices via QX API calls
+     */
+    public func online_devices(responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) {
+        self.__api.available_backends() { (backends,error) in
+            if error != nil {
+                responseHandler([],error)
+                return
+            }
+            var ret: Set<String> = []
+            for backend in backends {
+                guard let simulator = backend["simulator"] as? Bool else {
+                    continue
+                }
+                if !simulator {
+                    if let name = backend["name"] as? String {
+                        ret.update(with: name)
+                    }
+                }
+            }
+            responseHandler(ret,nil)
+        }
+    }
+
+    /**
+     Get the local backends.
+     */
+    public func local_backends() -> Set<String> {
+        return LocalSimulator.local_backends
+    }
+
     public func available_backends(responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) {
         self.online_backends() { (backends,error) in
             if error != nil {
@@ -181,7 +250,7 @@ public final class QuantumProgram {
                 return
             }
             var ret = backends
-            ret.formUnion(QuantumProgram.__LOCAL_BACKENDS)
+            ret.formUnion(self.local_backends())
             responseHandler(ret,nil)
         }
     }
@@ -201,7 +270,7 @@ public final class QuantumProgram {
                 self.__api.backend_status(backend,responseHandler: responseHandler)
                 return
             }
-            if QuantumProgram.__LOCAL_BACKENDS.contains(backend) {
+            if self.local_backends().contains(backend) {
                 responseHandler(["available" : true],nil)
                 return
             }
@@ -255,7 +324,7 @@ public final class QuantumProgram {
                 self.__api.backend_calibration(backend,responseHandler: responseHandler)
                 return
             }
-            if QuantumProgram.__LOCAL_BACKENDS.contains(backend) {
+            if self.local_backends().contains(backend) {
                 responseHandler(["calibrations" : "NA"],nil)
                 return
             }
@@ -279,8 +348,8 @@ public final class QuantumProgram {
                 self.__api.backend_parameters(backend,responseHandler: responseHandler)
                 return
             }
-            if QuantumProgram.__LOCAL_BACKENDS.contains(backend) {
-                responseHandler(["parameters" : "NA"],nil)
+            if self.local_backends().contains(backend) {
+                responseHandler(["parameters" : []],nil)
                 return
             }
             responseHandler(nil,IBMQuantumExperienceError.errorBackend(backend: backend))
@@ -293,6 +362,7 @@ public final class QuantumProgram {
     @discardableResult
     public func create_quantum_registers(_ name: String, _ size: Int) throws -> QuantumRegister {
         try self.__quantum_registers[name] = QuantumRegister(name, size)
+        print(">> quantum_registers created: \(name) \(size)")
         return self.__quantum_registers[name]!
     }
 
@@ -319,6 +389,7 @@ public final class QuantumProgram {
     @discardableResult
     public func  create_classical_registers(_ name: String, _ size: Int) throws -> ClassicalRegister {
         try self.__classical_registers[name] = ClassicalRegister(name, size)
+        print(">> classical_registers created: \(name) \(size)")
         return self.__classical_registers[name]!
     }
 
@@ -580,8 +651,7 @@ public final class QuantumProgram {
         }
         let unrolled_circuit = Unroller(try Qasm(data: circuitQasm).parse(),
                                         CircuitBackend(basis.components(separatedBy:",")))
-        try unrolled_circuit.execute()
-        let circuit_unrolled: Circuit = (unrolled_circuit.backend as! CircuitBackend).circuit  // circuit DAG
+        let circuit_unrolled = try unrolled_circuit.execute() as! Circuit
         let qasm_source = try circuit_unrolled.qasm(qeflag: true)
         return (qasm_source, circuit_unrolled)
     }
@@ -614,7 +684,10 @@ public final class QuantumProgram {
                  max_credits: Int = 3,
                  basis_gates: String? = nil,
                  coupling_map: [Int:[Int]]? = nil,
-                 seed: Double? = nil) throws {
+                 initial_layout: [RegBit:RegBit]? = nil,
+                 seed: Int? = nil,
+                 config: [String:Any]? = nil,
+                 silent: Bool = false) throws {
         if name_of_circuits.isEmpty {
             throw QISKitException.missingCircuits
         }
@@ -626,13 +699,23 @@ public final class QuantumProgram {
 
             // TODO: The circuit object has to have .qasm() method (be careful)
             var (qasm_compiled, dag_unrolled) = try self.unroller_code(qCircuit.circuit.qasm(), basis_gates)
+            var final_layout: [RegBit:RegBit]? = nil
             if coupling_map != nil {
-                //print("qasm compiled: \(qasm_compiled)")
-                //print("pre-mapping properties: \(try dag_unrolled.property_summary())")
+                if !silent {
+                    print("pre-mapping properties: \(try dag_unrolled.property_summary())")
+                }
                 // Insert swap gates
                 let coupling = try Coupling(coupling_map)
-                var (dag_unrolled, _) = try Mapping.swap_mapper(dag_unrolled, coupling)
-                //print("layout: \(final_layout)")
+                if !silent {
+                    print("initial layout: \(initial_layout ?? [:])")
+                }
+                var layout:[RegBit:RegBit] = [:]
+                (dag_unrolled, layout) = try Mapping.swap_mapper(dag_unrolled, coupling, initial_layout, verbose: false, trials: 20)
+                final_layout = layout
+                if !silent {
+                    print("final layout: \(final_layout ?? [:])")
+                }
+
                 // Expand swaps
                 (qasm_compiled, dag_unrolled) = try self.unroller_code(try dag_unrolled.qasm())
                 // Change cx directions
@@ -642,7 +725,9 @@ public final class QuantumProgram {
                 // Simplify single qubit gates
                 dag_unrolled = try Mapping.optimize_1q_gates(dag_unrolled)
                 qasm_compiled = try dag_unrolled.qasm(qeflag: true)
-                //print("post-mapping properties: \(try dag_unrolled.property_summary())")
+                if !silent {
+                    print("post-mapping properties: \(try dag_unrolled.property_summary())")
+                }
             }
             // TODO: add timestamp, compilation
             var jobs: [[String:Any]] = []
@@ -654,18 +739,29 @@ public final class QuantumProgram {
             if let map = coupling_map {
                 job["coupling_map"] = map 
             }
+            if let layout = final_layout {
+                job["layout"] = layout
+            }
             if let basis = basis_gates {
                 job["basis_gates"] = basis 
             }
             job["shots"] = shots 
             job["max_credits"] = max_credits 
+            if let conf = config {
+                job["config"] = conf
+            }
+            else {
+                job["config"] = [:] // default to empty config dict
+            }
             // TODO: This will become a new compiled circuit object in the
-            //      future. See future improvements at the top of this
-            //     file.
-            job["compiled_circuit"] = qasm_compiled 
-            job["seed"] = Random.random() 
+            //       future. See future improvements at the top of this
+            //      file.
+            job["compiled_circuit"] = qasm_compiled
             if seed != nil {
                 job["seed"] = seed! 
+            }
+            else {
+                job["seed"] = Int(Random.random())
             }
             jobs.append(job)
             self.__to_execute[backend] = jobs
@@ -698,8 +794,8 @@ public final class QuantumProgram {
      verbose controls how much is returned.
      */
     public func print_execution_list(_ verbose: Bool = false) {
-        for (device, jobs) in self.__to_execute {
-            print("\(device)")
+        for (backend, jobs) in self.__to_execute {
+            print("\(backend)")
             for job in jobs {
                 if let name = job["name"] as? String {
                     print("  \(name):")
@@ -710,7 +806,7 @@ public final class QuantumProgram {
                 if let max_credits = job["max_credits"] as? Int {
                     print("    max_credits = \(max_credits)")
                 }
-                if let seed = job["seed"] as? Double {
+                if let seed = job["seed"] as? Int {
                     print("    seed (simulator only) = \(seed)")
                 }
                 if verbose {
@@ -841,16 +937,15 @@ public final class QuantumProgram {
                     }
                     let basis_gates: [String] = []  // unroll to base gates
                     let unroller = Unroller(try Qasm(data: compiled_circuit).parse(),JsonBackend(basis_gates))
-                    try unroller.execute()
-                    let json_circuit: [String:Any] = (unroller.backend as! JsonBackend).circuit
-                    
+                    let json_circuit = try unroller.execute()
+                  
                     // converts qasm circuit to json circuit
                     var newJob: [String:Any] = [:]
                     newJob["compiled_circuit"] = json_circuit
                     if let shots = job["shots"] as? Int {
                         newJob["shots"] = shots
                     }
-                    if let seed = job["seed"] as? Double {
+                    if let seed = job["seed"] as? Int {
                         newJob["seed"] = seed
                     }
                     if let config = job["config"] as? Int {
@@ -864,7 +959,7 @@ public final class QuantumProgram {
                 }
 
                 var job_result: [ String: [[String:Any]] ] = [:]
-                if QuantumProgram.__LOCAL_BACKENDS.contains(backend) {
+                if self.local_backends().contains(backend) {
                     job_result = try QuantumProgram.run_local_simulator(backend,jobs)
                 }
                 else {
@@ -873,9 +968,11 @@ public final class QuantumProgram {
                 }
                 try self.postRun(backend,toExecute, job_result)
                 responseHandler(job_result,nil)
-            }
-            catch {
-                responseHandler(nil,error as? QISKitException)
+            } catch let error as QISKitException {
+                responseHandler(nil,error)
+                return
+            } catch {
+                responseHandler(nil,QISKitException.internalError(error: error))
                 return
             }
         }
@@ -1011,7 +1108,9 @@ public final class QuantumProgram {
                         silent: Bool = false,
                         basis_gates: String? = nil,
                         coupling_map: [Int:[Int]]? = nil,
-                        seed: Double? = nil,
+                        initial_layout: [RegBit:RegBit]? = nil,
+                        seed: Int? = nil,
+                        config: [String:Any]? = nil,
                         _ responseHandler: @escaping ((_:QISKitException?) -> Void)) {
         do {
             try self.compile(name_of_circuits,
@@ -1020,7 +1119,10 @@ public final class QuantumProgram {
                              max_credits: max_credits,
                              basis_gates: basis_gates,
                              coupling_map: coupling_map,
-                             seed: seed)
+                             initial_layout: initial_layout,
+                             seed: seed,
+                             config: config,
+                             silent: silent)
             self.run(wait,timeout,silent,responseHandler)
         } catch {
             if let err = error as? QISKitException {

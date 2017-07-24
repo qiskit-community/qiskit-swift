@@ -103,7 +103,7 @@ public final class DataMove {
                         print(try qp.get_compiled_qasm("swapping"))
                         print(try qp.get_counts("swapping"))
 
-                        // Both versions should give the same distribution
+                        print("Both versions should give the same distribution")
                     } catch {
                         print(error.localizedDescription)
                     }

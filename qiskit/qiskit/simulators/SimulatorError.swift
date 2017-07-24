@@ -13,7 +13,7 @@ Exception for errors raised by the Simulator object.
 */
 public enum SimulatorError: LocalizedError, CustomStringConvertible {
     case unknownSimulator(name: String)
-
+   
     public var errorDescription: String? {
         return self.description
     }

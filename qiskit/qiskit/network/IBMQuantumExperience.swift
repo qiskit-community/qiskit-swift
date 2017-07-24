@@ -306,7 +306,7 @@ public final class IBMQuantumExperience {
                                backend: String = "simulator",
                                shots: Int = 1,
                                name: String? = nil,
-                               seed: Double? = nil,
+                               seed: Int? = nil,
                                timeout: Int = 60,
                                responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
         self.checkCredentials(request: self.req) { (error) -> Void in
@@ -472,7 +472,7 @@ public final class IBMQuantumExperience {
                         backend: String = "simulator",
                         shots: Int = 1,
                         maxCredits: Int = 3,
-                        seed: Double? = nil,
+                        seed: Int? = nil,
                         responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
 
         self.checkCredentials(request: self.req) { (error) -> Void in

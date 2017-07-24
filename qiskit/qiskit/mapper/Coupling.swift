@@ -20,12 +20,12 @@ final class Coupling: CustomStringConvertible {
     /**
     qubits is dict from qubit (regname,idx) tuples to node indices
      */
-    private var qubits: OrderedDictionary<RegBit,GraphVertex<CouplingVertexData>> = OrderedDictionary<RegBit,GraphVertex<CouplingVertexData>>()
+    private var qubits: OrderedDictionary<RegBit,Int> = OrderedDictionary<RegBit,Int>()
 
     /**
      index_to_qubit is a dict from node indices to qubits
      */
-    private var index_to_qubit: [GraphVertex<CouplingVertexData>:RegBit] = [:]
+    private var index_to_qubit: [Int:RegBit] = [:]
 
     /**
      node_counter is integer counter for labeling nodes
@@ -51,7 +51,7 @@ final class Coupling: CustomStringConvertible {
         var list: [String] = []
         for k in self.qubits.keys {
             if let v = self.qubits[k] {
-                list.append("\(k.description) @ \(v.key)")
+                list.append("\(k.description) @ \(v)")
             }
         }
         s += list.joined(separator: ", ")
@@ -112,19 +112,7 @@ final class Coupling: CustomStringConvertible {
     public func get_edges() -> [TupleRegBit] {
         var edges: [TupleRegBit] = []
         for edge in self.G.edges {
-            guard let source = self.G.vertex(edge.source) else {
-                continue
-            }
-            guard let qubitSource = self.index_to_qubit[source] else {
-                continue
-            }
-            guard let neighbor = self.G.vertex(edge.neighbor) else {
-                continue
-            }
-            guard let qubitNeighbor = self.index_to_qubit[neighbor] else {
-                continue
-            }
-            edges.append(TupleRegBit(qubitSource,qubitNeighbor))
+            edges.append(TupleRegBit(self.index_to_qubit[edge.source]!,self.index_to_qubit[edge.neighbor]!))
         }
         return edges
     }
@@ -133,12 +121,12 @@ final class Coupling: CustomStringConvertible {
      Add a qubit to the coupling graph.
      name = tuple (regname, idx) for qubit
      */
-    public func add_qubit(_ name: RegBit) throws {
+    private func add_qubit(_ name: RegBit) throws {
         if self.qubits[name] != nil {
             throw CouplingError.duplicateregbit(regBit: name)
         }
         self.node_counter += 1
-        self.qubits[name] = self.G.add_vertex(self.node_counter, CouplingVertexData(name))
+        self.qubits[name] = self.G.add_vertex(self.node_counter, CouplingVertexData(name)).key
         self.index_to_qubit[self.qubits[name]!] = name
     }
 
@@ -147,7 +135,7 @@ final class Coupling: CustomStringConvertible {
      s_name = source qubit tuple
      d_name = destination qubit tuple
      */
-    public func add_edge(_ s_name: RegBit, _ d_name: RegBit) throws {
+    private func add_edge(_ s_name: RegBit, _ d_name: RegBit) throws {
         if self.qubits[s_name] == nil {
             try self.add_qubit(s_name)
         }
@@ -170,7 +158,7 @@ final class Coupling: CustomStringConvertible {
      The distance map self.dist is computed from the graph using
      all_pairs_shortest_path_length    
     */
-    public func compute_distance() throws {
+    private func compute_distance() throws {
         if try !self.connected() {
             throw CouplingError.notconnected
         }
@@ -178,17 +166,11 @@ final class Coupling: CustomStringConvertible {
         self.dist = [:]
         for i in self.qubits.keys {
             self.dist[i] = [:]
-            guard let sourceVertex = self.qubits[i] else {
-                continue
-            }
-            guard let lengthSource = lengths[sourceVertex.key] else {
+            guard let lengthSource = lengths[self.qubits[i]!] else {
                 continue
             }
             for j in self.qubits.keys {
-                guard let endVertex = self.qubits[j] else {
-                    continue
-                }
-                guard let lengthEnd = lengthSource[endVertex.key] else {
+                guard let lengthEnd = lengthSource[self.qubits[j]!] else {
                     continue
                 }
                 self.dist[i]![j] = lengthEnd
@@ -209,12 +191,6 @@ final class Coupling: CustomStringConvertible {
         if self.qubits[q2] == nil {
             throw CouplingError.notincouplinggraph(regBit: q2)
         }
-        guard let distMap = self.dist[q1] else {
-            return 0
-        }
-        guard let distance = distMap[q2] else {
-            return 0
-        }
-        return distance
+        return self.dist[q1]![q2]!
     }
 }

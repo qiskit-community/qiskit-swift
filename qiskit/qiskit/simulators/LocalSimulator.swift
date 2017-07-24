@@ -65,11 +65,11 @@ final class LocalSimulator {
                 UnitarySimulator.__configuration]
     }
 
-    static var local_backends: [String] {
-        var backends: [String] = []
+    static var local_backends: Set<String> {
+        var backends: Set<String> = []
         for configuration in local_configurations {
             if let name = configuration["name"] as? String {
-                backends.append(name)
+                backends.update(with:name)
             }
         }
         return backends
@@ -77,13 +77,13 @@ final class LocalSimulator {
 
     static private func sim(_ name: String, _ job: [String:Any]) throws -> Simulator {
         if name == (QasmCppSimulator.__configuration["name"] as? String) {
-            return QasmCppSimulator(job)
+            return try QasmCppSimulator(job)
         }
         if name == (QasmSimulator.__configuration["name"] as? String) {
-            return QasmSimulator(job)
+            return try QasmSimulator(job)
         }
         if name == (UnitarySimulator.__configuration["name"] as? String) {
-            return UnitarySimulator(job)
+            return try UnitarySimulator(job)
         }
         throw SimulatorError.unknownSimulator(name: name)
     }

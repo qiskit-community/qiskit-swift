@@ -106,4 +106,9 @@ protocol UnrollerBackend {
      qubits is list of (regname, idx) tuples.
      */
     func end_gate(_ name: String, _ args: [Double], _ qubits: [RegBit])
+
+    /**
+     Returns the generated circuit.
+     */
+    func get_output() throws -> Any?
 }

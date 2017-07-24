@@ -105,9 +105,14 @@ final class UnitarySimulator: Simulator {
     private var _unitary_state: [[Complex]] = []
     private var _number_of_operations: Int = 0
 
-    init(_ job: [String:Any]) {
-        if let compiled_circuit = job["compiled_circuit"] as? [String:Any] {
-            self.circuit = compiled_circuit
+    init(_ job: [String:Any]) throws {
+        if let compiled_circuit = job["compiled_circuit"] as? String {
+            if let data = compiled_circuit.data(using: .utf8) {
+                let jsonAny = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+                if let json = jsonAny as? [String:Any] {
+                    self.circuit = json
+                }
+            }
         }
         if let header = self.circuit["header"]  as? [String:Any] {
             if let number_of_qubits = header["number_of_qubits"] as? Int {

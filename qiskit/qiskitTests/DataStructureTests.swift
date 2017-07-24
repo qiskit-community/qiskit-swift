@@ -117,7 +117,7 @@ class DataStructureTests: XCTestCase {
         str = DataStructureTests.formatList(g.successors(4))
         XCTAssertEqual(str, "0 1")
         str = DataStructureTests.formatList(g.successors(5))
-        XCTAssertEqual(str, "2 0")
+        XCTAssertEqual(str, "0 2")
     }
 
     func testDescendants() {
@@ -140,7 +140,7 @@ class DataStructureTests: XCTestCase {
         str = DataStructureTests.formatList(g.descendants(4))
         XCTAssertEqual(str, "0 1")
         str = DataStructureTests.formatList(g.descendants(5))
-        XCTAssertEqual(str, "2 3 1 0")
+        XCTAssertEqual(str, "0 2 3 1")
     }
 
     func testWeaklyConnetectedComponents() {
