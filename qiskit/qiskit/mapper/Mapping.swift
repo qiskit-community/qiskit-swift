@@ -52,17 +52,17 @@ final class Mapping {
      has no multi-qubit gates.
      */
     static private func layer_permutation(_ layer_partition: [[RegBit]],
-                                  _ layout: [RegBit:RegBit],
+                                  _ layout: OrderedDictionary<RegBit,RegBit>,
                                   _ qubit_subset: [RegBit],
                                   _ coupling: Coupling,
-                                  _ trials: Int) throws -> (Bool, String?, Int?, [RegBit:RegBit]?, Bool) {
+                                  _ trials: Int) throws -> (Bool, String?, Int?, OrderedDictionary<RegBit,RegBit>?, Bool) {
 
         //print("layer permutation")
         //print("layer_partition",layer_partition)
         //print("layout ",layout)
         //print("qubit_subset ",qubit_subset)
 
-        var rev_layout: [RegBit:RegBit] = [:]
+        var rev_layout: OrderedDictionary<RegBit,RegBit> = OrderedDictionary<RegBit,RegBit>()
         for (a,b) in layout {
             rev_layout[b] = a
         }
@@ -89,7 +89,7 @@ final class Mapping {
         let n = coupling.size()
         var best_d: Int = Int.max  // initialize best depth
         var best_circ: String? = nil  // initialize best swap circuit
-        var best_layout: [RegBit:RegBit]? = nil  // initialize best final layout
+        var best_layout: OrderedDictionary<RegBit,RegBit>? = nil  // initialize best final layout
         for _ in 0..<trials {
             var trial_layout = layout
             var rev_trial_layout = rev_layout
@@ -126,8 +126,8 @@ final class Mapping {
                     // Try to decrease objective function
                     var progress_made = false
                     // Loop over edges of coupling graph
-                    var opt_layout: [RegBit:RegBit] = [:]
-                    var rev_opt_layout: [RegBit:RegBit] = [:]
+                    var opt_layout: OrderedDictionary<RegBit,RegBit> = OrderedDictionary<RegBit,RegBit>()
+                    var rev_opt_layout: OrderedDictionary<RegBit,RegBit> = OrderedDictionary<RegBit,RegBit>()
                     var opt_edge: TupleRegBit? = nil
                     for e in coupling.get_edges() {
                         // Are the qubits available?
@@ -275,7 +275,7 @@ final class Mapping {
     */
     static func update_qasm(_ i: Int,
                             _ first_layer: Bool,
-                            _ best_layout: [RegBit:RegBit],
+                            _ best_layout: OrderedDictionary<RegBit,RegBit>,
                             _ best_d: Int,
                             _ best_circ: String,
                             _ circuit_graph: Circuit,
@@ -337,10 +337,10 @@ final class Mapping {
      */
     static func swap_mapper(_ circuit_graph: Circuit,
                             _ coupling_graph: Coupling,
-                            _ init_layout: [RegBit:RegBit]? = nil,
+                            _ init_layout: OrderedDictionary<RegBit,RegBit>? = nil,
                             _ b: String = "cx,u1,u2,u3,id",
                             verbose: Bool = false,
-                            trials: Int = 20) throws -> (Circuit, [RegBit:RegBit]) {
+                            trials: Int = 20) throws -> (Circuit, OrderedDictionary<RegBit,RegBit>) {
         if circuit_graph.width() > coupling_graph.size() {
             throw MappingError.errorqubitscouplinggraph
         }
@@ -380,7 +380,7 @@ final class Mapping {
             // Supply a default layout
             qubit_subset = coupling_graph.get_qubits()
             qubit_subset = Array(qubit_subset[0..<circuit_graph.width()])
-            var init_layout: [RegBit:RegBit] = [:]
+            var init_layout: OrderedDictionary<RegBit,RegBit> = OrderedDictionary<RegBit,RegBit>()
             let qubits = circuit_graph.get_qubits()
             for i in 0..<qubits.count {
                 if i < qubit_subset.count {
@@ -438,7 +438,7 @@ final class Mapping {
 
                     // Give up if we fail again
                     if !success_flag {
-                        throw MappingError.swapmapperfailed(i: i, j: j, qasm: try serial_layerlist[j].graph.qasm(no_decls: true,aliases:layout))
+                        throw MappingError.swapmapperfailed(i: i, j: j, qasm: try serial_layer.graph.qasm(no_decls: true,aliases:layout))
                     }
                     // If this layer is only single-qubit gates,
                     // and we have yet to see multi-qubit gates,

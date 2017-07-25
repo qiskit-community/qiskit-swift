@@ -644,7 +644,7 @@ public final class QuantumProgram {
      circuit is circuits to unroll
      basis_gates are the base gates, which by default are: u1,u2,u3,cx,id
      */
-    func unroller_code(_ circuitQasm: String, _ basis_gates: String? = nil) throws -> (String,Circuit) {
+    private func unroller_code(_ circuitQasm: String, _ basis_gates: String? = nil) throws -> (String,Circuit) {
         var basis = "u1,u2,u3,cx,id"  // QE target basis
         if let b = basis_gates {
             basis = b
@@ -684,7 +684,7 @@ public final class QuantumProgram {
                  max_credits: Int = 3,
                  basis_gates: String? = nil,
                  coupling_map: [Int:[Int]]? = nil,
-                 initial_layout: [RegBit:RegBit]? = nil,
+                 initial_layout: OrderedDictionary<RegBit,RegBit>? = nil,
                  seed: Int? = nil,
                  config: [String:Any]? = nil,
                  silent: Bool = false) throws {
@@ -699,7 +699,7 @@ public final class QuantumProgram {
 
             // TODO: The circuit object has to have .qasm() method (be careful)
             var (qasm_compiled, dag_unrolled) = try self.unroller_code(qCircuit.circuit.qasm(), basis_gates)
-            var final_layout: [RegBit:RegBit]? = nil
+            var final_layout: OrderedDictionary<RegBit,RegBit>? = nil
             if coupling_map != nil {
                 if !silent {
                     print("pre-mapping properties: \(try dag_unrolled.property_summary())")
@@ -707,16 +707,17 @@ public final class QuantumProgram {
                 // Insert swap gates
                 let coupling = try Coupling(coupling_map)
                 if !silent {
-                    print("initial layout: \(initial_layout ?? [:])")
+                    print("initial layout: \(initial_layout ?? OrderedDictionary<RegBit,RegBit>())")
                 }
-                var layout:[RegBit:RegBit] = [:]
-                (dag_unrolled, layout) = try Mapping.swap_mapper(dag_unrolled, coupling, initial_layout, verbose: false, trials: 20)
+                var layout:OrderedDictionary<RegBit,RegBit> = OrderedDictionary<RegBit,RegBit>()
+                (dag_unrolled, layout) = try Mapping.swap_mapper(dag_unrolled, coupling, initial_layout, verbose: true, trials: 20)
                 final_layout = layout
                 if !silent {
-                    print("final layout: \(final_layout ?? [:])")
+                    print("final layout: \(final_layout ?? OrderedDictionary<RegBit,RegBit>())")
                 }
 
                 // Expand swaps
+                //print(try dag_unrolled.qasm(qeflag: true))
                 (qasm_compiled, dag_unrolled) = try self.unroller_code(try dag_unrolled.qasm())
                 // Change cx directions
                 dag_unrolled = try Mapping.direction_mapper(dag_unrolled,coupling)
@@ -725,6 +726,7 @@ public final class QuantumProgram {
                 // Simplify single qubit gates
                 dag_unrolled = try Mapping.optimize_1q_gates(dag_unrolled)
                 qasm_compiled = try dag_unrolled.qasm(qeflag: true)
+                //print(qasm_compiled)
                 if !silent {
                     print("post-mapping properties: \(try dag_unrolled.property_summary())")
                 }
@@ -769,7 +771,7 @@ public final class QuantumProgram {
     }
 
     /**
-     Get the compiled qasm for the named circuit and device.
+     Get the compiled qasm for the named circuit and backend.
      If device is None, it defaults to the last device.
     */
     public func get_compiled_qasm(_ name: String, _ backend: String? = nil) throws -> Any {
@@ -1108,7 +1110,7 @@ public final class QuantumProgram {
                         silent: Bool = false,
                         basis_gates: String? = nil,
                         coupling_map: [Int:[Int]]? = nil,
-                        initial_layout: [RegBit:RegBit]? = nil,
+                        initial_layout: OrderedDictionary<RegBit,RegBit>? = nil,
                         seed: Int? = nil,
                         config: [String:Any]? = nil,
                         _ responseHandler: @escaping ((_:QISKitException?) -> Void)) {

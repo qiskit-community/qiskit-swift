@@ -14,7 +14,7 @@ import qiskit
  */
 public final class DataMove {
 
-    private static let device: String = "ibmqx_qasm_simulator"
+    private static let backend: String = "ibmqx_qasm_simulator"
     private static let n: Int = 3  // make this at least 3
 
     private static let QPS_SPECS: [String: Any] = [
@@ -84,7 +84,7 @@ public final class DataMove {
         try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
 
         // First version: not compiled
-        qp.execute(["swapping"], backend: device,shots: 1024, coupling_map: nil) { (error) in
+        qp.execute(["swapping"], backend: backend,shots: 1024, coupling_map: nil) { (error) in
             do {
                 if error != nil {
                     print(error!.description)
@@ -94,7 +94,7 @@ public final class DataMove {
                 print(try qp.get_counts("swapping"))
 
                 // Second version: compiled to coupling graph
-                qp.execute(["swapping"], backend: device,shots: 1024, coupling_map: coupling_map) { (error) in
+                qp.execute(["swapping"], backend: backend,shots: 1024, coupling_map: coupling_map) { (error) in
                     do {
                         if error != nil {
                             print(error!.description)

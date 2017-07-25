@@ -26,10 +26,10 @@ class DataStructureTests: XCTestCase {
         dict[4] = "Four"
         dict[8] = "Eight"
         dict[15] = "Fifteen"
-        XCTAssertEqual(dict.description, "[\"4\": \"Four\",\"8\": \"Eight\",\"15\": \"Fifteen\"]")
+        XCTAssertEqual(dict.description, "[\"4\": \"Four\" ,\"8\": \"Eight\" ,\"15\": \"Fifteen\"]")
         dict[1] = nil
         dict[4] = nil
-        XCTAssertEqual(dict.description, "[\"8\": \"Eight\",\"15\": \"Fifteen\"]")
+        XCTAssertEqual(dict.description, "[\"8\": \"Eight\" ,\"15\": \"Fifteen\"]")
     }
 
     func testTopologicalSort() {

@@ -37,12 +37,12 @@ final class Circuit: NSCopying {
     /**
      Map from wire names (reg,idx) to input nodes of the graph
     */
-    private var input_map: [RegBit:Int] = [:]
+    private var input_map: OrderedDictionary<RegBit,Int> = OrderedDictionary<RegBit,Int>()
 
     /**
      Map from wire names (reg,idx) to output nodes of the graph
     */
-    private var output_map: [RegBit:Int] = [:]
+    private var output_map: OrderedDictionary<RegBit,Int> = OrderedDictionary<RegBit,Int>()
 
     /**
      Running count of the total number of nodes
@@ -55,7 +55,7 @@ final class Circuit: NSCopying {
      number of input qubits, input bits, and real parameters.
      The definition is external to the circuit object.
     */
-    private(set) var basis: [String: (Int,Int,Int)] = [:]
+    private(set) var basis: OrderedDictionary<String,(Int,Int,Int)> = OrderedDictionary<String,(Int,Int,Int)>()
 
     /**
       Directed multigraph whose nodes are inputs, outputs, or operations.
@@ -71,17 +71,17 @@ final class Circuit: NSCopying {
     /**
       Map of qregs to sizes
     */
-    private var qregs: [String:Int] = [:]
+    private var qregs: OrderedDictionary<String,Int> = OrderedDictionary<String,Int>()
 
     /**
       Map of cregs to sizes
     */
-    private var cregs: [String:Int] = [:]
+    private var cregs: OrderedDictionary<String,Int> = OrderedDictionary<String,Int>()
 
     /**
      Map of user defined gates to ast nodes defining them
     */
-    private var gates: [String:GateData] = [:]
+    private var gates: OrderedDictionary<String,GateData> = OrderedDictionary<String,GateData>()
 
     /**
      Output precision for printing floats
@@ -116,7 +116,7 @@ final class Circuit: NSCopying {
      */
     public func get_qubits() -> [RegBit] {
         var array:[RegBit] = []
-        let qRegsSorted = self.qregs.sorted(by:{ (n1: (key: String, value: Int), n2: (key: String, value: Int)) -> Bool in
+        let qRegsSorted = self.qregs.values.sorted(by:{ (n1: (key: String, value: Int), n2: (key: String, value: Int)) -> Bool in
             return n1.key < n2.key
         })
         for (name,index) in qRegsSorted {
@@ -407,7 +407,7 @@ final class Circuit: NSCopying {
      amap is a dictionary keyed on (regname,idx) tuples
      bval is boolean
      */
-    private func _check_bits(_ args: [RegBit], _ amap: [RegBit:Int], _ bval: Bool) throws {
+    private func _check_bits(_ args: [RegBit], _ amap: OrderedDictionary<RegBit,Int>, _ bval: Bool) throws {
         // Check for each wire
         for q in args {
             if amap[q] == nil {
@@ -538,7 +538,7 @@ final class Circuit: NSCopying {
      new elements of input_circuit.basis added.
      input_circuit is a CircuitGraph
      */
-    private func _make_union_basis(_ input_circuit: Circuit) throws -> [String: (Int,Int,Int)] {
+    private func _make_union_basis(_ input_circuit: Circuit) throws -> OrderedDictionary<String,(Int,Int,Int)> {
         var union_basis = self.basis
         for (g, val) in input_circuit.basis {
             if union_basis[g] == nil {
@@ -559,8 +559,8 @@ final class Circuit: NSCopying {
      NOTE: gates in input_circuit that are also in self must
      be *identical* to the gates in self
      */
-    private func _make_union_gates(_ input_circuit: Circuit) throws -> [String:GateData] {
-        var union_gates: [String:GateData] = self.gates
+    private func _make_union_gates(_ input_circuit: Circuit) throws -> OrderedDictionary<String,GateData> {
+        var union_gates = self.gates
         for (k, v) in input_circuit.gates {
             if union_gates[k] == nil {
                 union_gates[k] = v
@@ -601,8 +601,8 @@ final class Circuit: NSCopying {
      Return the set of regs to add to self
      */
     private func _check_wiremap_registers(_ wire_map: [RegBit:RegBit],
-                                          _ keyregs: [String:Int],
-                                          _ valregs: [String:Int],
+                                          _ keyregs: OrderedDictionary<String,Int>,
+                                          _ valregs: OrderedDictionary<String,Int>,
                                           _ valreg:Bool = true) throws -> Set<RegBit> {
         var add_regs = Set<RegBit>()
         var reg_frag_chk: [String:[Bool]]  = [:]
@@ -664,8 +664,8 @@ final class Circuit: NSCopying {
      input_circuit is a CircuitGraph
      */
     private func _check_wiremap_validity(_ wire_map: [RegBit:RegBit],
-                                         _ keymap: [RegBit:Int],
-                                         _ valmap: [RegBit:Int],
+                                         _ keymap: OrderedDictionary<RegBit,Int>,
+                                         _ valmap: OrderedDictionary<RegBit,Int>,
                                          _ input_circuit: Circuit) throws {
         for (k, v) in wire_map {
             if keymap[k] == nil {
@@ -937,9 +937,9 @@ final class Circuit: NSCopying {
                      add_swap: Bool = false,
                      no_decls: Bool = false,
                      qeflag: Bool = false,
-                     aliases: [RegBit:RegBit]? = nil) throws -> String {
+                     aliases: OrderedDictionary<RegBit,RegBit>? = nil) throws -> String {
         // Rename qregs if necessary
-        var qregdata: [String:Int] = [:]
+        var qregdata: OrderedDictionary<String,Int> = OrderedDictionary<String,Int>()
         if let aliasesMap = aliases {
             for (_,q) in aliasesMap {
                 guard let n = qregdata[q.name] else {
@@ -965,10 +965,10 @@ final class Circuit: NSCopying {
             if qeflag {
                 out += "include \"qelib1.inc\";\n"
             }
-            for (k,v) in qregdata.sorted(by: { $0.0 < $1.0 }) {
+            for (k,v) in qregdata.values.sorted(by: { $0.0 < $1.0 }) {
                 out += "qreg \(k)[\(v)];\n"
             }
-            for (k,v) in self.cregs.sorted(by: { $0.0 < $1.0 }) {
+            for (k,v) in self.cregs.values.sorted(by: { $0.0 < $1.0 }) {
                 out += "creg \(k)[\(v)];\n"
             }
             var omit:Set<String> = ["U", "CX", "measure", "reset", "barrier"]
@@ -1172,12 +1172,12 @@ final class Circuit: NSCopying {
         for w in wires {
             proxy_map[w] = RegBit("",0)
         }
-        let add_qregs = try self._check_wiremap_registers(proxy_map,input_circuit.qregs,[:], false)
+        let add_qregs = try self._check_wiremap_registers(proxy_map,input_circuit.qregs,OrderedDictionary<String,Int>(), false)
         for r in add_qregs {
             try self.add_qreg(r.name, r.index)
         }
 
-        let add_cregs = try self._check_wiremap_registers(proxy_map,input_circuit.cregs,[:], false)
+        let add_cregs = try self._check_wiremap_registers(proxy_map,input_circuit.cregs,OrderedDictionary<String,Int>(), false)
         for r in add_cregs {
             try self.add_creg(r.name, r.index)
         }
@@ -1213,7 +1213,7 @@ final class Circuit: NSCopying {
                     wire_map[wires[i]] = args[i]
                 }
             }
-            var wm: [RegBit:Int] = [:]
+            var wm: OrderedDictionary<RegBit,Int> = OrderedDictionary<RegBit,Int>()
             for w in wires {
                 wm[w] = 0
             }
@@ -1322,12 +1322,12 @@ final class Circuit: NSCopying {
         for w in wires {
             proxy_map[w] = RegBit("",0)
         }
-        let add_qregs = try self._check_wiremap_registers(proxy_map,input_circuit.qregs,[:], false)
+        let add_qregs = try self._check_wiremap_registers(proxy_map,input_circuit.qregs,OrderedDictionary<String,Int>(), false)
         for r in add_qregs {
             try self.add_qreg(r.name, r.index)
         }
 
-        let add_cregs = try self._check_wiremap_registers(proxy_map,input_circuit.cregs,[:], false)
+        let add_cregs = try self._check_wiremap_registers(proxy_map,input_circuit.cregs,OrderedDictionary<String,Int>(), false)
         for r in add_cregs {
             try self.add_creg(r.name, r.index)
         }
@@ -1351,7 +1351,7 @@ final class Circuit: NSCopying {
                 wire_map[wires[i]] = args[i]
             }
         }
-        var wm: [RegBit:Int] = [:]
+        var wm: OrderedDictionary<RegBit,Int> = OrderedDictionary<RegBit,Int>()
         for w in wires {
             wm[w] = 0
         }
@@ -1553,7 +1553,7 @@ final class Circuit: NSCopying {
         var node_map = self.input_map
         // wires_with_ops_remaining is a set of wire names that have
         // operations we still need to assign to layers
-        var wires_with_ops_remaining = Set<RegBit>(self.input_map.keys)
+        var wires_with_ops_remaining = self.input_map.keys
         while !wires_with_ops_remaining.isEmpty {
             // Create a new circuit graph and populate with regs and basis
             let new_layer = Circuit()
@@ -1564,9 +1564,8 @@ final class Circuit: NSCopying {
                 try new_layer.add_creg(k, v)
             }
             new_layer.basis = self.basis
-            for (key,value) in self.gates {
-                new_layer.gates[key] = value
-            }
+            new_layer.gates = self.gates
+
             // Save the support of each operation we add to the layer
             var support_list: [[RegBit]] = []
             // Determine what operations to add in this layer
@@ -1575,7 +1574,7 @@ final class Circuit: NSCopying {
             // of the inputs of a touched node are visited, the node is a
             // foreground node we can add to the current layer.
             var ops_touched: [Int:Set<RegBit>] = [:]
-            let wires_loop = Array<RegBit>(wires_with_ops_remaining)
+            let wires_loop = wires_with_ops_remaining
             var emit: Bool = false
             for w in wires_loop {
                 let outEdges = self.multi_graph.out_edges_iter(node_map[w]!)
@@ -1584,43 +1583,41 @@ final class Circuit: NSCopying {
                 let nxt_nd = self.multi_graph.vertex(oe[0].neighbor)!
                 // If we reach an output node, we are done with this wire.
                 if nxt_nd.data!.type == "out" {
-                    wires_with_ops_remaining.remove(w)
+                    wires_with_ops_remaining = wires_with_ops_remaining.filter() { $0 != w }
                 }
-                else {
-                    // Otherwise, we are somewhere inside the circuit
-                    if nxt_nd.data!.type == "op" {
-                        // Operation data
-                        let dOp = nxt_nd.data! as! CircuitVertexOpData
-                        let qa = dOp.qargs
-                        let ca = dOp.cargs
-                        let pa = dOp.params
-                        let co = dOp.condition
-                        let cob = self._bits_in_condition(co)
-                        // First time we see an operation, add to ops_touched
-                        if ops_touched[nxt_nd.key] == nil {
-                            ops_touched[nxt_nd.key] = Set<RegBit>(qa).union(ca).union(cob)
+                // Otherwise, we are somewhere inside the circuit
+                else if nxt_nd.data!.type == "op" {
+                    // Operation data
+                    let dOp = nxt_nd.data! as! CircuitVertexOpData
+                    let qa = dOp.qargs
+                    let ca = dOp.cargs
+                    let pa = dOp.params
+                    let co = dOp.condition
+                    let cob = self._bits_in_condition(co)
+                    // First time we see an operation, add to ops_touched
+                    if ops_touched[nxt_nd.key] == nil {
+                        ops_touched[nxt_nd.key] = Set<RegBit>(qa).union(ca).union(cob)
+                    }
+                    // Mark inputs visited by deleting from set
+                    // NOTE: expect trouble with if(c==1) measure q -> c;
+                    assert(ops_touched[nxt_nd.key]!.contains(w), "expected wire")
+                    ops_touched[nxt_nd.key]!.remove(w)
+                    // Node becomes "foreground" if set becomes empty,
+                    // i.e. every input is available for this operation
+                    if ops_touched[nxt_nd.key]!.isEmpty {
+                        // Add node to new_layer
+                        try new_layer.apply_operation_back(dOp.name, qa, ca, pa, co)
+                        // Update node_map to point to this op
+                        for v in Set<RegBit>(qa).union(ca).union(cob) {
+                            node_map[v] = nxt_nd.key
                         }
-                        // Mark inputs visited by deleting from set
-                        // NOTE: expect trouble with if(c==1) measure q -> c;
-                        assert(ops_touched[nxt_nd.key]!.contains(w), "expected wire")
-                        ops_touched[nxt_nd.key]!.remove(w)
-                        // Node becomes "foreground" if set becomes empty,
-                        // i.e. every input is available for this operation
-                        if ops_touched[nxt_nd.key]!.isEmpty {
-                            // Add node to new_layer
-                            try new_layer.apply_operation_back(dOp.name, qa, ca, pa, co)
-                            // Update node_map to point to this op
-                            for v in Set<RegBit>(qa).union(ca).union(cob) {
-                                node_map[v] = nxt_nd.key
-                            }
-                            // Add operation to partition
-                            if dOp.name != "barrier" {
-                                // support_list.append(list(set(qa) | set(ca) |
-                                //                          set(cob)))
-                                support_list.append(Array(Set<RegBit>(qa)))
-                            }
-                            emit = true
+                        // Add operation to partition
+                        if dOp.name != "barrier" {
+                            // support_list.append(list(set(qa) | set(ca) |
+                            //                          set(cob)))
+                            support_list.append(Array(Set<RegBit>(qa)))
                         }
+                        emit = true
                     }
                 }
             }

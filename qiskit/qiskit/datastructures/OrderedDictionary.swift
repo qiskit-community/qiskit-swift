@@ -8,25 +8,22 @@
 
 import Foundation
 
-struct OrderedDictionary<KeyType: Hashable, ValueType>: CustomStringConvertible {
+public struct OrderedDictionary<KeyType: Hashable, ValueType>: Sequence, CustomStringConvertible {
 
     public private(set) var keys: [KeyType] = []
-    private var values: [KeyType:ValueType] = [:]
+    public private(set) var values: [KeyType:ValueType] = [:]
 
-    var count: Int {
+    public var count: Int {
         return self.keys.count;
     }
 
-    subscript(key: KeyType) -> ValueType? {
+    public subscript(key: KeyType) -> ValueType? {
         get {
             return self.values[key]
         }
         set(newValue) {
             if newValue == nil {
-                if self.values[key] != nil {
-                    self.values.removeValue(forKey: key)
-                    self.keys = self.keys.filter {$0 != key}
-                }
+                self.removeValue(forKey: key)
             }
             else {
                 if nil == self.values.updateValue(newValue!, forKey: key) {
@@ -36,21 +33,40 @@ struct OrderedDictionary<KeyType: Hashable, ValueType>: CustomStringConvertible 
         }
     }
 
-    init() {
+    public init() {
     }
 
-    func value(_ at: Int) -> ValueType {
+    public func makeIterator() -> AnyIterator<(KeyType,ValueType)> {
+        var index = 0
+        return AnyIterator {
+            let nextIndex = index
+            guard nextIndex < self.count else {
+                return nil
+            }
+            index += 1
+            return (self.keys[nextIndex],self.value(nextIndex))
+        }
+    }
+
+    public mutating func removeValue(forKey: KeyType) {
+        if self.values[forKey] != nil {
+            self.values.removeValue(forKey: forKey)
+            self.keys = self.keys.filter {$0 != forKey}
+        }
+    }
+
+    public func value(_ at: Int) -> ValueType {
         let key = self.keys[at]
         return self.values[key]!
     }
 
-    var description: String {
+    public var description: String {
         var arr: [String] = []
         for key in self.keys {
             if let value = self[key] {
                 arr.append("\"\(key)\": \"\(value)\"")
             }
         }
-        return "[" + arr.joined(separator: ",") + "]"
+        return "[" + arr.joined(separator: " ,") + "]"
     }
 }
