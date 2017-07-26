@@ -14,7 +14,7 @@ import qiskit
  */
 public final class QFT {
 
-    private static let device: String = "ibmqx2"
+    private static let backend: String = "ibmqx2"
 
     private static let QPS_SPECS: [String: Any] = [
         "name": "ghz",
@@ -129,20 +129,16 @@ public final class QFT {
                     print(error!.description)
                     return
                 }
-                print(try qp.get_compiled_qasm("qft3"))
-                print(try qp.get_compiled_qasm("qft4"))
-                print(try qp.get_compiled_qasm("qft5"))
                 print(try qp.get_counts("qft3"))
                 print(try qp.get_counts("qft4"))
                 print(try qp.get_counts("qft5"))
 
-                qp.execute(["qft3"], backend:device,shots: 1024, timeout:120, coupling_map: coupling_map) { (error) in
+                qp.execute(["qft3"], backend:backend,shots: 1024, timeout:120, coupling_map: coupling_map) { (error) in
                     do {
                         if error != nil {
                             print(error!.description)
                             return
                         }
-                        print(try qp.get_compiled_qasm("qft3"))
                         print(try qp.get_counts("qft3"))
                     } catch {
                         print(error.localizedDescription)

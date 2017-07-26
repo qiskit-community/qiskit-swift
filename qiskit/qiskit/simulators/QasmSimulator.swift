@@ -47,41 +47,41 @@ compiled_circuit =
         }
         "operations": // list[map]
         [
-        {
-        "name": , // required -- string
-        "params": , // optional -- list[double]
-        "qubits": , // optional -- list[int]
-        "clbits": , //optional -- list[int]
-        "conditional":  // optional -- map
-        {
-        "type": , // string
-        "mask": , // big int
-        "val":  , // big int
-        }
-        },
+            {
+                "name": , // required -- string
+                "params": , // optional -- list[double]
+                "qubits": , // optional -- list[int]
+                "clbits": , //optional -- list[int]
+                "conditional":  // optional -- map
+                {
+                    "type": , // string
+                    "mask": , // big int
+                    "val":  , // big int
+                }
+            },
         ]
 }
 
 if shots = 1
 result =
-{
-    'data':
     {
-        'quantum_state': array([ 1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j]),
-        'classical_state': 0
+        'data':
+        {
+            'quantum_state': array([ 1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j]),
+            'classical_state': 0
+        }
+        'status': 'DONE'
     }
-    'status': 'DONE'
-}
 
 if shots > 1
 result =
-{
-    'data':
     {
-        'counts': {'0000': 50, '1001': 44},
+        'data':
+        {
+            'counts': {'0000': 50, '1001': 44},
+        }
+        'status': 'DONE'
     }
-    'status': 'DONE'
-}
  */
 
 // TODO add the IF qasm operation.
@@ -154,6 +154,8 @@ final class QasmSimulator: Simulator {
     private var _quantum_state: [Complex] = []
     private var _classical_state: Int = 0
     private var _shots: Int = 0
+    private var _cl_reg_index: [Int] = []
+    private var _cl_reg_nbits: [Int] = []
     private var _number_of_operations: Int = 0
 
     /**
@@ -174,6 +176,16 @@ final class QasmSimulator: Simulator {
             }
             if let _number_of_cbits = header["number_of_clbits"] as? Int {
                 self._number_of_cbits = _number_of_cbits
+            }
+            if let clbit_labels = header["clbit_labels"] as? [[Any]] {
+                var cbit_index: Int = 0
+                for cl_reg in clbit_labels {
+                    if let index = cl_reg[1] as? Int {
+                        self._cl_reg_nbits.append(index)
+                        self._cl_reg_index.append(cbit_index)
+                        cbit_index += index
+                    }
+                }
             }
         }
         self.result["data"] = [:]
@@ -345,8 +357,27 @@ final class QasmSimulator: Simulator {
             self._classical_state = 0
             if let operations = self.circuit["operations"] as? [[String:Any]] {
                 // Do each operation in this shot
-                for j in 0..<self._number_of_operations {
-                    let operation = operations[j]
+                for operation in operations {
+                    if let conditional = operation["conditional"] as? [String:Any] {
+                        if let m = conditional["mask"] as? String {
+                            if var mask = Int(m, radix: 16) {
+                                if mask > 0 {
+                                    var value: Int = self._classical_state & mask
+                                    while ((mask & 0x1) == 0) {
+                                        mask >>= 1
+                                        value >>= 1
+                                    }
+                                    if let v = conditional["val"] as? String {
+                                        if let val = Int(v, radix: 16) {
+                                            if value != val {
+                                                continue
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                     guard let name = operation["name"] as? String else {
                         self.result["status"] = "ERROR"
                         return self.result
@@ -390,11 +421,10 @@ final class QasmSimulator: Simulator {
                             self._add_qasm_reset(qubits[0])
                         }
                     }
-                    else if name == "barrier" || name == "id" {
+                    else if name == "barrier" {
                     }
                     else {
-                        self.result["status"] = "ERROR"
-                        return self.result
+                        throw SimulatorError.unrecognizedOperation(backend: QasmSimulator.__configuration["name"] as! String, operation: name)
                     }
                 }
             }
@@ -410,19 +440,49 @@ final class QasmSimulator: Simulator {
             data["classical_state"] = self._classical_state
         }
         else {
-            var counter: [String:Int] = [:]
+            var counts: [String:Int] = [:]
             for outcome in outcomes {
-                if let count = counter[outcome] {
-                    counter[outcome] = count + 1
+                if let count = counts[outcome] {
+                    counts[outcome] = count + 1
                 }
                 else {
-                    counter[outcome] = 1
+                    counts[outcome] = 1
                 }
             }
-            data["counts"] = counter
+            data["counts"] = self._format_result(counts)
         }
         self.result["data"] = data
         self.result["status"] = "DONE"
         return self.result
+    }
+
+    /**
+     Format the result bit string.
+
+     This formats the result bit strings such that spaces are inserted
+     at register divisions.
+
+     Args:
+     counts : dictionary of counts e.g. {'1111': 1000, '0000':5}
+     Returns:
+     spaces inserted into dictionary keys at register boundries.
+     */
+    private func _format_result(_ counts: [String:Int]) -> [String:Int] {
+        var fcounts: [String:Int] = [:]
+        for (key, value) in counts {
+            let start = key.index(key.endIndex, offsetBy: -self._cl_reg_nbits[0])
+            var new_key: [String] = [key[start..<key.endIndex]]
+            var zipped: [(Int,Int)] = []
+            for i in 1..<self._cl_reg_index.count {
+                zipped.append((self._cl_reg_index[i],self._cl_reg_nbits[i]))
+            }
+            for (index, nbits) in zipped {
+                let start = key.index(key.endIndex, offsetBy: -(index+nbits))
+                let end = key.index(key.endIndex, offsetBy: -index)
+                new_key.append(key[start..<end])
+            }
+            fcounts[new_key.joined(separator: " ")] = value
+        }
+        return fcounts
     }
 }

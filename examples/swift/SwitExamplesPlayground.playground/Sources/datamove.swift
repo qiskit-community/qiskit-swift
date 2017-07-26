@@ -77,6 +77,7 @@ public final class DataMove {
             try qc.measure(q[j], ans[j])
             try qc.measure(r[j], ans[j+n])
         }
+        print(qc.qasm())
 
         //##############################################################
         // Set up the API and execute the program.
@@ -90,7 +91,6 @@ public final class DataMove {
                     print(error!.description)
                     return
                 }
-                print(try qp.get_compiled_qasm("swapping"))
                 print(try qp.get_counts("swapping"))
 
                 // Second version: compiled to coupling graph
@@ -100,7 +100,6 @@ public final class DataMove {
                             print(error!.description)
                             return
                         }
-                        print(try qp.get_compiled_qasm("swapping"))
                         print(try qp.get_counts("swapping"))
 
                         print("Both versions should give the same distribution")

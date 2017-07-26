@@ -14,7 +14,7 @@ import qiskit
  */
 public final class Multiple {
 
-    private static let device: String = "ibmqx2"
+    private static let backend: String = "ibmqx2"
 
     private static let QPS_SPECS: [String: Any] = [
         "name": "programs",
@@ -98,6 +98,7 @@ public final class Multiple {
                 // print(try qp.get_counts("bell")) // returns error, don't do this
                 print(try qp.get_counts("bell", backend:"local_qasm_simulator"))
                 print(try qp.get_counts("ghz"))
+                print("multiple end")
             } catch {
                 print(error.localizedDescription)
             }

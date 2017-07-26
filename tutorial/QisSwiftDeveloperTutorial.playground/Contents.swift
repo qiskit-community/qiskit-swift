@@ -108,7 +108,6 @@ do {
             return
         }
         do {
-            print(try qp.get_compiled_qasm("test"))
             print(try qp.get_counts("test"))
         } catch let error {
             print(error.localizedDescription)

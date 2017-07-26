@@ -11,7 +11,7 @@ import qiskit
 
 public final class RippleAdd {
 
-    private static let device: String = "ibmqx_qasm_simulator"
+    private static let backend: String = "ibmqx_qasm_simulator"
     private static let coupling_map = [0: [1, 8], 1: [2, 9], 2: [3, 10], 3: [4, 11], 4: [5, 12],
                                         5: [6, 13], 6: [7, 14], 7: [15], 8: [9], 9: [10], 10: [11],
                                         11: [12], 12: [13], 13: [14], 14: [15]
@@ -82,30 +82,30 @@ public final class RippleAdd {
         }
         try qc.measure(cout[0], ans[n])
 
+        print(qc.qasm())
+
         //###############################################################
         //# Set up the API and execute the program.
         //###############################################################
         try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
 
-        // First version: not compiled
-        qp.execute(["rippleadd"], backend: device,shots: 1024, coupling_map: nil) { (error) in
+        print("First version: not compiled")
+        qp.execute(["rippleadd"], backend: backend,shots: 1024, coupling_map: nil) { (error) in
             do {
                 if error != nil {
                     print(error!.description)
                     return
                 }
-                print(try qp.get_compiled_qasm("rippleadd"))
                 print(try qp.get_counts("rippleadd"))
-                // Second version: compiled to 2x8 array coupling graph
-                try qp.compile(["rippleadd"], backend: device, shots: 1024, coupling_map: coupling_map)
-                // qp.print_execution_list(verbose=True)
+                print("Second version: compiled to 2x8 array coupling graph")
+                try qp.compile(["rippleadd"], backend: backend, shots: 1024, coupling_map: coupling_map)
+                // qp.print_execution_list(verbose=true)
                 qp.run() { (error) in
                     do {
                         if error != nil {
                             print(error!.description)
                             return
                         }
-                        print(try qp.get_compiled_qasm("rippleadd"))
                         print(try qp.get_counts("rippleadd"))
                         print("Both versions should give the same distribution")
                     } catch {

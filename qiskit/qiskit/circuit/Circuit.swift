@@ -166,8 +166,7 @@ final class Circuit: NSCopying {
             self.output_map.removeValue(forKey: oldTuple)
         }
         // n node d = data
-        for i in 0..<self.multi_graph.vertices.count {
-            let node = self.multi_graph.vertices.value(i)
+        for (_,node) in self.multi_graph.vertices {
             guard let data = node.data else {
                 continue
             }
@@ -393,7 +392,7 @@ final class Circuit: NSCopying {
     private func _check_condition(_ name: String, _ cond: RegBit?) throws {
         // Verify creg exists
         if let condition = cond {
-            if self.cregs[condition.name] != nil {
+            if self.cregs[condition.name] == nil {
                 throw CircuitError.cregcondition(name: name)
             }
         }

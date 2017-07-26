@@ -73,7 +73,7 @@ public final class IBMQuantumExperience {
                 ret = "ibmqx3"
             }
             else if IBMQuantumExperience.__names_backend_simulator.contains(backend) {
-                ret = "chip_simulator"
+                ret = "ibmqx_qasm_simulator"
             }
         }
         else if endpoint == "calibration" {
@@ -82,6 +82,9 @@ public final class IBMQuantumExperience {
             }
             else if IBMQuantumExperience.__names_backend_ibmqxv3.contains(backend) {
                 ret = "ibmqx3"
+            }
+            else if IBMQuantumExperience.__names_backend_simulator.contains(backend) {
+                ret = "ibmqx_qasm_simulator"
             }
         }
         if ret != nil {
@@ -621,6 +624,10 @@ public final class IBMQuantumExperience {
                     responseHandler(nil,IBMQuantumExperienceError.missingBackend(backend: backend))
                     return
                 }
+                if IBMQuantumExperience.__names_backend_simulator.contains(backend_type!) {
+                    responseHandler(["backend" : backend_type!],nil)
+                    return
+                }
                 self.req.get(path:"Backends/\(backend_type!)/calibration") { (out, error) -> Void in
                     if error != nil {
                         responseHandler(nil, error)
@@ -654,6 +661,10 @@ public final class IBMQuantumExperience {
                 }
                 if backend_type == nil {
                     responseHandler(nil,IBMQuantumExperienceError.missingBackend(backend: backend))
+                    return
+                }
+                if IBMQuantumExperience.__names_backend_simulator.contains(backend_type!) {
+                    responseHandler(["backend" : backend_type!],nil)
                     return
                 }
                 self.req.get(path:"Backends/\(backend_type!)/parameters") { (out, error) -> Void in
@@ -721,6 +732,39 @@ public final class IBMQuantumExperience {
                 }
             }
             responseHandler(ret, nil)
+        }
+    }
+
+    /**
+     Get the the credits by user to use in the QX Platform
+     */
+    public func get_my_credits(responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
+        self.checkCredentials(request: self.req) { (error) -> Void in
+            if error != nil {
+                responseHandler([:], error)
+                return
+            }
+            self.req.get(path: "users/\(self.req.credential.userId!)") { (out, error) -> Void in
+                if error != nil {
+                    responseHandler([:], error)
+                    return
+                }
+                guard let user_data = out as? [String:Any] else {
+                    responseHandler([:],IBMQuantumExperienceError.invalidResponseData)
+                    return
+                }
+                if var credit = user_data["credit"] as? [String:Any] {
+                    if credit["promotionalCodesUsed"] != nil {
+                        credit.removeValue(forKey: "promotionalCodesUsed")
+                    }
+                    if credit["lastRefill"] != nil {
+                        credit.removeValue(forKey: "lastRefill")
+                    }
+                    responseHandler(credit,nil)
+                    return
+                }
+                responseHandler([:], nil)
+            }
         }
     }
 }

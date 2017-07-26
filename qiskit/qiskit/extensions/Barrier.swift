@@ -65,7 +65,7 @@ public final class Barrier: Instruction {
 extension QuantumCircuit {
 
     /**
-     Apply barrier to QuantumRegister
+     Apply barrier to QuantumRegisters
      */
     @discardableResult
     public func barrier(_ regs: [QuantumRegister] = []) throws -> Barrier {
@@ -90,6 +90,14 @@ extension QuantumCircuit {
         }
         try QuantumCircuit._check_dups(qubits)
         return self._attach(Barrier(qubits, self)) as! Barrier
+    }
+
+    /**
+     Apply barrier to QuantumRegister
+     */
+    @discardableResult
+    public func barrier(_ reg: QuantumRegister) throws -> Barrier {
+       return try self.barrier([reg])
     }
 
     /**
@@ -130,7 +138,7 @@ extension QuantumCircuit {
 extension CompositeGate {
 
     /**
-     Apply barrier to QuantumRegister
+     Apply barrier to QuantumRegisters
      */
     @discardableResult
     public func barrier(_ regs: [QuantumRegister] = []) throws -> Barrier {
@@ -147,6 +155,14 @@ extension CompositeGate {
         }
         try QuantumCircuit._check_dups(qubits)
         return self._attach(Barrier(qubits, self))
+    }
+
+    /**
+     Apply barrier to QuantumRegister
+     */
+    @discardableResult
+    public func barrier(_ reg: QuantumRegister) throws -> Barrier {
+        return try self.barrier([reg])
     }
 
     /**

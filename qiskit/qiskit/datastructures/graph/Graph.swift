@@ -94,14 +94,12 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
 
     public func copy(with zone: NSZone? = nil) -> Any {
         let copy = Graph(directed: self.isDirected)
-        for i in 0..<self.vertices.count {
-            let vertex = self.vertices.value(i).copy(with: zone) as! GraphVertex<VertexDataType>
+        for (_,v) in self.vertices {
+            let vertex = v.copy(with: zone) as! GraphVertex<VertexDataType>
             copy.vertices[vertex.key] = vertex
         }
-        for i in 0..<self._edges.count {
-            let key = self._edges.keys[i]
-            var newMultiEdges: [GraphEdge<EdgeDataType>] = []
-            let multiEdges = self._edges.value(i)
+        for (key,multiEdges) in self._edges {
+            var newMultiEdges: [GraphEdge<EdgeDataType>] = [] 
             for edge in multiEdges {
                 newMultiEdges.append(edge.copy(with: zone) as! GraphEdge<EdgeDataType>)
             }
@@ -179,8 +177,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         }
         self._edges[TupleInt(index,index)] = nil
         self.vertices[index] = nil
-        for i in 0..<self.vertices.count {
-            let vertex = self.vertices.value(i)
+        for (_,vertex) in self.vertices {
             vertex.removeNeighbor(index)
             self._edges[TupleInt(index,vertex.key)] = nil
             self._edges[TupleInt(vertex.key,index)] = nil
@@ -348,8 +345,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
             return []
         }
         var list: [GraphVertex<VertexDataType>] = []
-        for i in 0..<self.vertices.count {
-            let vertex = self.vertices.value(i)
+        for (_,vertex) in self.vertices {
             for neighborKey in vertex.neighbors {
                 if neighborKey == key {
                     list.append(vertex)
@@ -362,8 +358,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
     public func ancestors(_ key: Int) -> [GraphVertex<VertexDataType>] {
         var list: [GraphVertex<VertexDataType>] = []
         var visited = Set<Int>()
-        for i in 0..<self.vertices.count {
-            let vertex = self.vertices.value(i)
+        for (_,vertex) in self.vertices {
             if vertex.key == key {
                 continue
             }
@@ -400,8 +395,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
 
     public func nonAncestors(_ key: Int) -> [GraphVertex<VertexDataType>] {
         var vertexSet: Set<Int> = []
-        for i in 0..<self.vertices.count {
-            let vertex = self.vertices.value(i)
+        for (_,vertex) in self.vertices {
             vertexSet.update(with: vertex.key)
         }
         var ancestorsSet: Set<Int> = []
@@ -459,8 +453,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
 
     public func nonDescendants(_ key: Int) -> [GraphVertex<VertexDataType>] {
         var vertexSet: Set<Int> = []
-        for i in 0..<self.vertices.count {
-            let vertex = self.vertices.value(i)
+        for (_,vertex) in self.vertices {
             vertexSet.update(with: vertex.key)
         }
         var descendantsSet: Set<Int> = []
@@ -484,8 +477,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
             return false
         }
         let state: DFSState = DFSState()
-        for i in 0..<self.vertices.count {
-            let vertex = self.vertices.value(i)
+        for (_,vertex) in self.vertices {
             if !state.discovered.contains(vertex.key) {
                 do {
                     try self.dfs(vertex, state) { (searchProcessType,vertex,edges,state) -> Void in
@@ -581,8 +573,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
 
     public func all_pairs_shortest_path_length() -> [Int: [Int:Int]] {
         var paths: [Int: [Int:Int]] = [:]
-        for i in 0..<self.vertices.count {
-            let vertex = self.vertices.value(i)
+        for (_,vertex) in self.vertices {
             paths[vertex.key] = self.single_source_shortest_path_length(vertex.key)
         }
         return paths
@@ -652,8 +643,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
             return graph
         }
         graph.isDirected = false
-        for i in 0..<graph._edges.count {
-            let multiEdges = graph._edges.value(i)
+        for (_,multiEdges) in graph._edges {
             for edge in multiEdges {
                 guard let source = graph.vertex(edge.source) else {
                     continue

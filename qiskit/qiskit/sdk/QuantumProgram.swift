@@ -710,7 +710,7 @@ public final class QuantumProgram {
                     print("initial layout: \(initial_layout ?? OrderedDictionary<RegBit,RegBit>())")
                 }
                 var layout:OrderedDictionary<RegBit,RegBit> = OrderedDictionary<RegBit,RegBit>()
-                (dag_unrolled, layout) = try Mapping.swap_mapper(dag_unrolled, coupling, initial_layout, verbose: true, trials: 20)
+                (dag_unrolled, layout) = try Mapping.swap_mapper(dag_unrolled, coupling, initial_layout, verbose: false, trials: 20)
                 final_layout = layout
                 if !silent {
                     print("final layout: \(final_layout ?? OrderedDictionary<RegBit,RegBit>())")
