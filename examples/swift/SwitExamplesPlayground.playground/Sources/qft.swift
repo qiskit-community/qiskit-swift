@@ -80,73 +80,86 @@ public final class QFT {
         }
     }
 
-    public class func qft(qConfig: Qconfig) throws {
-        let qp = try QuantumProgram(specs: QPS_SPECS)
-        guard let q = qp.get_quantum_registers("q") else { return }
-        guard let c = qp.get_classical_registers("c") else { return }
+    public class func qft(_ apiToken: String, _ responseHandler: ((Void) -> Void)? = nil) {
+        do {
+            print()
+            print("#################################################################")
+            print("QFT:")
+            let qConfig = try Qconfig(APItoken: apiToken)
+            let qp = try QuantumProgram(specs: QPS_SPECS)
+            guard let q = qp.get_quantum_registers("q") else { return }
+            guard let c = qp.get_classical_registers("c") else { return }
 
-        guard let qft3 = qp.get_circuit("qft3") else { return }
-        guard let qft4 = qp.get_circuit("qft4") else { return }
-        guard let qft5 = qp.get_circuit("qft5") else { return }
+            guard let qft3 = qp.get_circuit("qft3") else { return }
+            guard let qft4 = qp.get_circuit("qft4") else { return }
+            guard let qft5 = qp.get_circuit("qft5") else { return }
 
-        try input_state(qft3, q, 3)
-        try qft3.barrier()
-        try qft(qft3, q, 3)
-        try qft3.barrier()
-        for j in 0..<3 {
-            try qft3.measure(q[j], c[j])
-        }
-
-        try input_state(qft4, q, 4)
-        try qft4.barrier()
-        try qft(qft4, q, 4)
-        try qft4.barrier()
-        for j in 0..<4 {
-            try qft4.measure(q[j], c[j])
-        }
-
-        try input_state(qft5, q, 5)
-        try qft5.barrier()
-        try qft(qft5, q, 5)
-        try qft5.barrier()
-        for j in 0..<5 {
-            try qft5.measure(q[j], c[j])
-        }
-
-        print(qft3.qasm())
-        print(qft4.qasm())
-        print(qft5.qasm())
-
-
-        //##############################################################
-        // Set up the API and execute the program.
-        //##############################################################
-        try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
-
-        qp.execute(["qft3", "qft4", "qft5"], backend:"ibmqx_qasm_simulator",shots: 1024, coupling_map: coupling_map) { (error) in
-            do {
-                if error != nil {
-                    print(error!.description)
-                    return
-                }
-                print(try qp.get_counts("qft3"))
-                print(try qp.get_counts("qft4"))
-                print(try qp.get_counts("qft5"))
-
-                qp.execute(["qft3"], backend:backend,shots: 1024, timeout:120, coupling_map: coupling_map) { (error) in
-                    do {
-                        if error != nil {
-                            print(error!.description)
-                            return
-                        }
-                        print(try qp.get_counts("qft3"))
-                    } catch {
-                        print(error.localizedDescription)
-                    }
-                }
-            } catch {
-                print(error.localizedDescription)
+            try input_state(qft3, q, 3)
+            try qft3.barrier()
+            try qft(qft3, q, 3)
+            try qft3.barrier()
+            for j in 0..<3 {
+                try qft3.measure(q[j], c[j])
             }
+
+            try input_state(qft4, q, 4)
+            try qft4.barrier()
+            try qft(qft4, q, 4)
+            try qft4.barrier()
+            for j in 0..<4 {
+                try qft4.measure(q[j], c[j])
+            }
+
+            try input_state(qft5, q, 5)
+            try qft5.barrier()
+            try qft(qft5, q, 5)
+            try qft5.barrier()
+            for j in 0..<5 {
+                try qft5.measure(q[j], c[j])
+            }
+
+            print(qft3.qasm())
+            print(qft4.qasm())
+            print(qft5.qasm())
+
+
+            //##############################################################
+            // Set up the API and execute the program.
+            //##############################################################
+            try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
+
+            qp.execute(["qft3", "qft4", "qft5"], backend:"ibmqx_qasm_simulator",shots: 1024, coupling_map: coupling_map) { (error) in
+                do {
+                    if error != nil {
+                        print(error!.description)
+                        responseHandler?()
+                        return
+                    }
+                    print(try qp.get_counts("qft3"))
+                    print(try qp.get_counts("qft4"))
+                    print(try qp.get_counts("qft5"))
+
+                    qp.execute(["qft3"], backend:backend,shots: 1024, timeout:120, coupling_map: coupling_map) { (error) in
+                        do {
+                            if error != nil {
+                                print(error!.description)
+                                responseHandler?()
+                                return
+                            }
+                            print(try qp.get_counts("qft3"))
+                        } catch {
+                            print(error.localizedDescription)
+                        }
+                        responseHandler?()
+                    }
+                } catch {
+                    print(error.localizedDescription)
+                    responseHandler?()
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+            responseHandler?()
         }
     }
 }

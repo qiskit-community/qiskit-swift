@@ -37,84 +37,97 @@ public final class RippleAdd {
     private init() {
     }
 
-    public class func rippleAdd(qConfig: Qconfig) throws {
-        let qp = try QuantumProgram(specs: QPS_SPECS)
-        guard var qc = qp.get_circuit("rippleadd") else {
-            return
-        }
-        guard let a = qp.get_quantum_registers("a") else {
-            return
-        }
-        guard let b = qp.get_quantum_registers("b") else {
-            return
-        }
-        guard let cin = qp.get_quantum_registers("cin") else {
-            return
-        }
-        guard let cout = qp.get_quantum_registers("cout") else {
-            return
-        }
-        guard let ans = qp.get_classical_registers("ans") else {
-            return
-        }
-
-        // Build a temporary subcircuit that adds a to b,
-        // storing the result in b
-        let adder_subcircuit = try QuantumCircuit([cin, a, b, cout])
-        try RippleAdd.majority(adder_subcircuit, cin[0], b[0], a[0])
-        for j in 0..<(n-1) {
-            try RippleAdd.majority(adder_subcircuit, a[j], b[j + 1], a[j + 1])
-        }
-        try adder_subcircuit.cx(a[n - 1], cout[0])
-        for j in (0..<(n-1)).reversed() {
-            try RippleAdd.unmajority(adder_subcircuit, a[j], b[j + 1], a[j + 1])
-        }
-        try RippleAdd.unmajority(adder_subcircuit, cin[0], b[0], a[0])
-
-        // Set the inputs to the adder
-        try qc.x(a[0])  // Set input a = 0...0001
-        try qc.x(b)   // Set input b = 1...1111
-        // Apply the adder
-        try qc += adder_subcircuit
-        // Measure the output register in the computational basis
-        for j in 0..<n {
-            try qc.measure(b[j], ans[j])
-        }
-        try qc.measure(cout[0], ans[n])
-
-        print(qc.qasm())
-
-        //###############################################################
-        //# Set up the API and execute the program.
-        //###############################################################
-        try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
-
-        print("First version: not compiled")
-        qp.execute(["rippleadd"], backend: backend,shots: 1024, coupling_map: nil) { (error) in
-            do {
-                if error != nil {
-                    print(error!.description)
-                    return
-                }
-                print(try qp.get_counts("rippleadd"))
-                print("Second version: compiled to 2x8 array coupling graph")
-                try qp.compile(["rippleadd"], backend: backend, shots: 1024, coupling_map: coupling_map)
-                // qp.print_execution_list(verbose=true)
-                qp.run() { (error) in
-                    do {
-                        if error != nil {
-                            print(error!.description)
-                            return
-                        }
-                        print(try qp.get_counts("rippleadd"))
-                        print("Both versions should give the same distribution")
-                    } catch {
-                        print(error.localizedDescription)
-                    }
-                }
-            } catch {
-                print(error.localizedDescription)
+    public class func rippleAdd(_ apiToken: String, _ responseHandler: ((Void) -> Void)? = nil) {
+        do {
+            print()
+            print("#################################################################")
+            print("RippleAdd:")
+            let qConfig = try Qconfig(APItoken: apiToken)
+            let qp = try QuantumProgram(specs: QPS_SPECS)
+            guard var qc = qp.get_circuit("rippleadd") else {
+                return
             }
+            guard let a = qp.get_quantum_registers("a") else {
+                return
+            }
+            guard let b = qp.get_quantum_registers("b") else {
+                return
+            }
+            guard let cin = qp.get_quantum_registers("cin") else {
+                return
+            }
+            guard let cout = qp.get_quantum_registers("cout") else {
+                return
+            }
+            guard let ans = qp.get_classical_registers("ans") else {
+                return
+            }
+
+            // Build a temporary subcircuit that adds a to b,
+            // storing the result in b
+            let adder_subcircuit = try QuantumCircuit([cin, a, b, cout])
+            try RippleAdd.majority(adder_subcircuit, cin[0], b[0], a[0])
+            for j in 0..<(n-1) {
+                try RippleAdd.majority(adder_subcircuit, a[j], b[j + 1], a[j + 1])
+            }
+            try adder_subcircuit.cx(a[n - 1], cout[0])
+            for j in (0..<(n-1)).reversed() {
+                try RippleAdd.unmajority(adder_subcircuit, a[j], b[j + 1], a[j + 1])
+            }
+            try RippleAdd.unmajority(adder_subcircuit, cin[0], b[0], a[0])
+
+            // Set the inputs to the adder
+            try qc.x(a[0])  // Set input a = 0...0001
+            try qc.x(b)   // Set input b = 1...1111
+            // Apply the adder
+            try qc += adder_subcircuit
+            // Measure the output register in the computational basis
+            for j in 0..<n {
+                try qc.measure(b[j], ans[j])
+            }
+            try qc.measure(cout[0], ans[n])
+
+            print(qc.qasm())
+
+            //###############################################################
+            //# Set up the API and execute the program.
+            //###############################################################
+            try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
+
+            print("First version: not compiled")
+            qp.execute(["rippleadd"], backend: backend,shots: 1024, coupling_map: nil) { (error) in
+                do {
+                    if error != nil {
+                        print(error!.description)
+                        responseHandler?()
+                        return
+                    }
+                    print(try qp.get_counts("rippleadd"))
+                    print("Second version: compiled to 2x8 array coupling graph")
+                    try qp.compile(["rippleadd"], backend: backend, shots: 1024, coupling_map: coupling_map)
+                    // qp.print_execution_list(verbose=true)
+                    qp.run() { (error) in
+                        do {
+                            if error != nil {
+                                print(error!.description)
+                                responseHandler?()
+                                return
+                            }
+                            print(try qp.get_counts("rippleadd"))
+                            print("Both versions should give the same distribution")
+                        } catch {
+                            print(error.localizedDescription)
+                        }
+                        responseHandler?()
+                    }
+                } catch {
+                    print(error.localizedDescription)
+                    responseHandler?()
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+            responseHandler?()
         }
     }
 

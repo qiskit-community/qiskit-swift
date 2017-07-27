@@ -54,62 +54,75 @@ public final class DataMove {
         try qc.cx(q0, q1)
     }
 
-    public class func dataMove(qConfig: Qconfig) throws {
-        let qp = try QuantumProgram(specs: QPS_SPECS)
-        guard let qc = qp.get_circuit("swapping") else { return }
-        guard let q = qp.get_quantum_registers("q") else { return }
-        guard let r = qp.get_quantum_registers("r") else { return }
-        guard let ans = qp.get_classical_registers("ans") else { return }
+    public class func dataMove(_ apiToken: String, _ responseHandler: ((Void) -> Void)? = nil) {
+        do {
+            print()
+            print("#################################################################")
+            print("DataMove:")
+            let qConfig = try Qconfig(APItoken: apiToken)
+            let qp = try QuantumProgram(specs: QPS_SPECS)
+            guard let qc = qp.get_circuit("swapping") else { return }
+            guard let q = qp.get_quantum_registers("q") else { return }
+            guard let r = qp.get_quantum_registers("r") else { return }
+            guard let ans = qp.get_classical_registers("ans") else { return }
 
-        // Set the first bit of q
-        try qc.x(q[0])
+            // Set the first bit of q
+            try qc.x(q[0])
 
-        // Swap the set bit
-        try DataMove.swap(qc, q[0], q[n-1])
-        try DataMove.swap(qc, q[n-1], r[n-1])
-        try DataMove.swap(qc, r[n-1], q[1])
-        try DataMove.swap(qc, q[1], r[1])
+            // Swap the set bit
+            try DataMove.swap(qc, q[0], q[n-1])
+            try DataMove.swap(qc, q[n-1], r[n-1])
+            try DataMove.swap(qc, r[n-1], q[1])
+            try DataMove.swap(qc, q[1], r[1])
 
-        // Insert a barrier before measurement
-        try qc.barrier()
-        // Measure all of the qubits in the standard basis
-        for j in 0..<n {
-            try qc.measure(q[j], ans[j])
-            try qc.measure(r[j], ans[j+n])
-        }
-        print(qc.qasm())
-
-        //##############################################################
-        // Set up the API and execute the program.
-        //##############################################################
-        try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
-
-        // First version: not compiled
-        qp.execute(["swapping"], backend: backend,shots: 1024, coupling_map: nil) { (error) in
-            do {
-                if error != nil {
-                    print(error!.description)
-                    return
-                }
-                print(try qp.get_counts("swapping"))
-
-                // Second version: compiled to coupling graph
-                qp.execute(["swapping"], backend: backend,shots: 1024, coupling_map: coupling_map) { (error) in
-                    do {
-                        if error != nil {
-                            print(error!.description)
-                            return
-                        }
-                        print(try qp.get_counts("swapping"))
-
-                        print("Both versions should give the same distribution")
-                    } catch {
-                        print(error.localizedDescription)
-                    }
-                }
-            } catch {
-                print(error.localizedDescription)
+            // Insert a barrier before measurement
+            try qc.barrier()
+            // Measure all of the qubits in the standard basis
+            for j in 0..<n {
+                try qc.measure(q[j], ans[j])
+                try qc.measure(r[j], ans[j+n])
             }
+            print(qc.qasm())
+
+            //##############################################################
+            // Set up the API and execute the program.
+            //##############################################################
+            try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
+
+            print("First version: not compiled")
+            qp.execute(["swapping"], backend: backend,shots: 1024, coupling_map: nil) { (error) in
+                do {
+                    if error != nil {
+                        print(error!.description)
+                        responseHandler?()
+                        return
+                    }
+                    print(try qp.get_counts("swapping"))
+
+                    print("Second version: compiled to coupling graph")
+                    qp.execute(["swapping"], backend: backend,shots: 1024, coupling_map: coupling_map) { (error) in
+                        do {
+                            if error != nil {
+                                print(error!.description)
+                                responseHandler?()
+                                return
+                            }
+                            print(try qp.get_counts("swapping"))
+
+                            print("Both versions should give the same distribution")
+                        } catch {
+                            print(error.localizedDescription)
+                        }
+                        responseHandler?()
+                    }
+                } catch {
+                    print(error.localizedDescription)
+                    responseHandler?()
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+            responseHandler?()
         }
     }
 }
