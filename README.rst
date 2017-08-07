@@ -1,8 +1,6 @@
 Quantum Information Software Kit (QISKit)
 =========================================
 
-|Build Status|
-
 Swift software development kit (SDK) for working
 with OpenQASM and the IBM Q experience (QX).
 
@@ -79,15 +77,11 @@ fixed couplings given by a *CouplingGraph*.
 The four circuit representations and how they are currently transformed
 into each other are summarized in this figure:
 
-.. image:: images/circuit_representations.png
-:width: 200px
-:align: center
+.. image:: images/circuit_representations.png :width: 200px :align: center
 
 Several unroller backends and their outputs are summarized here:
 
-.. image:: images/unroller_backends.png
-:width: 200px
-:align: center
+.. image:: images/unroller_backends.png :width: 200px :align: center
 
 Installation and setup
 ----------------------
@@ -98,7 +92,7 @@ Installation and setup
 You'll need:
 
 -  Install `Xcode <https://developer.apple.com/xcode/>`__.
--  `Carthage <https://github.com/Carthage/Carthage>`__.
+-  Install `Carthage <https://github.com/Carthage/Carthage>`__.
 
 2. Get the code
 ~~~~~~~~~~~~~~~
@@ -120,7 +114,6 @@ then navigate to that folder in a terminal window.
 3. Alternatively install using Carthage
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-To use as a library install :
 - Install using Carthage: https://github.com/Carthage/Carthage
 - Run carthage update
 
@@ -128,19 +121,18 @@ To use as a library install :
 4. Configure your API token
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  Create an `IBM Quantum
-Experience <https://quantumexperience.ng.bluemix.net>`__ account if
+-  Create an `IBM Quantum Experience <https://quantumexperience.ng.bluemix.net>`__ account if
 you haven't already done so
 -  Get an API token from the Quantum Experience website under “My
 Account” > “Personal Access Token”
--  When developing your own project, you will pass your API token in a network object called Qconfig.swift.
+-  When developing your own project, you will pass your API token to a network object called Qconfig.swift.
 
 5. Build and run the Swift Playground Tutorial 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - Run carthage update to pull the latest Swift qiskit:
 - Open the QisSwiftPlayground.xcodeproj
 - Compile the qiskit framework
-- Add your API token from step 4. to the file "QisSwiftDeveloperTutorial.playground"
+- Add your API token to the file "QisSwiftDeveloperTutorial.playground"
 - Swift Playgrounds run automatically 
 
 
@@ -173,5 +165,3 @@ Do you want to help?
 If you'd like to contribute please take a look to our
 `contribution guidelines <CONTRIBUTING.rst>`__.
 
-.. |Build Status| image:: https://travis-ci.org/QISKit/qiskit-sdk-py.svg?branch=master
-:target: https://travis-ci.org/QISKit/qiskit-sdk-py
