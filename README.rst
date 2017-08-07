@@ -77,11 +77,15 @@ fixed couplings given by a *CouplingGraph*.
 The four circuit representations and how they are currently transformed
 into each other are summarized in this figure:
 
-.. image:: images/circuit_representations.png :width: 200px :align: center
+.. image:: images/circuit_representations.png
+    :width: 200px
+    :align: center
 
 Several unroller backends and their outputs are summarized here:
 
-.. image:: images/unroller_backends.png :width: 200px :align: center
+.. image:: images/unroller_backends.png
+    :width: 200px
+    :align: center
 
 Installation and setup
 ----------------------
@@ -117,14 +121,11 @@ then navigate to that folder in a terminal window.
 - Install using Carthage: https://github.com/Carthage/Carthage
 - Run carthage update
 
-
 4. Configure your API token
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  Create an `IBM Quantum Experience <https://quantumexperience.ng.bluemix.net>`__ account if
-you haven't already done so
--  Get an API token from the Quantum Experience website under “My
-Account” > “Personal Access Token”
+-  Create an `IBM Quantum Experience <https://quantumexperience.ng.bluemix.net>`__ account if you haven't already done so
+-  Get an API token from the Quantum Experience website under “My Account” > “Personal Access Token”
 -  When developing your own project, you will pass your API token to a network object called Qconfig.swift.
 
 5. Build and run the Swift Playground Tutorial 
