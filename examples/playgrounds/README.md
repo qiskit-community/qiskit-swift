@@ -1,2 +1,0 @@
-# qiskit-sdk-swift-dev
-
