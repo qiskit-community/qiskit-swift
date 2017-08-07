@@ -1,24 +1,19 @@
 /*:
 ![Playground icon](QISKit-c.gif)
 
-[https://github.ibm.com/IBMQuantum/qiskit-sdk-swift-dev]: https://github.ibm.com/IBMQuantum/qiskit-sdk-swift-dev "IBM Swift SDK"
+[https://github.com/QISKit/qiskit-sdk-swift]: https://github.com/QISKit/qiskit-sdk-swift "IBM QISKit Swift SDK"
  
  ## Getting Started with the QISKit Swift API
  The Official API Client to use **IBM Quantum Experience in Swift**.
- The latest version of this playground is available on [https://github.ibm.com/IBMQuantum/qiskit-sdk-swift-dev].
- For more information about how to use the Quantum Experience consult the Quantum Experience tutorials or check-out the community.
+ The latest version of this playground is available on [https://github.com/QISKit/qiskit-sdk-swift].
+ For more information about how to use the Quantum Experience consult the Quantum Experience tutorials or check-out the examples folder.
 */
 
-/*:
- ## Contributors
-Manoel Marques, Joe Ligman, Ismael Faro, Jay M. Gambetta
-*/
- 
 /*:
  [OpenQASM 2.0]: https://github.com/IBM/qiskit-openqasm "Open Qasm 2.0"
  ## Quantum QISKit SDK tutorial
  This tutorial aims to explain how to use the QISKit Swift SDK, but from a developer's point-of-view. We review the steps it takes to install and start to use the SDK tools.
- QISKIt is a Swift software development kit (SDK) that you can use to create your quantum computing programs, based on circuits defined through the [OpenQASM 2.0] specification, compiled and then executed on several Backends (Real Quantum Processors online, Simulators online and Simulators). For the online Backends QISKit uses our Swift API connector to the IBM Quantum Experience project.
+ QISKit is a Swift software development kit (SDK) that you can use to create your quantum computing programs, based on circuits defined through the [OpenQASM 2.0] specification, compiled and then executed on several Backends (Real Quantum Processors online, Simulators online and Simulators). For the online Backends QISKit uses our Swift API connector to the IBM Quantum Experience project.
  Once you get through this, we have other tutorials that introduce you to more complex concepts directly related with quantum computing.
 */
 /*:
@@ -30,9 +25,9 @@ Manoel Marques, Joe Ligman, Ismael Faro, Jay M. Gambetta
 */
 
 /*:
- [https://github.ibm.com/IBMQuantum/qiskit-sdk-swift-dev]: https://github.ibm.com/IBMQuantum/qiskit-sdk-swift-dev "qiskit swift sdk"
+ [https://github.com/QISKit/qiskit-sdk-swift]: https://github.com/QISKit/qiskit-sdk-swift "qiskit swift sdk"
  ## Installation
- If you have not yet installed the Swift interface to the web API of the Quantum Experience you can install it using Carthage. Alternatively you can install it by cloning the following git repository [https://github.ibm.com/IBMQuantum/qiskit-sdk-swift-dev].
+ If you have not yet installed the Swift interface to the web API of the Quantum Experience you can install it using Carthage. Alternatively you can install it by cloning the following git repository [https://github.com/QISKit/qiskit-sdk-swift].
 */
 
 /*:

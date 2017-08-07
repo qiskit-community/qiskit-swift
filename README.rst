@@ -108,12 +108,10 @@ machine:
 
 .. code:: sh
 
-git clone https://github.com/QISKit/qiskit-sdk-swift
-cd qiskit-sdk-swift
+    git clone https://github.com/QISKit/qiskit-sdk-swift
+    cd qiskit-sdk-swift
 
--  If you don't have Git installed, click the "Clone or download" button
-at the URL shown in the git clone command, unzip the file if needed,
-then navigate to that folder in a terminal window.
+-  If you don't have Git installed, click the "Clone or download" button at the URL shown in the git clone command, unzip the file if needed, then navigate to that folder in a terminal window.
 
 3. Alternatively install using Carthage
 ~~~~~~~~~~~~~~~~~~~~~~~~
