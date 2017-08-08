@@ -1,0 +1,403 @@
+%{
+
+#import "ParserBlocks.h"
+#import "ParseTree.h"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunreachable-code"
+
+int yylex(void);
+void yyerror(char *s);
+
+%}
+
+%union {
+    int ivalue;
+    double fvalue;
+    __unsafe_unretained NSString *svalue;
+    __unsafe_unretained Node *node;
+}
+
+%token <svalue> OPENQASM
+%token <ivalue> NNINTEGER
+%token <svalue> BARRIER
+%token <svalue> OPAQUE
+%token <svalue> RESET
+%token <svalue> IF
+%token <fvalue> REAL
+%token <svalue> QREG
+%token <svalue> CREG
+%token <svalue> GATE
+%token <svalue> PI
+%token <svalue> CX
+%token <svalue> U
+%token <svalue> MEASURE
+%token <svalue> MATCHES
+%token <svalue> ID
+%token <svalue> INCLD
+%token <svalue> STRING
+%token <svalue> ASSIGN
+
+%token <svalue> SIN
+%token <svalue> COS
+%token <svalue> TAN
+%token <svalue> EXP
+%token <svalue> LN
+%token <svalue> SQRT
+
+%type <node> mainprogram
+%type <node> include
+%type <node> program
+%type <node> statement
+%type <node> magic
+%type <node> id
+%type <node> indexed_id
+%type <node> primary
+%type <node> id_list
+%type <node> gate_id_list
+%type <node> bit_list
+%type <node> primary_list
+%type <node> decl
+%type <node> qreg_decl
+%type <node> creg_decl
+%type <node> gate_decl
+%type <node> gate_body
+%type <node> gate_op_list
+%type <node> unitary_op
+%type <node> gate_op
+%type <node> opaque
+%type <node> measure
+%type <node> barrier
+%type <node> reset
+%type <node> ifn
+%type <node> quantum_op
+%type <node> unary
+%type <node> prefix_expression
+%type <node> additive_expression
+%type <node> multiplicative_expression
+%type <node> expression
+%type <node> exp_list
+%type <node> nninteger
+%type <node> real
+%type <node> pi
+%type <svalue> assign
+%type <svalue> matches
+%type <svalue> incld
+%type <svalue> external
+%type <svalue> string
+
+
+%left ','
+%right '='
+%left '+' '-'
+%left '*' '/'
+%left '(' ')'
+
+%%
+
+// ----------------------------------------
+// mainprogram : magic ';' program
+// ----------------------------------------
+mainprogram : magic ';' program {
+    $$ = [ParseTree createMainProgram: $1 include: nil program: $3];
+    ParseSuccessBlock((NSObject*)$$);
+}
+| magic ';' include program {
+    $$ = [ParseTree createMainProgram: $1 include: $3 program: $4];
+    ParseSuccessBlock((NSObject*)$$);
+}
+
+// ----------------------------------------
+// include : include file
+// ----------------------------------------
+include : incld string ';' { $$ = [ParseTree createInclude: $2]; }
+
+// ----------------------------------------
+//  program : statement
+//          | program statement
+// ----------------------------------------
+program : statement { $$ = [ ParseTree createProgram: nil statement: $1]; }
+| program statement { $$ = [ ParseTree createProgram: $1 statement: $2]; }
+
+// ----------------------------------------
+//  statement : decl
+//            | quantum_op ';'
+//            | magic ';'
+// ----------------------------------------
+statement : decl { $$ = $1; }
+| quantum_op ';' { $$ = $1; }
+
+// ----------------------------------------
+// magic : MAGIC REAL
+// ----------------------------------------
+magic : OPENQASM real { $$ = [ParseTree createMagic: $2]; }
+
+// ----------------------------------------
+//  id : ID
+// ----------------------------------------
+id : ID { $$ = [ParseTree createId: $1 line: yylineno]; }
+
+// ----------------------------------------
+//  indexed_id : ID [ int ]
+// ----------------------------------------
+indexed_id : id { $$ = [ParseTree createIndexedId: $1 index: nil]; }
+| id '[' nninteger ']' { $$ = [ParseTree createIndexedId: $1 index: $3]; }
+
+// ----------------------------------------
+//  primary : id
+//          | indexed_id
+// ----------------------------------------
+primary : id { $$ = $1; }
+| indexed_id { $$ = $1; }
+
+// ----------------------------------------
+//  id_list : id
+//          | id_list ',' id
+// ----------------------------------------
+id_list : id { $$ = [ParseTree createIdlist: nil identifier: $1]; }
+| id_list ',' id { $$ = [ParseTree createIdlist: $1 identifier: $3]; }
+
+
+// ----------------------------------------
+//  gate_id_list : id
+//               | gate_id_list ',' id
+// ----------------------------------------
+gate_id_list : id { $$ = [ParseTree createIdlist: nil identifier: $1]; }
+| gate_id_list ',' id { $$ = [ParseTree createIdlist: $1 identifier: $3]; }
+
+// ----------------------------------------
+//  bit_list : bit
+//           | bit_list ',' bit
+// ----------------------------------------
+bit_list : id { $$ = [ParseTree createIdlist: nil identifier: $1]; }
+| bit_list ',' id { $$ = [ParseTree createIdlist: $1 identifier: $3]; }
+
+
+// ----------------------------------------
+//  primary_list : primary
+//               | primary_list ',' primary
+// ----------------------------------------
+primary_list : primary { $$ = [ParseTree createPrimaryList: nil primary:$1]; }
+| primary_list ',' primary  { $$ = [ParseTree createPrimaryList: $1 primary:$3]; }
+
+
+// ----------------------------------------
+//  decl : qreg_decl
+//       | creg_decl
+//       | gate_decl
+// ----------------------------------------
+decl : qreg_decl ';' { $$ = $1; }
+| creg_decl ';' { $$ = $1; }
+| gate_decl { $$ = $1; }
+
+
+// ----------------------------------------
+//  qreg_decl : QREG indexed_id
+// ----------------------------------------
+qreg_decl : QREG indexed_id { $$ = [ParseTree createQReg: $2]; }
+
+// ----------------------------------------
+//  creg_decl : QREG indexed_id
+// ----------------------------------------
+creg_decl : CREG indexed_id { $$ = [ParseTree createCReg: $2]; }
+
+
+// Gate_body will throw if there are errors, so we don't need to cover
+// that here. Same with the id_lists - if they are not legal, we die
+// before we get here
+//
+// ----------------------------------------
+//  gate_decl : GATE id gate_scope                      bit_list gate_body
+//            | GATE id gate_scope '(' ')'              bit_list gate_body
+//            | GATE id gate_scope '(' gate_id_list ')' bit_list gate_body
+//
+// ----------------------------------------
+gate_decl : GATE id bit_list gate_body { $$ = [ParseTree createGate: $2 list1: nil list2: $3 list3: $4]; }
+| GATE id '(' ')' bit_list gate_body  { $$ = [ParseTree createGate: $2 list1: nil list2: $5 list3: $6]; }
+| GATE id '(' gate_id_list ')' bit_list gate_body { $$ = [ParseTree createGate: $2 list1: $4 list2: $6 list3: $7]; }
+
+
+// ----------------------------------------
+//  gate_body : '{' gate_op_list '}'
+//            | '{' '}'
+//
+//            | '{' gate_op_list error
+//            | '{' error
+//
+// Error handling: gete_op will throw if there's a problem so we won't
+//                 get here with in the gate_op_list
+// ----------------------------------------
+gate_body : '{' gate_op_list '}' { $$ = [ParseTree createGateBody: $2]; }
+| '{' '}' { $$ = [ParseTree createGateBody: nil]; }
+
+// ----------------------------------------
+//  gate_op_list : gate_op
+//               | gate_op_ist gate_op
+//
+// Error handling: gete_op will throw if there's a problem so we won't
+//                 get here with errors
+// ----------------------------------------
+gate_op_list : gate_op { $$ = [ParseTree createGopList: nil gate_op: $1]; }
+| gate_op_list gate_op { $$ = [ParseTree createGopList: $1 gate_op: $2]; }
+
+
+// ----------------------------------------
+// These are for use outside of gate_bodies and allow
+// indexed ids everywhere.
+//
+// unitary_op : U '(' exp_list ')'  primary
+//            | CX                  primary ',' primary
+//            | id                  pirmary_list
+//            | id '(' ')'          primary_list
+//            | id '(' exp_list ')' primary_list
+//
+// Note that it might not be unitary - this is the mechanism that
+// is also used to invoke calls to 'opaque'
+// ----------------------------------------
+unitary_op : U '(' exp_list ')'  primary  { $$ = [ParseTree createUniversalUnitary: $3 list2: $5]; }
+| CX primary ',' primary { $$ = [ParseTree createCX: $2 arg2: $4]; }
+| id primary_list { $$ = [ParseTree createCustomUnitary: $1 arguments: nil bitlist: $2]; }
+| id '(' ')' primary_list { $$ = [ParseTree createCustomUnitary: $1 arguments: nil bitlist: $4]; }
+| id '(' exp_list ')' primary_list { $$ = [ParseTree createCustomUnitary: $1 arguments: $3 bitlist: $5]; }
+
+// ----------------------------------------
+// This is a restricted set of "quantum_op" which also
+// prohibits indexed ids, for use in a gate_body
+//
+// gate_op : U '(' exp_list ')'  id         ';'
+//         | CX                  id ',' id  ';'
+//         | id                  id_list    ';'
+//         | id '(' ')'          id_list    ';'
+//         | id '(' exp_list ')' id_list    ';'
+//         | BARRIER id_list                ';'
+// ----------------------------------------
+gate_op : U '(' exp_list ')' id ';' { $$ = [ParseTree createUniversalUnitary: $3 list2: $5]; }
+| CX id ',' id  ';' { $$ = [ParseTree createCX: $2 arg2: $4]; }
+| id id_list ';' { $$ = [ParseTree createCustomUnitary: $1 arguments: nil bitlist: $2]; }
+| id '(' ')' id_list ';' { $$ = [ParseTree createCustomUnitary: $1 arguments: nil bitlist: $4]; }
+| id '(' exp_list ')' id_list ';' { $$ = [ParseTree createCustomUnitary: $1 arguments: $3 bitlist: $5]; }
+| BARRIER id_list ';' { $$ = [ParseTree createBarrier: $2]; }
+
+
+// ----------------------------------------
+// opaque : OPAQUE id gate_scope                      bit_list
+//        | OPAQUE id gate_scope '(' ')'              bit_list
+//        | OPAQUE id gate_scope '(' gate_id_list ')' bit_list
+//
+// These are like gate declaratons only wihtout a body.
+// ----------------------------------------
+opaque : OPAQUE id bit_list { $$ = [ParseTree createOpaque: $2 list1: $3 list2: nil]; }
+| OPAQUE id '(' ')' bit_list { $$ = [ParseTree createOpaque: $2 list1: $5 list2: nil]; }
+| OPAQUE id '(' gate_id_list ')' bit_list { $$ = [ParseTree createOpaque: $2 list1: $4 list2: $6]; }
+
+// ----------------------------------------
+// measure : MEASURE primary ASSIGN primary
+// ----------------------------------------
+measure : MEASURE primary assign primary { $$ = [ParseTree createMeasure: $2 argument: $4]; }
+
+// ----------------------------------------
+// barrier : BARRIER primary_list
+//
+// Errors are covered by handling erros in primary_list
+// ----------------------------------------
+barrier : BARRIER primary_list { $$ = [ParseTree createBarrier: $2]; }
+
+// ----------------------------------------
+// reset : RESET primary
+// ----------------------------------------
+reset : RESET primary { $$ = [ParseTree createReset: $2 ]; }
+
+// ----------------------------------------
+// IF '(' ID MATCHES NNINTEGER ')' quantum_op
+// if : IF '(' id MATCHES NNINTEGER ')' quantum_op
+// if : IF '(' id error
+// if : IF '(' id MATCHES error
+// if : IF '(' id MATCHES NNINTEGER error
+// if : IF error
+// ----------------------------------------
+ifn : IF '(' id matches nninteger ')' quantum_op { $$ = [ParseTree createIf: $3 nninteger: $5 quantum_op: $7]; }
+
+// ----------------------------------------
+// These are all the things you can have outside of a gate declaration
+//        quantum_op : unitary_op
+//                   | opaque
+//                   | measure
+//                   | reset
+//                   | barrier
+//                   | if
+//
+// ----------------------------------------
+quantum_op : unitary_op { $$ = $1; }
+| opaque { $$ = $1; }
+| measure { $$ = $1; }
+| barrier { $$ = $1; }
+| reset { $$ = $1; }
+| ifn { $$ = $1; }
+
+
+// ----------------------------------------
+// unary : NNINTEGER
+//       | REAL
+//       | PI
+//       | ID
+//       | '(' expression ')'
+//       | id '(' expression ')'
+//
+// We will trust 'expression' to throw before we have to handle it here
+// ----------------------------------------
+unary : nninteger { $$ = $1; }
+| real { $$ = $1; }
+| pi { $$ = $1; }
+| id { $$ = $1; }
+| '(' expression ')' { $$ = $2; }
+| id '(' external ')' { [ParseTree createExternal: $1 external: $3]; }
+
+
+// ----------------------------------------
+// Prefix
+// ----------------------------------------
+prefix_expression : unary { $$ = $1; }
+| '+' prefix_expression { $$ = [ParseTree createPrefixOperation: @"+" operand: $2]; }
+| '-' prefix_expression { $$ = [ParseTree createPrefixOperation: @"-" operand: $2]; }
+
+additive_expression : prefix_expression { $$ = $1; }
+| additive_expression '+' prefix_expression { $$ = [ParseTree createBinaryOperation: @"+" operand1: $1 operand2: $3];  }
+| additive_expression '-' prefix_expression { $$ = [ParseTree createBinaryOperation: @"-" operand1: $1 operand2: $3];  }
+
+multiplicative_expression : additive_expression { $$ = $1; }
+| multiplicative_expression '*' additive_expression { $$ = [ParseTree createBinaryOperation: @"*" operand1: $1 operand2: $3]; }
+| multiplicative_expression '/' additive_expression { $$ = [ParseTree createBinaryOperation: @"/" operand1: $1 operand2: $3]; }
+
+expression : multiplicative_expression { $$ = $1; }
+| expression '^' multiplicative_expression { $$ = [ParseTree createBinaryOperation: @"^" operand1: $1 operand2: $3]; }
+
+// ----------------------------------------
+// exp_list : exp
+//          | exp_list ',' exp
+// ----------------------------------------
+exp_list : expression { $$ = [ParseTree createExpressionList: nil expression: $1];  }
+| expression ',' exp_list { $$ = [ParseTree createExpressionList: $3 expression: $1]; }
+
+// ----------------------------------------
+// Terminals
+// ----------------------------------------
+nninteger : NNINTEGER { $$ = [ParseTree createInt: $1]; }
+real : REAL { $$ = [ParseTree createReal: $1]; }
+pi : PI { $$ = [ParseTree createReal: M_PI]; }
+
+assign : ASSIGN { $$ = $1; }
+matches : MATCHES { $$ = $1; }
+string : STRING { $$ = $1; }
+incld : INCLD { $$ = $1; }
+
+external : SIN { $$ = $1; }
+| COS { $$ = $1; }
+| TAN { $$ = $1; }
+| EXP { $$ = $1; }
+| LN { $$ = $1; }
+| SQRT { $$ = $1; }
+
+
+%%
+
+#pragma clang diagnostic pop
+
