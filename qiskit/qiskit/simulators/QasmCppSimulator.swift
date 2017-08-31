@@ -21,10 +21,9 @@ final class QasmCppSimulator: Simulator {
         "name": "local_qasm_cpp_simulator",
         "url": "https://github.com/IBM/qiskit-sdk-py",
         "simulator": true,
-        "description": "A python simulator for qasm files",
-        "nQubits": 10,
-        "couplingMap": "all-to-all",
-        "gateset": "SU2+CNOT"
+        "description": "A c++ simulator for qasm files",
+        "coupling_map": "all-to-all",
+        "basis_gates": "u1,u2,u3,cx,id"
     ]
 
     private var config: [String:Any] = [:]
@@ -58,12 +57,15 @@ final class QasmCppSimulator: Simulator {
 
         self.result["data"] = [:]
 
-        if let shots = job["shots"] as? Int {
-            self._shots = shots
+        if let config = job["config"] as? [String:Any] {
+            if let shots = config["shots"] as? Int {
+                self._shots = shots
+            }
+            if let seed = config["seed"] as? Int {
+                srand48(seed)
+            }
         }
-        if let seed = job["seed"] as? Int {
-            self._seed = seed
-        }
+        
         // Number of threads for simulator
         if let threads = self.config["threads"] as? Int {
             self._threads = threads
@@ -83,7 +85,7 @@ final class QasmCppSimulator: Simulator {
         }
     }
 
-    func run() throws -> [String:Any] {
+    func run(_ silent: Bool) throws -> [String:Any] {
         preconditionFailure("CPPSimulator run not implemented")
     }
 }

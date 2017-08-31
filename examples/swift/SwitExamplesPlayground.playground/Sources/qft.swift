@@ -94,12 +94,12 @@ public final class QFT {
             print("QFT:")
             let qConfig = try Qconfig(APItoken: apiToken)
             let qp = try QuantumProgram(specs: QPS_SPECS)
-            guard let q = qp.get_quantum_registers("q") else { return }
-            guard let c = qp.get_classical_registers("c") else { return }
+            let q = try qp.get_quantum_register("q")
+            let c = try qp.get_classical_register("c")
 
-            guard let qft3 = qp.get_circuit("qft3") else { return }
-            guard let qft4 = qp.get_circuit("qft4") else { return }
-            guard let qft5 = qp.get_circuit("qft5") else { return }
+            let qft3 = try qp.get_circuit("qft3")
+            let qft4 = try qp.get_circuit("qft4")
+            let qft5 = try qp.get_circuit("qft5")
 
             try input_state(qft3, q, 3)
             try qft3.barrier()
@@ -135,25 +135,25 @@ public final class QFT {
             //##############################################################
             try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
 
-            qp.execute(["qft3", "qft4", "qft5"], backend:"ibmqx_qasm_simulator",shots: 1024, coupling_map: coupling_map) { (error) in
+            qp.execute(["qft3", "qft4", "qft5"], backend:"ibmqx_qasm_simulator",shots: 1024, coupling_map: coupling_map) { (result,error) in
                 do {
                     if error != nil {
                         print(error!.description)
                         responseHandler?()
                         return
                     }
-                    print(try qp.get_counts("qft3"))
-                    print(try qp.get_counts("qft4"))
-                    print(try qp.get_counts("qft5"))
+                    print(try result.get_counts("qft3"))
+                    print(try result.get_counts("qft4"))
+                    print(try result.get_counts("qft5"))
 
-                    qp.execute(["qft3"], backend:backend,shots: 1024, timeout:120, coupling_map: coupling_map) { (error) in
+                    qp.execute(["qft3"], backend:backend,shots: 1024, timeout:120, coupling_map: coupling_map) { (result,error) in
                         do {
                             if error != nil {
                                 print(error!.description)
                                 responseHandler?()
                                 return
                             }
-                            print(try qp.get_counts("qft3"))
+                            print(try result.get_counts("qft3"))
                         } catch {
                             print(error.localizedDescription)
                         }

@@ -16,79 +16,71 @@
 import Foundation
 
 /**
-Contains a (slow) python simulator.
-
-Author: Jay Gambetta and John Smolin
-
-It simulates a qasm quantum circuit that has been compiled to run on the
-simulator. It is exponential in the number of qubits.
-
-We advise using the c++ simulator or online for larger size systems.
-
-The input is
-compiled_circuit object
-shots
-seed
-and the output is the results object
-
-if shots = 1
-compiled_circuit['result']['data']['quantum_state'] and
-results['data']['classical_state'] where quantum_state is
-a 2**n complex numpy array representing the quantum state vector and
-classical_state is a interger representing the state of the classical
-registors.
-if shots > 1
-results['data']["counts"] where this is dict {"0000" : 454}
-
-The simulator is run using
-
-QasmSimulator(compiled_circuit,shots,seed).run().
-
-compiled_circuit =
-    {
-        "header": {
-            "number_of_qubits": 2, // int
-            "number_of_clbits": 2, // int
-            "qubit_labels": [["q", 0], ["v", 0]], // list[list[string, int]]
-            "clbit_labels": [["c", 2]], // list[list[string, int]]
-        }
-        "operations": // list[map]
-        [
-            {
-                "name": , // required -- string
-                "params": , // optional -- list[double]
-                "qubits": , // optional -- list[int]
-                "clbits": , //optional -- list[int]
-                "conditional":  // optional -- map
-                {
-                    "type": , // string
-                    "mask": , // big int
-                    "val":  , // big int
-                }
-            },
-        ]
-}
-
-if shots = 1
-result =
-    {
-        'data':
-        {
-            'quantum_state': array([ 1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j]),
-            'classical_state': 0
-        }
-        'status': 'DONE'
-    }
-
-if shots > 1
-result =
-    {
-        'data':
-        {
-            'counts': {'0000': 50, '1001': 44},
-        }
-        'status': 'DONE'
-    }
+ Contains a (slow) simulator.
+ It simulates a qasm quantum circuit that has been compiled to run on the
+ simulator. It is exponential in the number of qubits.
+ We advise using the c++ simulator or online simulator for larger size systems.
+ The input is a qobj dictionary
+ and the output is a Results object
+ if shots = 1
+ compiled_circuit['result']['data']['quantum_state']
+ and
+ results['data']['classical_state']
+ where 'quantum_state' is a 2\ :sup:`n` complex numpy array representing the
+ quantum state vector and 'classical_state' is an integer representing
+ the state of the classical registors.
+ if shots > 1
+ results['data']["counts"] where this is dict {"0000" : 454}
+ The simulator is run using
+ .. code-block:: python
+ QasmSimulator(compiled_circuit,shots,seed).run().
+ .. code-block:: guess
+ compiled_circuit =
+ {
+ "header": {
+ "number_of_qubits": 2, // int
+ "number_of_clbits": 2, // int
+ "qubit_labels": [["q", 0], ["v", 0]], // list[list[string, int]]
+ "clbit_labels": [["c", 2]], // list[list[string, int]]
+ }
+ "operations": // list[map]
+ [
+ {
+ "name": , // required -- string
+ "params": , // optional -- list[double]
+ "qubits": , // optional -- list[int]
+ "clbits": , //optional -- list[int]
+ "conditional":  // optional -- map
+ {
+ "type": , // string
+ "mask": , // big int
+ "val":  , // big int
+ }
+ },
+ ]
+ }
+ if shots = 1
+ .. code-block:: python
+ result =
+ {
+ 'data':
+ {
+ 'quantum_state': array([ 1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j]),
+ 'classical_state': 0
+ 'counts': {'0000': 1}
+ }
+ 'status': 'DONE'
+ }
+ if shots > 1
+ .. code-block:: python
+ result =
+ {
+ 'data':
+ {
+ 'counts': {'0000': 50, '1001': 44},
+ }
+ 'status': 'DONE'
+ }
  */
 
 // TODO add the IF qasm operation.
@@ -104,10 +96,9 @@ final class QasmSimulator: Simulator {
         "name": "local_qasm_simulator",
         "url": "https://github.com/IBM/qiskit-sdk-py",
         "simulator": true,
-        "description": "A python simulator for qasm files",
-        "nQubits": 10,
-        "couplingMap": "all-to-all",
-        "gateset": "SU2+CNOT"
+        "description": "A swift simulator for qasm files",
+        "coupling_map": "all-to-all",
+        "basis_gates": "u1,u2,u3,cx,id"
     ]
 
     /**
@@ -197,11 +188,13 @@ final class QasmSimulator: Simulator {
         }
         self.result["data"] = [:]
 
-        if let shots = job["shots"] as? Int {
-            self._shots = shots
-        }
-        if let seed = job["seed"] as? Int {
-            srand48(Int(seed))
+        if let config = job["config"] as? [String:Any] {
+            if let shots = config["shots"] as? Int {
+                self._shots = shots
+            }
+            if let seed = config["seed"] as? Int {
+                srand48(seed)
+            }
         }
         if let operations = self.circuit["operations"]  as? [[String:Any]] {
             self._number_of_operations = operations.count
@@ -333,29 +326,7 @@ final class QasmSimulator: Simulator {
         }
     }
 
-    /**
-     Apply a single qubit gate to the qubit.
-
-     Args:
-     gate(str): the single qubit gate name
-     params(list): the operation parameters op['params']
-     Returns:
-     a tuple of U gate parameters (theta, phi, lam)
-     */
-    private static func _qasm_single_params(_ gate: String, _ params: [Double]) -> (Double,Double,Double) {
-        if gate == "U" || gate == "u3" {
-            return (params[0], params[1], params[2])
-        }
-        else if gate == "u2" {
-            return (Double.pi/2, params[0], params[1])
-        }
-        else if gate == "u1" {
-            return (0.0, 0.0, params[0])
-        }
-        return (0.0,0.0,0.0)
-    }
-
-    func run() throws -> [String:Any] {
+    func run(_ silent: Bool) throws -> [String:Any] {
         var outcomes: [String] = []
         // Do each shot
         for _ in 0..<self._shots {
@@ -394,22 +365,15 @@ final class QasmSimulator: Simulator {
                         if let qubits = operation["qubits"] as? [Int] {
                             if let params = operation["params"] as? [Double] {
                                 let qubit = qubits[0]
-                                let (theta, phi, lam) = QasmSimulator._qasm_single_params(name, params)
-                                let gate: [[Complex]] = [[
-                                             Complex(real:cos(theta/2.0)),
-                                             Complex(imag: lam).exp() * -sin(theta/2.0)
-                                            ],
-                                            [
-                                             Complex(imag: phi).exp() * sin(theta/2.0),
-                                             (Complex(imag: phi) + Complex(imag: lam)).exp() * cos(theta/2.0)
-                                            ]
-                                ]
+                                let gate = SimulatorTools.single_gate_matrix(name, params)
                                 self._add_qasm_single(gate, qubit)
                             }
                         }
                     }
+                    else if ["id", "u0"].contains(name) {
+                    }
                     // Check if CX gate
-                    else if name == "CX" || name == "cx" {
+                    else if ["CX", "cx"].contains(name) {
                         if let qubits = operation["qubits"] as? [Int] {
                             self._add_qasm_cx(qubits[0], qubits[1])
                         }
@@ -446,18 +410,16 @@ final class QasmSimulator: Simulator {
             data["quantum_state"] = self._quantum_state
             data["classical_state"] = self._classical_state
         }
-        else {
-            var counts: [String:Int] = [:]
-            for outcome in outcomes {
-                if let count = counts[outcome] {
-                    counts[outcome] = count + 1
-                }
-                else {
-                    counts[outcome] = 1
-                }
+        var counts: [String:Int] = [:]
+        for outcome in outcomes {
+            if let count = counts[outcome] {
+                counts[outcome] = count + 1
             }
-            data["counts"] = self._format_result(counts)
+            else {
+                counts[outcome] = 1
+            }
         }
+        data["counts"] = self._format_result(counts)
         self.result["data"] = data
         self.result["status"] = "DONE"
         return self.result
@@ -470,9 +432,9 @@ final class QasmSimulator: Simulator {
      at register divisions.
 
      Args:
-     counts : dictionary of counts e.g. {'1111': 1000, '0000':5}
+        counts : dictionary of counts e.g. {'1111': 1000, '0000':5}
      Returns:
-     spaces inserted into dictionary keys at register boundries.
+        spaces inserted into dictionary keys at register boundries.
      */
     private func _format_result(_ counts: [String:Int]) -> [String:Int] {
         var fcounts: [String:Int] = [:]

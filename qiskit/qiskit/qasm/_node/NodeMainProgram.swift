@@ -32,10 +32,10 @@ import Foundation
         return .N_MAINPROGRAM
     }
     
-    public override func qasm() -> String {
-        var qasm: String = magic?.qasm() ?? ""
-        qasm += "\(incld?.qasm() ?? "")\n"
-        qasm += "\(program?.qasm() ?? "")\n"
+    public override func qasm(_ prec: Int) -> String {
+        var qasm: String = magic?.qasm(prec) ?? ""
+        qasm += "\(incld?.qasm(prec) ?? "")\n"
+        qasm += "\(program?.qasm(prec) ?? "")\n"
         return qasm
     }
 }

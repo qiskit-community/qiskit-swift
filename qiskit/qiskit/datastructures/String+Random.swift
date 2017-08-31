@@ -15,12 +15,18 @@
 
 import Foundation
 
-final class Layer {
-    public let graph: Circuit
-    public let partition : [[RegBit]]
-
-    init(_ graph: Circuit, _ partition: [[RegBit]]) {
-        self.graph = graph
-        self.partition = partition
+extension String {
+    static func randomAlphanumeric(length: Int) -> String {
+        struct StaticVars {
+            static let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".characters
+            static let lettersLength = UInt32(letters.count)
+        }
+        var array = [Character](repeating: " ", count: length)
+        for i in 0..<length {
+            let pos = Int(arc4random_uniform(StaticVars.lettersLength))
+            let index = StaticVars.letters.index(StaticVars.letters.startIndex, offsetBy: pos)
+            array[i] = StaticVars.letters[index]
+        }
+        return String(array)
     }
 }

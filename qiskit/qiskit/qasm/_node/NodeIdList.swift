@@ -43,11 +43,11 @@ import Foundation
         return (identifiers != nil) ? identifiers! : []
     }
     
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         var qasms: [String] = []
         if let list = identifiers {
             qasms = list.flatMap({ (node: Node) -> String in
-                return node.qasm()
+                return node.qasm(prec)
             })
         }
         return qasms.joined(separator: ",")

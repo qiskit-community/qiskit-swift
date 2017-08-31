@@ -78,13 +78,13 @@ extension QuantumCircuit {
     public func barrier(_ regs: [QuantumRegister] = []) throws -> Barrier {
         var registers = regs
         if registers.isEmpty { //TODO: implement this for all single qubit gates
-            for register in self.regs {
-                if register is QuantumRegister {
-                    registers.append(register as! QuantumRegister)
+            for (_,register) in self.regs {
+                if let reg = register as? QuantumRegister {
+                    registers.append(reg)
                 }
             }
             if registers.isEmpty {
-                throw QISKitException.noarguments
+                throw QISKitError.noArguments
             }
         }
         var qubits: [QuantumRegisterTuple] = []
@@ -115,13 +115,13 @@ extension QuantumCircuit {
         var qubits: [QuantumRegisterTuple] = []
         if qTuples.isEmpty { //TODO: implement this for all single qubit gates
             var registers: [QuantumRegister] = []
-            for reg in self.regs {
-                if let register = reg as? QuantumRegister {
-                    registers.append(register)
+            for (_,register) in self.regs {
+                if let reg = register as? QuantumRegister {
+                    registers.append(reg)
                 }
             }
             if registers.isEmpty {
-                throw QISKitException.noarguments
+                throw QISKitError.noArguments
             }
             for register in registers {
                 for j in 0..<register.size {
@@ -150,7 +150,7 @@ extension CompositeGate {
     @discardableResult
     public func barrier(_ regs: [QuantumRegister] = []) throws -> Barrier {
         if regs.isEmpty {
-            throw QISKitException.noarguments
+            throw QISKitError.noArguments
         }
         var qubits: [QuantumRegisterTuple] = []
         for register in regs {
@@ -178,11 +178,11 @@ extension CompositeGate {
     @discardableResult
     public func barrier(_ qTuples: [QuantumRegisterTuple]) throws -> Barrier {
         if qTuples.isEmpty {
-            throw QISKitException.noarguments
+            throw QISKitError.noArguments
         }
         var qubits: [QuantumRegisterTuple] = []
         if qTuples.isEmpty { //TODO: implement this for all single qubit gates
-            throw QISKitException.noarguments
+            throw QISKitError.noArguments
         }
         for tuple_element in qTuples {
             try self._check_qubit(tuple_element)

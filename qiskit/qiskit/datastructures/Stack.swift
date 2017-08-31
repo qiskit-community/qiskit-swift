@@ -16,7 +16,7 @@
 import Foundation
 
 struct Stack<Element> {
-    private var items = [Element]()
+    private(set) var items = [Element]()
 
     var isEmpty: Bool {
         return self.items.isEmpty

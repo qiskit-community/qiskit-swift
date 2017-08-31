@@ -63,12 +63,15 @@ final class Mapping {
                                   _ layout: OrderedDictionary<RegBit,RegBit>,
                                   _ qubit_subset: [RegBit],
                                   _ coupling: Coupling,
-                                  _ trials: Int) throws -> (Bool, String?, Int?, OrderedDictionary<RegBit,RegBit>?, Bool) {
-
-        //print("layer permutation")
-        //print("layer_partition",layer_partition)
-        //print("layout ",layout)
-        //print("qubit_subset ",qubit_subset)
+                                  _ trials: Int,
+                                  _ verbose: Bool = false) throws -> (Bool, String?, Int?, OrderedDictionary<RegBit,RegBit>?, Bool) {
+        if verbose {
+            print("layer_permutation: ----- enter -----")
+            print("layer_permutation: layer_partition = \(layer_partition)")
+            print("layer_permutation: layout = \(layout)")
+            print("layer_permutation: qubit_subset = \(qubit_subset)")
+            print("layer_permutation: trials = \(trials)")
+        }
 
         var rev_layout: OrderedDictionary<RegBit,RegBit> = OrderedDictionary<RegBit,RegBit>()
         for (a,b) in layout {
@@ -77,11 +80,15 @@ final class Mapping {
         var gates: [(RegBit,RegBit)] = []
         for layer in layer_partition {
             if layer.count > 2 {
-                throw MappingError.layouterror
+                throw MappingError.layoutError
             }
             if layer.count == 2 {
                 gates.append((layer[0],layer[1]))
             }
+        }
+
+        if verbose {
+            print("layer_permutation: gates = \(gates)")
         }
 
         // Can we already apply the gates?
@@ -89,7 +96,14 @@ final class Mapping {
         for g in gates {
             dist += try coupling.distance(layout[g.0]!,layout[g.1]!)
         }
+        if verbose {
+            print("layer_permutation: dist = \(dist)")
+        }
         if dist == gates.count {
+            if verbose {
+                print("layer_permutation: done already")
+                print("layer_permutation: ----- exit -----")
+            }
             return (true, "", 0, layout, gates.isEmpty)
         }
 
@@ -98,7 +112,10 @@ final class Mapping {
         var best_d: Int = Int.max  // initialize best depth
         var best_circ: String? = nil  // initialize best swap circuit
         var best_layout: OrderedDictionary<RegBit,RegBit>? = nil  // initialize best final layout
-        for _ in 0..<trials {
+        for trial in 0..<trials {
+            if verbose {
+                print("layer_permutation: trial \(trial)")
+            }
             var trial_layout = layout
             var rev_trial_layout = rev_layout
             var trial_circ = ""  // circuit produced in this trial
@@ -130,7 +147,6 @@ final class Mapping {
                     for g in gates {
                         min_cost += xi[trial_layout[g.0]!]![trial_layout[g.1]!]!
                     }
-                    //min_cost = sum([xi[trial_layout[g[0]]][trial_layout[g[1]]] for g in gates])
                     // Try to decrease objective function
                     var progress_made = false
                     // Loop over edges of coupling graph
@@ -152,9 +168,11 @@ final class Mapping {
                             for g in gates {
                                 new_cost += xi[new_layout[g.0]!]![new_layout[g.1]!]!
                             }
-                            //new_cost = sum([xi[new_layout[g[0]]][new_layout[g[1]]] for g in gates])
                             // Record progress if we succceed
                             if new_cost < min_cost {
+                                if verbose {
+                                    print("layer_permutation: progress! min_cost = \(min_cost)")
+                                }
                                 progress_made = true
                                 min_cost = new_cost
                                 opt_layout = new_layout
@@ -171,6 +189,9 @@ final class Mapping {
                         trial_layout = opt_layout
                         rev_trial_layout = rev_opt_layout
                         circ += "swap \(opt_edge!.one.description),\(opt_edge!.two.description); "
+                        if verbose {
+                            print("layer_permutation: chose pair \(opt_edge!)")
+                        }
                     }
                     else {
                         break
@@ -182,25 +203,38 @@ final class Mapping {
                 for g in gates {
                     dist += try coupling.distance(trial_layout[g.0]!,trial_layout[g.1]!)
                 }
-                //dist = sum([coupling.distance(trial_layout[g[0]],trial_layout[g[1]]) for g in gates])
+                if verbose {
+                    print("layer_permutation: dist = \(dist)")
+                }
                 // If all gates can be applied now, we are finished
                 // Otherwise we need to consider a deeper swap circuit
                 if dist == gates.count {
+                    if verbose {
+                        print("layer_permutation: all can be applied now")
+                    }
                     trial_circ += circ
                     break
                 }
 
                 // Increment the depth
                 d += 1
+                if verbose {
+                    print("layer_permutation: increment depth to \(d)")
+                }
             }
             // Either we have succeeded at some depth d < dmax or failed
             var dist: Int = 0
             for g in gates {
                 dist += try coupling.distance(trial_layout[g.0]!,trial_layout[g.1]!)
             }
-            //dist = sum([coupling.distance(trial_layout[g[0]],trial_layout[g[1]]) for g in gates])
+            if verbose {
+                print("layer_permutation: dist = \(dist)")
+            }
             if dist == gates.count {
                 if d < best_d {
+                    if verbose {
+                        print("layer_permutation: got circuit with depth \(d)")
+                    }
                     best_circ = trial_circ
                     best_layout = trial_layout
                 }
@@ -208,29 +242,39 @@ final class Mapping {
             }
         }
         if best_circ == nil {
+            if verbose {
+                print("layer_permutation: failed!")
+                print("layer_permutation: ----- exit -----")
+            }
             return (false, nil, nil, nil, false)
         }
-        //print("layer permutation ends best_circ \(best_circ!)")
+        if verbose {
+            print("layer_permutation: done")
+            print("layer_permutation: ----- exit -----")
+        }
         return (true, best_circ, best_d, best_layout, false)
     }
 
     /**
      Change the direction of CNOT gates to conform to CouplingGraph.
-     circuit_graph = input Circuit
+
+     circuit_graph = input DAGCircuit
      coupling_graph = corresponding CouplingGraph
      verbose = optional flag to print more information
+
      Adds "h" to the circuit basis.
-     Returns a Circuit object containing a circuit equivalent to
+
+     Returns a DAGCircuit object containing a circuit equivalent to
      circuit_graph but with CNOT gate directions matching the edges
      of coupling_graph. Raises an exception if the circuit_graph
      does not conform to the coupling_graph.
      */
-    static func direction_mapper(_ circuit_graph: Circuit, _ coupling_graph: Coupling, _ verbose: Bool = false) throws -> Circuit {
+    static func direction_mapper(_ circuit_graph: DAGCircuit, _ coupling_graph: Coupling, _ verbose: Bool = false) throws -> DAGCircuit {
         guard let basis = circuit_graph.basis["cx"] else {
             return circuit_graph
         }
         if basis != (2, 0, 0) {
-            throw MappingError.unexpectedsignature(a: basis.0, b: basis.1, c: basis.2)
+            throw MappingError.unexpectedSignature(a: basis.0, b: basis.1, c: basis.2)
         }
         let flipped_qasm = "OPENQASM 2.0;\n" +
             "gate cx c,t { CX c,t; }\n" +
@@ -240,8 +284,8 @@ final class Mapping {
             "qreg q[2];\n" +
             "cx_flipped q[0],q[1];\n"
 
-        let u = Unroller(try Qasm(data: flipped_qasm).parse(),CircuitBackend(["cx", "h"]))
-        let flipped_cx_circuit = try u.execute() as! Circuit
+        let u = Unroller(try Qasm(data: flipped_qasm).parse(),DAGBackend(["cx", "h"]))
+        let flipped_cx_circuit = try u.execute() as! DAGCircuit
         let cx_node_list = try circuit_graph.get_named_nodes("cx")
         let cg_edges = coupling_graph.get_edges()
         for cx_node in cx_node_list {
@@ -262,7 +306,7 @@ final class Mapping {
                 }
                 continue
             }
-            throw MappingError.errorcouplinggraph(cxedge: cxedge)
+            throw MappingError.errorCouplingGraph(cxedge: cxedge)
         }
         return circuit_graph
     }
@@ -286,7 +330,7 @@ final class Mapping {
                             _ best_layout: OrderedDictionary<RegBit,RegBit>,
                             _ best_d: Int,
                             _ best_circ: String,
-                            _ circuit_graph: Circuit,
+                            _ circuit_graph: DAGCircuit,
                             _ layer_list: [Layer],
                             _ verbose: Bool = false) throws -> String {
         var openqasm_output = ""
@@ -326,31 +370,33 @@ final class Mapping {
     }
 
     /**
-     Map a Circuit onto a CouplingGraph using swap gates.
+     Map a DAGCircuit onto a CouplingGraph using swap gates.
 
-     circuit_graph = input Circuit
-     coupling_graph = CouplingGraph to map onto
-     initial_layout = dict from qubits of circuit_graph to qubits
-     of coupling_graph (optional)
-     basis = basis string specifying basis of output Circuit
-     verbose = optional flag to print more information
+     Args:
+        circuit_graph (DAGCircuit): input DAG circuit
+        coupling_graph (CouplingGraph): coupling graph to map onto
+        initial_layout (dict): dict from qubits of circuit_graph to qubits
+        of coupling_graph (optional)
+        basis (str, optional): basis string specifying basis of output
+            DAGCircuit
+        verbose (bool, optional): print more information
 
-     Returns a Circuit object containing a circuit equivalent to
-     circuit_graph that respects couplings in coupling_graph, and
-     a layout dict mapping qubits of circuit_graph into qubits
-     of coupling_graph. The layout may differ from the initial_layout
-     if the first layer of gates cannot be executed on the
-     initial_layout.cannot be executed on the
-     initial_layout.
+     Returns:
+         Returns a DAGCircuit object containing a circuit equivalent to
+         circuit_graph that respects couplings in coupling_graph, and
+         a layout dict mapping qubits of circuit_graph into qubits
+         of coupling_graph. The layout may differ from the initial_layout
+         if the first layer of gates cannot be executed on the
+         initial_layout.  
      */
-    static func swap_mapper(_ circuit_graph: Circuit,
+    static func swap_mapper(_ circuit_graph: DAGCircuit,
                             _ coupling_graph: Coupling,
                             _ init_layout: OrderedDictionary<RegBit,RegBit>? = nil,
                             _ b: String = "cx,u1,u2,u3,id",
                             verbose: Bool = false,
-                            trials: Int = 20) throws -> (Circuit, OrderedDictionary<RegBit,RegBit>) {
+                            trials: Int = 20) throws -> (DAGCircuit, OrderedDictionary<RegBit,RegBit>) {
         if circuit_graph.width() > coupling_graph.size() {
-            throw MappingError.errorqubitscouplinggraph
+            throw MappingError.errorQubitsCouplingGraph
         }
         var basis = b
 
@@ -377,10 +423,10 @@ final class Mapping {
             for (k, v) in init_layout {
                 qubit_subset.append(v)
                 if !circ_qubits.contains(k) {
-                    throw MappingError.errorqubitinputcircuit(regBit: k)
+                    throw MappingError.errorQubitInputCircuit(regBit: k)
                 }
                 if !coup_qubits.contains(v) {
-                    throw MappingError.errorqubitincouplinggraph(regBit: v)
+                    throw MappingError.errorQubitInCouplingGraph(regBit: v)
                 }
             }
         }
@@ -446,7 +492,7 @@ final class Mapping {
 
                     // Give up if we fail again
                     if !success_flag {
-                        throw MappingError.swapmapperfailed(i: i, j: j, qasm: try serial_layer.graph.qasm(no_decls: true,aliases:layout))
+                        throw MappingError.swapMapperFailed(i: i, j: j, qasm: try serial_layer.graph.qasm(no_decls: true,aliases:layout))
                     }
                     // If this layer is only single-qubit gates,
                     // and we have yet to see multi-qubit gates,
@@ -493,8 +539,8 @@ final class Mapping {
 
         // Parse openqasm_output into Circuit object
         basis += ",swap"
-        let u = Unroller(try Qasm(data: openqasm_output).parse(), CircuitBackend(basis.components(separatedBy:",")))
-        let circuit = try u.execute() as! Circuit
+        let u = Unroller(try Qasm(data: openqasm_output).parse(), DAGBackend(basis.components(separatedBy:",")))
+        let circuit = try u.execute() as! DAGCircuit
         return (circuit, initial_layout!)
     }
 
@@ -656,7 +702,7 @@ final class Mapping {
     /**
      Cancel back-to-back "cx" gates in circuit.
      */
-    static func cx_cancellation(_ circuit: Circuit) throws {
+    static func cx_cancellation(_ circuit: DAGCircuit) throws {
         let runs = try circuit.collect_runs(["cx"])
         for run in runs {
             // Partition the run into chunks with equal gate arguments
@@ -693,10 +739,10 @@ final class Mapping {
      "Simplify runs of single qubit gates in the QX basis.
      Return a new circuit that has been optimized.
      */
-    static func optimize_1q_gates(_ circuit: Circuit) throws -> Circuit {
+    static func optimize_1q_gates(_ circuit: DAGCircuit) throws -> DAGCircuit {
         let qx_basis = ["u1", "u2", "u3", "cx", "id"]
-        let urlr = try Unroller(Qasm(data: circuit.qasm(qeflag: true)).parse(), CircuitBackend(qx_basis))
-        let unrolled = try urlr.execute() as! Circuit
+        let urlr = try Unroller(Qasm(data: circuit.qasm(qeflag: true)).parse(), DAGBackend(qx_basis))
+        let unrolled = try urlr.execute() as! DAGCircuit
        
         let runs = try unrolled.collect_runs(["u1", "u2", "u3", "id"])
         for run in runs {

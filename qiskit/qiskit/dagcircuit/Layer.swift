@@ -15,28 +15,12 @@
 
 import Foundation
 
-/*
-Node for an OPENQASM real number.
-This node has no children. The data is in the value field.
-*/
+final class Layer {
+    public let graph: DAGCircuit
+    public let partition : [[RegBit]]
 
-@objc public final class NodeReal: Node, NodeRealValueProtocol {
-
-    public let value: Double
-    
-    public init(id: Double) {
-        self.value = id
-    }
-    
-    public override var type: NodeType {
-        return .N_REAL
-    }
-
-    public override func qasm(_ prec: Int) -> String {
-        return self.value.format(prec)
-    }
-
-    public func real(_ nested_scope: [[String:NodeRealValueProtocol]]?) throws -> Double {
-        return self.value
+    init(_ graph: DAGCircuit, _ partition: [[RegBit]]) {
+        self.graph = graph
+        self.partition = partition
     }
 }

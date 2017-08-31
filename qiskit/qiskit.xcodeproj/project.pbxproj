@@ -9,9 +9,9 @@
 /* Begin PBXBuildFile section */
 		690188721EE24343005B4419 /* GraphError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 690188711EE24343005B4419 /* GraphError.swift */; };
 		690188741EE269B0005B4419 /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 690188731EE269B0005B4419 /* Queue.swift */; };
-		6903A9BF1EE07211006E8190 /* Layer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6903A9BE1EE07211006E8190 /* Layer.swift */; };
 		6908D0351EF5AC0500F77905 /* SyncLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6908D0341EF5AC0500F77905 /* SyncLock.swift */; };
 		6913D0A21ECE41D6003C5FD3 /* InstructionSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6913D0A11ECE41D6003C5FD3 /* InstructionSet.swift */; };
+		691541811F4E1C4400B3E12D /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 691541801F4E1C4400B3E12D /* Result.swift */; };
 		692DBDFE1EE6E4440032F6CF /* Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692DBDFD1EE6E4440032F6CF /* Mapping.swift */; };
 		692DBE001EE6EA2C0032F6CF /* MappingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692DBDFF1EE6EA2C0032F6CF /* MappingError.swift */; };
 		692DBE041EE701890032F6CF /* Unroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692DBE031EE701890032F6CF /* Unroller.swift */; };
@@ -19,10 +19,9 @@
 		692DBE081EE702FA0032F6CF /* UnrollerBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692DBE071EE702FA0032F6CF /* UnrollerBackend.swift */; };
 		692DBE0A1EE7031D0032F6CF /* CircuitBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692DBE091EE7031D0032F6CF /* CircuitBackend.swift */; };
 		6931093F1EE98A6C00CD2CD1 /* RegBit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6931093E1EE98A6C00CD2CD1 /* RegBit.swift */; };
-		693109411EE9953600CD2CD1 /* BackendException.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693109401EE9953600CD2CD1 /* BackendException.swift */; };
-		693109431EE9964500CD2CD1 /* OneRegisterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693109421EE9964500CD2CD1 /* OneRegisterBackend.swift */; };
+		693109411EE9953600CD2CD1 /* BackendError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693109401EE9953600CD2CD1 /* BackendError.swift */; };
 		693109451EE9966D00CD2CD1 /* PrinterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693109441EE9966D00CD2CD1 /* PrinterBackend.swift */; };
-		693177A11EEAF42500B4CF9D /* UnrollerException.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693177A01EEAF42500B4CF9D /* UnrollerException.swift */; };
+		693177A11EEAF42500B4CF9D /* UnrollerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693177A01EEAF42500B4CF9D /* UnrollerError.swift */; };
 		6932C2D51F0064E40057DDB6 /* qasm.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6932C2D41F0064E40057DDB6 /* qasm.bundle */; };
 		69339B171EFAE9E500AB0E5D /* UnrollerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69339B161EFAE9E500AB0E5D /* UnrollerTests.swift */; };
 		693A9F421ECA363D00112AC9 /* Barrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693A9F411ECA363D00112AC9 /* Barrier.swift */; };
@@ -33,6 +32,12 @@
 		69458A281EE5A1760027F5A6 /* Coupling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69458A271EE5A1760027F5A6 /* Coupling.swift */; };
 		69458A2A1EE5A6A10027F5A6 /* CouplingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69458A291EE5A6A10027F5A6 /* CouplingError.swift */; };
 		69458A2C1EE5B1320027F5A6 /* CouplingVertexData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69458A2B1EE5B1320027F5A6 /* CouplingVertexData.swift */; };
+		69467F5D1F4C7B21009E7E03 /* DAGCircuit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69467F5C1F4C7B21009E7E03 /* DAGCircuit.swift */; };
+		69467F631F4C7B2C009E7E03 /* CircuitEdgeData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69467F5E1F4C7B2C009E7E03 /* CircuitEdgeData.swift */; };
+		69467F641F4C7B2C009E7E03 /* DAGCircuitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69467F5F1F4C7B2C009E7E03 /* DAGCircuitError.swift */; };
+		69467F651F4C7B2C009E7E03 /* CircuitVertexData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69467F601F4C7B2C009E7E03 /* CircuitVertexData.swift */; };
+		69467F661F4C7B2C009E7E03 /* GateData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69467F611F4C7B2C009E7E03 /* GateData.swift */; };
+		69467F671F4C7B2C009E7E03 /* Layer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69467F621F4C7B2C009E7E03 /* Layer.swift */; };
 		694E4B841F1E4C1B00C2EE49 /* SimulatorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694E4B831F1E4C1B00C2EE49 /* SimulatorError.swift */; };
 		695701341ED75C1C00C6CCAB /* Graph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695701311ED75C1C00C6CCAB /* Graph.swift */; };
 		695701351ED75C1C00C6CCAB /* GraphVertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695701321ED75C1C00C6CCAB /* GraphVertex.swift */; };
@@ -40,12 +45,13 @@
 		695701381ED75C2E00C6CCAB /* Stack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695701371ED75C2E00C6CCAB /* Stack.swift */; };
 		6957013A1ED75C8B00C6CCAB /* HashableTuple.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695701391ED75C8B00C6CCAB /* HashableTuple.swift */; };
 		6957013C1ED75E9100C6CCAB /* DataStructureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6957013B1ED75E9100C6CCAB /* DataStructureTests.swift */; };
-		6974E5951ECA1EF300D1AE97 /* QISKitException.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6974E5941ECA1EF300D1AE97 /* QISKitException.swift */; };
+		696613221F4C9E920031A146 /* DAGBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696613211F4C9E920031A146 /* DAGBackend.swift */; };
+		696613241F4CBA5B0031A146 /* NodeRealValueProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696613231F4CBA5B0031A146 /* NodeRealValueProtocol.swift */; };
+		696613261F4CD08B0031A146 /* Swap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696613251F4CD08B0031A146 /* Swap.swift */; };
+		6974E5951ECA1EF300D1AE97 /* QISKitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6974E5941ECA1EF300D1AE97 /* QISKitError.swift */; };
 		6977A01E1F05762A00CF52F2 /* libs.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6977A01D1F05762A00CF52F2 /* libs.bundle */; };
 		697BEDB11ED0844E00AB9A86 /* GatesTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697BEDB01ED0844E00AB9A86 /* GatesTools.swift */; };
 		697D36AE1EE3493B00557541 /* OrderedDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697D36AD1EE3493B00557541 /* OrderedDictionary.swift */; };
-		697F259C1ED45BED0065B106 /* Circuit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697F259B1ED45BED0065B106 /* Circuit.swift */; };
-		697F259E1ED45DD90065B106 /* CircuitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697F259D1ED45DD90065B106 /* CircuitError.swift */; };
 		698C0DFE1F191CAA00C99536 /* LocalSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698C0DFD1F191CAA00C99536 /* LocalSimulator.swift */; };
 		698C0E001F19253C00C99536 /* Simulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698C0DFF1F19253C00C99536 /* Simulator.swift */; };
 		698C0E021F19257C00C99536 /* QasmCppSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698C0E011F19257C00C99536 /* QasmCppSimulator.swift */; };
@@ -83,19 +89,18 @@
 		69DE361F1ECD197E00EC4756 /* Y.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DE361E1ECD197E00EC4756 /* Y.swift */; };
 		69DE36211ECD198E00EC4756 /* Z.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DE36201ECD198E00EC4756 /* Z.swift */; };
 		69DE36231ECD1A1500EC4756 /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DE36221ECD1A1500EC4756 /* Header.swift */; };
-		69E234321EDEE76200E47750 /* GateData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E234311EDEE76200E47750 /* GateData.swift */; };
 		69E3354F1ECA1B8D0027271D /* Register.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E3354E1ECA1B8D0027271D /* Register.swift */; };
 		69E335511ECA1BC00027271D /* QuantumRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E335501ECA1BC00027271D /* QuantumRegister.swift */; };
 		69E335531ECA1BD20027271D /* ClassicalRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E335521ECA1BD20027271D /* ClassicalRegister.swift */; };
 		69E597AB1ECA90A600A321F5 /* U1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E597AA1ECA90A600A321F5 /* U1.swift */; };
 		69E597AF1ECA980F00A321F5 /* X.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E597AE1ECA980F00A321F5 /* X.swift */; };
 		69E597B11ECA99B300A321F5 /* H.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E597B01ECA99B300A321F5 /* H.swift */; };
-		69EF51491EDC72BD0074AE42 /* CircuitVertexData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69EF51481EDC72BD0074AE42 /* CircuitVertexData.swift */; };
-		69EF514B1EDC72E10074AE42 /* CircuitEdgeData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69EF514A1EDC72E10074AE42 /* CircuitEdgeData.swift */; };
+		69E88AED1F4F13E40089D784 /* ResultError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E88AEC1F4F13E40089D784 /* ResultError.swift */; };
 		69F7B61B1F107C9100FDE7C4 /* CH.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F7B61A1F107C9100FDE7C4 /* CH.swift */; };
 		69F7B61D1F107CB100FDE7C4 /* CRZ.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F7B61C1F107CB100FDE7C4 /* CRZ.swift */; };
 		69F7B61F1F107CE500FDE7C4 /* CU1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F7B61E1F107CE500FDE7C4 /* CU1.swift */; };
 		69F7B6211F107D0100FDE7C4 /* CU3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F7B6201F107D0100FDE7C4 /* CU3.swift */; };
+		69FE9CE71F4DC6E7006AFB2F /* String+Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69FE9CE61F4DC6E7006AFB2F /* String+Random.swift */; };
 		69FEC8381ECB37E0002324E2 /* IBMQuantumExperienceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69FEC8371ECB37E0002324E2 /* IBMQuantumExperienceError.swift */; };
 		DF79735D1ED071F600C01457 /* parser.ym in Sources */ = {isa = PBXBuildFile; fileRef = DF79735B1ED071F600C01457 /* parser.ym */; };
 		DF79735E1ED071F600C01457 /* tokenizer.lm in Sources */ = {isa = PBXBuildFile; fileRef = DF79735C1ED071F600C01457 /* tokenizer.lm */; };
@@ -128,7 +133,6 @@
 		DF8E1D0D1EE7B4FC00DCC35C /* NodePrimaryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8E1D0C1EE7B4FC00DCC35C /* NodePrimaryList.swift */; };
 		DFB567101EE9C0F7004D2B65 /* NodeMainProgram.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB5670F1EE9C0F7004D2B65 /* NodeMainProgram.swift */; };
 		DFB567121EEA1493004D2B65 /* NodeInclude.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB567111EEA1493004D2B65 /* NodeInclude.swift */; };
-		DFBB49971EF97710001DE633 /* SymbolTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBB49961EF97710001DE633 /* SymbolTable.swift */; };
 		DFBB49991EF98011001DE633 /* QasmException.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBB49981EF98011001DE633 /* QasmException.swift */; };
 		DFBB499B1EF999D5001DE633 /* NodeCustomUnitary.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBB499A1EF999D5001DE633 /* NodeCustomUnitary.swift */; };
 		DFBB499D1EFC1382001DE633 /* NodeGateBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBB499C1EFC1382001DE633 /* NodeGateBody.swift */; };
@@ -153,10 +157,10 @@
 /* Begin PBXFileReference section */
 		690188711EE24343005B4419 /* GraphError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GraphError.swift; path = datastructures/graph/GraphError.swift; sourceTree = "<group>"; };
 		690188731EE269B0005B4419 /* Queue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Queue.swift; path = datastructures/Queue.swift; sourceTree = "<group>"; };
-		6903A9BE1EE07211006E8190 /* Layer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Layer.swift; path = circuit/Layer.swift; sourceTree = "<group>"; };
 		6908D0301EF5730200F77905 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; name = module.modulemap; path = module/module.modulemap; sourceTree = "<group>"; };
 		6908D0341EF5AC0500F77905 /* SyncLock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncLock.swift; path = datastructures/SyncLock.swift; sourceTree = "<group>"; };
 		6913D0A11ECE41D6003C5FD3 /* InstructionSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = InstructionSet.swift; path = sdk/InstructionSet.swift; sourceTree = "<group>"; };
+		691541801F4E1C4400B3E12D /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Result.swift; path = sdk/Result.swift; sourceTree = "<group>"; };
 		692DBDFD1EE6E4440032F6CF /* Mapping.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Mapping.swift; path = mapper/Mapping.swift; sourceTree = "<group>"; };
 		692DBDFF1EE6EA2C0032F6CF /* MappingError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MappingError.swift; path = mapper/MappingError.swift; sourceTree = "<group>"; };
 		692DBE031EE701890032F6CF /* Unroller.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Unroller.swift; path = unroll/Unroller.swift; sourceTree = "<group>"; };
@@ -164,10 +168,9 @@
 		692DBE071EE702FA0032F6CF /* UnrollerBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UnrollerBackend.swift; path = unroll/UnrollerBackend.swift; sourceTree = "<group>"; };
 		692DBE091EE7031D0032F6CF /* CircuitBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CircuitBackend.swift; path = unroll/CircuitBackend.swift; sourceTree = "<group>"; };
 		6931093E1EE98A6C00CD2CD1 /* RegBit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RegBit.swift; path = datastructures/RegBit.swift; sourceTree = "<group>"; };
-		693109401EE9953600CD2CD1 /* BackendException.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BackendException.swift; path = unroll/BackendException.swift; sourceTree = "<group>"; };
-		693109421EE9964500CD2CD1 /* OneRegisterBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OneRegisterBackend.swift; path = unroll/OneRegisterBackend.swift; sourceTree = "<group>"; };
+		693109401EE9953600CD2CD1 /* BackendError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BackendError.swift; path = unroll/BackendError.swift; sourceTree = "<group>"; };
 		693109441EE9966D00CD2CD1 /* PrinterBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PrinterBackend.swift; path = unroll/PrinterBackend.swift; sourceTree = "<group>"; };
-		693177A01EEAF42500B4CF9D /* UnrollerException.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UnrollerException.swift; path = unroll/UnrollerException.swift; sourceTree = "<group>"; };
+		693177A01EEAF42500B4CF9D /* UnrollerError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UnrollerError.swift; path = unroll/UnrollerError.swift; sourceTree = "<group>"; };
 		6932C2D41F0064E40057DDB6 /* qasm.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = qasm.bundle; sourceTree = "<group>"; };
 		69339B161EFAE9E500AB0E5D /* UnrollerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnrollerTests.swift; sourceTree = "<group>"; };
 		693A9F411ECA363D00112AC9 /* Barrier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Barrier.swift; path = extensions/Barrier.swift; sourceTree = "<group>"; };
@@ -178,6 +181,12 @@
 		69458A271EE5A1760027F5A6 /* Coupling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Coupling.swift; path = mapper/Coupling.swift; sourceTree = "<group>"; };
 		69458A291EE5A6A10027F5A6 /* CouplingError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CouplingError.swift; path = mapper/CouplingError.swift; sourceTree = "<group>"; };
 		69458A2B1EE5B1320027F5A6 /* CouplingVertexData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CouplingVertexData.swift; path = mapper/CouplingVertexData.swift; sourceTree = "<group>"; };
+		69467F5C1F4C7B21009E7E03 /* DAGCircuit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DAGCircuit.swift; path = dagcircuit/DAGCircuit.swift; sourceTree = "<group>"; };
+		69467F5E1F4C7B2C009E7E03 /* CircuitEdgeData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CircuitEdgeData.swift; path = dagcircuit/CircuitEdgeData.swift; sourceTree = "<group>"; };
+		69467F5F1F4C7B2C009E7E03 /* DAGCircuitError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DAGCircuitError.swift; path = dagcircuit/DAGCircuitError.swift; sourceTree = "<group>"; };
+		69467F601F4C7B2C009E7E03 /* CircuitVertexData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CircuitVertexData.swift; path = dagcircuit/CircuitVertexData.swift; sourceTree = "<group>"; };
+		69467F611F4C7B2C009E7E03 /* GateData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GateData.swift; path = dagcircuit/GateData.swift; sourceTree = "<group>"; };
+		69467F621F4C7B2C009E7E03 /* Layer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Layer.swift; path = dagcircuit/Layer.swift; sourceTree = "<group>"; };
 		694E4B831F1E4C1B00C2EE49 /* SimulatorError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SimulatorError.swift; path = simulators/SimulatorError.swift; sourceTree = "<group>"; };
 		695701311ED75C1C00C6CCAB /* Graph.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Graph.swift; path = datastructures/graph/Graph.swift; sourceTree = "<group>"; };
 		695701321ED75C1C00C6CCAB /* GraphVertex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GraphVertex.swift; path = datastructures/graph/GraphVertex.swift; sourceTree = "<group>"; };
@@ -185,12 +194,13 @@
 		695701371ED75C2E00C6CCAB /* Stack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Stack.swift; path = datastructures/Stack.swift; sourceTree = "<group>"; };
 		695701391ED75C8B00C6CCAB /* HashableTuple.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HashableTuple.swift; path = datastructures/HashableTuple.swift; sourceTree = "<group>"; };
 		6957013B1ED75E9100C6CCAB /* DataStructureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataStructureTests.swift; sourceTree = "<group>"; };
-		6974E5941ECA1EF300D1AE97 /* QISKitException.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QISKitException.swift; path = sdk/QISKitException.swift; sourceTree = "<group>"; };
+		696613211F4C9E920031A146 /* DAGBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DAGBackend.swift; path = unroll/DAGBackend.swift; sourceTree = "<group>"; };
+		696613231F4CBA5B0031A146 /* NodeRealValueProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeRealValueProtocol.swift; path = _node/NodeRealValueProtocol.swift; sourceTree = "<group>"; };
+		696613251F4CD08B0031A146 /* Swap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Swap.swift; path = extensions/Swap.swift; sourceTree = "<group>"; };
+		6974E5941ECA1EF300D1AE97 /* QISKitError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QISKitError.swift; path = sdk/QISKitError.swift; sourceTree = "<group>"; };
 		6977A01D1F05762A00CF52F2 /* libs.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = libs.bundle; sourceTree = "<group>"; };
 		697BEDB01ED0844E00AB9A86 /* GatesTools.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GatesTools.swift; path = extensions/GatesTools.swift; sourceTree = "<group>"; };
 		697D36AD1EE3493B00557541 /* OrderedDictionary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OrderedDictionary.swift; path = datastructures/OrderedDictionary.swift; sourceTree = "<group>"; };
-		697F259B1ED45BED0065B106 /* Circuit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Circuit.swift; path = circuit/Circuit.swift; sourceTree = "<group>"; };
-		697F259D1ED45DD90065B106 /* CircuitError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CircuitError.swift; path = circuit/CircuitError.swift; sourceTree = "<group>"; };
 		698C0DFD1F191CAA00C99536 /* LocalSimulator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LocalSimulator.swift; path = simulators/LocalSimulator.swift; sourceTree = "<group>"; };
 		698C0DFF1F19253C00C99536 /* Simulator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Simulator.swift; path = simulators/Simulator.swift; sourceTree = "<group>"; };
 		698C0E011F19257C00C99536 /* QasmCppSimulator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QasmCppSimulator.swift; path = simulators/QasmCppSimulator.swift; sourceTree = "<group>"; };
@@ -228,19 +238,18 @@
 		69DE361E1ECD197E00EC4756 /* Y.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Y.swift; path = extensions/Y.swift; sourceTree = "<group>"; };
 		69DE36201ECD198E00EC4756 /* Z.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Z.swift; path = extensions/Z.swift; sourceTree = "<group>"; };
 		69DE36221ECD1A1500EC4756 /* Header.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Header.swift; path = extensions/Header.swift; sourceTree = "<group>"; };
-		69E234311EDEE76200E47750 /* GateData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GateData.swift; path = circuit/GateData.swift; sourceTree = "<group>"; };
 		69E3354E1ECA1B8D0027271D /* Register.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Register.swift; path = sdk/Register.swift; sourceTree = "<group>"; };
 		69E335501ECA1BC00027271D /* QuantumRegister.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QuantumRegister.swift; path = sdk/QuantumRegister.swift; sourceTree = "<group>"; };
 		69E335521ECA1BD20027271D /* ClassicalRegister.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ClassicalRegister.swift; path = sdk/ClassicalRegister.swift; sourceTree = "<group>"; };
 		69E597AA1ECA90A600A321F5 /* U1.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = U1.swift; path = extensions/U1.swift; sourceTree = "<group>"; };
 		69E597AE1ECA980F00A321F5 /* X.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = X.swift; path = extensions/X.swift; sourceTree = "<group>"; };
 		69E597B01ECA99B300A321F5 /* H.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = H.swift; path = extensions/H.swift; sourceTree = "<group>"; };
-		69EF51481EDC72BD0074AE42 /* CircuitVertexData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CircuitVertexData.swift; path = circuit/CircuitVertexData.swift; sourceTree = "<group>"; };
-		69EF514A1EDC72E10074AE42 /* CircuitEdgeData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CircuitEdgeData.swift; path = circuit/CircuitEdgeData.swift; sourceTree = "<group>"; };
+		69E88AEC1F4F13E40089D784 /* ResultError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResultError.swift; path = sdk/ResultError.swift; sourceTree = "<group>"; };
 		69F7B61A1F107C9100FDE7C4 /* CH.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CH.swift; path = extensions/CH.swift; sourceTree = "<group>"; };
 		69F7B61C1F107CB100FDE7C4 /* CRZ.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CRZ.swift; path = extensions/CRZ.swift; sourceTree = "<group>"; };
 		69F7B61E1F107CE500FDE7C4 /* CU1.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CU1.swift; path = extensions/CU1.swift; sourceTree = "<group>"; };
 		69F7B6201F107D0100FDE7C4 /* CU3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CU3.swift; path = extensions/CU3.swift; sourceTree = "<group>"; };
+		69FE9CE61F4DC6E7006AFB2F /* String+Random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "String+Random.swift"; path = "datastructures/String+Random.swift"; sourceTree = "<group>"; };
 		69FEC8371ECB37E0002324E2 /* IBMQuantumExperienceError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IBMQuantumExperienceError.swift; path = qiskit/network/IBMQuantumExperienceError.swift; sourceTree = SOURCE_ROOT; };
 		DF79735B1ED071F600C01457 /* parser.ym */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; path = parser.ym; sourceTree = "<group>"; };
 		DF79735C1ED071F600C01457 /* tokenizer.lm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; path = tokenizer.lm; sourceTree = "<group>"; };
@@ -275,7 +284,6 @@
 		DF8E1D0C1EE7B4FC00DCC35C /* NodePrimaryList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodePrimaryList.swift; path = _node/NodePrimaryList.swift; sourceTree = "<group>"; };
 		DFB5670F1EE9C0F7004D2B65 /* NodeMainProgram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeMainProgram.swift; path = _node/NodeMainProgram.swift; sourceTree = "<group>"; };
 		DFB567111EEA1493004D2B65 /* NodeInclude.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeInclude.swift; path = _node/NodeInclude.swift; sourceTree = "<group>"; };
-		DFBB49961EF97710001DE633 /* SymbolTable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SymbolTable.swift; sourceTree = "<group>"; };
 		DFBB49981EF98011001DE633 /* QasmException.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QasmException.swift; sourceTree = "<group>"; };
 		DFBB499A1EF999D5001DE633 /* NodeCustomUnitary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeCustomUnitary.swift; path = _node/NodeCustomUnitary.swift; sourceTree = "<group>"; };
 		DFBB499C1EFC1382001DE633 /* NodeGateBody.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeGateBody.swift; path = _node/NodeGateBody.swift; sourceTree = "<group>"; };
@@ -342,6 +350,7 @@
 				6931093E1EE98A6C00CD2CD1 /* RegBit.swift */,
 				695701371ED75C2E00C6CCAB /* Stack.swift */,
 				6908D0341EF5AC0500F77905 /* SyncLock.swift */,
+				69FE9CE61F4DC6E7006AFB2F /* String+Random.swift */,
 			);
 			name = "Data Structures";
 			sourceTree = "<group>";
@@ -377,21 +386,22 @@
 				DF8E1CD81EE501FD00DCC35C /* NodeReal.swift */,
 				DF8E1CD61EE501E700DCC35C /* NodeReset.swift */,
 				DF8E1CD41EE501D000DCC35C /* NodeUniversalUnitary.swift */,
+				696613231F4CBA5B0031A146 /* NodeRealValueProtocol.swift */,
 			);
 			name = _node;
 			sourceTree = "<group>";
 		};
-		69D310641ECA159C00B3E752 /* circuit */ = {
+		69D310641ECA159C00B3E752 /* dagcircuit */ = {
 			isa = PBXGroup;
 			children = (
-				697F259B1ED45BED0065B106 /* Circuit.swift */,
-				697F259D1ED45DD90065B106 /* CircuitError.swift */,
-				69EF51481EDC72BD0074AE42 /* CircuitVertexData.swift */,
-				69EF514A1EDC72E10074AE42 /* CircuitEdgeData.swift */,
-				69E234311EDEE76200E47750 /* GateData.swift */,
-				6903A9BE1EE07211006E8190 /* Layer.swift */,
+				69467F5C1F4C7B21009E7E03 /* DAGCircuit.swift */,
+				69467F5F1F4C7B2C009E7E03 /* DAGCircuitError.swift */,
+				69467F5E1F4C7B2C009E7E03 /* CircuitEdgeData.swift */,
+				69467F601F4C7B2C009E7E03 /* CircuitVertexData.swift */,
+				69467F611F4C7B2C009E7E03 /* GateData.swift */,
+				69467F621F4C7B2C009E7E03 /* Layer.swift */,
 			);
-			name = circuit;
+			name = dagcircuit;
 			sourceTree = "<group>";
 		};
 		69D310651ECA15B200B3E752 /* extensions */ = {
@@ -416,6 +426,7 @@
 				69DE36121ECD18BE00EC4756 /* RY.swift */,
 				69DE36141ECD18D600EC4756 /* RZ.swift */,
 				69DE36161ECD190E00EC4756 /* S.swift */,
+				696613251F4CD08B0031A146 /* Swap.swift */,
 				69DE36181ECD191F00EC4756 /* T.swift */,
 				69E597AA1ECA90A600A321F5 /* U1.swift */,
 				69DE361A1ECD194600EC4756 /* U2.swift */,
@@ -444,14 +455,14 @@
 		69D310671ECA15D300B3E752 /* unroll */ = {
 			isa = PBXGroup;
 			children = (
-				693109401EE9953600CD2CD1 /* BackendException.swift */,
+				693109401EE9953600CD2CD1 /* BackendError.swift */,
 				692DBE091EE7031D0032F6CF /* CircuitBackend.swift */,
+				696613211F4C9E920031A146 /* DAGBackend.swift */,
 				69AE98BE1F1D09670026FA66 /* JsonBackend.swift */,
-				693109421EE9964500CD2CD1 /* OneRegisterBackend.swift */,
 				693109441EE9966D00CD2CD1 /* PrinterBackend.swift */,
 				692DBE031EE701890032F6CF /* Unroller.swift */,
 				692DBE071EE702FA0032F6CF /* UnrollerBackend.swift */,
-				693177A01EEAF42500B4CF9D /* UnrollerException.swift */,
+				693177A01EEAF42500B4CF9D /* UnrollerError.swift */,
 			);
 			name = unroll;
 			sourceTree = "<group>";
@@ -470,7 +481,9 @@
 				69E3354E1ECA1B8D0027271D /* Register.swift */,
 				69E335501ECA1BC00027271D /* QuantumRegister.swift */,
 				69E335521ECA1BD20027271D /* ClassicalRegister.swift */,
-				6974E5941ECA1EF300D1AE97 /* QISKitException.swift */,
+				6974E5941ECA1EF300D1AE97 /* QISKitError.swift */,
+				691541801F4E1C4400B3E12D /* Result.swift */,
+				69E88AEC1F4F13E40089D784 /* ResultError.swift */,
 			);
 			name = sdk;
 			sourceTree = "<group>";
@@ -511,7 +524,7 @@
 			isa = PBXGroup;
 			children = (
 				695701301ED75B5200C6CCAB /* Data Structures */,
-				69D310641ECA159C00B3E752 /* circuit */,
+				69D310641ECA159C00B3E752 /* dagcircuit */,
 				69D310651ECA15B200B3E752 /* extensions */,
 				69D310661ECA15CA00B3E752 /* mapper */,
 				DFBC4FCA1EC73F8F00027640 /* qasm */,
@@ -567,7 +580,6 @@
 				DF7973671ED0808D00C01457 /* Parser-PrefixHeader.pch */,
 				699AAB521EE47FDB0015DB83 /* _node */,
 				692DBE051EE702490032F6CF /* Qasm.swift */,
-				DFBB49961EF97710001DE633 /* SymbolTable.swift */,
 				DFBB49981EF98011001DE633 /* QasmException.swift */,
 			);
 			path = qasm;
@@ -695,11 +707,14 @@
 				DF8E1CDF1EE5024700DCC35C /* NodePrefix.swift in Sources */,
 				693B1B161F2660E000C89F03 /* Compiling.swift in Sources */,
 				695701381ED75C2E00C6CCAB /* Stack.swift in Sources */,
+				69467F631F4C7B2C009E7E03 /* CircuitEdgeData.swift in Sources */,
 				69DE36231ECD1A1500EC4756 /* Header.swift in Sources */,
 				69F7B61B1F107C9100FDE7C4 /* CH.swift in Sources */,
 				690188721EE24343005B4419 /* GraphError.swift in Sources */,
 				DFBB49E41F0109B8001DE633 /* Node.swift in Sources */,
+				69467F651F4C7B2C009E7E03 /* CircuitVertexData.swift in Sources */,
 				69E335531ECA1BD20027271D /* ClassicalRegister.swift in Sources */,
+				69FE9CE71F4DC6E7006AFB2F /* String+Random.swift in Sources */,
 				698C0E001F19253C00C99536 /* Simulator.swift in Sources */,
 				69D3107C1ECA180500B3E752 /* QuantumCircuit.swift in Sources */,
 				DF8E1CFB1EE503BD00DCC35C /* NodeCreg.swift in Sources */,
@@ -709,29 +724,27 @@
 				DF8E1CF31EE5036300DCC35C /* NodeGate.swift in Sources */,
 				DF8E1CF71EE5039100DCC35C /* NodeExpressionList.swift in Sources */,
 				692DBE081EE702FA0032F6CF /* UnrollerBackend.swift in Sources */,
-				69EF51491EDC72BD0074AE42 /* CircuitVertexData.swift in Sources */,
 				69D3107B1ECA180500B3E752 /* Gate.swift in Sources */,
 				693A9F421ECA363D00112AC9 /* Barrier.swift in Sources */,
 				69D310801ECA180500B3E752 /* CompositeGate.swift in Sources */,
-				697F259E1ED45DD90065B106 /* CircuitError.swift in Sources */,
 				DF8E1CE11EE5025C00DCC35C /* NodeOpaque.swift in Sources */,
 				695701361ED75C1C00C6CCAB /* GraphEdge.swift in Sources */,
+				69467F671F4C7B2C009E7E03 /* Layer.swift in Sources */,
 				697D36AE1EE3493B00557541 /* OrderedDictionary.swift in Sources */,
 				69458A281EE5A1760027F5A6 /* Coupling.swift in Sources */,
 				695701351ED75C1C00C6CCAB /* GraphVertex.swift in Sources */,
-				693109431EE9964500CD2CD1 /* OneRegisterBackend.swift in Sources */,
 				69D3108F1ECA192000B3E752 /* Instruction.swift in Sources */,
 				698C0E021F19257C00C99536 /* QasmCppSimulator.swift in Sources */,
 				69D3107E1ECA180500B3E752 /* Reset.swift in Sources */,
 				69DE361F1ECD197E00EC4756 /* Y.swift in Sources */,
 				DF8E1CFD1EE503D300DCC35C /* NodeCnot.swift in Sources */,
 				DF8E1CD91EE501FD00DCC35C /* NodeReal.swift in Sources */,
-				693109411EE9953600CD2CD1 /* BackendException.swift in Sources */,
+				693109411EE9953600CD2CD1 /* BackendError.swift in Sources */,
 				6908D0351EF5AC0500F77905 /* SyncLock.swift in Sources */,
 				693A9F461ECA369500112AC9 /* UBase.swift in Sources */,
-				6903A9BF1EE07211006E8190 /* Layer.swift in Sources */,
 				6957013A1ED75C8B00C6CCAB /* HashableTuple.swift in Sources */,
 				DF8E1CD51EE501D000DCC35C /* NodeUniversalUnitary.swift in Sources */,
+				69467F5D1F4C7B21009E7E03 /* DAGCircuit.swift in Sources */,
 				69DE36171ECD190E00EC4756 /* S.swift in Sources */,
 				DF8E1CD71EE501E700DCC35C /* NodeReset.swift in Sources */,
 				69CCAFC81F24D51D00CA4605 /* SimulatorTools.swift in Sources */,
@@ -740,11 +753,12 @@
 				DF8E1CE51EE5028800DCC35C /* NodeMagic.swift in Sources */,
 				DF8E1CED1EE502ED00DCC35C /* NodeIdList.swift in Sources */,
 				69D3108B1ECA182000B3E752 /* Credentials.swift in Sources */,
-				6974E5951ECA1EF300D1AE97 /* QISKitException.swift in Sources */,
+				6974E5951ECA1EF300D1AE97 /* QISKitError.swift in Sources */,
 				69DBD7301ECA48BE0099CB1D /* CCX.swift in Sources */,
 				690188741EE269B0005B4419 /* Queue.swift in Sources */,
 				69E3354F1ECA1B8D0027271D /* Register.swift in Sources */,
 				69E335511ECA1BC00027271D /* QuantumRegister.swift in Sources */,
+				691541811F4E1C4400B3E12D /* Result.swift in Sources */,
 				DF79735D1ED071F600C01457 /* parser.ym in Sources */,
 				DF8E1CFF1EE503E800DCC35C /* NodeBinaryOp.swift in Sources */,
 				69CED61A1F1FA2B100FA8180 /* Random.swift in Sources */,
@@ -754,19 +768,18 @@
 				69E597AB1ECA90A600A321F5 /* U1.swift in Sources */,
 				69DE36151ECD18D600EC4756 /* RZ.swift in Sources */,
 				692DBE061EE702490032F6CF /* Qasm.swift in Sources */,
+				69467F641F4C7B2C009E7E03 /* DAGCircuitError.swift in Sources */,
+				696613261F4CD08B0031A146 /* Swap.swift in Sources */,
 				69DE361B1ECD194600EC4756 /* U2.swift in Sources */,
 				69DE36091ECD152100EC4756 /* CXBase.swift in Sources */,
 				69DE360D1ECD155000EC4756 /* CZ.swift in Sources */,
 				69DE360F1ECD188000EC4756 /* Iden.swift in Sources */,
 				DFB567121EEA1493004D2B65 /* NodeInclude.swift in Sources */,
 				DFB567101EE9C0F7004D2B65 /* NodeMainProgram.swift in Sources */,
-				697F259C1ED45BED0065B106 /* Circuit.swift in Sources */,
-				69EF514B1EDC72E10074AE42 /* CircuitEdgeData.swift in Sources */,
 				692DBE0A1EE7031D0032F6CF /* CircuitBackend.swift in Sources */,
 				69458A2A1EE5A6A10027F5A6 /* CouplingError.swift in Sources */,
 				692DBDFE1EE6E4440032F6CF /* Mapping.swift in Sources */,
 				697BEDB11ED0844E00AB9A86 /* GatesTools.swift in Sources */,
-				DFBB49971EF97710001DE633 /* SymbolTable.swift in Sources */,
 				69E597AF1ECA980F00A321F5 /* X.swift in Sources */,
 				69458A2C1EE5B1320027F5A6 /* CouplingVertexData.swift in Sources */,
 				DFBB49991EF98011001DE633 /* QasmException.swift in Sources */,
@@ -777,17 +790,19 @@
 				69DE360B1ECD153D00EC4756 /* CY.swift in Sources */,
 				DF8E1D011EE5040300DCC35C /* NodeBarrier.swift in Sources */,
 				6931093F1EE98A6C00CD2CD1 /* RegBit.swift in Sources */,
+				69E88AED1F4F13E40089D784 /* ResultError.swift in Sources */,
 				69DE36111ECD18AD00EC4756 /* RX.swift in Sources */,
 				698C0DFE1F191CAA00C99536 /* LocalSimulator.swift in Sources */,
+				696613221F4C9E920031A146 /* DAGBackend.swift in Sources */,
 				69DE36071ECD150300EC4756 /* CSwap.swift in Sources */,
 				69D310881ECA182000B3E752 /* Request.swift in Sources */,
 				DFBB49E61F0D714D001DE633 /* NodeGopList.swift in Sources */,
 				69CED61C1F1FAA3200FA8180 /* Complex.swift in Sources */,
-				69E234321EDEE76200E47750 /* GateData.swift in Sources */,
 				DF8E1D031EE5048300DCC35C /* NodeId.swift in Sources */,
+				69467F661F4C7B2C009E7E03 /* GateData.swift in Sources */,
 				DF8E1D091EE79F4C00DCC35C /* NodeIndexedId.swift in Sources */,
 				69AE98BF1F1D09670026FA66 /* JsonBackend.swift in Sources */,
-				693177A11EEAF42500B4CF9D /* UnrollerException.swift in Sources */,
+				693177A11EEAF42500B4CF9D /* UnrollerError.swift in Sources */,
 				69D310771ECA180500B3E752 /* QuantumProgram.swift in Sources */,
 				DF8E1CDB1EE5021400DCC35C /* NodeQreg.swift in Sources */,
 				694E4B841F1E4C1B00C2EE49 /* SimulatorError.swift in Sources */,
@@ -802,6 +817,7 @@
 				DF7973621ED0747B00C01457 /* ParserBlocks.m in Sources */,
 				DF8E1CF51EE5037D00DCC35C /* NodeExternal.swift in Sources */,
 				695701341ED75C1C00C6CCAB /* Graph.swift in Sources */,
+				696613241F4CBA5B0031A146 /* NodeRealValueProtocol.swift in Sources */,
 				6913D0A21ECE41D6003C5FD3 /* InstructionSet.swift in Sources */,
 				692DBE041EE701890032F6CF /* Unroller.swift in Sources */,
 				69DE36131ECD18BE00EC4756 /* RY.swift in Sources */,

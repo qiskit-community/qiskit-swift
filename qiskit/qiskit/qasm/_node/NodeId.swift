@@ -21,13 +21,13 @@ import Foundation
  The node has no children but has fields name, line, and file.
  There is a flag is_bit that is set when XXXXX to help with scoping.
  */
-@objc public final class NodeId: Node {
+@objc public final class NodeId: Node, NodeRealValueProtocol {
 
-    public var _name: String = ""
-    public var line: Int = 0
-    public var file: String = ""
-    public var index: Int = 0  // FIXME where does the index come from?
-    public var is_bit: Bool = false
+    public private(set) var _name: String = ""
+    public private(set) var line: Int = 0
+    public private(set) var file: String = ""
+    public private(set) var index: Int = 0  // FIXME where does the index come from?
+    public private(set) var is_bit: Bool = false
     
     public init(identifier: String, line: Int) {
         self._name = identifier
@@ -44,8 +44,22 @@ import Foundation
         return _name
     }
 
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         let qasm: String = _name
         return qasm
+    }
+
+    public func real(_ nested_scope: [[String:NodeRealValueProtocol]]?) throws -> Double {
+        guard let scope = nested_scope else {
+            throw QasmException.errorLocalParameter(qasm: self.qasm(15))
+        }
+        guard let last = scope.last else {
+            throw QasmException.errorLocalParameter(qasm: self.qasm(15))
+        }
+        guard let arg = last[self.name] else {
+            throw QasmException.errorLocalParameter(qasm: self.qasm(15))
+        }
+        let endIndex: Int = scope.count - 1
+        return try arg.real(Array(scope[0..<endIndex]))
     }
 }

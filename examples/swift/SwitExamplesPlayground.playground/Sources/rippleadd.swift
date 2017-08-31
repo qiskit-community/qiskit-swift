@@ -51,24 +51,12 @@ public final class RippleAdd {
             print("RippleAdd:")
             let qConfig = try Qconfig(APItoken: apiToken)
             let qp = try QuantumProgram(specs: QPS_SPECS)
-            guard var qc = qp.get_circuit("rippleadd") else {
-                return
-            }
-            guard let a = qp.get_quantum_registers("a") else {
-                return
-            }
-            guard let b = qp.get_quantum_registers("b") else {
-                return
-            }
-            guard let cin = qp.get_quantum_registers("cin") else {
-                return
-            }
-            guard let cout = qp.get_quantum_registers("cout") else {
-                return
-            }
-            guard let ans = qp.get_classical_registers("ans") else {
-                return
-            }
+            var qc = try qp.get_circuit("rippleadd")
+            let a = try qp.get_quantum_register("a")
+            let b = try qp.get_quantum_register("b")
+            let cin = try qp.get_quantum_register("cin")
+            let cout = try qp.get_quantum_register("cout")
+            let ans = try qp.get_classical_register("ans")
 
             // Build a temporary subcircuit that adds a to b,
             // storing the result in b
@@ -102,25 +90,24 @@ public final class RippleAdd {
             try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
 
             print("First version: not compiled")
-            qp.execute(["rippleadd"], backend: backend,shots: 1024, coupling_map: nil) { (error) in
+            qp.execute(["rippleadd"], backend: backend,shots: 1024, coupling_map: nil) { (result,error) in
                 do {
                     if error != nil {
                         print(error!.description)
                         responseHandler?()
                         return
                     }
-                    print(try qp.get_counts("rippleadd"))
+                    print(try result.get_counts("rippleadd"))
                     print("Second version: compiled to 2x8 array coupling graph")
-                    try qp.compile(["rippleadd"], backend: backend, shots: 1024, coupling_map: coupling_map)
-                    // qp.print_execution_list(verbose=true)
-                    qp.run() { (error) in
+                    let qobj = try qp.compile(["rippleadd"], backend: backend, shots: 1024, coupling_map: coupling_map)
+                    qp.run(qobj) { (result,error) in
                         do {
                             if error != nil {
                                 print(error!.description)
                                 responseHandler?()
                                 return
                             }
-                            print(try qp.get_counts("rippleadd"))
+                            print(try result.get_counts("rippleadd"))
                             print("Both versions should give the same distribution")
                         } catch {
                             print(error.localizedDescription)

@@ -112,7 +112,7 @@ final class PrinterBackend: UnrollerBackend {
             out += ";"
         }
         else {
-            out += "\n{\n" + (gate.body != nil ? gate.body!.qasm() : "") + "}"
+            out += "\n{\n" + (gate.body != nil ? gate.body!.qasm(self.prec) : "") + "}"
         }
         return out
     }
@@ -150,10 +150,13 @@ final class PrinterBackend: UnrollerBackend {
 
     /**
      Fundamental single qubit gate.
-     arg is 3-tuple of float parameters.
+
+     arg is 3-tuple of Node expression objects.
      qubit is (regname,idx) tuple.
+     nested_scope is a list of dictionaries mapping expression variables
+     to Node expression objects in order of increasing nesting depth.
      */
-    func u(_ arg: (Double, Double, Double), _ qubit: RegBit) throws {
+    func u(_ arg: (NodeRealValueProtocol, NodeRealValueProtocol, NodeRealValueProtocol), _ qubit: RegBit, _ nested_scope:[[String:NodeRealValueProtocol]]?) throws {
         if self.listen {
             if !self.basis.contains("U") {
                 self.basis.append("U")
@@ -163,7 +166,7 @@ final class PrinterBackend: UnrollerBackend {
                     print("if(\(reg)==\(val)) ")
                 }
             }
-            print("U(\(self._fs(arg.0)),\(self._fs(arg.1)),\(self._fs(arg.2))) \(qubit.description);")
+            print("U(\(self._fs(try arg.0.real(nested_scope))),\(self._fs(try arg.1.real(nested_scope))),\(self._fs(try arg.2.real(nested_scope)))) \(qubit.description);")
         }
     }
 
@@ -267,14 +270,17 @@ final class PrinterBackend: UnrollerBackend {
 
     /**
      Begin a custom gate.
+
      name is name string.
-     args is list of floating point parameters.
+     args is list of Node expression objects.
      qubits is list of (regname, idx) tuples.
+     nested_scope is a list of dictionaries mapping expression variables
+     to Node expression objects in order of increasing nesting depth.
      */
-    func start_gate(_ name: String, _ args: [Double], _ qubits: [RegBit]) throws {
+    func start_gate(_ name: String, _ args: [NodeRealValueProtocol], _ qubits: [RegBit], _ nested_scope:[[String:NodeRealValueProtocol]]?) throws {
         var sargs: [String] = []
         for arg in args {
-            sargs.append(self._fs(arg))
+            sargs.append(try self._fs(arg.real(nested_scope)))
         }
         var squbits: [String] = []
         for qubit in qubits {
@@ -286,7 +292,7 @@ final class PrinterBackend: UnrollerBackend {
         if self.listen && !self.basis.contains(name) {
             if let gate = self.gates[name] {
                 if gate.opaque {
-                    throw BackendException.erroropaque(name: name)
+                    throw BackendError.errorOpaque(name: name)
                 }
             }
         }
@@ -308,11 +314,14 @@ final class PrinterBackend: UnrollerBackend {
 
     /**
      End a custom gate.
+
      name is name string.
-     args is list of floating point parameters.
+     args is list of Node expression objects.
      qubits is list of (regname, idx) tuples.
+     nested_scope is a list of dictionaries mapping expression variables
+     to Node expression objects in order of increasing nesting depth..
      */
-    func end_gate(_ name: String, _ args: [Double], _ qubits: [RegBit]) {
+    func end_gate(_ name: String, _ args: [NodeRealValueProtocol], _ qubits: [RegBit], _ nested_scope:[[String:NodeRealValueProtocol]]?) throws {
         if name == self.in_gate {
             self.in_gate = ""
             self.listen = true
@@ -320,7 +329,7 @@ final class PrinterBackend: UnrollerBackend {
         if self.listen && self.comments {
             var sargs: [String] = []
             for arg in args {
-                sargs.append(self._fs(arg))
+                sargs.append(self._fs(try arg.real(nested_scope)))
             }
             var squbits: [String] = []
             for qubit in qubits {

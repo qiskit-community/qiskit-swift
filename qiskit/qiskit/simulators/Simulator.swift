@@ -19,5 +19,5 @@ protocol Simulator {
 
     static var __configuration : [String:Any] {get}
 
-    func run() throws -> [String:Any]
+    func run(_ silent: Bool) throws -> [String:Any]
 }

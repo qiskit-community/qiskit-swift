@@ -16,38 +16,25 @@
 import Foundation
 
 /**
- Backend that creates a Circuit object with one "q" qreg.
- */
-final class OneRegisterBackend: UnrollerBackend {
+ Backend for the unroller that creates a Circuit object
+*/
+final class DAGBackend: UnrollerBackend {
 
     private let prec: Int = 15
     private var creg:String? = nil
     private var cval:Int? = nil
-    private let circuit: Circuit = Circuit()
+    private let circuit = DAGCircuit()
     private var basis: [String]
     private var listen: Bool = true
     private var in_gate: String = ""
     private var gates: [String:GateData] = [:]
-    private var qubit_map: [RegBit:RegBit] = [:]
-    private var index_sum: Int = 0
-    private var created_qreg: Bool = false
-    
+
     /**
      Setup this backend.
      basis is a list of operation name strings.
      */
     init(_ basis: [String] = []) {
-         self.basis = basis
-    }
-
-    /**
-     Add the qreg to the Circui.
-     */
-    private func initialize_qreg() throws {
-        if !self.created_qreg {
-            try self.circuit.add_qreg("q", self.index_sum)
-            self.created_qreg = true
-        }
+        self.basis = basis
     }
 
     /**
@@ -55,7 +42,7 @@ final class OneRegisterBackend: UnrollerBackend {
      basis is a list of operation name strings.
      */
     func set_basis(_ basis: [String]) {
-         self.basis = basis
+        self.basis = basis
     }
 
     /**
@@ -71,16 +58,7 @@ final class OneRegisterBackend: UnrollerBackend {
      sz = size of the register
      */
     func new_qreg(_ name: String, _ size: Int) throws {
-        if self.created_qreg {
-            // This is not ideal. Come back to it later.
-            throw  BackendException.qregadded
-        }
-        // Add qubits to the map but don't add qreg
-        for j in 0..<size {
-            let dest = RegBit("q", j + self.index_sum)
-            self.qubit_map[RegBit(name, j)] = dest
-        }
-        self.index_sum += size
+        try self.circuit.add_qreg(name, size)
     }
 
     /**
@@ -104,14 +82,13 @@ final class OneRegisterBackend: UnrollerBackend {
 
     /**
      Fundamental single qubit gate.
-     arg is 3-tuple of float parameters.
+
+     arg is 3-tuple of Node expression objects.
      qubit is (regname,idx) tuple.
+     nested_scope is a list of dictionaries mapping expression variables
+     to Node expression objects in order of increasing nesting depth.
      */
-    func u(_ arg: (Double, Double, Double), _ q: RegBit) throws {
-        try self.initialize_qreg()
-        guard let qubit = self.qubit_map[q] else {
-            return
-        }
+    func u(_ arg: (NodeRealValueProtocol, NodeRealValueProtocol, NodeRealValueProtocol), _ qubit: RegBit, _ nested_scope:[[String:NodeRealValueProtocol]]?) throws {
         if self.listen {
             var condition: RegBit? = nil
             if let reg = self.creg {
@@ -123,7 +100,10 @@ final class OneRegisterBackend: UnrollerBackend {
                 self.basis.append("U")
                 try self.circuit.add_basis_element("U", 1, 0, 3)
             }
-            try self.circuit.apply_operation_back("U", [qubit], [], [String(arg.0),String(arg.1),String(arg.2)], condition)
+            try self.circuit.apply_operation_back("U", [qubit], [],
+                                [arg.0.real(nested_scope).format(self.prec),
+                                 arg.1.real(nested_scope).format(self.prec),
+                                 arg.2.real(nested_scope).format(self.prec)], condition)
         }
     }
 
@@ -132,14 +112,7 @@ final class OneRegisterBackend: UnrollerBackend {
      qubit0 is (regname,idx) tuple for the control qubit.
      qubit1 is (regname,idx) tuple for the target qubit.
      */
-    func cx(_ q0: RegBit, _ q1: RegBit) throws {
-        try self.initialize_qreg()
-        guard let qubit0 = self.qubit_map[q0] else {
-            return
-        }
-        guard let qubit1 = self.qubit_map[q1] else {
-            return
-        }
+    func cx(_ qubit0: RegBit, _ qubit1: RegBit) throws {
         if self.listen {
             var condition: RegBit? = nil
             if let reg = self.creg {
@@ -151,7 +124,7 @@ final class OneRegisterBackend: UnrollerBackend {
                 self.basis.append("CX")
                 try self.circuit.add_basis_element("CX", 2)
             }
-            try self.circuit.apply_operation_back("CX", [qubit0,qubit1], [], [], condition)
+            try self.circuit.apply_operation_back("CX", [qubit0, qubit1], [], [], condition)
         }
     }
 
@@ -160,11 +133,7 @@ final class OneRegisterBackend: UnrollerBackend {
      qubit is (regname, idx) tuple for the input qubit.
      bit is (regname, idx) tuple for the output bit.
      */
-    func measure(_ q: RegBit, _ bit: RegBit) throws {
-        try self.initialize_qreg()
-        guard let qubit = self.qubit_map[q] else {
-            return
-        }
+    func measure(_ qubit: RegBit, _ bit: RegBit) throws {
         var condition: RegBit? = nil
         if let reg = self.creg {
             if let val = self.cval {
@@ -183,7 +152,6 @@ final class OneRegisterBackend: UnrollerBackend {
      qubitlists is a list of lists of (regname, idx) tuples.
      */
     func barrier(_ qubitlists: [[RegBit]]) throws {
-        try self.initialize_qreg()
         if self.listen {
             var names: [RegBit] = []
             for x in qubitlists {
@@ -203,11 +171,7 @@ final class OneRegisterBackend: UnrollerBackend {
      Reset instruction.
      qubit is a (regname, idx) tuple.
      */
-    func reset(_ q: RegBit) throws {
-        try self.initialize_qreg()
-        guard let qubit = self.qubit_map[q] else {
-            return
-        }
+    func reset(_ qubit: RegBit) throws {
         var condition: RegBit? = nil
         if let reg = self.creg {
             if let val = self.cval {
@@ -241,22 +205,18 @@ final class OneRegisterBackend: UnrollerBackend {
 
     /**
      Begin a custom gate.
+
      name is name string.
-     args is list of floating point parameters.
+     args is list of Node expression objects.
      qubits is list of (regname, idx) tuples.
+     nested_scope is a list of dictionaries mapping expression variables
+     to Node expression objects in order of increasing nesting depth.
      */
-    func start_gate(_ name: String, _ args: [Double], _ qs: [RegBit]) throws {
-        try self.initialize_qreg()
-        var qubits: [RegBit] = []
-        for q in qs {
-            if let qubit = self.qubit_map[q] {
-                qubits.append(qubit)
-            }
-        }
+    func start_gate(_ name: String, _ args: [NodeRealValueProtocol], _ qubits: [RegBit], _ nested_scope:[[String:NodeRealValueProtocol]]?) throws {
         if self.listen && !self.basis.contains(name) {
             if let gate = self.gates[name] {
                 if gate.opaque {
-                    throw BackendException.erroropaque(name: name)
+                    throw BackendError.errorOpaque(name: name)
                 }
             }
         }
@@ -272,7 +232,7 @@ final class OneRegisterBackend: UnrollerBackend {
             try self.circuit.add_basis_element(name, qubits.count, 0, args.count)
             var params: [String] = []
             for arg in args {
-                params.append(String(arg))
+                params.append(try arg.real(nested_scope).format(self.prec))
             }
             try self.circuit.apply_operation_back(name, qubits, [], params, condition)
         }
@@ -280,11 +240,14 @@ final class OneRegisterBackend: UnrollerBackend {
 
     /**
      End a custom gate.
+
      name is name string.
-     args is list of floating point parameters.
+     args is list of Node expression objects.
      qubits is list of (regname, idx) tuples.
+     nested_scope is a list of dictionaries mapping expression variables
+     to Node expression objects in order of increasing nesting depth..
      */
-    func end_gate(_ name: String, _ args: [Double], _ qubits: [RegBit]) {
+    func end_gate(_ name: String, _ args: [NodeRealValueProtocol], _ qubits: [RegBit], _ nested_scope:[[String:NodeRealValueProtocol]]?) throws {
         if name == self.in_gate {
             self.in_gate = ""
             self.listen = true

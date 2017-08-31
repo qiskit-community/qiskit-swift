@@ -23,14 +23,14 @@ import Foundation
  */
 @objc public final class NodeOpaque: Node {
 
-    public var identifier: Node?
-    public var arguments: Node?
-    public var bitlist: Node?
+    public let identifier: Node?
+    public let arguments: Node?
+    public let bitlist: Node?
     
-    public var _name: String = ""
-    public var line: Int = 0
-    public var file: String = ""
-    public var index: Int = 0
+    public private(set) var _name: String = ""
+    public private(set) var line: Int = 0
+    public private(set) var file: String = ""
+    public private(set) var index: Int = 0
     
     public var n_args: Int {
         get{
@@ -84,7 +84,7 @@ import Foundation
     }
     
 
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         var qasm: String = "opaque"
         
         guard let ident = identifier else {
@@ -98,9 +98,9 @@ import Foundation
         }
         
         if let l2 = bitlist {
-            qasm += " \(ident.qasm()) ( \(l1.qasm()) ) \(l2.qasm());"
+            qasm += " \(ident.qasm(prec)) ( \(l1.qasm(prec)) ) \(l2.qasm(prec));"
         } else {
-            qasm += " \(ident.qasm()) \(l1.qasm());"
+            qasm += " \(ident.qasm(prec)) \(l1.qasm(prec));"
         }
         
         return qasm

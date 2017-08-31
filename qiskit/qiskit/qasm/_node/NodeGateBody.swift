@@ -24,10 +24,9 @@ import Foundation
 
 @objc public final class NodeGateBody: Node {
     
-    public var goplist: Node?
+    public let goplist: Node?
     
     public init(goplist: Node?) {
-        super.init()
         self.goplist = goplist
     }
     
@@ -57,11 +56,11 @@ import Foundation
         return []
     }
     
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         var qasms: [String] = []
         if let glist = goplist as? NodeGopList {
             qasms = glist.children.flatMap({ (node: Node) -> String in
-                return node.qasm()
+                return node.qasm(prec)
             })
         }
         return qasms.joined(separator: "\n")

@@ -193,13 +193,4 @@
     return node;
 }
 
-
-+(SymbolTable*) symbolTable {
-    static SymbolTable *symbol_table = nil;
-    if (symbol_table == nil) {
-        symbol_table = [SymbolTable alloc];
-    }
-    return symbol_table;
-}
-
 @end

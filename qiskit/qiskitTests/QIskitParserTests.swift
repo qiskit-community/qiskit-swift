@@ -118,7 +118,7 @@ class QIskitParserTests: XCTestCase {
         }
         let qasm = lines.joined()
         let parser = Qasm(data: qasm)
-        return (qasm,try parser.parse().qasm())
+        return (qasm,try parser.parse().qasm(15))
     }
 
 
@@ -259,7 +259,7 @@ class QIskitParserTests: XCTestCase {
             XCTAssertNotNil(n)
             if let node = n as? NodeMainProgram {
                 let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
-                let emittedQasm = node.qasm().components(separatedBy: whitespaceCharacterSet).joined()
+                let emittedQasm = node.qasm(15).components(separatedBy: whitespaceCharacterSet).joined()
                 let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
                 XCTAssertEqual(emittedQasm, targetQasm)
                 asyncExpectation.fulfill()
@@ -319,7 +319,7 @@ class QIskitParserTests: XCTestCase {
             let parser = Qasm(data: qasmProgram)
             let root = try parser.parse()
             let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
-            let emittedQasm = root.qasm().components(separatedBy: whitespaceCharacterSet).joined()
+            let emittedQasm = root.qasm(15).components(separatedBy: whitespaceCharacterSet).joined()
             let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
             XCTAssertEqual(emittedQasm, targetQasm)
         } catch let error {
@@ -356,7 +356,7 @@ class QIskitParserTests: XCTestCase {
                 XCTAssertNotNil(n)
                 if let node = n as? NodeMainProgram {
                     let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
-                    let emittedQasm = node.qasm().components(separatedBy: whitespaceCharacterSet).joined()
+                    let emittedQasm = node.qasm(15).components(separatedBy: whitespaceCharacterSet).joined()
                     let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
                     XCTAssertEqual(emittedQasm, targetQasm)
                     asyncExpectation.fulfill()
@@ -410,7 +410,7 @@ class QIskitParserTests: XCTestCase {
                 XCTAssertNotNil(n)
                 if let node = n as? NodeMainProgram {
                     let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
-                    let emittedQasm = node.qasm().components(separatedBy: whitespaceCharacterSet).joined()
+                    let emittedQasm = node.qasm(15).components(separatedBy: whitespaceCharacterSet).joined()
                     let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
                     XCTAssertEqual(emittedQasm, targetQasm)
                     asyncExpectation.fulfill()

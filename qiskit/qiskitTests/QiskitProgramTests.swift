@@ -59,10 +59,9 @@ class QiskitProgramTests: XCTestCase {
     func testGetComponents() {
         do {
             let qprogram = try QuantumProgram(specs: QiskitProgramTests.QPS_SPECS)
-            let elements = qprogram.get_quantum_elements()
-             XCTAssertTrue(elements.0 != nil)
-             XCTAssertTrue(elements.1 != nil)
-             XCTAssertTrue(elements.2 != nil)
+            try qprogram.get_circuit("circuitName")
+            try qprogram.get_quantum_register("qname")
+            try qprogram.get_classical_register("cname")
         } catch {
             XCTFail("\(error)")
         }
@@ -71,12 +70,9 @@ class QiskitProgramTests: XCTestCase {
     func testGetIndividualComponents() {
         do {
             let qprogram = try QuantumProgram(specs: QiskitProgramTests.QPS_SPECS)
-            let qc = qprogram.get_circuit("circuitName")
-            let qr = qprogram.get_quantum_registers("qname")
-            let cr = qprogram.get_classical_registers("cname")
-            XCTAssertTrue(qc != nil)
-            XCTAssertTrue(qr != nil)
-            XCTAssertTrue(cr != nil)
+            try qprogram.get_circuit("circuitName")
+            try qprogram.get_quantum_register("qname")
+            try qprogram.get_classical_register("cname")
         } catch {
             XCTFail("\(error)")
         }
@@ -85,7 +81,7 @@ class QiskitProgramTests: XCTestCase {
     func testCreateClassicalRegister() {
         do {
             let qprogram = try QuantumProgram()
-            let cr = try qprogram.create_classical_registers("cr", 3)
+            let cr = try qprogram.create_classical_register("cr", 3)
             XCTAssertTrue(cr.name == "cr" && cr.size == 3)
         } catch {
             XCTFail("\(error)")
@@ -95,7 +91,7 @@ class QiskitProgramTests: XCTestCase {
     func testCreateQuantumRegister() {
         do {
             let qprogram = try QuantumProgram()
-            let qr = try qprogram.create_quantum_registers("qr", 3)
+            let qr = try qprogram.create_quantum_register("qr", 3)
             XCTAssertTrue(qr.name == "qr" && qr.size == 3)
         } catch {
             XCTFail("\(error)")
@@ -105,9 +101,9 @@ class QiskitProgramTests: XCTestCase {
     func testCreateCircuit() {
         do {
             let qprogram = try QuantumProgram()
-            let qr = try qprogram.create_quantum_registers("qr", 3)
-            let cr = try qprogram.create_classical_registers("cr", 3)
-            let qc: QuantumCircuit? = try qprogram.create_circuit("qc", ["qr"], ["cr"])
+            let qr = try qprogram.create_quantum_register("qr", 3)
+            let cr = try qprogram.create_classical_register("cr", 3)
+            let qc: QuantumCircuit? = try qprogram.create_circuit("qc", [qr], [cr])
             XCTAssertTrue(qr.name == "qr" && qr.size == 3)
             XCTAssertTrue(cr.name == "cr" && cr.size == 3)
             XCTAssertNotNil(qc)
@@ -119,11 +115,11 @@ class QiskitProgramTests: XCTestCase {
     func testCreateServeralCircuits() {
         do {
             let qprogram = try QuantumProgram()
-            let qr = try qprogram.create_quantum_registers("qr", 3)
-            let cr = try qprogram.create_classical_registers("cr", 3)
-            let qc1: QuantumCircuit? = try qprogram.create_circuit("qc1", ["qr"], ["cr"])
-            let qc2: QuantumCircuit? = try qprogram.create_circuit("qc2", ["qr"], ["cr"])
-            let qc3: QuantumCircuit? = try qprogram.create_circuit("qc3", ["qr"], ["cr"])
+            let qr = try qprogram.create_quantum_register("qr", 3)
+            let cr = try qprogram.create_classical_register("cr", 3)
+            let qc1: QuantumCircuit? = try qprogram.create_circuit("qc1", [qr], [cr])
+            let qc2: QuantumCircuit? = try qprogram.create_circuit("qc2", [qr], [cr])
+            let qc3: QuantumCircuit? = try qprogram.create_circuit("qc3", [qr], [cr])
             XCTAssertTrue(qr.name == "qr" && qr.size == 3)
             XCTAssertTrue(cr.name == "cr" && cr.size == 3)
             XCTAssertNotNil(qc1)
@@ -138,14 +134,9 @@ class QiskitProgramTests: XCTestCase {
     func testPrintCircuit() {
         do {
             let qprogram = try QuantumProgram(specs: QiskitProgramTests.QPS_SPECS)
-            let elements = qprogram.get_quantum_elements()
-            guard let qc = elements.0 else {
-                XCTFail("Quantum circuit not defined!")
-                return }
-            guard let qr = elements.1 else {
-                XCTFail("Quantum register not defined!")
-                return  }
-            
+            let qc = try qprogram.get_circuit("circuitName")
+            let qr = try qprogram.get_quantum_register("qname")
+
             try qc.h(qr[1])
             let result = qc.qasm()
             XCTAssertEqual(result, "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nh qname[1];")
@@ -158,20 +149,9 @@ class QiskitProgramTests: XCTestCase {
     func testPrintProgram() {
         do {
             let qprogram = try QuantumProgram(specs: QiskitProgramTests.QPS_SPECS)
-            guard let qc = qprogram.get_circuit("circuitName") else {
-                XCTFail("Quantum circuit not defined!")
-                return
-            }
-            guard let qr = qprogram.get_quantum_registers("qname") else {
-                XCTFail("Quantum register not defined!")
-                return
-            }
-            
-            guard let _ = qprogram.get_classical_registers("cname") else {
-                XCTFail("Classical register not defined!")
-                return
-            }
-            
+            let qc = try qprogram.get_circuit("circuitName")
+            let qr = try qprogram.get_quantum_register("qname")
+            try qprogram.get_classical_register("cname")
             try qc.h(qr[1])
             let result = try qprogram.get_qasm("circuitName")
             XCTAssertEqual(result, "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nh qname[1];")
@@ -200,20 +180,10 @@ class QiskitProgramTests: XCTestCase {
             "measure qname[1] -> cname[1];"
             
             let qprogram = try QuantumProgram(specs: QiskitProgramTests.QPS_SPECS)
-            guard let qc = qprogram.get_circuit("circuitName") else {
-                XCTFail("Quantum circuit not defined!")
-                return
-            }
-            guard let qr = qprogram.get_quantum_registers("qname") else {
-                XCTFail("Quantum register not defined!")
-                return
-            }
-            
-            guard let cr = qprogram.get_classical_registers("cname") else {
-                XCTFail("Classical register not defined!")
-                return
-            }
-            
+            let qc = try qprogram.get_circuit("circuitName")
+            let qr = try qprogram.get_quantum_register("qname")
+            let cr = try qprogram.get_classical_register("cname")
+
             try qc.u3(0.3, 0.2, 0.1, qr[0])
             try qc.h(qr[1])
             try qc.cx(qr[1], qr[2])
@@ -237,15 +207,14 @@ class QiskitProgramTests: XCTestCase {
     func testCreateCircuitMultipleRegisters() {
         do {
             let qprogram = try QuantumProgram(specs: QiskitProgramTests.QPS_SPECS)
-
-            qprogram.get_quantum_registers("qname")
-            qprogram.get_classical_registers("cname")
-            try qprogram.create_quantum_registers("qr", 3)
-            try qprogram.create_classical_registers("cr", 3)
+            let qname = try qprogram.get_quantum_register("qname")
+            let cname = try qprogram.get_classical_register("cname")
+            let qr = try qprogram.create_quantum_register("qr", 3)
+            let cr = try qprogram.create_classical_register("cr", 3)
             
             let result = try qprogram.create_circuit("qc2",
-                                                 ["qname", "qr"],
-                                                 ["cname", "cr"])
+                                                 [qname, qr],
+                                                 [cname, cr])
             
             XCTAssertEqual(result.qasm(), "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\nqreg qr[3];\ncreg cname[3];\ncreg cr[3];")
         } catch {
@@ -258,32 +227,19 @@ class QiskitProgramTests: XCTestCase {
         do {
             let qprogram = try QuantumProgram(specs: QiskitProgramTests.QPS_SPECS)
             
+            let qname = try qprogram.get_quantum_register("qname")
+            let cname = try qprogram.get_classical_register("cname")
+            let qc2 = try qprogram.create_circuit("qc2",[qname],[cname])
 
-            guard let qr = qprogram.get_quantum_registers("qname") else {
-                XCTFail("Quantum register not defined!")
-                return
-            }
-            
-            guard let cr = qprogram.get_classical_registers("cname") else {
-                XCTFail("Classical register not defined!")
-                return
-            }
-            
-            let qc2 = try qprogram.create_circuit("qc2",
-                                                     ["qname"],
-                                                     ["cname"])
+            let qc3 = try qprogram.create_circuit("qc3",[qname],[cname])
 
-            let qc3 = try qprogram.create_circuit("qc3",
-                                                  ["qname"],
-                                                  ["cname"])
-
-            try qc2.h(qr[0])
-            try qc3.h(qr[0])
-            try qc2.measure(qr[0], cr[0])
-            try qc3.measure(qr[0], cr[0])
+            try qc2.h(qname[0])
+            try qc3.h(qname[0])
+            try qc2.measure(qname[0], cname[0])
+            try qc3.measure(qname[0], cname[0])
             let qc_result = try qc2 + qc3
 
-            XCTAssertEqual(qc_result.qasm(), "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nh qname[0];\nmeasure qname[0] -> cname[0];")
+            XCTAssertEqual(qc_result.qasm(), "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nh qname[0];\nmeasure qname[0] -> cname[0];\nh qname[0];\nmeasure qname[0] -> cname[0];")
         } catch {
             XCTFail("\(error)")
         }
@@ -293,30 +249,17 @@ class QiskitProgramTests: XCTestCase {
     func testCompileProgram() {
         do {
             let qprogram = try QuantumProgram(specs: QiskitProgramTests.QPS_SPECS)
-            guard let qc = qprogram.get_circuit("circuitName") else {
-                XCTFail("Quantum circuit not defined!")
-                return
-            }
-            guard let qr = qprogram.get_quantum_registers("qname") else {
-                XCTFail("Quantum register not defined!")
-                return
-            }
-            
-            guard let cr = qprogram.get_classical_registers("cname") else {
-                XCTFail("Classical register not defined!")
-                return
-            }
-            
-            try qc.h(qr[0])
-            try qc.h(qr[0])
-            try qc.measure(qr[0], cr[0])
+            let qc = try qprogram.get_circuit("circuitName")
+            let qname = try qprogram.get_quantum_register("qname")
+            let cname = try qprogram.get_classical_register("cname")
+
+            try qc.h(qname[0])
+            try qc.h(qname[0])
+            try qc.measure(qname[0], cname[0])
 
             
             try qprogram.compile(["circuitName"])
-            guard let to_test = qprogram.get_circuit("circuitName") else {
-                XCTFail("Quantum circuit not defined!")
-                return
-            }
+            let to_test = try qprogram.get_circuit("circuitName")
             XCTAssertEqual(to_test.qasm(), "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nh qname[0];\nh qname[0];\nmeasure qname[0] -> cname[0];")
         } catch {
             XCTFail("\(error)")

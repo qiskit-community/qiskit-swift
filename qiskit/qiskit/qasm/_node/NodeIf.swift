@@ -54,16 +54,16 @@ import Foundation
         return _children
     }
     
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         var qasm: String = "if"
         if let ident = nodeId {
-            qasm += " (\(ident.qasm())"
+            qasm += " (\(ident.qasm(prec))"
         }
         if let nnint = nodeNNInt {
-            qasm += " == \(nnint.qasm())"
+            qasm += " == \(nnint.qasm(prec))"
         }
         if let qop = nodeQop {
-            qasm += " ) \(qop.qasm())"
+            qasm += " ) \(qop.qasm(prec))"
         }
         return qasm
     }

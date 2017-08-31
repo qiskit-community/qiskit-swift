@@ -24,10 +24,10 @@ children[1] is an integer (not a node).
 @objc public final class NodeIndexedId: Node {
 
     public let identifer: Node?
-    public var _name: String = ""
-    public var line: Int = 0
-    public var file: String = ""
-    public var index: Int = -1
+    public private(set) var _name: String = ""
+    public private(set) var line: Int = 0
+    public private(set) var file: String = ""
+    public private(set) var index: Int = -1
     
     public init(identifier: Node, index: Node?) {
         self.identifer = identifier
@@ -51,12 +51,12 @@ children[1] is an integer (not a node).
         return _name
     }
     
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         guard let ident = identifer else {
             assertionFailure("Invalid NodeIndexedId Operation")
             return ""
         }
-        var qasm: String = "\(ident.qasm())"
+        var qasm: String = "\(ident.qasm(prec))"
         if index >= 0 {
             qasm += " [\(index)]"
         }

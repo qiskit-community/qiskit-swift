@@ -100,10 +100,9 @@ final class UnitarySimulator: Simulator {
         "name": "local_unitary_simulator",
         "url": "https://github.com/IBM/qiskit-sdk-py",
         "simulator": true,
-        "description": "A cpp simulator for qasm files",
-        "nQubits": 10,
-        "couplingMap": "all-to-all",
-        "gateset": "SU2+CNOT"
+        "description": "A swift simulator for unitary matrix",
+        "coupling_map": "all-to-all",
+        "basis_gates": "u1,u2,u3,cx,id"
     ]
 
     private(set) var circuit: [String:Any] = [:]
@@ -162,47 +161,39 @@ final class UnitarySimulator: Simulator {
     /**
      Apply the single-qubit gate.
      */
-    func run() throws -> [String:Any] {
+    func run(_ silent: Bool) throws -> [String:Any] {
         if let operations = self.circuit["operations"] as? [[String:Any]] {
-            for j in 0..<self._number_of_operations {
-                // each operation
-                let operation = operations[j]
+            for operation in operations {
                 guard let name = operation["name"] as? String else {
                     self.result["status"] = "ERROR"
                     return self.result
                 }
-                if name == "U" {
+                if ["U", "u1", "u2", "u3"].contains(name) {
                     if let qubits = operation["qubits"] as? [Int] {
                         if let params = operation["params"] as? [Double] {
                             let qubit = qubits[0]
-                            let theta = params[0]
-                            let phi = params[1]
-                            let lam = params[2]
-                            let gate: [[Complex]] = [
-                                    [
-                                        Complex(real:cos(theta/2.0)),
-                                        Complex(imag: lam).exp() * -sin(theta/2.0)
-                                    ],
-                                    [
-                                        Complex(imag: phi).exp() * sin(theta/2.0),
-                                        (Complex(imag: phi) + Complex(imag: lam)).exp() * cos(theta/2.0)
-                                    ]
-                            ]
+                            let gate = SimulatorTools.single_gate_matrix(name, params)
                             self._add_unitary_single(gate, qubit)
                         }
                     }
                 }
-                else if name == "CX" {
+                else if ["id", "u0"].contains(name) {
+                }
+                else if ["CX", "cx"].contains(name) {
                     if let qubits = operation["qubits"] as? [Int] {
                         let gate: [[Complex]] = [[1, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0]]
                         self._add_unitary_two(gate, qubits[0], qubits[1])
                     }
                 }
                 else if name == "measure" {
-                    print("Warning have dropped measure from unitary simulator")
+                    if !silent {
+                        print("Warning have dropped measure from unitary simulator")
+                    }
                 }
                 else if name == "reset" {
-                print("Warning have dropped reset from unitary simulator")
+                    if !silent {
+                        print("Warning have dropped reset from unitary simulator")
+                    }
                 }
                 else if name == "barrier" {
                 }

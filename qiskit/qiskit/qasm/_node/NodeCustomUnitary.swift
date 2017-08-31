@@ -34,7 +34,7 @@ Has properties:
     public let identifier: Node?
     public let arguments: Node?
     public let bitlist: Node?
-    public var _name: String = ""
+    public private(set) var _name: String = ""
 
     public init(identifier: Node?, arguments: Node?, bitlist: Node?) {
         self.identifier = identifier     // id
@@ -54,13 +54,13 @@ Has properties:
         return _name
     }
 
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         var qasm = "\(self.name)"
         if let args = self.arguments {
-            qasm += " (" + args.qasm() + ")"
+            qasm += " (" + args.qasm(prec) + ")"
         }
         if let bits = self.bitlist {
-            qasm += " \(bits.qasm());"
+            qasm += " \(bits.qasm(prec));"
         }
         return qasm
     }

@@ -36,7 +36,7 @@ extension Register {
      */
     public func check_range(_ i: Int) throws {
         if i < 0 || i >= self.size {
-            throw QISKitException.regindexrange
+            throw QISKitError.regIndexRange
         }
     }
 
@@ -47,13 +47,13 @@ extension Register {
             let nsString = self.name as NSString
             matches = regex.numberOfMatches(in: name, options: [], range: NSRange(location: 0, length: nsString.length))
         } catch {
-            throw QISKitException.internalError(error: error)
+            throw QISKitError.internalError(error: error)
         }
         if matches <= 0 {
-            throw QISKitException.regname
+            throw QISKitError.regName
         }
         if self.size <= 0 {
-            throw QISKitException.regsize
+            throw QISKitError.regSize
         }
     }
 }

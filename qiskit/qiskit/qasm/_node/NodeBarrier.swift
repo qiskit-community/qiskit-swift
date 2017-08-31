@@ -22,7 +22,7 @@ import Foundation
  */
 @objc public final class NodeBarrier: Node {
 
-    public var list: Node?
+    public let list: Node?
     
     public init(list: Node?) {
         self.list = list
@@ -41,13 +41,13 @@ import Foundation
     }
 
     
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         var qasm: String = "barrier"
         guard let l = list else {
             assertionFailure("Invalid NodeBarrier Operation")
             return ""
         }
-        qasm += " \(l.qasm());"
+        qasm += " \(l.qasm(prec));"
         return qasm
     }
 }

@@ -143,10 +143,13 @@ final class JsonBackend: UnrollerBackend {
 
     /**
      Fundamental single qubit gate.
-     arg is 3-tuple of float parameters.
+
+     arg is 3-tuple of Node expression objects.
      qubit is (regname,idx) tuple.
+     nested_scope is a list of dictionaries mapping expression variables
+     to Node expression objects in order of increasing nesting depth.
      */
-    func u(_ arg: (Double, Double, Double), _ qubit: RegBit) throws {
+    func u(_ arg: (NodeRealValueProtocol, NodeRealValueProtocol, NodeRealValueProtocol), _ qubit: RegBit, _ nested_scope:[[String:NodeRealValueProtocol]]?) throws {
         if self.listen {
             if !self.basis.contains("U") {
                 self.basis.append("U")
@@ -158,7 +161,7 @@ final class JsonBackend: UnrollerBackend {
             }
             var operation: [String:Any] = [:]
             operation["name"] = "U"
-            operation["params"] = [arg.0,arg.1,arg.2]
+            operation["params"] = [try arg.0.real(nested_scope),try arg.1.real(nested_scope),try arg.2.real(nested_scope)]
             operation["qubits"] = qubit_indices
             operations.append(operation)
             self.circuit["operations"] = operations
@@ -319,15 +322,18 @@ final class JsonBackend: UnrollerBackend {
 
     /**
      Begin a custom gate.
+
      name is name string.
-     args is list of floating point parameters.
+     args is list of Node expression objects.
      qubits is list of (regname, idx) tuples.
+     nested_scope is a list of dictionaries mapping expression variables
+     to Node expression objects in order of increasing nesting depth.
      */
-    func start_gate(_ name: String, _ args: [Double], _ qubits: [RegBit]) throws {
+    func start_gate(_ name: String, _ args: [NodeRealValueProtocol], _ qubits: [RegBit], _ nested_scope:[[String:NodeRealValueProtocol]]?) throws {
         if self.listen && !self.basis.contains(name) {
             if let gate = self.gates[name] {
                 if gate.opaque {
-                    throw BackendException.erroropaque(name: name)
+                    throw BackendError.errorOpaque(name: name)
                 }
             }
         }
@@ -344,7 +350,11 @@ final class JsonBackend: UnrollerBackend {
             }
             var operation: [String:Any] = [:]
             operation["name"] = name
-            operation["params"] = args
+            var params: [Double] = []
+            for arg in args {
+                params.append(try arg.real(nested_scope))
+            }
+            operation["params"] = params
             operation["qubits"] = qubit_indices
             operations.append(operation)
             self.circuit["operations"] = operations
@@ -354,11 +364,14 @@ final class JsonBackend: UnrollerBackend {
 
     /**
      End a custom gate.
+
      name is name string.
-     args is list of floating point parameters.
+     args is list of Node expression objects.
      qubits is list of (regname, idx) tuples.
+     nested_scope is a list of dictionaries mapping expression variables
+     to Node expression objects in order of increasing nesting depth..
      */
-    func end_gate(_ name: String, _ args: [Double], _ qubits: [RegBit]) {
+    func end_gate(_ name: String, _ args: [NodeRealValueProtocol], _ qubits: [RegBit], _ nested_scope:[[String:NodeRealValueProtocol]]?) throws {
         if name == self.in_gate {
             self.in_gate = ""
             self.listen = true
@@ -374,7 +387,7 @@ final class JsonBackend: UnrollerBackend {
             let data = try JSONSerialization.data(withJSONObject: self.circuit)
             return String(data: data, encoding: .utf8)
         }
-        throw UnrollerException.invalidJSON
+        throw UnrollerError.invalidJSON
     }
 
     /**

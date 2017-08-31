@@ -93,7 +93,7 @@ public class CompositeGate: Gate {
                 }
             }
         }
-        throw  QISKitException.notqubitgate(qubit: qubit)
+        throw QISKitError.notQubitGate(qubit: qubit)
     }
 
     /**

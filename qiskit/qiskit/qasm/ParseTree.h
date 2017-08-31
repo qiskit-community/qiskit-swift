@@ -17,7 +17,6 @@
 #import <Foundation/Foundation.h>
 
 @class Node;
-@class SymbolTable;
 
 @interface ParseTree : NSObject
 
@@ -49,5 +48,4 @@
 +(Node*) createReset: (Node*) identifier;
 +(Node*) createUniversalUnitary: (Node*) list1 list2: (Node*) list2;
 
-+(SymbolTable*) symbolTable;
 @end

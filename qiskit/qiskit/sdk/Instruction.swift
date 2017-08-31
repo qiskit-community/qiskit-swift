@@ -56,7 +56,7 @@ public class Instruction: CustomStringConvertible {
      */
     public func check_circuit() throws {
         if self.circuit == nil {
-            throw QISKitException.intructionCircuitNil
+            throw QISKitError.intructionCircuitNil
         }
     }
 
@@ -66,7 +66,7 @@ public class Instruction: CustomStringConvertible {
     @discardableResult
     public func c_if(_ classical: ClassicalRegister, _ val: Int) throws -> Instruction {
         if val < 0 {
-            throw QISKitException.controlValueNegative
+            throw QISKitError.controlValueNegative
         }
         self.control = (classical, val)
         return self
@@ -84,7 +84,7 @@ public class Instruction: CustomStringConvertible {
         if self.control != nil {
             try self.check_circuit()
             if !instruction.circuit!.has_register(self.control!.0) {
-                throw QISKitException.controlregnotfound(name: self.control!.0.name)
+                throw QISKitError.controlRegNotFound(name: self.control!.0.name)
             }
             try instruction.c_if(self.control!.0, self.control!.1)
         }

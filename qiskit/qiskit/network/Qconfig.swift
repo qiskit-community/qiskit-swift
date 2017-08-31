@@ -20,7 +20,7 @@ import Foundation
  */
 public final class Qconfig {
 
-    private static let BASEURL: String = "https://quantumexperience.ng.bluemix.net/api/"
+    public static let BASEURL: String = "https://quantumexperience.ng.bluemix.net/api/"
 
     /// Target URL
     public var url: URL

@@ -39,13 +39,12 @@ particular for modules which require making calls to compiled binaries.
 In order for a module to be registered in needs to define module-scope
 dictionary of the form::
 
-__configuration ={"name": "local_qasm_simulator",
-    "url": "https://github.com/IBM/qiskit-sdk-py",
-    "simulator": True,
-    "description": "A python simulator for qasm files",
-    "nQubits": 10,
-    "couplingMap": "all-to-all",
-    "gateset": "SU2+CNOT"}
+ __configuration = {'name': 'local_qasm_simulator',
+ 'url': 'https://github.com/IBM/qiskit-sdk-py',
+ 'simulator': True,
+ 'description': 'A python simulator for qasm files',
+ 'coupling_map': 'all-to-all',
+ 'basis_gates': 'u1,u2,u3,cx,id'}
 
 and it needs a class with a run method. The identifier for the backend
 simulator comes from the "name" key in this dictionary. The class'
@@ -99,7 +98,7 @@ final class LocalSimulator {
     private let backend: String
     private let job: [String:Any]
     private let _sim: Simulator
-    private var _result: [String:Any] = [:]
+    private var _result: [String:Any] = ["status": "Error"]
 
     var result: [String:Any] {
         return self._result
@@ -111,11 +110,11 @@ final class LocalSimulator {
         self._sim = try LocalSimulator.sim(self.backend,self.job)
     }
 
-    func run() throws {
-        let simOutput = try self._sim.run()
-        self._result["result"] = []
+    func run(_ silent: Bool = false) throws {
+        let simOutput = try self._sim.run(silent)
+        self._result = ["status": "Error"]
         if let data = simOutput["data"] {
-            self._result["result"] = ["data" : data]
+            self._result["data"] = data
         }
         if let status = simOutput["status"] {
             self._result["status"] = status

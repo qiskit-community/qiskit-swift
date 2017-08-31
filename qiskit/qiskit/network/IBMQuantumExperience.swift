@@ -32,7 +32,7 @@ public final class IBMQuantumExperience {
      - parameter token: API token
      - parameter config: Qconfig object
      */
-    public init(_ token: String, _ config: Qconfig? = nil, verify: Bool = true) throws {
+    public init(_ token: String, _ config: Qconfig? = nil, _ verify: Bool = true) throws {
         self.req = try Request(token,config,verify)
     }
 
@@ -74,7 +74,7 @@ public final class IBMQuantumExperience {
         }
         else if endpoint == "status" {
             if IBMQuantumExperience.__names_backend_ibmqxv2.contains(backend) {
-                ret = "chip_real"
+                ret = "ibmqx2"
             }
             else if IBMQuantumExperience.__names_backend_ibmqxv3.contains(backend) {
                 ret = "ibmqx3"
@@ -213,6 +213,12 @@ public final class IBMQuantumExperience {
                         }
                         if let additionalData = data["additionalData"] {
                             result["extraInfo"] = additionalData
+                        }
+                        if let cregLabels = data["cregLabels"] {
+                            result["creg_labels"] = cregLabels
+                        }
+                        if let time = data["time"] {
+                            result["time_taken"] = time
                         }
                     }
                 }
@@ -558,11 +564,30 @@ public final class IBMQuantumExperience {
                 return
             }
             self.req.get(path: "Jobs/\(jobId)") { (out, error) -> Void in
-                guard let json = out as? [String:Any] else {
+                guard var job = out as? [String:Any] else {
                     responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
                     return
                 }
-                responseHandler(json, error)
+                // To remove result object and add the attributes to data object
+                if let qasms = job["qasms"] as? [[String:Any]] {
+                    var new_qasms: [[String:Any]] = []
+                    for qasm in qasms {
+                        var new_qasm = qasm
+                        if var result = new_qasm["result"] as? [String:Any] {
+                            if var data = result["data"] as? [String:Any] {
+                                new_qasm.removeValue(forKey:"result")
+                                result.removeValue(forKey:"data")
+                                for (key,value) in result {
+                                    data[key] = value
+                                }
+                                new_qasm["data"] = data
+                            }
+                        }
+                        new_qasms.append(new_qasm)
+                    }
+                    job["qasms"] = new_qasms
+                }
+                responseHandler(job, error)
             }
         }
     }
@@ -602,12 +627,19 @@ public final class IBMQuantumExperience {
                 responseHandler(nil,IBMQuantumExperienceError.missingBackend(backend: backend))
                 return
             }
-            self.req.get(path:"Status/queue?backend=\(backend_type!)",with_token: false) { (out, error) -> Void in
-                guard let json = out as? [String:Any] else {
+            self.req.get(path:"Backends/\(backend_type!)/queue/status",with_token: false) { (out, error) -> Void in
+                guard let status = out as? [String:Any] else {
                     responseHandler(nil,IBMQuantumExperienceError.invalidResponseData)
                     return
                 }
-                responseHandler(["available" : (json["state"] != nil) ], error)
+                var ret: [String:Any] = [:]
+                if let state = status["state"] as? Bool {
+                    ret["available"] = state
+                }
+                if let busy = status["busy"] as? Bool {
+                    ret["busy"] = busy
+                }
+                responseHandler(ret, error)
             }
         }
     }

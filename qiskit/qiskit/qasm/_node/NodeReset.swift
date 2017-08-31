@@ -40,12 +40,12 @@ children[0] is a primary node (id or indexedid)
         return _children
     }
 
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         guard let iid = indexedid else {
             assertionFailure("Invalid NodeReset Operation")
             return ""
         }
-        return "reset \(iid.qasm());"
+        return "reset \(iid.qasm(prec));"
     }
 
 }

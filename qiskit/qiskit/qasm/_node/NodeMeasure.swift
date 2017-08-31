@@ -22,8 +22,8 @@ import Foundation
  */
 @objc public final class NodeMeasure: Node {
 
-    public var arg1: Node?
-    public var arg2: Node?
+    public let arg1: Node?
+    public let arg2: Node?
     
     public init(arg1: Node?, arg2: Node?) {
         self.arg1 = arg1
@@ -45,7 +45,7 @@ import Foundation
         return _children
     }
     
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         guard let a1 = arg1 else {
             assertionFailure("Invalid NodeQop Operation")
             return ""
@@ -54,6 +54,6 @@ import Foundation
             assertionFailure("Invalid NodeQop Operation")
             return ""
         }
-        return "measure \(a1.qasm()) -> \(a2.qasm());"
+        return "measure \(a1.qasm(prec)) -> \(a2.qasm(prec));"
     }
 }

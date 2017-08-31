@@ -26,6 +26,50 @@ import Foundation
 final class Coupling: CustomStringConvertible {
 
     /**
+     Convert coupling map dictionary into list.
+
+     Example dictionary format: {0: [1, 2], 1: [2]}
+     Example list format: [[0, 1], [0, 2], [1, 2]]
+
+     We do not do any checking of the input.
+
+     Return coupling map in list format.
+     */
+    static func coupling_dict2list(_ couplingdict: [Int:[Int]]) -> [[Int]] {
+        var couplinglist: [[Int]] = []
+        for (ctl, tgtlist) in couplingdict {
+            for tgt in tgtlist {
+                couplinglist.append([ctl, tgt])
+            }
+        }
+        return couplinglist
+    }
+
+    /**
+     Convert coupling map list into dictionary.
+
+     Example list format: [[0, 1], [0, 2], [1, 2]]
+     Example dictionary format: {0: [1, 2], 1: [2]}
+
+     We do not do any checking of the input.
+
+     Return coupling map in dict format.
+     */
+    static func coupling_list2dict(_ couplinglist: [[Int]]) -> [Int:[Int]] {
+        var couplingdict: [Int:[Int]] = [:]
+        for pair in couplinglist {
+            if var value = couplingdict[pair[0]] {
+                value.append(pair[1])
+                couplingdict[pair[0]] = value
+            }
+            else {
+                couplingdict[pair[0]] = [pair[1]]
+            }
+        }
+        return couplingdict
+    }
+
+    /**
     qubits is dict from qubit (regname,idx) tuples to node indices
      */
     private var qubits: OrderedDictionary<RegBit,Int> = OrderedDictionary<RegBit,Int>()

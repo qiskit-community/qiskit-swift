@@ -28,7 +28,7 @@ import Foundation
         return .N_INCLUDE
     }
     
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         let qasm: String = "include \(file);"
         return qasm
     }

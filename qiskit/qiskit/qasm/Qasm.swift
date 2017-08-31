@@ -59,10 +59,10 @@ final class Qasm {
             semaphore.wait()
         }
         if let error = errorMsg {
-            throw QISKitException.parserError(msg: error)
+            throw QISKitError.parserError(msg: error)
         }
         if root == nil {
-            throw QISKitException.parserError(msg: "Missing root node")
+            throw QISKitError.parserError(msg: "Missing root node")
         }
         return root!
     }

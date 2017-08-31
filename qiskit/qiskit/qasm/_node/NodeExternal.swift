@@ -21,7 +21,7 @@ import Foundation
  children[0] is an id node with the name of the function.
  children[1] is an expression node.
  */
-@objc public final class NodeExternal: Node {
+@objc public final class NodeExternal: Node, NodeRealValueProtocol {
 
     public static let externalFunctions = ["sin", "cos", "tan", "exp", "ln", "sqrt"]
 
@@ -45,12 +45,36 @@ import Foundation
         return _children
     }
 
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         var qasm = operation
         if let exp = expression {
-            qasm += "( \(exp.qasm()) )"
+            qasm += "( \(exp.qasm(prec)) )"
         }
         return qasm
     }
 
+    public func real(_ nested_scope: [[String:NodeRealValueProtocol]]?) throws -> Double {
+        if let expr = self.expression as? NodeRealValueProtocol {
+            let arg = try expr.real(nested_scope)
+            if self.operation == "sin" {
+                return sin(arg)
+            }
+            if self.operation == "cos" {
+                return cos(arg)
+            }
+            if self.operation == "tan" {
+                return tan(arg)
+            }
+            if self.operation == "exp" {
+                return exp(arg)
+            }
+            if self.operation == "ln" {
+                return log(arg)
+            }
+            if self.operation == "sqrt" {
+                return sqrt(arg)
+            }
+        }
+        throw QasmException.errorExternal(qasm: self.qasm(15))
+    }
 }

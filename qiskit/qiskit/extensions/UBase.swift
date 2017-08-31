@@ -23,7 +23,7 @@ public final class UBase: Gate {
 
     fileprivate init(_ params: [Double], _ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) throws {
         if params.count != 3 {
-            throw QISKitException.not3params
+            throw QISKitError.not3Params
         }
         super.init("U", params, [qubit], circuit)
     }

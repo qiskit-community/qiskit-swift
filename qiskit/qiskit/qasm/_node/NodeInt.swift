@@ -20,7 +20,7 @@ import Foundation
 Node for an OPENQASM integer.
 This node has no children. The data is in the value field.
 */
-@objc public final class NodeNNInt: Node {
+@objc public final class NodeNNInt: Node, NodeRealValueProtocol {
 
     public let value: Int
 
@@ -32,8 +32,12 @@ This node has no children. The data is in the value field.
         return .N_INT
     }
     
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         let qasm: String = "\(value)"
         return qasm
+    }
+
+    public func real(_ nested_scope: [[String:NodeRealValueProtocol]]?) throws -> Double {
+        return Double(self.value)
     }
 }

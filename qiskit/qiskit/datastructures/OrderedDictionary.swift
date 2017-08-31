@@ -18,22 +18,32 @@ import Foundation
 public struct OrderedDictionary<KeyType: Hashable, ValueType>: Sequence, CustomStringConvertible {
 
     public private(set) var keys: [KeyType] = []
-    public private(set) var values: [KeyType:ValueType] = [:]
+    private var keyValues: [KeyType:ValueType] = [:]
 
     public var count: Int {
         return self.keys.count;
     }
 
+    public var values: [ValueType] {
+        var vals: [ValueType] = []
+        for key in self.keys {
+            if let value = self[key] {
+                vals.append(value)
+            }
+        }
+        return vals
+    }
+
     public subscript(key: KeyType) -> ValueType? {
         get {
-            return self.values[key]
+            return self.keyValues[key]
         }
         set(newValue) {
             if newValue == nil {
                 self.removeValue(forKey: key)
             }
             else {
-                if nil == self.values.updateValue(newValue!, forKey: key) {
+                if nil == self.keyValues.updateValue(newValue!, forKey: key) {
                     self.keys.append(key)
                 }
             }
@@ -56,15 +66,15 @@ public struct OrderedDictionary<KeyType: Hashable, ValueType>: Sequence, CustomS
     }
 
     public mutating func removeValue(forKey: KeyType) {
-        if self.values[forKey] != nil {
-            self.values.removeValue(forKey: forKey)
+        if self.keyValues[forKey] != nil {
+            self.keyValues.removeValue(forKey: forKey)
             self.keys = self.keys.filter {$0 != forKey}
         }
     }
 
     public func value(_ at: Int) -> ValueType {
         let key = self.keys[at]
-        return self.values[key]!
+        return self.keyValues[key]!
     }
 
     public var description: String {

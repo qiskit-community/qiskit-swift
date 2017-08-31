@@ -64,11 +64,11 @@ interface is used to generate **OpenQASM** circuits. **OpenQASM**
 source, as a file or string, is passed into a *Qasm* object, whose
 *parse* method produces an abstract syntax tree (**AST**). The **AST**
 is passed to an *Unroller* that is attached to an *UnrollerBackend*.
-There is a *PrinterBackend* for outputting text, a *SimulatorBackend*
-for outputting simulator input data for the local simulators, and a
-*CircuitBackend* for constructing *Circuit* objects. The *Circuit*
+There is a *PrinterBackend* for outputting text, a *JsonBackend*
+for outputting JSON data, a *CircuitBackend* for constructing *QuantumCircuit* objects
+and a DAGBackend for constructing *DAGCircuit* objects. The *DAGCircuit*
 object represents an "unrolled" **OpenQASM** circuit as a directed
-acyclic graph (**DAG**). The *Circuit* provides methods for
+acyclic graph (**DAG**). The *DAGCircuit* provides methods for
 representing, transforming, and computing properties of a circuit and
 outputting the results again as **OpenQASM**. The whole flow is used by
 the *mapper* module to rewrite a circuit to execute on a device with
@@ -78,12 +78,6 @@ The four circuit representations and how they are currently transformed
 into each other are summarized in this figure:
 
 .. image:: images/circuit_representations.png
-    :width: 200px
-    :align: center
-
-Several unroller backends and their outputs are summarized here:
-
-.. image:: images/unroller_backends.png
     :width: 200px
     :align: center
 

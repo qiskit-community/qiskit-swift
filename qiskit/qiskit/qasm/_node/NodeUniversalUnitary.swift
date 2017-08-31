@@ -44,7 +44,7 @@ children[1] is a primary node (id or indexedid).
         return _children
     }
 
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         guard let el = explist else {
             assertionFailure("Invalid NodeUniversalUnitary Operation")
             return ""
@@ -54,6 +54,6 @@ children[1] is a primary node (id or indexedid).
             assertionFailure("Invalid NodeUniversalUnitary Operation")
             return ""
         }
-        return "U (\(el.qasm())) \(iid.qasm());"
+        return "U (\(el.qasm(prec))) \(iid.qasm(prec));"
     }
 }

@@ -18,84 +18,84 @@ import Foundation
 /**
  Exception for errors raised by the Circuit object.
  */
-public enum CircuitError: LocalizedError, CustomStringConvertible {
-    case duplicateregister(name: String)
-    case noregister(name: String)
-    case duplicatewire(regBit: RegBit)
-    case nobasicop(name: String)
-    case gatematch
-    case qbitsnumber(name: String)
-    case bitsnumber(name: String)
-    case paramsnumber(name: String)
-    case cregcondition(name: String)
-    case bitnotfound(q: RegBit)
-    case wiretype(bVal: Bool, q: RegBit)
-    case incompatiblebasis
-    case ineqgate(name: String)
-    case wirefrag(name: String)
-    case unmappedupname(name: String)
-    case invalidwiremapkey(regBit: RegBit)
-    case invalidwiremapvalue(regBit: RegBit)
-    case inconsistentewiremap(name: RegBit, value: RegBit)
-    case duplicateswiremap
-    case duplicatewires
-    case totalwires(expected: Int, total: Int)
-    case missingwire(wire: RegBit)
-    case missingname(name: String)
-    case invalidoptype(type: String)
+public enum DAGCircuitError: LocalizedError, CustomStringConvertible {
+    case duplicateRegister(name: String)
+    case noRegister(name: String)
+    case duplicateWire(regBit: RegBit)
+    case noBasicOp(name: String)
+    case gateMatch
+    case qbitsNumber(name: String)
+    case bitsNumber(name: String)
+    case paramsNumber(name: String)
+    case cregCondition(name: String)
+    case bitNotFound(q: RegBit)
+    case wireType(bVal: Bool, q: RegBit)
+    case incompatibleBasis
+    case ineqGate(name: String)
+    case wireFrag(name: String)
+    case unmappeDupName(name: String)
+    case invalidWireMapKey(regBit: RegBit)
+    case invalidWireMapValue(regBit: RegBit)
+    case inconsistenteWireMap(name: RegBit, value: RegBit)
+    case duplicatesWireMap
+    case duplicateWires
+    case totalWires(expected: Int, total: Int)
+    case missingWire(wire: RegBit)
+    case missingName(name: String)
+    case invalidOpType(type: String)
 
     public var errorDescription: String? {
         return self.description
     }
     public var description: String {
         switch self {
-        case .duplicateregister(let name):
+        case .duplicateRegister(let name):
             return "duplicate register name '\(name)'"
-        case .noregister(let name):
+        case .noRegister(let name):
             return "no register name '\(name)'"
-        case .duplicatewire(let regBit):
+        case .duplicateWire(let regBit):
             return "duplicate wire '\(regBit.name)-\(regBit.index)'"
-        case .nobasicop(let name):
+        case .noBasicOp(let name):
             return "\(name) is not in the list of basis operations"
-        case .gatematch():
+        case .gateMatch():
             return "gate data does not match basis element specification"
-        case .qbitsnumber(let name):
+        case .qbitsNumber(let name):
             return "incorrect number of qubits for \(name)"
-        case .bitsnumber(let name):
+        case .bitsNumber(let name):
             return "incorrect number of bits for \(name)"
-        case .paramsnumber(let name):
+        case .paramsNumber(let name):
             return "incorrect number of parameters for \(name)"
-        case .cregcondition(let name):
+        case .cregCondition(let name):
             return "invalid creg in condition for \(name)"
-        case .bitnotfound(let q):
+        case .bitNotFound(let q):
             return "(qu)bit \(q.qasm) not found"
-        case .wiretype(let bVal, let q):
+        case .wireType(let bVal, let q):
             return "expected wire type \(bVal) for \(q.qasm)"
-        case .incompatiblebasis():
+        case .incompatibleBasis():
             return "incompatible basis"
-        case .ineqgate(let name):
+        case .ineqGate(let name):
             return "inequivalent gate definitions for \(name)"
-        case .wirefrag(let name):
+        case .wireFrag(let name):
             return "wire_map fragments reg \(name)"
-        case .unmappedupname(let name):
+        case .unmappeDupName(let name):
             return "unmapped duplicate reg \(name)"
-        case .invalidwiremapkey(let regBit):
+        case .invalidWireMapKey(let regBit):
             return "invalid wire mapping key \(regBit.qasm)"
-        case .invalidwiremapvalue(let regBit):
+        case .invalidWireMapValue(let regBit):
             return "invalid wire mapping value \(regBit.qasm)"
-        case .inconsistentewiremap(let name, let value):
+        case .inconsistenteWireMap(let name, let value):
             return "inconsistent wire_map at (\(name.qasm),\(value.qasm))"
-        case .duplicateswiremap():
+        case .duplicatesWireMap():
             return "duplicates in wire_map"
-        case .duplicatewires():
+        case .duplicateWires():
             return "duplicate wires"
-        case .totalwires(let expected, let total):
+        case .totalWires(let expected, let total):
             return "expected \(expected) wires, got \(total)"
-        case .missingwire(let w):
+        case .missingWire(let w):
             return "wire (\(w.name),\(w.index)) not in input circuit"
-        case .missingname(let name):
+        case .missingName(let name):
             return "\(name) is not in the list of basis operations"
-        case .invalidoptype(let type):
+        case .invalidOpType(let type):
             return "expected node type \"op\", got \(type)"
         }
     }

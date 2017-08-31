@@ -81,24 +81,12 @@ class UnrollerTests: XCTestCase {
 
     private func rippleAdd(_ qConfig: Qconfig) throws {
         let qp = try QuantumProgram(specs: UnrollerTests.QPS_SPECS)
-        guard var qc = qp.get_circuit("rippleadd") else {
-            return
-        }
-        guard let a = qp.get_quantum_registers("a") else {
-            return
-        }
-        guard let b = qp.get_quantum_registers("b") else {
-            return
-        }
-        guard let cin = qp.get_quantum_registers("cin") else {
-            return
-        }
-        guard let cout = qp.get_quantum_registers("cout") else {
-            return
-        }
-        guard let ans = qp.get_classical_registers("ans") else {
-            return
-        }
+        var qc = try qp.get_circuit("rippleadd")
+        let a = try qp.get_quantum_register("a")
+        let b = try qp.get_quantum_register("b")
+        let cin = try qp.get_quantum_register("cin")
+        let cout = try qp.get_quantum_register("cout")
+        let ans = try qp.get_classical_register("ans")
 
         // Build a temporary subcircuit that adds a to b,
         // storing the result in b
@@ -132,8 +120,8 @@ class UnrollerTests: XCTestCase {
         let QASM_source = try qp.get_qasm("rippleadd")
         print(QASM_source)
 
-        try qp.compile(["rippleadd"], backend: UnrollerTests.backend, shots: 1024, coupling_map: UnrollerTests.coupling_map)
-        qp.print_execution_list(true)
+        let qobj = try qp.compile(["rippleadd"], backend: UnrollerTests.backend, shots: 1024, coupling_map: UnrollerTests.coupling_map)
+        qp.get_execution_list(qobj,true)
         /*let asyncExpectation = self.expectation(description: "runJob")
         qp.run() { (result,error) in
             do {

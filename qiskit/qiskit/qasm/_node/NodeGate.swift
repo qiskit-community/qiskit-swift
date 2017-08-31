@@ -32,10 +32,10 @@ import Foundation
     public let bitlist: Node?
     public let body: Node?
 
-    public var _name: String = ""
-    public var line: Int = 0
-    public var file: String = ""
-    public var index: Int = 0
+    public private(set) var _name: String = ""
+    public private(set) var line: Int = 0
+    public private(set) var file: String = ""
+    public private(set) var index: Int = 0
 
     public var n_args: Int {
         get{
@@ -93,16 +93,16 @@ import Foundation
         return _children
     }
     
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         var qasm = "gate \(self.name)"
         if let args = self.arguments {
-            qasm += "(" + args.qasm() + ")"
+            qasm += "(" + args.qasm(prec) + ")"
         }
         if let bits = self.bitlist {
-            qasm += " \(bits.qasm())\n"
+            qasm += " \(bits.qasm(prec))\n"
         }
         if let bdy = self.body {
-            qasm += "{\n \(bdy.qasm()) }"
+            qasm += "{\n \(bdy.qasm(prec)) }"
         }
         return qasm
     }

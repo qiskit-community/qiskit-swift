@@ -21,7 +21,7 @@ children is a list of nodes (statements).
 */
 @objc public final class NodeProgram: Node  {
 
-    public private(set) var statements: [Node]?
+    public private(set) var statements: [Node]? = nil
     
     public init(statement: Node?) {
         super.init()
@@ -48,12 +48,12 @@ children is a list of nodes (statements).
         return _children
     }
     
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         
         var qasms: [String] = []
         if let stmt = statements {
             qasms += stmt.flatMap({ (node: Node) -> String in
-                                    return node.qasm()
+                                    return node.qasm(prec)
                                     })
         }
         return qasms.joined(separator: "\n")

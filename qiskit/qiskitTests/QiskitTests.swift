@@ -280,21 +280,12 @@ class QiskitTests: XCTestCase {
             "measure qr[0] -> cr[0];"
 
             let Q_program = try QuantumProgram()
-            try Q_program.create_quantum_registers("qr", 4)
-            try Q_program.create_classical_registers("cr", 4)
-            try Q_program.create_circuit("Circuit", ["qr"], ["cr"])
-            guard let circuit = Q_program.get_circuit("Circuit") else {
-                XCTFail("Missing circuit")
-                return
-            }
-            guard let quantum_r = Q_program.get_quantum_registers("qr") else {
-                XCTFail("Missing quantum register")
-                return
-            }
-            guard let classical_r = Q_program.get_classical_registers("cr") else {
-                XCTFail("Missing classical register")
-                return
-            }
+            let qr = try Q_program.create_quantum_register("qr", 4)
+            let cr = try Q_program.create_classical_register("cr", 4)
+            try Q_program.create_circuit("Circuit", [qr], [cr])
+            let circuit = try Q_program.get_circuit("Circuit")
+            let quantum_r = try Q_program.get_quantum_register("qr")
+            let classical_r = try Q_program.get_classical_register("cr")
 
             // H (Hadamard) gate to the qubit 0 in the Quantum Register "qr"
             try circuit.h(quantum_r[0])
@@ -352,19 +343,19 @@ class QiskitTests: XCTestCase {
 
     private func runJob(_ qConfig: Qconfig, _ circuit: QuantumCircuit, _ device: String) throws {
         let qp = try QuantumProgram()
-        qp.add_circuit("circuit",circuit)
+        try qp.add_circuit("circuit",circuit)
         try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
 
         let asyncExpectation = self.expectation(description: "runJob")
-        qp.execute(["circuit"], backend: device) { (error) in
+        qp.execute(["circuit"], backend: device) { (result,error) in
             if error != nil {
                 XCTFail("Failure in runJob: \(error!)")
                 asyncExpectation.fulfill()
                 return
             }
             do {
-                print(try qp.get_compiled_qasm("circuit"))
-                print(try qp.get_counts("circuit"))
+                print(try result.get_ran_qasm("circuit"))
+                print(try result.get_counts("circuit"))
                 asyncExpectation.fulfill()
             } catch let error {
                 XCTFail("Failure in runJob: \(error)")

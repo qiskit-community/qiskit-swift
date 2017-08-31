@@ -83,10 +83,12 @@ final class SimulatorTools {
      Enlarge single operator to n qubits.
 
      It is exponential in the number of qubits.
-     opt is the single-qubit opt.
-     qubit is the qubit to apply it on counts from 0 and order
-     is q_{n-1} ... otimes q_1 otimes q_0.
-     number_of_qubits is the number of qubits in the system.
+
+     Args:
+        opt: the single-qubit opt.
+        qubit: the qubit to apply it on counts from 0 and order
+            is q_{n-1} ... otimes q_1 otimes q_0.
+        number_of_qubits: the number of qubits in the system.
      */
     static func enlarge_single_opt(_ opt: [[Complex]], _ qubit: Int, _ number_of_qubits: Int) -> [[Complex]] {
         let temp_1 = NumUtilities.identityComplex(Int(pow(2.0,Double(number_of_qubits-qubit-1))))
@@ -118,5 +120,51 @@ final class SimulatorTools {
             }
         }
         return enlarge_opt
+    }
+
+    /**
+     Apply a single qubit gate to the qubit.
+
+     Args:
+        gate(str): the single qubit gate name
+        params(list): the operation parameters op['params']
+     Returns:
+        a tuple of U gate parameters (theta, phi, lam)
+     */
+    static func single_gate_params(_ gate: String, _ params: [Double]) -> (Double,Double,Double) {
+        if gate == "U" || gate == "u3" {
+            return (params[0], params[1], params[2])
+        }
+        else if gate == "u2" {
+            return (Double.pi / 2.0, params[0], params[1])
+        }
+        else if gate == "u1" {
+            return (0.0, 0.0, params[0])
+        }
+        else if gate == "id" {
+            return (0.0, 0.0, 0.0)
+        }
+        return (0.0, 0.0, 0.0)
+    }
+
+    /**
+     Get the matrix for a single qubit.
+
+     Args:
+        params(list): the operation parameters op['params']
+     Returns:
+        A numpy array representing the matrix
+     */
+    static func single_gate_matrix(_ gate: String, _ params: [Double]) -> [[Complex]] {
+        let (theta, phi, lam) = SimulatorTools.single_gate_params(gate, params)
+        return [[
+                    Complex(real:cos(theta/2.0)),
+                    Complex(imag: lam).exp() * -sin(theta/2.0)
+                ],
+                [
+                    Complex(imag: phi).exp() * sin(theta/2.0),
+                    (Complex(imag: phi) + Complex(imag: lam)).exp() * cos(theta/2.0)
+                ]
+        ]
     }
 }

@@ -16,24 +16,25 @@
 import Foundation
 
 /**
- Backend for the unroller that creates a Circuit object
+ Backend for the unroller that produces a QuantumCircuit.
+
+ By default, basis gates are the QX gates.
 */
 final class CircuitBackend: UnrollerBackend {
 
-    private let prec: Int = 15
     private var creg:String? = nil
     private var cval:Int? = nil
-    private let circuit: Circuit = Circuit()
     private var basis: [String]
+    private var gates: [String:GateData] = [:]
     private var listen: Bool = true
     private var in_gate: String = ""
-    private var gates: [String:GateData] = [:]
+    private let circuit = QuantumCircuit()
 
     /**
      Setup this backend.
      basis is a list of operation name strings.
      */
-    init(_ basis: [String] = []) {
+    init(_ basis: [String] = ["cx", "u1", "u2", "u3"]) {
         self.basis = basis
     }
 
@@ -58,7 +59,7 @@ final class CircuitBackend: UnrollerBackend {
      sz = size of the register
      */
     func new_qreg(_ name: String, _ size: Int) throws {
-        try self.circuit.add_qreg(name, size)
+        try self.circuit.add(QuantumRegister(name, size))
     }
 
     /**
@@ -67,7 +68,7 @@ final class CircuitBackend: UnrollerBackend {
      sz = size of the register
      */
     func new_creg(_ name: String, _ size: Int) throws {
-        try self.circuit.add_creg(name, size)
+        try self.circuit.add(ClassicalRegister(name, size))
     }
 
     /**
@@ -77,28 +78,62 @@ final class CircuitBackend: UnrollerBackend {
      */
     func define_gate(_ name: String, _ gatedata: GateData) throws {
         self.gates[name] = gatedata
-        try self.circuit.add_gate_data(name, gatedata)
+    }
+
+    /**
+     Map qubit tuple (regname, index) to (QuantumRegister, index).
+     */
+    private func _map_qubit(_ qubit: RegBit) throws -> QuantumRegisterTuple {
+        let qregs = self.circuit.get_qregs()
+        if let qreg = qregs[qubit.name] {
+            return QuantumRegisterTuple(qreg, qubit.index)
+        }
+        throw BackendError.qregNotExist(name: qubit.name)
+    }
+
+    /**
+     Map bit tuple (regname, index) to (ClassicalRegister, index).
+     */
+    private func _map_bit(_ bit: RegBit) throws -> ClassicalRegisterTuple {
+        let cregs = self.circuit.get_cregs()
+        if let creg = cregs[bit.name] {
+            return ClassicalRegisterTuple(creg, bit.index)
+        }
+        throw BackendError.cregNotExist(name: bit.name)
+    }
+
+    /**
+     Map creg name to ClassicalRegister.
+     */
+    private func _map_creg(_ creg: String) throws -> ClassicalRegister {
+        let cregs = self.circuit.get_cregs()
+        if let creg = cregs[creg] {
+            return creg
+        }
+        throw BackendError.cregNotExist(name: creg)
     }
 
     /**
      Fundamental single qubit gate.
-     arg is 3-tuple of float parameters.
+
+     arg is 3-tuple of Node expression objects.
      qubit is (regname,idx) tuple.
+     nested_scope is a list of dictionaries mapping expression variables
+     to Node expression objects in order of increasing nesting depth.
      */
-    func u(_ arg: (Double, Double, Double), _ qubit: RegBit) throws {
+    func u(_ arg: (NodeRealValueProtocol, NodeRealValueProtocol, NodeRealValueProtocol), _ qubit: RegBit, _ nested_scope:[[String:NodeRealValueProtocol]]?) throws {
         if self.listen {
-            var condition: RegBit? = nil
-            if let reg = self.creg {
-                if let val = self.cval {
-                    condition = RegBit(reg,val)
-                }
-            }
             if !self.basis.contains("U") {
                 self.basis.append("U")
-                try self.circuit.add_basis_element("U", 1, 0, 3)
             }
-            try self.circuit.apply_operation_back("U", [qubit], [],
-                                [arg.0.format(self.prec),arg.1.format(self.prec),arg.2.format(self.prec)], condition)
+            let this_gate = try self.circuit.u_base([try arg.0.real(nested_scope),
+                                                     try arg.1.real(nested_scope),
+                                                     try arg.2.real(nested_scope)],
+                                                    try self._map_qubit(qubit))
+            if let reg = self.creg,
+                let val = self.cval {
+                try this_gate.c_if(self._map_creg(reg), val)
+            }
         }
     }
 
@@ -109,17 +144,14 @@ final class CircuitBackend: UnrollerBackend {
      */
     func cx(_ qubit0: RegBit, _ qubit1: RegBit) throws {
         if self.listen {
-            var condition: RegBit? = nil
-            if let reg = self.creg {
-                if let val = self.cval {
-                    condition = RegBit(reg,val)
-                }
-            }
             if !self.basis.contains("CX") {
                 self.basis.append("CX")
-                try self.circuit.add_basis_element("CX", 2)
             }
-            try self.circuit.apply_operation_back("CX", [qubit0, qubit1], [], [], condition)
+            let this_gate = try self.circuit.cx_base(self._map_qubit(qubit0),self._map_qubit(qubit1))
+            if let reg = self.creg,
+                let val = self.cval {
+                try this_gate.c_if(self._map_creg(reg), val)
+            }
         }
     }
 
@@ -129,17 +161,14 @@ final class CircuitBackend: UnrollerBackend {
      bit is (regname, idx) tuple for the output bit.
      */
     func measure(_ qubit: RegBit, _ bit: RegBit) throws {
-        var condition: RegBit? = nil
-        if let reg = self.creg {
-            if let val = self.cval {
-                condition = RegBit(reg,val)
-            }
-        }
         if !self.basis.contains("measure") {
             self.basis.append("measure")
-            try self.circuit.add_basis_element("measure", 1, 1)
         }
-        try self.circuit.apply_operation_back("measure", [qubit], [bit], [], condition)
+        let this_op = try self.circuit.measure(self._map_qubit(qubit),self._map_bit(bit))
+        if let reg = self.creg,
+            let val = self.cval {
+            try this_op.c_if(self._map_creg(reg), val)
+        }
     }
 
     /**
@@ -148,17 +177,16 @@ final class CircuitBackend: UnrollerBackend {
      */
     func barrier(_ qubitlists: [[RegBit]]) throws {
         if self.listen {
-            var names: [RegBit] = []
-            for x in qubitlists {
-                for reg in x {
-                    names.append(reg)
-                }
-            }
             if !self.basis.contains("barrier") {
                 self.basis.append("barrier")
-                try self.circuit.add_basis_element("barrier", -1)
             }
-            try self.circuit.apply_operation_back("barrier", names)
+            var tuples: [QuantumRegisterTuple] = []
+            for qubitlists in qubitlists {
+                for regBit in qubitlists {
+                    tuples.append(try self._map_qubit(regBit))
+                }
+            }
+            try self.circuit.barrier(tuples)
         }
     }
 
@@ -167,17 +195,14 @@ final class CircuitBackend: UnrollerBackend {
      qubit is a (regname, idx) tuple.
      */
     func reset(_ qubit: RegBit) throws {
-        var condition: RegBit? = nil
-        if let reg = self.creg {
-            if let val = self.cval {
-                condition = RegBit(reg,val)
-            }
-        }
         if !self.basis.contains("reset") {
             self.basis.append("reset")
-            try self.circuit.add_basis_element("reset", 1)
         }
-        try self.circuit.apply_operation_back("reset", [qubit], [], [], condition)
+        let this_op = try self.circuit.reset(self._map_qubit(qubit))
+        if let reg = self.creg,
+            let val = self.cval {
+            try this_op.c_if(self._map_creg(reg), val)
+        }
     }
 
     /**
@@ -200,43 +225,198 @@ final class CircuitBackend: UnrollerBackend {
 
     /**
      Begin a custom gate.
+
      name is name string.
-     args is list of floating point parameters.
+     args is list of Node expression objects.
      qubits is list of (regname, idx) tuples.
+     nested_scope is a list of dictionaries mapping expression variables
+     to Node expression objects in order of increasing nesting depth.
      */
-    func start_gate(_ name: String, _ args: [Double], _ qubits: [RegBit]) throws {
+    func start_gate(_ name: String, _ args: [NodeRealValueProtocol], _ qubits: [RegBit], _ nested_scope:[[String:NodeRealValueProtocol]]?) throws {
         if self.listen && !self.basis.contains(name) {
             if let gate = self.gates[name] {
                 if gate.opaque {
-                    throw BackendException.erroropaque(name: name)
+                    throw BackendError.errorOpaque(name: name)
                 }
             }
         }
         if self.listen && self.basis.contains(name) {
-            var condition: RegBit? = nil
-            if let reg = self.creg {
-                if let val = self.cval {
-                    condition = RegBit(reg,val)
-                }
-            }
             self.in_gate = name
             self.listen = false
-            try self.circuit.add_basis_element(name, qubits.count, 0, args.count)
-            var params: [String] = []
-            for arg in args {
-                params.append(arg.format(self.prec))
+
+            var this_gate: Gate? = nil
+            if name == "ccx" {
+                if 0 != args.count || 3 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.ccx(self._map_qubit(qubits[0]),self._map_qubit(qubits[1]),self._map_qubit(qubits[2]))
             }
-            try self.circuit.apply_operation_back(name, qubits, [], params, condition)
+            else if name == "ch" {
+                if 0 != args.count || 2 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.ch(self._map_qubit(qubits[0]),self._map_qubit(qubits[1]))
+            }
+            else if name == "crz" {
+                if  1 != args.count || 2 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.crz(args[0].real(nested_scope),self._map_qubit(qubits[0]),self._map_qubit(qubits[1]))
+            }
+            else if name == "cswap" {
+                if 0 != args.count || 3 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.cswap(self._map_qubit(qubits[0]),self._map_qubit(qubits[1]),self._map_qubit(qubits[2]))
+            }
+            else if name == "cu1" {
+                if 1 != args.count || 2 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.cu1(args[0].real(nested_scope),self._map_qubit(qubits[0]),self._map_qubit(qubits[1]))
+            }
+            else if name == "cu3" {
+                if 3 != args.count || 2 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.cu3(args[0].real(nested_scope),args[1].real(nested_scope),args[2].real(nested_scope),
+                                                 self._map_qubit(qubits[0]),self._map_qubit(qubits[1]))
+            }
+            else if name == "cx" {
+                if 0 != args.count || 2 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.cx(self._map_qubit(qubits[0]),self._map_qubit(qubits[1]))
+            }
+            else if name == "cy" {
+                if 0 != args.count || 2 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.cy(self._map_qubit(qubits[0]),self._map_qubit(qubits[1]))
+            }
+            else if name == "cz" {
+                if 0 != args.count || 2 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.cz(self._map_qubit(qubits[0]),self._map_qubit(qubits[1]))
+            }
+            else if name == "swap" {
+                if 0 != args.count || 2 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.swap(self._map_qubit(qubits[0]),self._map_qubit(qubits[1]))
+            }
+            else if name == "h" {
+                if 0 != args.count || 1 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.h(self._map_qubit(qubits[0]))
+            }
+            else if name == "id" {
+                if 0 != args.count || 1 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.iden(self._map_qubit(qubits[0]))
+            }
+            else if name == "rx" {
+                if 1 != args.count || 1 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.rx(args[0].real(nested_scope),self._map_qubit(qubits[0]))
+            }
+            else if name == "ry" {
+                if 1 != args.count || 1 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.ry(args[0].real(nested_scope),self._map_qubit(qubits[0]))
+            }
+            else if name == "rz" {
+                if 1 != args.count || 1 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.rz(args[0].real(nested_scope),self._map_qubit(qubits[0]))
+            }
+            else if name == "s" {
+                if 0 != args.count || 1 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.s(self._map_qubit(qubits[0]))
+            }
+            else if name == "sdg" {
+                if 0 != args.count || 1 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.sdg(self._map_qubit(qubits[0]))
+            }
+            else if name == "t" {
+                if 0 != args.count || 1 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.t(self._map_qubit(qubits[0]))
+            }
+            else if name == "tdg" {
+                if 0 != args.count || 1 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.tdg(self._map_qubit(qubits[0]))
+            }
+            else if name == "u1" {
+                if 1 != args.count || 1 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.u1(args[0].real(nested_scope),self._map_qubit(qubits[0]))
+            }
+            else if name == "u2" {
+                if 2 != args.count || 1 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.u2(args[0].real(nested_scope),args[1].real(nested_scope),self._map_qubit(qubits[0]))
+            }
+            else if name == "u3" {
+                if 3 != args.count || 1 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.u3(args[0].real(nested_scope),args[1].real(nested_scope),args[2].real(nested_scope),
+                                                 self._map_qubit(qubits[0]))
+            }
+            else if name == "x" {
+                if 0 != args.count || 1 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.x(self._map_qubit(qubits[0]))
+            }
+            else if name == "y" {
+                if 0 != args.count || 1 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.y(self._map_qubit(qubits[0]))
+            }
+            else if name == "z" {
+                if 0 != args.count || 1 != qubits.count {
+                    throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
+                }
+                this_gate = try self.circuit.z(self._map_qubit(qubits[0]))
+            }
+            else {
+                throw BackendError.gateNotExist(name: name)
+            }
+            if let reg = self.creg,
+                let val = self.cval {
+                try this_gate!.c_if(self._map_creg(reg), val)
+            }
         }
     }
 
     /**
      End a custom gate.
+
      name is name string.
-     args is list of floating point parameters.
+     args is list of Node expression objects.
      qubits is list of (regname, idx) tuples.
+     nested_scope is a list of dictionaries mapping expression variables
+     to Node expression objects in order of increasing nesting depth..
      */
-    func end_gate(_ name: String, _ args: [Double], _ qubits: [RegBit]) {
+    func end_gate(_ name: String, _ args: [NodeRealValueProtocol], _ qubits: [RegBit], _ nested_scope:[[String:NodeRealValueProtocol]]?) throws {
         if name == self.in_gate {
             self.in_gate = ""
             self.listen = true

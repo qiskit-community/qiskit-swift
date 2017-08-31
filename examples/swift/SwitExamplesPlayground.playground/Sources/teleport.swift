@@ -63,11 +63,11 @@ public final class Teleport {
             print("Teleport:")
             let qConfig = try Qconfig(APItoken: apiToken)
             let qp = try QuantumProgram(specs: QPS_SPECS)
-            guard let qc = qp.get_circuit("teleport") else { return }
-            guard let q = qp.get_quantum_registers("q") else { return }
-            guard let c0 = qp.get_classical_registers("c0") else { return }
-            guard let c1 = qp.get_classical_registers("c1") else { return }
-            guard let c2 = qp.get_classical_registers("c2") else { return }
+            let qc = try qp.get_circuit("teleport")
+            let q = try qp.get_quantum_register("q")
+            let c0 = try qp.get_classical_register("c0")
+            let c1 = try qp.get_classical_register("c1")
+            let c2 = try qp.get_classical_register("c2")
 
             // Prepare an initial state
             try qc.u3(0.3, 0.2, 0.1, q[0])
@@ -100,25 +100,25 @@ public final class Teleport {
             print("Experiment does not support feedback, so we use the simulator")
 
             print("First version: not compiled")
-            qp.execute(["teleport"], backend: backend,shots: 1024, coupling_map: nil) { (error) in
+            qp.execute(["teleport"], backend: backend,shots: 1024, coupling_map: nil) { (result,error) in
                 do {
                     if error != nil {
                         print(error!.description)
                         responseHandler?()
                         return
                     }
-                    print(try qp.get_counts("teleport"))
+                    print(try result.get_counts("teleport"))
 
                     print("Second version: compiled to ibmqx2 coupling graph")
-                    try qp.compile(["teleport"], backend: backend, shots: 1024, coupling_map: coupling_map)
-                    qp.run() { (error) in
+                    let qobj = try qp.compile(["teleport"], backend: backend, shots: 1024, coupling_map: coupling_map)
+                    qp.run(qobj) { (result,error) in
                         do {
                             if error != nil {
                                 print(error!.description)
                                 responseHandler?()
                                 return
                             }
-                            print(try qp.get_counts("teleport"))
+                            print(try result.get_counts("teleport"))
                             print("Both versions should give the same distribution")
                         } catch {
                             print(error.localizedDescription)

@@ -33,7 +33,7 @@ import Foundation
  The nodes are connected by directed edges that correspond to qubits and
  bits.
  */
-final class Circuit: NSCopying {
+final class DAGCircuit: NSCopying {
 
     /**
      Map from a wire's name (reg,idx) to a Bool that is True if the
@@ -93,7 +93,7 @@ final class Circuit: NSCopying {
     /**
      Output precision for printing floats
     */
-    private var prec = 10
+    private var prec = 15
 
     /**
      Create an empty circuit
@@ -103,7 +103,7 @@ final class Circuit: NSCopying {
     }
 
     public func copy(with zone: NSZone? = nil) -> Any {
-        let copy =  Circuit()
+        let copy =  DAGCircuit()
         copy.wire_type = self.wire_type
         copy.input_map = self.input_map
         copy.output_map = self.output_map
@@ -123,7 +123,7 @@ final class Circuit: NSCopying {
      */
     public func get_qubits() -> [RegBit] {
         var array:[RegBit] = []
-        let qRegsSorted = self.qregs.values.sorted(by:{ (n1: (key: String, value: Int), n2: (key: String, value: Int)) -> Bool in
+        let qRegsSorted = self.qregs.sorted(by:{ (n1: (key: String, value: Int), n2: (key: String, value: Int)) -> Bool in
             return n1.key < n2.key
         })
         for (name,index) in qRegsSorted {
@@ -144,10 +144,10 @@ final class Circuit: NSCopying {
             return
         }
         if self.qregs[newname] != nil || self.cregs[newname] != nil {
-            throw CircuitError.duplicateregister(name: newname)
+            throw DAGCircuitError.duplicateRegister(name: newname)
         }
         if self.qregs[regname] == nil && self.cregs[regname] == nil {
-            throw CircuitError.noregister(name: newname)
+            throw DAGCircuitError.noRegister(name: newname)
         }
         var reg_size: Int = 0
         if self.qregs[regname] != nil {
@@ -232,8 +232,8 @@ final class Circuit: NSCopying {
     /**
      Return a deep copy of self
      */
-    public func deepcopy() -> Circuit {
-        return self.copy(with: nil) as! Circuit
+    public func deepcopy() -> DAGCircuit {
+        return self.copy(with: nil) as! DAGCircuit
     }
 
     /**
@@ -248,7 +248,7 @@ final class Circuit: NSCopying {
      */
     public func add_qreg(_ name: String, _ size: Int) throws {
         if self.qregs[name] != nil || self.cregs[name] != nil {
-            throw CircuitError.duplicateregister(name: name)
+            throw DAGCircuitError.duplicateRegister(name: name)
         }
         self.qregs[name] = size
         for j in 0..<size {
@@ -261,7 +261,7 @@ final class Circuit: NSCopying {
      */
     public func add_creg(_ name: String, _ size: Int) throws {
         if self.qregs[name] != nil || self.cregs[name] != nil {
-            throw CircuitError.duplicateregister(name: name)
+            throw DAGCircuitError.duplicateRegister(name: name)
         }
         self.cregs[name] = size
         for j in 0..<size {
@@ -276,7 +276,7 @@ final class Circuit: NSCopying {
      */
     private func _add_wire(_ name: RegBit, _ isClassical:Bool = false) throws {
         if self.wire_type[name] != nil {
-            throw CircuitError.duplicatewire(regBit: name)
+            throw DAGCircuitError.duplicateWire(regBit: name)
         }
         self.wire_type[name] = isClassical
         self.node_counter += 1
@@ -310,13 +310,13 @@ final class Circuit: NSCopying {
         }
         if let gateMap = self.gates[name] {
             if number_classical != 0 {
-                throw CircuitError.gatematch
+                throw DAGCircuitError.gateMatch
             }
             if gateMap.n_args != number_parameters {
-                throw CircuitError.gatematch
+                throw DAGCircuitError.gateMatch
             }
             if gateMap.n_bits != number_qubits {
-                throw CircuitError.gatematch
+                throw DAGCircuitError.gateMatch
             }
         }
     }
@@ -336,13 +336,13 @@ final class Circuit: NSCopying {
             self.gates[name] = gateMap
             if let basis = self.basis[name] {
                 if gateMap.n_bits != basis.0 {
-                    throw CircuitError.gatematch
+                    throw DAGCircuitError.gateMatch
                 }
                 if basis.1 != 0 {
-                    throw CircuitError.gatematch
+                    throw DAGCircuitError.gateMatch
                 }
                 if gateMap.n_args != basis.2 {
-                    throw CircuitError.gatematch
+                    throw DAGCircuitError.gateMatch
                 }
             }
         }
@@ -361,32 +361,32 @@ final class Circuit: NSCopying {
                                    _ params: [String]) throws {
         // Check that we have this operation
         if self.basis[name] == nil {
-            throw CircuitError.nobasicop(name: name)
+            throw DAGCircuitError.noBasicOp(name: name)
         }
         // Check the number of arguments matches the signature
         if name != "barrier" {
             if let basis = self.basis[name] {
                 if qargs.count != basis.0 {
-                    throw CircuitError.qbitsnumber(name: name)
+                    throw DAGCircuitError.qbitsNumber(name: name)
                 }
                 if cargs.count != basis.1 {
-                    throw CircuitError.bitsnumber(name: name)
+                    throw DAGCircuitError.bitsNumber(name: name)
                 }
                 if params.count != basis.2 {
-                    throw CircuitError.paramsnumber(name: name)
+                    throw DAGCircuitError.paramsNumber(name: name)
                 }
             }
         }
         else {
             // "barrier" is a special case
             if qargs.isEmpty {
-                throw CircuitError.qbitsnumber(name: name)
+                throw DAGCircuitError.qbitsNumber(name: name)
             }
             if !cargs.isEmpty {
-                throw CircuitError.bitsnumber(name: name)
+                throw DAGCircuitError.bitsNumber(name: name)
             }
             if !params.isEmpty {
-                throw CircuitError.paramsnumber(name: name)
+                throw DAGCircuitError.paramsNumber(name: name)
             }
         }
     }
@@ -400,7 +400,7 @@ final class Circuit: NSCopying {
         // Verify creg exists
         if let condition = cond {
             if self.cregs[condition.name] == nil {
-                throw CircuitError.cregcondition(name: name)
+                throw DAGCircuitError.cregCondition(name: name)
             }
         }
     }
@@ -417,11 +417,11 @@ final class Circuit: NSCopying {
         // Check for each wire
         for q in args {
             if amap[q] == nil {
-                throw CircuitError.bitnotfound(q: q)
+                throw DAGCircuitError.bitNotFound(q: q)
             }
             if let wt = self.wire_type[q] {
                 if wt != bval {
-                    throw CircuitError.wiretype(bVal: bval, q: q)
+                    throw DAGCircuitError.wireType(bVal: bval, q: q)
                 }
             }
         }
@@ -544,14 +544,14 @@ final class Circuit: NSCopying {
      new elements of input_circuit.basis added.
      input_circuit is a CircuitGraph
      */
-    private func _make_union_basis(_ input_circuit: Circuit) throws -> OrderedDictionary<String,(Int,Int,Int)> {
+    private func _make_union_basis(_ input_circuit: DAGCircuit) throws -> OrderedDictionary<String,(Int,Int,Int)> {
         var union_basis = self.basis
         for (g, val) in input_circuit.basis {
             if union_basis[g] == nil {
                 union_basis[g] = val
             }
             if union_basis[g]! != val {
-                throw CircuitError.incompatiblebasis
+                throw DAGCircuitError.incompatibleBasis
             }
         }
         return union_basis
@@ -565,7 +565,7 @@ final class Circuit: NSCopying {
      NOTE: gates in input_circuit that are also in self must
      be *identical* to the gates in self
      */
-    private func _make_union_gates(_ input_circuit: Circuit) throws -> OrderedDictionary<String,GateData> {
+    private func _make_union_gates(_ input_circuit: DAGCircuit) throws -> OrderedDictionary<String,GateData> {
         var union_gates = self.gates
         for (k, v) in input_circuit.gates {
             if union_gates[k] == nil {
@@ -582,11 +582,11 @@ final class Circuit: NSCopying {
                 union_gate.n_bits != input_circuit_gate.n_bits ||
                 union_gate.args != input_circuit_gate.args ||
                 union_gate.bits != input_circuit_gate.bits {
-                throw CircuitError.ineqgate(name: k)
+                throw DAGCircuitError.ineqGate(name: k)
             }
             if !union_gate.opaque && union_gate.body != nil && input_circuit_gate.body != nil &&
-                union_gate.body!.qasm() != input_circuit_gate.body!.qasm() {
-                throw CircuitError.ineqgate(name: k)
+                union_gate.body!.qasm(self.prec) != input_circuit_gate.body!.qasm(self.prec) {
+                throw DAGCircuitError.ineqGate(name: k)
             }
         }
         return union_gates
@@ -623,11 +623,11 @@ final class Circuit: NSCopying {
         for (k, v) in reg_frag_chk {
             let s = Set<Bool>(v)
             if s.count == 2 {
-                throw CircuitError.wirefrag(name: k)
+                throw DAGCircuitError.wireFrag(name: k)
             }
             if s.count == 1 && s.contains(false) {
                 if self.qregs[k] != nil || self.cregs[k] != nil {
-                    throw CircuitError.unmappedupname(name: k)
+                    throw DAGCircuitError.unmappeDupName(name: k)
                 }
                 else {
                     // Add registers that appear only in keyregs
@@ -672,16 +672,16 @@ final class Circuit: NSCopying {
     private func _check_wiremap_validity(_ wire_map: [RegBit:RegBit],
                                          _ keymap: OrderedDictionary<RegBit,Int>,
                                          _ valmap: OrderedDictionary<RegBit,Int>,
-                                         _ input_circuit: Circuit) throws {
+                                         _ input_circuit: DAGCircuit) throws {
         for (k, v) in wire_map {
             if keymap[k] == nil {
-                throw CircuitError.invalidwiremapkey(regBit: k)
+                throw DAGCircuitError.invalidWireMapKey(regBit: k)
             }
             if valmap[v] == nil {
-                throw CircuitError.invalidwiremapvalue(regBit: v)
+                throw DAGCircuitError.invalidWireMapValue(regBit: v)
             }
             if input_circuit.wire_type[k] != self.wire_type[v] {
-                throw CircuitError.inconsistentewiremap(name: k, value: v)
+                throw DAGCircuitError.inconsistenteWireMap(name: k, value: v)
             }
         }
     }
@@ -715,13 +715,13 @@ final class Circuit: NSCopying {
      to a subset of output qubits of this circuit.
      wire_map[input_qubit_to_input_circuit] = output_qubit_of_self
      */
-    public func compose_back(_ input_circuit: Circuit, _ wire_map: [RegBit:RegBit] = [:]) throws {
+    public func compose_back(_ input_circuit: DAGCircuit, _ wire_map: [RegBit:RegBit] = [:]) throws {
         let union_basis = try self._make_union_basis(input_circuit)
         let union_gates = try self._make_union_gates(input_circuit)
 
         // Check the wire map for duplicate values
         if Set<RegBit>(wire_map.values).count != wire_map.count {
-            throw CircuitError.duplicateswiremap
+            throw DAGCircuitError.duplicatesWireMap
         }
 
         let add_qregs = try self._check_wiremap_registers(wire_map,input_circuit.qregs,self.qregs)
@@ -791,13 +791,13 @@ final class Circuit: NSCopying {
      to a subset of input qubits of
      this circuit.
      */
-    public func compose_front(_ input_circuit: Circuit, _ wire_map: [RegBit:RegBit] = [:]) throws {
+    public func compose_front(_ input_circuit: DAGCircuit, _ wire_map: [RegBit:RegBit] = [:]) throws {
         let union_basis = try self._make_union_basis(input_circuit)
         let union_gates = try self._make_union_gates(input_circuit)
 
         // Check the wire map
         if Set<RegBit>(wire_map.values).count != wire_map.count {
-            throw CircuitError.duplicateswiremap
+            throw DAGCircuitError.duplicatesWireMap
         }
 
         let add_qregs = try self._check_wiremap_registers(wire_map,input_circuit.qregs,self.qregs)
@@ -922,7 +922,7 @@ final class Circuit: NSCopying {
             out += ";"
         }
         else {
-            out += "\n{\n" + (data.body != nil ? data.body!.qasm() : "") + "}"
+            out += "\n{\n" + (data.body != nil ? data.body!.qasm(self.prec) : "") + "}"
         }
         return out
     }
@@ -971,10 +971,10 @@ final class Circuit: NSCopying {
             if qeflag {
                 out += "include \"qelib1.inc\";\n"
             }
-            for (k,v) in qregdata.values.sorted(by: { $0.0 < $1.0 }) {
+            for (k,v) in qregdata.sorted(by: { $0.0 < $1.0 }) {
                 out += "qreg \(k)[\(v)];\n"
             }
-            for (k,v) in self.cregs.values.sorted(by: { $0.0 < $1.0 }) {
+            for (k,v) in self.cregs.sorted(by: { $0.0 < $1.0 }) {
                 out += "creg \(k)[\(v)];\n"
             }
             var omit:Set<String> = ["U", "CX", "measure", "reset", "barrier"]
@@ -1082,20 +1082,20 @@ final class Circuit: NSCopying {
      - elements are wires of input_circuit
      Raises an exception otherwise.
      */
-    private func _check_wires_list(_ wires:[RegBit], _ name: String, _ input_circuit: Circuit) throws {
+    private func _check_wires_list(_ wires:[RegBit], _ name: String, _ input_circuit: DAGCircuit) throws {
         if Set<RegBit>(wires).count != wires.count {
-            throw CircuitError.duplicatewires
+            throw DAGCircuitError.duplicateWires
         }
         var wire_tot: Int = 0
         if let vals = self.basis[name] {
             wire_tot = vals.0 + vals.1
         }
         if wires.count != wire_tot {
-            throw CircuitError.totalwires(expected:wire_tot, total: wires.count)
+            throw DAGCircuitError.totalWires(expected:wire_tot, total: wires.count)
         }
         for w in wires {
             if input_circuit.wire_type[w] == nil {
-                throw CircuitError.missingwire(wire: w)
+                throw DAGCircuitError.missingWire(wire: w)
             }
         }
     }
@@ -1134,7 +1134,7 @@ final class Circuit: NSCopying {
      */
     private func _full_pred_succ_maps(_ pred_map: [RegBit:Int],
                                       _ succ_map: [RegBit:Int],
-                                      _ input_circuit: Circuit,
+                                      _ input_circuit: DAGCircuit,
                                       _ wire_map: [RegBit:RegBit]) -> ([RegBit:Int],[RegBit:Int]) {
         var full_pred_map: [RegBit:Int] = [:]
         var full_succ_map: [RegBit:Int] = [:]
@@ -1162,10 +1162,10 @@ final class Circuit: NSCopying {
      Replace every occurrence of named operation with input_circuit.
      */
     public func  substitute_circuit_all(_ name: String,
-                                        _ input_circuit: Circuit,
+                                        _ input_circuit: DAGCircuit,
                                         _ wires: [RegBit] = []) throws {
         if self.basis[name] == nil {
-            throw CircuitError.missingname(name: name)
+            throw DAGCircuitError.missingName(name: name)
         }
 
         try self._check_wires_list(wires, name, input_circuit)
@@ -1307,11 +1307,11 @@ final class Circuit: NSCopying {
      input_circuit is a CircuitGraph.
      */
     func substitute_circuit_one(_ node: GraphVertex<CircuitVertexData>,
-                                _ input_circuit: Circuit,
+                                _ input_circuit: DAGCircuit,
                                 wires: [RegBit] = []) throws {
 
         if node.data!.type != "op" {
-            throw CircuitError.invalidoptype(type: node.data!.type)
+            throw DAGCircuitError.invalidOpType(type: node.data!.type)
         }
         let nd = node.data as! CircuitVertexOpData
 
@@ -1443,7 +1443,7 @@ final class Circuit: NSCopying {
      */
     public func get_named_nodes(_ name: String) throws -> [GraphVertex<CircuitVertexData>] {
         if self.basis[name] == nil {
-            throw CircuitError.nobasicop(name: name)
+            throw DAGCircuitError.noBasicOp(name: name)
         }
         var nlist: [GraphVertex<CircuitVertexData>] = []
         // Iterate through the nodes of self in topological order
@@ -1562,7 +1562,7 @@ final class Circuit: NSCopying {
         var wires_with_ops_remaining = self.input_map.keys
         while !wires_with_ops_remaining.isEmpty {
             // Create a new circuit graph and populate with regs and basis
-            let new_layer = Circuit()
+            let new_layer = DAGCircuit()
             for (k, v) in self.qregs {
                 try new_layer.add_qreg(k, v)
             }
@@ -1654,7 +1654,7 @@ final class Circuit: NSCopying {
                 continue
             }
             let dOp = nd as! CircuitVertexOpData
-            let new_layer = Circuit()
+            let new_layer = DAGCircuit()
             for (k, v) in self.qregs {
                 try new_layer.add_qreg(k, v)
             }

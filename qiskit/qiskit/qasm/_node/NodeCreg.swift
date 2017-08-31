@@ -23,10 +23,10 @@ children[0] is an indexedid node.
 @objc public final class NodeCreg: Node {
 
     public let indexedid: Node?
-    public var _name: String = ""
-    public var line: Int = 0
-    public var file: String = ""
-    public var index: Int = 0
+    public private(set) var _name: String = ""
+    public private(set) var line: Int = 0
+    public private(set) var file: String = ""
+    public private(set) var index: Int = 0
     
     public init(indexedid: Node?, line: Int, file: String) {
         
@@ -59,12 +59,12 @@ children[0] is an indexedid node.
         return _children
     }
     
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         guard let iid = indexedid else {
             assertionFailure("Invalid NodeQreg Operation")
             return ""
         }
-        return "creg " + iid.qasm() + ";"
+        return "creg " + iid.qasm(prec) + ";"
     }
     
 

@@ -43,7 +43,7 @@ children[0] is a floating point number (not a node).
         return _children
     }
     
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         guard let version = nodeVersion else {
             assertionFailure("Invalid NodeMagic Operation")
             return ""

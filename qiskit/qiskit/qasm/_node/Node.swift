@@ -60,7 +60,7 @@ public enum NodeType: String {
         preconditionFailure("Node children not implemented")
     }
     
-    func qasm() -> String {
+    func qasm(_ prec: Int) -> String {
         preconditionFailure("Node qasm not implemented")
     }
 }

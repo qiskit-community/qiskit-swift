@@ -15,30 +15,31 @@
 
 import Foundation
 
-public enum QasmException: LocalizedError, CustomStringConvertible {
+/**
+ Exception for errors raised by unroller backends.
+ */
+public enum BackendError: LocalizedError, CustomStringConvertible {
+    case errorOpaque(name: String)
+    case qregNotExist(name: String)
+    case cregNotExist(name: String)
+    case gateNotExist(name: String)
+    case gateIncompatible(name: String,args: Int, qubits: Int)
 
-    case errorBinop(qasm: String)
-    case errorPrefix(qasm: String)
-    case errorExternal(qasm: String)
-    case errorLocalParameter(qasm: String)
-    case error(msg: String)
-    
     public var errorDescription: String? {
         return self.description
     }
-    
     public var description: String {
         switch self {
-        case .errorBinop(let qasm):
-            return "internal error: undefined binop: qasm='\(qasm)'"
-        case .errorPrefix(let qasm):
-            return "internal error: undefined prefix: qasm='\(qasm)'"
-        case .errorExternal(let qasm):
-            return "internal error: undefined external: qasm='\(qasm)'"
-        case .errorLocalParameter(let qasm):
-            return "expected local parameter name: qasm='\(qasm)'"
-        case .error(let msg):
-            return msg
+        case .errorOpaque(let name):
+            return "opaque gate \(name) not in basis"
+        case .qregNotExist(let name):
+            return "qreg \(name) does not exist"
+        case .cregNotExist(let name):
+            return "creg \(name) does not exist"
+        case .gateNotExist(let name):
+            return "gate \(name) not in standard extensions"
+        case .gateIncompatible(let name,let args, let qubits):
+            return "gate \(name) signature [\(args),\(qubits)] is incompatible with the standard extensions"
         }
     }
 }

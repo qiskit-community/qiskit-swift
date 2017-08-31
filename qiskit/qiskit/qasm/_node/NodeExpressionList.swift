@@ -22,7 +22,7 @@ children are expression nodes.
 */
 @objc public final class NodeExpressionList: Node {
 
-    public var expressionList: [Node]? = nil
+    public private(set) var expressionList: [Node]? = nil
     
     public init(expression: Node?) {
         super.init()
@@ -43,11 +43,11 @@ children are expression nodes.
         return (expressionList != nil) ? expressionList! : []
     }
     
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         var qasms: [String] = []
         if let elist = expressionList  {
             for node in elist {
-                qasms.append(node.qasm())
+                qasms.append(node.qasm(prec))
             }
         }
         return qasms.joined(separator: ",")

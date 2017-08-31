@@ -66,10 +66,10 @@ public final class Multiple {
             print("Multiple:")
             let qConfig = try Qconfig(APItoken: apiToken)
             let qp = try QuantumProgram(specs: QPS_SPECS)
-            guard let ghz = qp.get_circuit("ghz") else { return }
-            guard let bell = qp.get_circuit("bell") else { return }
-            guard let q = qp.get_quantum_registers("q") else { return }
-            guard let c = qp.get_classical_registers("c") else { return }
+            let ghz = try qp.get_circuit("ghz")
+            let bell = try qp.get_circuit("bell")
+            let q = try qp.get_quantum_register("q")
+            let c = try qp.get_classical_register("c")
 
             // Create a GHZ state
             try ghz.h(q[0])
@@ -98,19 +98,15 @@ public final class Multiple {
             //##############################################################
             try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
 
-            try qp.compile(["bell"], backend:"local_qasm_simulator", shots:1024)
-            try qp.compile(["ghz"], backend:"ibmqx_qasm_simulator", shots:1024,coupling_map:coupling_map)
-
-            qp.run() { (error) in
+            qp.execute(["bell", "ghz"], backend:"ibmqx_qasm_simulator",shots: 1024, coupling_map: coupling_map) { (result,error) in
                 do {
                     if error != nil {
                         print(error!.description)
                         responseHandler?()
                         return
                     }
-                    // print(try qp.get_counts("bell")) // returns error, don't do this
-                    print(try qp.get_counts("bell", backend:"local_qasm_simulator"))
-                    print(try qp.get_counts("ghz"))
+                    print(try result.get_counts("bell"))
+                    print(try result.get_counts("ghz"))
                     print("multiple end")
                 } catch {
                     print(error.localizedDescription)

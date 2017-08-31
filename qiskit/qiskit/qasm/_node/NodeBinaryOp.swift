@@ -23,7 +23,7 @@ import Foundation
  children[2] is the right expression.
  */
 
-@objc public final class NodeBinaryOp: Node {
+@objc public final class NodeBinaryOp: Node, NodeRealValueProtocol {
 
     public let op: String
     public let _children: [Node]
@@ -37,18 +37,45 @@ import Foundation
         return .N_BINARYOP
     }
     
-    public override func qasm() -> String {
+    public override func qasm(_ prec: Int) -> String {
         let lhs = _children[0]
         let rhs = _children[1]
         
-        var lhsqasm = lhs.qasm()
+        var lhsqasm = lhs.qasm(prec)
         if lhs.type == .N_BINARYOP {
             if (lhs as! NodeBinaryOp).op == "+" || (lhs as! NodeBinaryOp).op == "-" {
-                lhsqasm = "(\(lhs.qasm()))"
+                lhsqasm = "(\(lhs.qasm(prec)))"
             }
         }
         
-        return "\(lhsqasm) \(op) \(rhs.qasm())"
+        return "\(lhsqasm) \(op) \(rhs.qasm(prec))"
     }
 
+    public func real(_ nested_scope: [[String:NodeRealValueProtocol]]? = nil) throws -> Double {
+        let operation = self.op
+        guard let lexpr = self._children[0] as? NodeRealValueProtocol else {
+            throw QasmException.errorBinop(qasm: self.qasm(15))
+        }
+        guard let rexpr = self._children[1] as? NodeRealValueProtocol else {
+            throw QasmException.errorBinop(qasm: self.qasm(15))
+        }
+        let lhs = try lexpr.real(nested_scope)
+        let rhs = try rexpr.real(nested_scope)
+        if operation == "+" {
+            return lhs + rhs
+        }
+        if operation == "-" {
+            return lhs - rhs
+        }
+        if operation == "*" {
+            return lhs * rhs
+        }
+        if operation == "/" {
+            return lhs / rhs
+        }
+        if operation == "^" {
+            return pow(lhs,rhs)
+        }
+        throw QasmException.errorBinop(qasm: self.qasm(15))
+    }
 }

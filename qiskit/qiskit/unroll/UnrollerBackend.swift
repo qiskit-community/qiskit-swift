@@ -55,10 +55,13 @@ protocol UnrollerBackend {
 
     /**
      Fundamental single qubit gate.
-     arg is 3-tuple of float parameters.
+
+     arg is 3-tuple of Node expression objects.
      qubit is (regname,idx) tuple.
+     nested_scope is a list of dictionaries mapping expression variables
+     to Node expression objects in order of increasing nesting depth.
      */
-    func u(_ arg: (Double, Double, Double), _ qubit: RegBit) throws
+    func u(_ arg: (NodeRealValueProtocol, NodeRealValueProtocol, NodeRealValueProtocol), _ qubit: RegBit, _ nested_scope:[[String:NodeRealValueProtocol]]?) throws
 
     /**
      Fundamental two qubit gate.
@@ -100,19 +103,25 @@ protocol UnrollerBackend {
 
     /**
      Begin a custom gate.
+
      name is name string.
-     args is list of floating point parameters.
+     args is list of Node expression objects.
      qubits is list of (regname, idx) tuples.
+     nested_scope is a list of dictionaries mapping expression variables
+     to Node expression objects in order of increasing nesting depth.
      */
-    func start_gate(_ name: String, _ args: [Double], _ qubits: [RegBit]) throws
+    func start_gate(_ name: String, _ args: [NodeRealValueProtocol], _ qubits: [RegBit], _ nested_scope:[[String:NodeRealValueProtocol]]?) throws
 
     /**
      End a custom gate.
+
      name is name string.
-     args is list of floating point parameters.
+     args is list of Node expression objects.
      qubits is list of (regname, idx) tuples.
+     nested_scope is a list of dictionaries mapping expression variables
+     to Node expression objects in order of increasing nesting depth..
      */
-    func end_gate(_ name: String, _ args: [Double], _ qubits: [RegBit])
+    func end_gate(_ name: String, _ args: [NodeRealValueProtocol], _ qubits: [RegBit], _ nested_scope:[[String:NodeRealValueProtocol]]?) throws
 
     /**
      Returns the generated circuit.

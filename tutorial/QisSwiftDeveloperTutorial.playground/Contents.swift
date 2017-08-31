@@ -96,15 +96,15 @@ print(circuit.qasm())
 do {
     let qp = try QuantumProgram()
     try qp.set_api(token: apitoken, url: testurl)
-    qp.add_circuit("test", circuit)
+    try qp.add_circuit("test", circuit)
 
-    qp.execute(["test"], backend: "ibmqx_qasm_simulator") { (error) in
+    qp.execute(["test"], backend: "ibmqx_qasm_simulator") { (result,error) in
         if error != nil {
             debugPrint(error!.description)
             return
         }
         do {
-            print(try qp.get_counts("test"))
+            print(try result.get_counts("test"))
         } catch let error {
             print(error.localizedDescription)
         }

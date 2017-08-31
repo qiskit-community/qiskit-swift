@@ -68,10 +68,10 @@ public final class DataMove {
             print("DataMove:")
             let qConfig = try Qconfig(APItoken: apiToken)
             let qp = try QuantumProgram(specs: QPS_SPECS)
-            guard let qc = qp.get_circuit("swapping") else { return }
-            guard let q = qp.get_quantum_registers("q") else { return }
-            guard let r = qp.get_quantum_registers("r") else { return }
-            guard let ans = qp.get_classical_registers("ans") else { return }
+            let qc = try qp.get_circuit("swapping")
+            let q = try qp.get_quantum_register("q")
+            let r = try qp.get_quantum_register("r")
+            let ans = try qp.get_classical_register("ans")
 
             // Set the first bit of q
             try qc.x(q[0])
@@ -97,24 +97,24 @@ public final class DataMove {
             try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
 
             print("First version: not compiled")
-            qp.execute(["swapping"], backend: backend,shots: 1024, coupling_map: nil) { (error) in
+            qp.execute(["swapping"], backend: backend,shots: 1024, coupling_map: nil) { (result,error) in
                 do {
                     if error != nil {
                         print(error!.description)
                         responseHandler?()
                         return
                     }
-                    print(try qp.get_counts("swapping"))
+                    print(try result.get_counts("swapping"))
 
                     print("Second version: compiled to coupling graph")
-                    qp.execute(["swapping"], backend: backend,shots: 1024, coupling_map: coupling_map) { (error) in
+                    qp.execute(["swapping"], backend: backend,shots: 1024, coupling_map: coupling_map) { (result,error) in
                         do {
                             if error != nil {
                                 print(error!.description)
                                 responseHandler?()
                                 return
                             }
-                            print(try qp.get_counts("swapping"))
+                            print(try result.get_counts("swapping"))
 
                             print("Both versions should give the same distribution")
                         } catch {
