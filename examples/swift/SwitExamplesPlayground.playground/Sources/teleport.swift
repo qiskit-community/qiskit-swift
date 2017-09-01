@@ -90,8 +90,6 @@ public final class Teleport {
             try qc.x(q[2]).c_if(c1, 1)
             try qc.measure(q[2], c2[0])
 
-            print(qc.qasm())
-
             //##############################################################
             // Set up the API and execute the program.
             //##############################################################
@@ -99,7 +97,7 @@ public final class Teleport {
 
             print("Experiment does not support feedback, so we use the simulator")
 
-            print("First version: not compiled")
+            print("First version: not mapped")
             qp.execute(["teleport"], backend: backend,shots: 1024, coupling_map: nil) { (result,error) in
                 do {
                     if error != nil {
@@ -107,17 +105,19 @@ public final class Teleport {
                         responseHandler?()
                         return
                     }
+                    print(result)
                     print(try result.get_counts("teleport"))
 
-                    print("Second version: compiled to ibmqx2 coupling graph")
-                    let qobj = try qp.compile(["teleport"], backend: backend, shots: 1024, coupling_map: coupling_map)
-                    qp.run(qobj) { (result,error) in
+                    print("Second version: mapped to qx2 coupling graph")
+                    qp.execute(["teleport"], backend: backend,shots: 1024, coupling_map: coupling_map) { (result,error) in
                         do {
                             if error != nil {
                                 print(error!.description)
                                 responseHandler?()
                                 return
                             }
+                            print(result)
+                            print(try result.get_ran_qasm("teleport"))
                             print(try result.get_counts("teleport"))
                             print("Both versions should give the same distribution")
                         } catch {

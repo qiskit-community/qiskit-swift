@@ -82,14 +82,12 @@ public final class RippleAdd {
             }
             try qc.measure(cout[0], ans[n])
 
-            print(qc.qasm())
-
             //###############################################################
             //# Set up the API and execute the program.
             //###############################################################
             try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
 
-            print("First version: not compiled")
+            print("First version: not mapped")
             qp.execute(["rippleadd"], backend: backend,shots: 1024, coupling_map: nil) { (result,error) in
                 do {
                     if error != nil {
@@ -97,8 +95,9 @@ public final class RippleAdd {
                         responseHandler?()
                         return
                     }
+                    print(result)
                     print(try result.get_counts("rippleadd"))
-                    print("Second version: compiled to 2x8 array coupling graph")
+                    print("Second version: mapped to 2x8 array coupling graph")
                     let qobj = try qp.compile(["rippleadd"], backend: backend, shots: 1024, coupling_map: coupling_map)
                     qp.run(qobj) { (result,error) in
                         do {
@@ -107,6 +106,8 @@ public final class RippleAdd {
                                 responseHandler?()
                                 return
                             }
+                            print(result)
+                            print(try result.get_ran_qasm("rippleadd"))
                             print(try result.get_counts("rippleadd"))
                             print("Both versions should give the same distribution")
                         } catch {

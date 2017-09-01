@@ -58,6 +58,7 @@
 		698C0E041F19259800C99536 /* UnitarySimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698C0E031F19259800C99536 /* UnitarySimulator.swift */; };
 		698C0E061F1925B400C99536 /* QasmSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698C0E051F1925B400C99536 /* QasmSimulator.swift */; };
 		69AE98BF1F1D09670026FA66 /* JsonBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69AE98BE1F1D09670026FA66 /* JsonBackend.swift */; };
+		69B616561F58E63B00E8185B /* NodeGopList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69B616551F58E63B00E8185B /* NodeGopList.swift */; };
 		69BD4B871F0DE4FE001A28F9 /* Double+Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69BD4B861F0DE4FE001A28F9 /* Double+Format.swift */; };
 		69CCAFC81F24D51D00CA4605 /* SimulatorTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69CCAFC71F24D51D00CA4605 /* SimulatorTools.swift */; };
 		69CCAFCA1F24D99A00CA4605 /* NumUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69CCAFC91F24D99A00CA4605 /* NumUtilities.swift */; };
@@ -137,7 +138,6 @@
 		DFBB499B1EF999D5001DE633 /* NodeCustomUnitary.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBB499A1EF999D5001DE633 /* NodeCustomUnitary.swift */; };
 		DFBB499D1EFC1382001DE633 /* NodeGateBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBB499C1EFC1382001DE633 /* NodeGateBody.swift */; };
 		DFBB49E41F0109B8001DE633 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBB49E31F0109B8001DE633 /* Node.swift */; };
-		DFBB49E61F0D714D001DE633 /* NodeGopList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBB49E51F0D714D001DE633 /* NodeGopList.swift */; };
 		DFBB49E81F0E6A98001DE633 /* QiskitProgramTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBB49E71F0E6A98001DE633 /* QiskitProgramTests.swift */; };
 		DFBC4F6C1EC7384200027640 /* qiskit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFBC4F621EC7384100027640 /* qiskit.framework */; };
 		DFBC4F711EC7384200027640 /* QiskitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBC4F701EC7384200027640 /* QiskitTests.swift */; };
@@ -207,6 +207,7 @@
 		698C0E031F19259800C99536 /* UnitarySimulator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UnitarySimulator.swift; path = simulators/UnitarySimulator.swift; sourceTree = "<group>"; };
 		698C0E051F1925B400C99536 /* QasmSimulator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QasmSimulator.swift; path = simulators/QasmSimulator.swift; sourceTree = "<group>"; };
 		69AE98BE1F1D09670026FA66 /* JsonBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = JsonBackend.swift; path = unroll/JsonBackend.swift; sourceTree = "<group>"; };
+		69B616551F58E63B00E8185B /* NodeGopList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeGopList.swift; path = _node/NodeGopList.swift; sourceTree = "<group>"; };
 		69BD4B861F0DE4FE001A28F9 /* Double+Format.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Double+Format.swift"; path = "datastructures/Double+Format.swift"; sourceTree = "<group>"; };
 		69CCAFC71F24D51D00CA4605 /* SimulatorTools.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SimulatorTools.swift; path = simulators/SimulatorTools.swift; sourceTree = "<group>"; };
 		69CCAFC91F24D99A00CA4605 /* NumUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NumUtilities.swift; path = datastructures/NumUtilities.swift; sourceTree = "<group>"; };
@@ -288,7 +289,6 @@
 		DFBB499A1EF999D5001DE633 /* NodeCustomUnitary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeCustomUnitary.swift; path = _node/NodeCustomUnitary.swift; sourceTree = "<group>"; };
 		DFBB499C1EFC1382001DE633 /* NodeGateBody.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeGateBody.swift; path = _node/NodeGateBody.swift; sourceTree = "<group>"; };
 		DFBB49E31F0109B8001DE633 /* Node.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Node.swift; path = _node/Node.swift; sourceTree = "<group>"; };
-		DFBB49E51F0D714D001DE633 /* NodeGopList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodeGopList.swift; sourceTree = "<group>"; };
 		DFBB49E71F0E6A98001DE633 /* QiskitProgramTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QiskitProgramTests.swift; sourceTree = "<group>"; };
 		DFBC4F621EC7384100027640 /* qiskit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = qiskit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFBC4F6B1EC7384200027640 /* qiskitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = qiskitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -367,7 +367,7 @@
 				DF8E1CF41EE5037D00DCC35C /* NodeExternal.swift */,
 				DF8E1CF21EE5036300DCC35C /* NodeGate.swift */,
 				DFBB499C1EFC1382001DE633 /* NodeGateBody.swift */,
-				DFBB49E51F0D714D001DE633 /* NodeGopList.swift */,
+				69B616551F58E63B00E8185B /* NodeGopList.swift */,
 				DF8E1D021EE5048300DCC35C /* NodeId.swift */,
 				DF8E1CEC1EE502ED00DCC35C /* NodeIdList.swift */,
 				DF8E1CEA1EE502D200DCC35C /* NodeIf.swift */,
@@ -760,6 +760,7 @@
 				69E335511ECA1BC00027271D /* QuantumRegister.swift in Sources */,
 				691541811F4E1C4400B3E12D /* Result.swift in Sources */,
 				DF79735D1ED071F600C01457 /* parser.ym in Sources */,
+				69B616561F58E63B00E8185B /* NodeGopList.swift in Sources */,
 				DF8E1CFF1EE503E800DCC35C /* NodeBinaryOp.swift in Sources */,
 				69CED61A1F1FA2B100FA8180 /* Random.swift in Sources */,
 				DF8E1CD31EE4A27B00DCC35C /* NodeProgram.swift in Sources */,
@@ -796,7 +797,6 @@
 				696613221F4C9E920031A146 /* DAGBackend.swift in Sources */,
 				69DE36071ECD150300EC4756 /* CSwap.swift in Sources */,
 				69D310881ECA182000B3E752 /* Request.swift in Sources */,
-				DFBB49E61F0D714D001DE633 /* NodeGopList.swift in Sources */,
 				69CED61C1F1FAA3200FA8180 /* Complex.swift in Sources */,
 				DF8E1D031EE5048300DCC35C /* NodeId.swift in Sources */,
 				69467F661F4C7B2C009E7E03 /* GateData.swift in Sources */,

@@ -142,6 +142,10 @@ public final class QFT {
                         responseHandler?()
                         return
                     }
+                    print(result)
+                    print(try result.get_ran_qasm("qft3"))
+                    print(try result.get_ran_qasm("qft4"))
+                    print(try result.get_ran_qasm("qft5"))
                     print(try result.get_counts("qft3"))
                     print(try result.get_counts("qft4"))
                     print(try result.get_counts("qft5"))
@@ -153,6 +157,8 @@ public final class QFT {
                                 responseHandler?()
                                 return
                             }
+                            print(result)
+                            print(try result.get_ran_qasm("qft3"))
                             print(try result.get_counts("qft3"))
                         } catch {
                             print(error.localizedDescription)

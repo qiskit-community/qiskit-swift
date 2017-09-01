@@ -19,14 +19,10 @@ import XCPlayground
 
 var apitoken = "NONE"
 
-DataMove.dataMove(apitoken) {
-    GHZ.ghz(apitoken) {
-        Multiple.multiple(apitoken) {
-            QFT.qft(apitoken) {
-                RippleAdd.rippleAdd(apitoken) {
-                    Teleport.teleport(apitoken)
-                }
-            }
+GHZ.ghz(apitoken) {
+    QFT.qft(apitoken) {
+        RippleAdd.rippleAdd(apitoken) {
+            Teleport.teleport(apitoken)
         }
     }
 }

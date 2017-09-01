@@ -35,7 +35,7 @@ import Foundation
              ...
         ]
  */
-public final class Result {
+public final class Result: CustomStringConvertible {
 
     private let __qobj: [String:Any]
     private let __result: [String:Any]
@@ -48,6 +48,20 @@ public final class Result {
     init(_ qobj_result: [String:Any], _ qobj: [String:Any]) {
         self.__qobj = qobj
         self.__result = qobj_result
+    }
+
+    /**
+     Get the status of the run.
+     Returns:
+     the status of the results.
+     */
+    public var description: String {
+        do {
+            return try self.status()
+        }
+        catch {
+            return ""
+        }
     }
 
     /**

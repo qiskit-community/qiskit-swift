@@ -72,7 +72,6 @@ public final class GHZ {
             for i in 0..<5 {
                 try qc.measure(q[i], c[i])
             }
-            print(qc.qasm())
 
             //##############################################################
             // Set up the API and execute the program.
@@ -80,7 +79,7 @@ public final class GHZ {
             try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
 
             print("First version: not compiled")
-            print("no compilation, simulator")
+            print("no mapping, simulator")
             qp.execute(["ghz"], backend: "ibmqx_qasm_simulator",shots: 1024, coupling_map: nil) { (result,error) in
                 do {
                     if error != nil {
@@ -88,10 +87,11 @@ public final class GHZ {
                         responseHandler?()
                         return
                     }
+                    print(result)
                     print(try result.get_counts("ghz"))
 
-                    print("Second version: compiled to qc5qv2 coupling graph")
-                    print("compilation to \(backend), simulator")
+                    print("Second version: map to qx2 coupling graph and simulate")
+                    print("map to \(backend), simulator")
                     qp.execute(["ghz"], backend: "ibmqx_qasm_simulator",shots: 1024, coupling_map: coupling_map) { (result,error) in
                         do {
                             if error != nil {
@@ -99,10 +99,11 @@ public final class GHZ {
                                 responseHandler?()
                                 return
                             }
+                            print(result)
                             print(try result.get_counts("ghz"))
 
-                            print("Third version: compiled to qc5qv2 coupling graph")
-                            print("compilation to \(backend), local qasm simulator")
+                            print("Third version: map to qx2 coupling graph and simulate locally")
+                            print("map to \(backend), local qasm simulator")
                             qp.execute(["ghz"], backend: "local_qasm_simulator",shots: 1024, coupling_map: coupling_map) { (result,error) in
                                 do {
                                     if error != nil {
@@ -110,10 +111,11 @@ public final class GHZ {
                                         responseHandler?()
                                         return
                                     }
+                                    print(result)
                                     print(try result.get_counts("ghz"))
 
-                                    print("Fourth version: compiled to qc5qv2 coupling graph and run on qx5q")
-                                    print("compilation to \(backend), backend")
+                                    print("Fourth version: map to qx2 coupling graph and run on qx2")
+                                    print("map to \(backend), backend")
                                     qp.execute(["ghz"], backend: backend,shots: 1024, timeout:120, coupling_map: coupling_map) { (result,error) in
                                         do {
                                             if error != nil {
@@ -121,6 +123,7 @@ public final class GHZ {
                                                 responseHandler?()
                                                 return
                                             }
+                                            print(result)
                                             print(try result.get_counts("ghz"))
                                             print("ghz end")
                                         } catch {
