@@ -86,6 +86,6 @@ final class QasmCppSimulator: Simulator {
     }
 
     func run(_ silent: Bool) throws -> [String:Any] {
-        preconditionFailure("CPPSimulator run not implemented")
+        throw SimulatorError.notImplemented(backend: QasmCppSimulator.__configuration["name"] as! String)
     }
 }

@@ -37,8 +37,8 @@ import Foundation
  */
 public final class Result: CustomStringConvertible {
 
-    private let __qobj: [String:Any]
-    private let __result: [String:Any]
+    private var __qobj: [String:Any]
+    private var __result: [String:Any]
 
     init() {
         self.__qobj = [:]
@@ -62,6 +62,68 @@ public final class Result: CustomStringConvertible {
         catch {
             return ""
         }
+    }
+
+    /**
+     Append a Result object to current Result object.
+     Arg:
+        other (Result): a Result object to append.
+     Returns:
+        The current object with appended results.
+     */
+    public static func += (left: inout Result, right: Result) throws {
+        if let leftConfig = left.__qobj["config"] as? [String:Any],
+            let rightConfig = right.__qobj["config"] as? [String:Any] {
+            if NSDictionary(dictionary: leftConfig).isEqual(to: rightConfig) {
+                if let leftId = left.__qobj["id"] as? String {
+                    left.__qobj["id"] = [leftId]
+                }
+                if var leftIds = left.__qobj["id"] as? [String] {
+                    if let rightId = right.__qobj["id"] as? String {
+                        leftIds.append(rightId)
+                    }
+                    else if let rightIds = right.__qobj["id"] as? [String] {
+                        leftIds.append(contentsOf:rightIds)
+                    }
+                    left.__qobj["id"] = leftIds
+                }
+                if let rightCircuits = right.__qobj["circuits"] as? [Any] {
+                    if var leftCircuits = left.__qobj["circuits"] as? [Any] {
+                        leftCircuits.append(contentsOf: rightCircuits)
+                        left.__qobj["circuits"] = leftCircuits
+                    }
+                    else {
+                        left.__qobj["circuits"] = rightCircuits
+                    }
+                }
+                if let rightResults = right.__result["result"] as? [Any] {
+                    if var leftResults = left.__result["result"] as? [Any] {
+                        leftResults.append(contentsOf: rightResults)
+                        left.__result["result"] = leftResults
+                    }
+                    else {
+                        left.__result["result"] = rightResults
+                    }
+                }
+                return
+            }
+        }
+        throw QISKitError.invalidResultsCombine
+    }
+
+    /**
+     Combine Result objects.
+        Note that the qobj id of the returned result will be the same as the
+        first result.
+     Arg:
+        other (Result): a Result object to combine.
+     Returns:
+        A new Result object consisting of combined objects.
+     */
+    public static func + (left: Result, right: Result) throws -> Result {
+        var ret =  Result(left.__result, left.__qobj)
+        try ret += right
+        return ret
     }
 
     /**

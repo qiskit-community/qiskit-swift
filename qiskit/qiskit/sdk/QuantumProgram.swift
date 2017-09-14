@@ -526,6 +526,7 @@ public final class QuantumProgram {
                 as the quantum experience.
             URL (str): The url used for online backend such as the quantum
                 experience.
+            Verify (Boolean): If False, ignores SSL certificates errors.
         Returns:
             Nothing but fills __api, and __api_config
      */

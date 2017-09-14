@@ -214,6 +214,9 @@ public final class IBMQuantumExperience {
                         if let additionalData = data["additionalData"] {
                             result["extraInfo"] = additionalData
                         }
+                        if let calibration = execution["calibration"] {
+                            result["calibration"] = calibration
+                        }
                         if let cregLabels = data["cregLabels"] {
                             result["creg_labels"] = cregLabels
                         }

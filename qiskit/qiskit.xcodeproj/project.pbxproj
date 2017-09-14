@@ -50,7 +50,6 @@
 		696613261F4CD08B0031A146 /* Swap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696613251F4CD08B0031A146 /* Swap.swift */; };
 		6974E5951ECA1EF300D1AE97 /* QISKitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6974E5941ECA1EF300D1AE97 /* QISKitError.swift */; };
 		6977A01E1F05762A00CF52F2 /* libs.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6977A01D1F05762A00CF52F2 /* libs.bundle */; };
-		697BEDB11ED0844E00AB9A86 /* GatesTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697BEDB01ED0844E00AB9A86 /* GatesTools.swift */; };
 		697D36AE1EE3493B00557541 /* OrderedDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697D36AD1EE3493B00557541 /* OrderedDictionary.swift */; };
 		698C0DFE1F191CAA00C99536 /* LocalSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698C0DFD1F191CAA00C99536 /* LocalSimulator.swift */; };
 		698C0E001F19253C00C99536 /* Simulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698C0DFF1F19253C00C99536 /* Simulator.swift */; };
@@ -199,7 +198,6 @@
 		696613251F4CD08B0031A146 /* Swap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Swap.swift; path = extensions/Swap.swift; sourceTree = "<group>"; };
 		6974E5941ECA1EF300D1AE97 /* QISKitError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QISKitError.swift; path = sdk/QISKitError.swift; sourceTree = "<group>"; };
 		6977A01D1F05762A00CF52F2 /* libs.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = libs.bundle; sourceTree = "<group>"; };
-		697BEDB01ED0844E00AB9A86 /* GatesTools.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GatesTools.swift; path = extensions/GatesTools.swift; sourceTree = "<group>"; };
 		697D36AD1EE3493B00557541 /* OrderedDictionary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OrderedDictionary.swift; path = datastructures/OrderedDictionary.swift; sourceTree = "<group>"; };
 		698C0DFD1F191CAA00C99536 /* LocalSimulator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LocalSimulator.swift; path = simulators/LocalSimulator.swift; sourceTree = "<group>"; };
 		698C0DFF1F19253C00C99536 /* Simulator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Simulator.swift; path = simulators/Simulator.swift; sourceTree = "<group>"; };
@@ -408,17 +406,16 @@
 			isa = PBXGroup;
 			children = (
 				693A9F411ECA363D00112AC9 /* Barrier.swift */,
+				69DBD72F1ECA48BE0099CB1D /* CCX.swift */,
 				69F7B61A1F107C9100FDE7C4 /* CH.swift */,
 				69F7B61C1F107CB100FDE7C4 /* CRZ.swift */,
+				69DE36061ECD150300EC4756 /* CSwap.swift */,
 				69F7B61E1F107CE500FDE7C4 /* CU1.swift */,
 				69F7B6201F107D0100FDE7C4 /* CU3.swift */,
-				69DBD72F1ECA48BE0099CB1D /* CCX.swift */,
-				69DE36061ECD150300EC4756 /* CSwap.swift */,
 				693A9F431ECA366000112AC9 /* CX.swift */,
 				69DE36081ECD152100EC4756 /* CXBase.swift */,
 				69DE360A1ECD153D00EC4756 /* CY.swift */,
 				69DE360C1ECD155000EC4756 /* CZ.swift */,
-				697BEDB01ED0844E00AB9A86 /* GatesTools.swift */,
 				69E597B01ECA99B300A321F5 /* H.swift */,
 				69DE36221ECD1A1500EC4756 /* Header.swift */,
 				69DE360E1ECD188000EC4756 /* Iden.swift */,
@@ -470,18 +467,18 @@
 		69D310681ECA16E400B3E752 /* sdk */ = {
 			isa = PBXGroup;
 			children = (
+				69E335521ECA1BD20027271D /* ClassicalRegister.swift */,
+				69D310731ECA180500B3E752 /* CompositeGate.swift */,
+				69D3106E1ECA180500B3E752 /* Gate.swift */,
 				69D3108E1ECA192000B3E752 /* Instruction.swift */,
 				6913D0A11ECE41D6003C5FD3 /* InstructionSet.swift */,
 				69D3108C1ECA18B800B3E752 /* Measure.swift */,
-				69D3106A1ECA180500B3E752 /* QuantumProgram.swift */,
-				69D3106E1ECA180500B3E752 /* Gate.swift */,
-				69D3106F1ECA180500B3E752 /* QuantumCircuit.swift */,
-				69D310711ECA180500B3E752 /* Reset.swift */,
-				69D310731ECA180500B3E752 /* CompositeGate.swift */,
-				69E3354E1ECA1B8D0027271D /* Register.swift */,
-				69E335501ECA1BC00027271D /* QuantumRegister.swift */,
-				69E335521ECA1BD20027271D /* ClassicalRegister.swift */,
 				6974E5941ECA1EF300D1AE97 /* QISKitError.swift */,
+				69D3106F1ECA180500B3E752 /* QuantumCircuit.swift */,
+				69D3106A1ECA180500B3E752 /* QuantumProgram.swift */,
+				69E335501ECA1BC00027271D /* QuantumRegister.swift */,
+				69E3354E1ECA1B8D0027271D /* Register.swift */,
+				69D310711ECA180500B3E752 /* Reset.swift */,
 				691541801F4E1C4400B3E12D /* Result.swift */,
 				69E88AEC1F4F13E40089D784 /* ResultError.swift */,
 			);
@@ -780,7 +777,6 @@
 				692DBE0A1EE7031D0032F6CF /* CircuitBackend.swift in Sources */,
 				69458A2A1EE5A6A10027F5A6 /* CouplingError.swift in Sources */,
 				692DBDFE1EE6E4440032F6CF /* Mapping.swift in Sources */,
-				697BEDB11ED0844E00AB9A86 /* GatesTools.swift in Sources */,
 				69E597AF1ECA980F00A321F5 /* X.swift in Sources */,
 				69458A2C1EE5B1320027F5A6 /* CouplingVertexData.swift in Sources */,
 				DFBB49991EF98011001DE633 /* QasmException.swift in Sources */,

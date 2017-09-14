@@ -55,6 +55,7 @@ public enum QISKitError: LocalizedError, CustomStringConvertible {
     case noQASM(name: String)
     case noData(name: String)
     case noCounts(name: String)
+    case invalidResultsCombine
     case internalError(error: Error)
 
     public var errorDescription: String? {
@@ -132,6 +133,8 @@ public enum QISKitError: LocalizedError, CustomStringConvertible {
             return "No data for circuit \(name)"
         case .noCounts(let name):
             return "'No counts for circuit \(name)"
+        case .invalidResultsCombine:
+            return "Result objects have different configs and cannot be combined."
         case .internalError(let error):
             return error.localizedDescription
         }

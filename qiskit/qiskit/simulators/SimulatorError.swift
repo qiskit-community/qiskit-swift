@@ -21,6 +21,7 @@ Exception for errors raised by the Simulator object.
 public enum SimulatorError: LocalizedError, CustomStringConvertible {
     case unknownSimulator(name: String)
     case unrecognizedOperation(backend: String, operation: String)
+    case notImplemented(backend: String)
    
     public var errorDescription: String? {
         return self.description
@@ -31,6 +32,8 @@ public enum SimulatorError: LocalizedError, CustomStringConvertible {
             return "Unknown simulator '\(name)'"
         case .unrecognizedOperation(let backend,let operation):
             return "\(backend) encountered unrecognized operation '\(operation)'"
+        case .notImplemented(let backend):
+            return "\(backend) not implemented"
         }
     }
 }
