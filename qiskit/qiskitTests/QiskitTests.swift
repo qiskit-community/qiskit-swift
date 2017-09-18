@@ -344,7 +344,7 @@ class QiskitTests: XCTestCase {
     private func runJob(_ qConfig: Qconfig, _ circuit: QuantumCircuit, _ device: String) throws {
         let qp = try QuantumProgram()
         try qp.add_circuit("circuit",circuit)
-        try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
+        try qp.set_api(token: QiskitTests.APItoken, url: qConfig.url.absoluteString)
 
         let asyncExpectation = self.expectation(description: "runJob")
         qp.execute(["circuit"], backend: device) { (result,error) in

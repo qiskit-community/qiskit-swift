@@ -526,13 +526,12 @@ public final class QuantumProgram {
                 as the quantum experience.
             URL (str): The url used for online backend such as the quantum
                 experience.
-            Verify (Boolean): If False, ignores SSL certificates errors.
         Returns:
             Nothing but fills __api, and __api_config
      */
-    public func set_api(token: String, url: String, verify: Bool = true) throws {
+    public func set_api(token: String, url: String) throws {
         self.__api_config = try APIConfig(token,url)
-        self.__api = try IBMQuantumExperience(self.__api_config.token, try Qconfig(url: self.__api_config.url.absoluteString),verify)
+        self.__api = try IBMQuantumExperience(self.__api_config.token, try Qconfig(url: self.__api_config.url.absoluteString))
     }
 
     /**
@@ -722,7 +721,7 @@ public final class QuantumProgram {
                 return
             }
             if backends.contains(backend) {
-                self.__api.backend_status(backend,responseHandler: responseHandler)
+                self.__api.backend_status(backend: backend,responseHandler: responseHandler)
                 return
             }
             if self.local_backends().contains(backend) {
@@ -806,7 +805,7 @@ public final class QuantumProgram {
                 return
             }
             if backends.contains(backend) {
-                self.__api.backend_calibration(backend) { (calibrations,error) in
+                self.__api.backend_calibration(backend: backend) { (calibrations,error) in
                     if error != nil {
                         responseHandler(nil,error)
                         return
@@ -844,7 +843,7 @@ public final class QuantumProgram {
                 return
             }
             if backends.contains(backend) {
-                self.__api.backend_parameters(backend) { (parameters,error) in
+                self.__api.backend_parameters(backend: backend) { (parameters,error) in
                     if error != nil {
                         responseHandler(nil,error)
                         return

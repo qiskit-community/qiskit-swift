@@ -49,7 +49,7 @@ public final class RippleAdd {
             print()
             print("#################################################################")
             print("RippleAdd:")
-            let qConfig = try Qconfig(APItoken: apiToken)
+            let qConfig = try Qconfig()
             let qp = try QuantumProgram(specs: QPS_SPECS)
             var qc = try qp.get_circuit("rippleadd")
             let a = try qp.get_quantum_register("a")
@@ -85,7 +85,7 @@ public final class RippleAdd {
             //###############################################################
             //# Set up the API and execute the program.
             //###############################################################
-            try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
+            try qp.set_api(token: apiToken, url: qConfig.url.absoluteString)
 
             print("First version: not mapped")
             qp.execute(["rippleadd"], backend: backend,shots: 1024, coupling_map: nil) { (result,error) in

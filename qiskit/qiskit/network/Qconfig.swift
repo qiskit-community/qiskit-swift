@@ -21,17 +21,31 @@ import Foundation
 public final class Qconfig {
 
     public static let BASEURL: String = "https://quantumexperience.ng.bluemix.net/api/"
+    public static let CLIENT_APPLICATION: String = "qiskit-sdk-swift"
 
     /// Target URL
     public var url: URL
-    /// User API Token
-    public var APItoken: String
+    /// User Access Token
+    public var access_token: String?
+    /// User User ID
+    public var user_id: String?
+    /// Client Application
+    public var client_application: String
+    /// Client email
+    public var email: String? = nil
+    /// Client password
+    public var password: String? = nil
 
-    public init(APItoken: String = "", url: String = BASEURL) throws {
-        self.APItoken = APItoken
+    public init(access_token: String? = nil,
+                user_id: String? = nil,
+                url: String = BASEURL,
+                client_application: String = CLIENT_APPLICATION) throws {
+        self.access_token = access_token
+        self.user_id = user_id
         guard let u = URL(string: url) else {
             throw IBMQuantumExperienceError.invalidURL(url: url)
         }
         self.url = u
+        self.client_application = client_application
     }
 }

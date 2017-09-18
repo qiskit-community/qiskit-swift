@@ -53,7 +53,7 @@ class UnrollerTests: XCTestCase {
             UnrollerTests.APItoken = token
         }
         do {
-            UnrollerTests.config = try Qconfig(APItoken: UnrollerTests.APItoken, url: TESTURL)
+            UnrollerTests.config = try Qconfig(url: TESTURL)
         } catch let error {
             XCTFail("\(error)")
         }
@@ -115,7 +115,7 @@ class UnrollerTests: XCTestCase {
         //###############################################################
         //# Set up the API and execute the program.
         //###############################################################
-        try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
+        try qp.set_api(token: UnrollerTests.APItoken, url: qConfig.url.absoluteString)
 
         let QASM_source = try qp.get_qasm("rippleadd")
         print(QASM_source)

@@ -38,6 +38,8 @@ public enum IBMQuantumExperienceError: LocalizedError, CustomStringConvertible {
     case missingBackends
     case badBackendError(backend: String)
     case retriesPositive
+    case invalidCredentials
+    case userGroupError(user_group: String)
     case internalError(error: Error)
 
     public var errorDescription: String? {
@@ -81,6 +83,10 @@ public enum IBMQuantumExperienceError: LocalizedError, CustomStringConvertible {
             return "Could not find backend '\(backend)' available."
         case .retriesPositive():
             return "post retries must be positive integer"
+        case .invalidCredentials():
+            return "Not credentials valid"
+        case .userGroupError(let user_group):
+            return "User group doesnt exist \(user_group)"
         case .internalError(let error):
             return error.localizedDescription
         }

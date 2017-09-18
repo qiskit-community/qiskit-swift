@@ -55,7 +55,7 @@ public final class GHZ {
             print()
             print("#################################################################")
             print("GHZ:")
-            let qConfig = try Qconfig(APItoken: apiToken)
+            let qConfig = try Qconfig()
             let qp = try QuantumProgram(specs: QPS_SPECS)
             let qc = try qp.get_circuit("ghz")
             let q = try qp.get_quantum_register("q")
@@ -76,7 +76,7 @@ public final class GHZ {
             //##############################################################
             // Set up the API and execute the program.
             //##############################################################
-            try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
+            try qp.set_api(token: apiToken, url: qConfig.url.absoluteString)
 
             print("First version: not compiled")
             print("no mapping, simulator")

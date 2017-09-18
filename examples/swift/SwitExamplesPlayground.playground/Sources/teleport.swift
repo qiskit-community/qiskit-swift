@@ -61,7 +61,7 @@ public final class Teleport {
             print()
             print("#################################################################")
             print("Teleport:")
-            let qConfig = try Qconfig(APItoken: apiToken)
+            let qConfig = try Qconfig()
             let qp = try QuantumProgram(specs: QPS_SPECS)
             let qc = try qp.get_circuit("teleport")
             let q = try qp.get_quantum_register("q")
@@ -93,7 +93,7 @@ public final class Teleport {
             //##############################################################
             // Set up the API and execute the program.
             //##############################################################
-            try qp.set_api(token: qConfig.APItoken, url: qConfig.url.absoluteString)
+            try qp.set_api(token: apiToken, url: qConfig.url.absoluteString)
 
             print("Experiment does not support feedback, so we use the simulator")
 
