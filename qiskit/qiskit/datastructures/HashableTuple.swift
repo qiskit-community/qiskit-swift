@@ -35,7 +35,7 @@ public struct HashableTuple<A:Hashable,B:Hashable> : Hashable, Equatable, Custom
         return "(\(self.one), \(self.two))"
     }
 
-    public static func ==<A:Hashable,B:Hashable>(lhs: HashableTuple<A,B>, rhs: HashableTuple<A,B>) -> Bool {
+    public static func ==(lhs: HashableTuple<A,B>, rhs: HashableTuple<A,B>) -> Bool {
         return lhs.one == rhs.one && lhs.two == rhs.two
     }
 }

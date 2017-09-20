@@ -53,7 +53,7 @@ final class GraphVertex<VertexDataType: NSCopying> : Hashable, Equatable {
         return copy
     }
 
-    public static func ==<VertexDataType: NSCopying>(lhs: GraphVertex<VertexDataType>, rhs: GraphVertex<VertexDataType>) -> Bool {
+    public static func ==(lhs: GraphVertex<VertexDataType>, rhs: GraphVertex<VertexDataType>) -> Bool {
         return lhs.key == rhs.key
     }
 }

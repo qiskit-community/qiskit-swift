@@ -87,7 +87,7 @@ public final class QFT {
         }
     }
 
-    public class func qft(_ apiToken: String, _ responseHandler: ((Void) -> Void)? = nil) {
+    public class func qft(_ apiToken: String, _ responseHandler: (() -> Void)? = nil) {
         do {
             print()
             print("#################################################################")

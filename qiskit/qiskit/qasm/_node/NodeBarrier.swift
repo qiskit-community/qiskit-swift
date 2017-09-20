@@ -20,11 +20,11 @@ import Foundation
  Node for an OPENQASM barrier statement.
  children[0] is a primarylist node.
  */
-@objc public final class NodeBarrier: Node {
+public final class NodeBarrier: Node {
 
     public let list: Node?
     
-    public init(list: Node?) {
+    @objc public init(list: Node?) {
         self.list = list
     }
 

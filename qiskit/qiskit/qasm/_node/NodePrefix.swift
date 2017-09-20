@@ -20,12 +20,12 @@ Node for an OPENQASM prefix expression.
 children[0] is a prefix string such as '-'.
 children[1] is an expression node.
 */
-@objc public final class NodePrefix: Node, NodeRealValueProtocol {
+public final class NodePrefix: Node, NodeRealValueProtocol {
 
     public let op: String
     public let _children: [Node]
 
-    public init(op: String, children: [Node]) {
+    @objc public init(op: String, children: [Node]) {
         self.op = op
         self._children = children
     }

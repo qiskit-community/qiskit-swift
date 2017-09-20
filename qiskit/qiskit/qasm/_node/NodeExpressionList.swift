@@ -20,18 +20,18 @@ import Foundation
 Node for an OPENQASM expression list.
 children are expression nodes.
 */
-@objc public final class NodeExpressionList: Node {
+public final class NodeExpressionList: Node {
 
     public private(set) var expressionList: [Node]? = nil
     
-    public init(expression: Node?) {
+    @objc public init(expression: Node?) {
         super.init()
         if let exp = expression {
             self.expressionList = [exp]
         }
     }
 
-    public func addExpression(exp: Node) {
+    @objc public func addExpression(exp: Node) {
         expressionList?.insert(exp, at: 0)
     }
     

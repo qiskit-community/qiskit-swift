@@ -21,14 +21,14 @@ import Foundation
  children[0] is an id node with the name of the function.
  children[1] is an expression node.
  */
-@objc public final class NodeExternal: Node, NodeRealValueProtocol {
+public final class NodeExternal: Node, NodeRealValueProtocol {
 
     public static let externalFunctions = ["sin", "cos", "tan", "exp", "ln", "sqrt"]
 
     public let operation: String
     public let expression: Node?
     
-    public init(operation: String, expression: Node?) {
+    @objc public init(operation: String, expression: Node?) {
         self.operation = operation
         self.expression = expression
     }

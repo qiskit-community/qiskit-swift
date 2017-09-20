@@ -21,7 +21,7 @@ import Foundation
  The node has no children but has fields name, line, and file.
  There is a flag is_bit that is set when XXXXX to help with scoping.
  */
-@objc public final class NodeId: Node, NodeRealValueProtocol {
+public final class NodeId: Node, NodeRealValueProtocol {
 
     public private(set) var _name: String = ""
     public private(set) var line: Int = 0
@@ -29,7 +29,7 @@ import Foundation
     public private(set) var index: Int = 0  // FIXME where does the index come from?
     public private(set) var is_bit: Bool = false
     
-    public init(identifier: String, line: Int) {
+    @objc public init(identifier: String, line: Int) {
         self._name = identifier
         self.line = line
         self.file = "" // FIXME find the name

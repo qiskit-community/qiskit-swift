@@ -21,12 +21,11 @@ import Foundation
  children is a list of gate operation nodes.
  These are one of barrier, custom_unitary, U, or CX.
 */
-
-@objc public final class NodeGateBody: Node {
+public final class NodeGateBody: Node {
     
     public let goplist: Node?
     
-    public init(goplist: Node?) {
+    @objc public init(goplist: Node?) {
         self.goplist = goplist
     }
     

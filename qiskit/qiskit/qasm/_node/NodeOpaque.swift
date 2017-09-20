@@ -21,7 +21,7 @@ import Foundation
  and children[2] is an idlist node.
  Otherwise, children[1] is an idlist node.
  */
-@objc public final class NodeOpaque: Node {
+public final class NodeOpaque: Node {
 
     public let identifier: Node?
     public let arguments: Node?
@@ -45,7 +45,7 @@ import Foundation
     }
 
     
-    public init(identifier: Node?, arguments: Node?, bitlist: Node?) {
+    @objc public init(identifier: Node?, arguments: Node?, bitlist: Node?) {
         self.identifier = identifier
         self.arguments = arguments
         self.bitlist = bitlist

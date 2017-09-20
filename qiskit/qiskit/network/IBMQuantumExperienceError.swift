@@ -59,15 +59,15 @@ public enum IBMQuantumExperienceError: LocalizedError, CustomStringConvertible {
             return url
         case .invalidResponseData:
             return "Invalid response data"
-        case .missingTokenId():
+        case .missingTokenId:
             return "Missing TokenId"
-        case .missingJobId():
+        case .missingJobId:
             return "Missing JobId"
-        case .missingExecutionId():
+        case .missingExecutionId:
             return "Missing ExecutionId"
-        case .missingStatus():
+        case .missingStatus:
             return "Missing Status"
-        case .timeout():
+        case .timeout:
             return "Timeout"
         case .missingBackend(let backend):
             return "Backend \(backend) does not exits in Quantum Experience."
@@ -75,15 +75,15 @@ public enum IBMQuantumExperienceError: LocalizedError, CustomStringConvertible {
             return "Backend \(backend) does not exits"
         case .errorSeed(let backend):
             return "No seed allowed in \(backend)"
-        case .errorSeedLength():
+        case .errorSeedLength:
             return "No seed allowed. Max 10 digits."
-        case .missingBackends():
+        case .missingBackends:
             return "Missing backends"
         case .badBackendError(let backend):
             return "Could not find backend '\(backend)' available."
-        case .retriesPositive():
+        case .retriesPositive:
             return "post retries must be positive integer"
-        case .invalidCredentials():
+        case .invalidCredentials:
             return "Not credentials valid"
         case .userGroupError(let user_group):
             return "User group doesnt exist \(user_group)"

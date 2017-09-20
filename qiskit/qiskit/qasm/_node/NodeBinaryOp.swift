@@ -23,12 +23,12 @@ import Foundation
  children[2] is the right expression.
  */
 
-@objc public final class NodeBinaryOp: Node, NodeRealValueProtocol {
+public final class NodeBinaryOp: Node, NodeRealValueProtocol {
 
     public let op: String
     public let _children: [Node]
     
-    public init(op: String, children: [Node]) {
+    @objc public init(op: String, children: [Node]) {
         self.op = op
         self._children = children
     }

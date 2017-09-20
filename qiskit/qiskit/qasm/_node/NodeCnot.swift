@@ -21,12 +21,12 @@ import Foundation
  children[0], children[1] are id nodes if CX is inside a gate body,
  otherwise they are primary nodes.
  */
-@objc public final class NodeCnot: Node {
+public final class NodeCnot: Node {
 
     public let arg1: Node?
     public let arg2: Node?
     
-    public init(arg1: Node?, arg2: Node?) {
+    @objc public init(arg1: Node?, arg2: Node?) {
         self.arg1 = arg1
         self.arg2 = arg2
     }

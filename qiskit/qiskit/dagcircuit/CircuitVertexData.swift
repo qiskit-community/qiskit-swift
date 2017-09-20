@@ -19,7 +19,7 @@ class CircuitVertexData: NSCopying {
     let type: String
 
     init(type: String) {
-        if type(of: self) == CircuitVertexData.self {
+        if Swift.type(of: self) == CircuitVertexData.self {
             fatalError("Abstract class instantiation.")
         }
         self.type = type
@@ -34,7 +34,7 @@ class CircuitVertexInOutData: CircuitVertexData {
     var name: RegBit
 
     init(name: RegBit, type: String) {
-        if type(of: self) == CircuitVertexInOutData.self {
+        if Swift.type(of: self) == CircuitVertexInOutData.self {
             fatalError("Abstract class instantiation.")
         }
         self.name = name

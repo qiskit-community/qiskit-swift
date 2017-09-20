@@ -19,12 +19,11 @@ import Foundation
 Node for an OPENQASM real number.
 This node has no children. The data is in the value field.
 */
-
-@objc public final class NodeReal: Node, NodeRealValueProtocol {
+public final class NodeReal: Node, NodeRealValueProtocol {
 
     public let value: Double
     
-    public init(id: Double) {
+    @objc public init(id: Double) {
         self.value = id
     }
     

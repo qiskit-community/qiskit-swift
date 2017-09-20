@@ -21,7 +21,7 @@ Node for an OPENQASM indexed id.
 children[0] is an id node.
 children[1] is an integer (not a node).
 */
-@objc public final class NodeIndexedId: Node {
+public final class NodeIndexedId: Node {
 
     public let identifer: Node?
     public private(set) var _name: String = ""
@@ -29,7 +29,7 @@ children[1] is an integer (not a node).
     public private(set) var file: String = ""
     public private(set) var index: Int = -1
     
-    public init(identifier: Node, index: Node?) {
+    @objc public init(identifier: Node, index: Node?) {
         self.identifer = identifier
         self.index = (index as? NodeNNInt)?.value ?? -1
         if let _id = self.identifer as? NodeId{

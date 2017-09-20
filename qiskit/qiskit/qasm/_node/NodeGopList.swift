@@ -16,18 +16,18 @@
 
 import Foundation
 
-@objc public final class NodeGopList: Node {
+public final class NodeGopList: Node {
 
     public private(set) var gateops: [Node]?
     
-    public init(gateop: Node?) {
+    @objc public init(gateop: Node?) {
         super.init()
         if let gop = gateop {
             self.gateops = [gop]
         }
     }
     
-    public func addIdentifier(gateop: Node) {
+    @objc public func addIdentifier(gateop: Node) {
         gateops?.append(gateop)
     }
     

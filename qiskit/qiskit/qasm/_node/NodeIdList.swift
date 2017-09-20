@@ -20,18 +20,18 @@ import Foundation
  Node for an OPENQASM idlist.
  children is a list of id nodes.
  */
-@objc public final class NodeIdList: Node {
+public final class NodeIdList: Node {
     
     public private(set) var identifiers: [Node]?
 
-    public init(identifier: Node?) {
+    @objc public init(identifier: Node?) {
         super.init()
         if let ident = identifier {
             self.identifiers = [ident]
         }
     }
     
-    public func addIdentifier(identifier: Node) {
+    @objc public func addIdentifier(identifier: Node) {
         identifiers?.append(identifier)
     }
     

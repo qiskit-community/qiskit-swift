@@ -46,7 +46,7 @@ public enum NodeType: String {
     case N_UNDEFINED = "undefined"
 }
 
-@objc public class Node : NSObject {
+public class Node : NSObject {
 
     var name: String {
         return self.type.rawValue

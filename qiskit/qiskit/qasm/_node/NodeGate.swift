@@ -25,7 +25,7 @@ import Foundation
  children[2] is an idlist node, and children[3] is a gatebody node.
  */
 
-@objc public final class NodeGate: Node {
+public final class NodeGate: Node {
 
     public let identifier: Node?
     public let arguments: Node?
@@ -49,7 +49,7 @@ import Foundation
         }
     }
     
-    public init(identifier: Node?, arguments: Node?, bitlist: Node?, body: Node?) {
+    @objc public init(identifier: Node?, arguments: Node?, bitlist: Node?, body: Node?) {
         self.identifier = identifier
         self.arguments = arguments
         self.bitlist = bitlist

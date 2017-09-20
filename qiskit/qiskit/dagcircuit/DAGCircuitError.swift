@@ -57,7 +57,7 @@ public enum DAGCircuitError: LocalizedError, CustomStringConvertible {
             return "duplicate wire '\(regBit.name)-\(regBit.index)'"
         case .noBasicOp(let name):
             return "\(name) is not in the list of basis operations"
-        case .gateMatch():
+        case .gateMatch:
             return "gate data does not match basis element specification"
         case .qbitsNumber(let name):
             return "incorrect number of qubits for \(name)"
@@ -71,7 +71,7 @@ public enum DAGCircuitError: LocalizedError, CustomStringConvertible {
             return "(qu)bit \(q.qasm) not found"
         case .wireType(let bVal, let q):
             return "expected wire type \(bVal) for \(q.qasm)"
-        case .incompatibleBasis():
+        case .incompatibleBasis:
             return "incompatible basis"
         case .ineqGate(let name):
             return "inequivalent gate definitions for \(name)"
@@ -85,9 +85,9 @@ public enum DAGCircuitError: LocalizedError, CustomStringConvertible {
             return "invalid wire mapping value \(regBit.qasm)"
         case .inconsistenteWireMap(let name, let value):
             return "inconsistent wire_map at (\(name.qasm),\(value.qasm))"
-        case .duplicatesWireMap():
+        case .duplicatesWireMap:
             return "duplicates in wire_map"
-        case .duplicateWires():
+        case .duplicateWires:
             return "duplicate wires"
         case .totalWires(let expected, let total):
             return "expected \(expected) wires, got \(total)"

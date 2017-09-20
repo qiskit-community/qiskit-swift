@@ -109,7 +109,7 @@ class QIskitParserTests: XCTestCase {
                 let start = range.lowerBound
                 let newLine = line[line.startIndex..<start]
                 if !newLine.isEmpty {
-                    lines.append(newLine)
+                    lines.append(String(newLine))
                 }
             }
             else {
@@ -173,9 +173,6 @@ class QIskitParserTests: XCTestCase {
             let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
             let emittedQasm = qasm.components(separatedBy: whitespaceCharacterSet).joined()
             let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
-            let diff = QIskitParserTests.firstDifferenceBetweenStrings(emittedQasm,targetQasm)
-            print(emittedQasm.substring(to: emittedQasm.index(emittedQasm.startIndex, offsetBy: diff+1)))
-            print(targetQasm.substring(to: targetQasm.index(targetQasm.startIndex, offsetBy: diff+1)))
             XCTAssertEqual(emittedQasm, targetQasm)
         } catch let error {
             XCTFail("\(error)")

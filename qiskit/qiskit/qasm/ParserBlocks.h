@@ -25,6 +25,6 @@ extern void (^ParseFailBlock)(NSString *msg);
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 YY_BUFFER_STATE  yy_scan_string(const char *s);
 
-int yyparse();
+int yyparse(void);
 
 #endif

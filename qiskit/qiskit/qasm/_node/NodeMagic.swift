@@ -21,11 +21,11 @@ Node for an OPENQASM file identifier/version statement ("magic number").
 children[0] is a floating point number (not a node).
 */
 
-@objc public final class NodeMagic:  Node {
+public final class NodeMagic:  Node {
 
     public let nodeVersion: NodeReal?
 
-    public init(version: Node?) {
+    @objc public init(version: Node?) {
         self.nodeVersion = (version as? NodeReal)
     }
 

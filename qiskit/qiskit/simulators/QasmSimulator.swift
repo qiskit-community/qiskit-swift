@@ -446,7 +446,7 @@ final class QasmSimulator: Simulator {
         var fcounts: [String:Int] = [:]
         for (key, value) in counts {
             let start = key.index(key.endIndex, offsetBy: -self._cl_reg_nbits[0])
-            var new_key: [String] = [key[start..<key.endIndex]]
+            var new_key: [String] = [String(key[start..<key.endIndex])]
             var zipped: [(Int,Int)] = []
             for i in 1..<self._cl_reg_index.count {
                 zipped.append((self._cl_reg_index[i],self._cl_reg_nbits[i]))
@@ -454,7 +454,7 @@ final class QasmSimulator: Simulator {
             for (index, nbits) in zipped {
                 let start = key.index(key.endIndex, offsetBy: -(index+nbits))
                 let end = key.index(key.endIndex, offsetBy: -index)
-                new_key.append(key[start..<end])
+                new_key.append(String(key[start..<end]))
             }
             fcounts[new_key.joined(separator: " ")] = value
         }

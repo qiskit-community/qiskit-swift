@@ -44,7 +44,7 @@ public final class RippleAdd {
     private init() {
     }
 
-    public class func rippleAdd(_ apiToken: String, _ responseHandler: ((Void) -> Void)? = nil) {
+    public class func rippleAdd(_ apiToken: String, _ responseHandler: (() -> Void)? = nil) {
         do {
             print()
             print("#################################################################")

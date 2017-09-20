@@ -32,7 +32,7 @@ public enum CouplingError: LocalizedError, CustomStringConvertible {
         switch self {
         case .duplicateregbit(let regBit):
             return "'\(regBit.description)' already in coupling graph"
-        case .notconnected():
+        case .notconnected:
             return "coupling graph not connected"
         case .distancenotcomputed:
             return "distance has not been computed"

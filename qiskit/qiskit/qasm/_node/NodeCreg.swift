@@ -20,7 +20,7 @@ import Foundation
  Node for an OPENQASM creg statement.
 children[0] is an indexedid node.
 */
-@objc public final class NodeCreg: Node {
+public final class NodeCreg: Node {
 
     public let indexedid: Node?
     public private(set) var _name: String = ""
@@ -28,7 +28,7 @@ children[0] is an indexedid node.
     public private(set) var file: String = ""
     public private(set) var index: Int = 0
     
-    public init(indexedid: Node?, line: Int, file: String) {
+    @objc public init(indexedid: Node?, line: Int, file: String) {
         
         self.indexedid = indexedid
         if let _id = self.indexedid as? NodeIndexedId {

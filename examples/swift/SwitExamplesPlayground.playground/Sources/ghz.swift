@@ -50,7 +50,7 @@ public final class GHZ {
     // Make a quantum program for the GHZ state.
     //##############################################################
 
-    public class func ghz(_ apiToken: String, _ responseHandler: ((Void) -> Void)? = nil) {
+    public class func ghz(_ apiToken: String, _ responseHandler: (() -> Void)? = nil) {
         do {
             print()
             print("#################################################################")

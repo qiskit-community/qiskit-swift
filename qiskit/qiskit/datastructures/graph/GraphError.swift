@@ -29,11 +29,11 @@ public enum GraphError: LocalizedError, CustomStringConvertible {
     }
     public var description: String {
         switch self {
-        case .isUndirected():
+        case .isUndirected:
             return "Graph is undirected"
-        case .isCyclic():
+        case .isCyclic:
             return "Graph has cycles"
-        case .connectEmptyGraph():
+        case .connectEmptyGraph:
             return "Connectivity is undefined for the null graph."
         }
     }

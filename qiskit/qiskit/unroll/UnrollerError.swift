@@ -56,25 +56,25 @@ public enum UnrollerError: LocalizedError, CustomStringConvertible {
             return "internal error n.type == indexed_id: qasm='\(qasm)'"
         case .errorType(let type,let qasm):
             return "internal error: undefined node type \(type): qasm='\(qasm)'"
-        case .errorBackend():
+        case .errorBackend:
             return "backend not attached"
         case .invalidCircuit:
             return "Invalid circuit! Has the Qasm parsing been called?. e.g: unroller.execute()"
-        case .invalidJSON():
+        case .invalidJSON:
             return "Invalid JSON Object in backend"
-        case .processNodeId():
+        case .processNodeId:
             return "internal error: _process_node on id"
-        case .processNodeInt():
+        case .processNodeInt:
            return "internal error: _process_node on int"
-        case .processNodeReal():
+        case .processNodeReal:
             return "internal error: _process_node on real"
-        case .processNodeIndexedId():
+        case .processNodeIndexedId:
             return "internal error: _process_node on indexed_id"
-        case .processNodeBinop():
+        case .processNodeBinop:
             return "internal error: _process_node on binop"
-        case .processNodePrefix():
+        case .processNodePrefix:
             return "internal error: _process_node on prefix"
-        case .processNodeExternal():
+        case .processNodeExternal:
             return"internal error: _process_node on external"
         }
     }

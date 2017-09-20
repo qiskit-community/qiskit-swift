@@ -19,12 +19,12 @@ Node for an OPENQASM U statement.
 children[0] is an expressionlist node.
 children[1] is a primary node (id or indexedid).
 */
-@objc public final class NodeUniversalUnitary: Node {
+public final class NodeUniversalUnitary: Node {
 
     public let explist: Node?
     public let indexedid: Node?
     
-    public init(explist: Node?, indexedid: Node?) {
+    @objc public init(explist: Node?, indexedid: Node?) {
         self.explist = explist
         self.indexedid = indexedid
     }

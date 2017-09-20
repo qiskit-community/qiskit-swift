@@ -20,11 +20,11 @@ import Foundation
 Node for an OPENQASM integer.
 This node has no children. The data is in the value field.
 */
-@objc public final class NodeNNInt: Node, NodeRealValueProtocol {
+public final class NodeNNInt: Node, NodeRealValueProtocol {
 
     public let value: Int
 
-    public init(value: Int) {
+    @objc public init(value: Int) {
         self.value = value
     }
     

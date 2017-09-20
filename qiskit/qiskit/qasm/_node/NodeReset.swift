@@ -20,11 +20,11 @@ Node for an OPENQASM reset statement.
 children[0] is a primary node (id or indexedid)
 */
 
-@objc public final class NodeReset: Node {
+public final class NodeReset: Node {
     
     public let indexedid: Node?
  
-    public init(indexedid: Node?) {
+    @objc public init(indexedid: Node?) {
         self.indexedid = indexedid
     }
     

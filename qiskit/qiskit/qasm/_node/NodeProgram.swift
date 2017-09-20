@@ -19,18 +19,18 @@ import Foundation
 Node for an OPENQASM program.
 children is a list of nodes (statements).
 */
-@objc public final class NodeProgram: Node  {
+public final class NodeProgram: Node  {
 
     public private(set) var statements: [Node]? = nil
     
-    public init(statement: Node?) {
+    @objc public init(statement: Node?) {
         super.init()
         if let stmt = statement {
             self.statements = [stmt]
         }
     }
     
-    public func addStatement(statement: Node) {
+    @objc public func addStatement(statement: Node) {
         statements?.append(statement)
     }
     

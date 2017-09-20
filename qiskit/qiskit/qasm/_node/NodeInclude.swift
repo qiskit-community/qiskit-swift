@@ -16,11 +16,11 @@
 
 import Foundation
 
-@objc public final class NodeInclude: Node {
+public final class NodeInclude: Node {
     
     public let file: String
     
-    public init(file: String) {
+    @objc public init(file: String) {
         self.file = file
     }
     

@@ -29,14 +29,14 @@ Has properties:
 .arguments = None or exp_list node
 .bitlist = primary_list node
 */
-@objc public final class NodeCustomUnitary: Node {
+public final class NodeCustomUnitary: Node {
     
     public let identifier: Node?
     public let arguments: Node?
     public let bitlist: Node?
     public private(set) var _name: String = ""
 
-    public init(identifier: Node?, arguments: Node?, bitlist: Node?) {
+    @objc public init(identifier: Node?, arguments: Node?, bitlist: Node?) {
         self.identifier = identifier     // id
         self.arguments = arguments   // anylist
         self.bitlist = bitlist   // explist

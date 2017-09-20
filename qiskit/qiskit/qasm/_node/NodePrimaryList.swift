@@ -20,18 +20,18 @@ Node for an OPENQASM primarylist.
 children is a list of primary nodes. Primary nodes are indexedid or id.
 */
 
-@objc public final class NodePrimaryList: Node {
+public final class NodePrimaryList: Node {
     
     public private(set) var identifiers: [Node]? = nil
    
-    public init(identifier: Node?) {
+    @objc public init(identifier: Node?) {
         super.init()
         if let ident = identifier {
             self.identifiers = [ident]
         }
     }
     
-    public func addIdentifier(identifier: Node) {
+    @objc public func addIdentifier(identifier: Node) {
         identifiers?.append(identifier)
     }
     

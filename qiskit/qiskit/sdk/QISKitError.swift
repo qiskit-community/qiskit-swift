@@ -63,69 +63,69 @@ public enum QISKitError: LocalizedError, CustomStringConvertible {
     }
     public var description: String {
         switch self {
-        case .intructionCircuitNil():
+        case .intructionCircuitNil:
             return "Instruction's circuit not assigned"
         case .regExists(let name):
             return "register '\(name)'already exists"
         case .regNotExists(let name):
             return "register '\(name)'does not exist"
-        case .controlValueNegative():
+        case .controlValueNegative:
             return "control value should be non-negative"
-        case .notCreg():
+        case .notCreg:
             return "expected classical register"
         case .regNotInCircuit(let name):
             return "register '\(name)' not in this circuit"
-        case .regName():
+        case .regName:
             return "invalid OPENQASM register name"
-        case .regSize():
+        case .regSize:
              return "register size must be positive"
         case .controlRegNotFound(let name):
             return "control register \(name) not found"
-        case .not3Params():
+        case .not3Params:
             return "Expected 3 parameters."
         case .notQubitGate(let qubit):
             return "qubit '\(qubit.identifier)' not argument of gate."
-        case .duplicateQubits():
+        case .duplicateQubits:
             return "duplicate qubit arguments"
-        case .regIndexRange():
+        case .regIndexRange:
             return "register index out of range"
-        case .circuitsNotCompatible():
+        case .circuitsNotCompatible:
             return "circuits are not compatible"
-        case .noArguments():
+        case .noArguments:
             return "no arguments passed"
-        case .missingFileName():
+        case .missingFileName:
             return "No filename provided"
-        case .missingCircuit():
+        case .missingCircuit:
             return "Circuit not found"
-        case .missingCircuits():
+        case .missingCircuits:
             return "No circuits"
         case .missingQuantumProgram(let name):
             return "result: \(name) not in QuantumProgram"
-        case .missingCompiledConfig():
+        case .missingCompiledConfig:
             return "No compiled configuration for this circuit"
-        case .missingCompiledQasm():
+        case .missingCompiledQasm:
             return "No compiled qasm for this circuit"
-        case .errorShots():
+        case .errorShots:
             return "Online backends only support job batches with equal numbers of shots"
-        case .errorMaxCredit():
+        case .errorMaxCredit:
             return "Online backends only support job batches with equal max credit"
-        case .missingStatus():
+        case .missingStatus:
             return "Missing Status"
-        case .timeout():
+        case .timeout:
             return "Timeout"
         case .errorStatus(let status):
             return "status: \(status)"
         case .errorResult(let result):
             return result.description
-        case .errorLocalSimulator():
+        case .errorLocalSimulator:
             return "Not a local simulator"
-        case .missingJobId():
+        case .missingJobId:
             return "Missing JobId"
         case .parserError(let msg):
             return "QASM Parser error: \(msg)"
         case .missingBackend(let backend):
             return "Unrecognized \(backend)"
-        case .registerSize():
+        case .registerSize:
             return "Can't make this register: Already in program with different size"
         case .noQASM(let name):
             return "No  qasm for circuit \(name)"

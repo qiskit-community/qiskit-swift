@@ -56,7 +56,7 @@ public final class Teleport {
     // Make a quantum program for the GHZ and Bell states.
     //##############################################################
    
-    public class func teleport(_ apiToken: String, _ responseHandler: ((Void) -> Void)? = nil) {
+    public class func teleport(_ apiToken: String, _ responseHandler: (() -> Void)? = nil) {
         do {
             print()
             print("#################################################################")

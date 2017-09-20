@@ -23,13 +23,13 @@ import Foundation
  children[2] is quantum operation node, including U, CX, custom_unitary,
  measure, reset, (and BUG: barrier, if).
  */
-@objc public final class NodeIf: Node {
+public final class NodeIf: Node {
   
     public let nodeId: Node?
     public let nodeNNInt: Node?
     public let nodeQop: Node?
     
-    public init(identifier: Node?, nninteger: Node?, qop: Node?) {
+    @objc public init(identifier: Node?, nninteger: Node?, qop: Node?) {
         nodeId = identifier
         nodeNNInt = nninteger
         nodeQop = qop
