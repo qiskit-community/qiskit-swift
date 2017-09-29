@@ -758,7 +758,7 @@ public final class IBMQuantumExperience {
     /**
      Get the status of a chip
      */
-    public func backend_status(backend: String = "ibmqx2",
+    public func backend_status(backend: String = "ibmqx4",
                                access_token: String? = nil,
                                user_id: String? = nil,
                                responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
@@ -788,6 +788,10 @@ public final class IBMQuantumExperience {
                     if let busy = status["busy"] as? Bool {
                         ret["busy"] = busy
                     }
+                    if let lengthQueue = status["lengthQueue"] {
+                        ret["pending_jobs"] = lengthQueue
+                    }
+                    ret["backend"] = backend_type!
                     responseHandler(ret, error)
                 }
             }
@@ -797,7 +801,7 @@ public final class IBMQuantumExperience {
     /**
      Get the calibration of a real chip
      */
-    public func backend_calibration(backend: String = "ibmqx2",
+    public func backend_calibration(backend: String = "ibmqx4",
                                     access_token: String? = nil,
                                     user_id: String? = nil,
                                     responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
@@ -848,7 +852,7 @@ public final class IBMQuantumExperience {
     /**
      Get the parameters of calibration of a real chip
      */
-    public func backend_parameters(backend: String = "ibmqx2",
+    public func backend_parameters(backend: String = "ibmqx4",
                                    access_token: String? = nil,
                                    user_id: String? = nil,
                                   responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
