@@ -120,19 +120,18 @@ class UnrollerTests: XCTestCase {
         let QASM_source = try qp.get_qasm("rippleadd")
         print(QASM_source)
 
-        let qobj = try qp.compile(["rippleadd"], backend: UnrollerTests.backend, shots: 1024, coupling_map: UnrollerTests.coupling_map)
+        let qobj = try qp.compile(["rippleadd"], backend: UnrollerTests.backend, coupling_map: UnrollerTests.coupling_map, shots: 1024)
         qp.get_execution_list(qobj,true)
-        /*let asyncExpectation = self.expectation(description: "runJob")
-        qp.run() { (result,error) in
+       /* let asyncExpectation = self.expectation(description: "runJob")
+        qp.run_async(qobj) { (result) in
             do {
-                if error != nil {
-                    XCTFail("Failure in runJob: \(error!)")
+                if result.is_error() {
+                    XCTFail("Failure in runJob: \(result.get_error())")
                     asyncExpectation.fulfill()
                     return
                 }
-                print(result!)
-                print(try qp.get_compiled_qasm("rippleadd"))
-                print(try qp.get_counts("rippleadd"))
+                print(try result.get_ran_qasm("rippleadd"))
+                print(try result.get_counts("rippleadd"))
                 // Both versions should give the same distribution
                 asyncExpectation.fulfill()
             } catch {

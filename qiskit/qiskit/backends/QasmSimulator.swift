@@ -96,16 +96,7 @@ import Foundation
 /**
  Implementation of a qasm simulator
  */
-final class QasmSimulator: Simulator {
-
-    static let __configuration: [String:Any] = [
-        "name": "local_qasm_simulator",
-        "url": "https://github.com/IBM/qiskit-sdk-py",
-        "simulator": true,
-        "description": "A swift simulator for qasm files",
-        "coupling_map": "all-to-all",
-        "basis_gates": "u1,u2,u3,cx,id"
-    ]
+final class QasmSimulator: BaseBackend {
 
     /**
      Magic index1 function.
@@ -151,60 +142,26 @@ final class QasmSimulator: Simulator {
         return retval
     }
 
-    private(set) var circuit: [String:Any] = [:]
     private var _number_of_qubits: Int = 0
     private var _number_of_cbits: Int = 0
-    private var result: [String:Any] = [:]
     private var _quantum_state: [Complex] = []
     private var _classical_state: Int = 0
     private var _shots: Int = 0
-    private var _cl_reg_index: [Int] = []
-    private var _cl_reg_nbits: [Int] = []
-    private var _number_of_operations: Int = 0
 
     /**
      Initialize the QasmSimulator object
      */
-    init(_ job: [String:Any]) throws {
-        if let compiled_circuit = job["compiled_circuit"] as? String {
-            if let data = compiled_circuit.data(using: .utf8) {
-                let jsonAny = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
-                if let json = jsonAny as? [String:Any] {
-                    self.circuit = json
-                }
-            }
-        }
-        if let header = self.circuit["header"]  as? [String:Any] {
-            if let number_of_qubits = header["number_of_qubits"] as? Int {
-                self._number_of_qubits = number_of_qubits
-            }
-            if let _number_of_cbits = header["number_of_clbits"] as? Int {
-                self._number_of_cbits = _number_of_cbits
-            }
-            if let clbit_labels = header["clbit_labels"] as? [[Any]] {
-                var cbit_index: Int = 0
-                for cl_reg in clbit_labels {
-                    if let index = cl_reg[1] as? Int {
-                        self._cl_reg_nbits.append(index)
-                        self._cl_reg_index.append(cbit_index)
-                        cbit_index += index
-                    }
-                }
-            }
-        }
-        self.result["data"] = [:]
-
-        if let config = job["config"] as? [String:Any] {
-            if let shots = config["shots"] as? Int {
-                self._shots = shots
-            }
-            if let seed = config["seed"] as? Int {
-                srand48(seed)
-            }
-        }
-        if let operations = self.circuit["operations"]  as? [[String:Any]] {
-            self._number_of_operations = operations.count
-        }
+    public required init(_ qobj: [String:Any]) {
+        super.init(qobj)
+        self._configuration = [
+            "name": "local_qasm_simulator",
+            "url": "https://github.com/IBM/qiskit-sdk-py",
+            "simulator": true,
+            "local": true,
+            "description": "A python simulator for qasm files",
+            "coupling_map": "all-to-all",
+            "basis_gates": "u1,u2,u3,cx,id"
+        ]
     }
 
     /**
@@ -332,14 +289,83 @@ final class QasmSimulator: Simulator {
         }
     }
 
-    func run(_ silent: Bool) throws -> [String:Any] {
+    /**
+     Run circuits in qobj
+
+     Args:
+     silent (bool, optional): Silence print statements. Default is True.
+     */
+    override public func run(_ silent: Bool = true) throws -> Result {
+        var result_list: [[String:Any]] = []
+        if let config = self.qobj["config"] as? [String:Any] {
+            if let shots = config["shots"] as? Int {
+                self._shots = shots
+            }
+        }
+        if let circuits = self.qobj["circuits"] as? [[String:Any]] {
+            for circuit in circuits {
+                result_list.append(try self.run_circuit(circuit,silent))
+            }
+        }
+        return Result(["result": result_list, "status": "COMPLETED"],self.qobj)
+    }
+
+    /**
+     Run a circuit and return a single Result.
+     Args:
+         circuit (dict): JSON circuit from qobj circuits list
+         shots (int): number of shots to run circuit
+     Returns:
+         A dictionary of results which looks something like::
+         {
+         "data":
+             {  #### DATA CAN BE A DIFFERENT DICTIONARY FOR EACH BACKEND ####
+             "counts": {’00000’: XXXX, ’00001’: XXXXX},
+             "time"  : xx.xxxxxxxx
+             },
+         "status": --status (string)--
+         }
+     */
+    private func run_circuit(_ circuit: [String:Any], _ silent: Bool = true) throws -> [String:Any] {
+        var result: [String:Any] = [:]
+        result["data"] = [:]
+        guard let ccircuit = circuit["compiled_circuit"] as? [String:Any] else {
+            throw SimulatorError.missingCompiledCircuit
+        }
+        self._quantum_state = []
+        self._classical_state = 0
+        var cl_reg_index: [Int] = [] // starting bit index of classical register
+        var cl_reg_nbits: [Int] = [] // number of bits in classical register
+        if let header = ccircuit["header"]  as? [String:Any] {
+            if let number_of_qubits = header["number_of_qubits"] as? Int {
+                self._number_of_qubits = number_of_qubits
+            }
+            if let _number_of_cbits = header["number_of_clbits"] as? Int {
+                self._number_of_cbits = _number_of_cbits
+            }
+            if let clbit_labels = header["clbit_labels"] as? [[Any]] {
+                var cbit_index: Int = 0
+                for cl_reg in clbit_labels {
+                    if let index = cl_reg[1] as? Int {
+                        cl_reg_nbits.append(index)
+                        cl_reg_index.append(cbit_index)
+                        cbit_index += index
+                    }
+                }
+            }
+        }
+        if let config = circuit["config"] as? [String:Any] {
+            if let seed = config["seed"] as? Int {
+                srand48(seed)
+            }
+        }
         var outcomes: [String] = []
         // Do each shot
         for _ in 0..<self._shots {
             self._quantum_state = [Complex](repeating: Complex(), count: 1 << self._number_of_qubits)
             self._quantum_state[0] = 1
             self._classical_state = 0
-            if let operations = self.circuit["operations"] as? [[String:Any]] {
+            if let operations = ccircuit["operations"] as? [[String:Any]] {
                 // Do each operation in this shot
                 for operation in operations {
                     if let conditional = operation["conditional"] as? [String:Any] {
@@ -363,17 +389,18 @@ final class QasmSimulator: Simulator {
                         }
                     }
                     guard let name = operation["name"] as? String else {
-                        self.result["status"] = "ERROR"
-                        return self.result
+                        throw SimulatorError.missingOperationName
                     }
                     // Check if single  gate
                     if ["U", "u1", "u2", "u3"].contains(name) {
                         if let qubits = operation["qubits"] as? [Int] {
-                            if let params = operation["params"] as? [Double] {
-                                let qubit = qubits[0]
-                                let gate = SimulatorTools.single_gate_matrix(name, params)
-                                self._add_qasm_single(gate, qubit)
+                            var params: [Double]? = nil
+                            if let _params = operation["params"] as? [Double] {
+                                params = _params
                             }
+                            let qubit = qubits[0]
+                            let gate = SimulatorTools.single_gate_matrix(name, params)
+                            self._add_qasm_single(gate, qubit)
                         }
                     }
                     else if ["id", "u0"].contains(name) {
@@ -401,7 +428,7 @@ final class QasmSimulator: Simulator {
                     else if name == "barrier" {
                     }
                     else {
-                        throw SimulatorError.unrecognizedOperation(backend: QasmSimulator.__configuration["name"] as! String, operation: name)
+                        throw SimulatorError.unrecognizedOperation(backend: self.configuration["name"] as! String, operation: name)
                     }
                 }
             }
@@ -425,10 +452,10 @@ final class QasmSimulator: Simulator {
                 counts[outcome] = 1
             }
         }
-        data["counts"] = self._format_result(counts)
-        self.result["data"] = data
-        self.result["status"] = "DONE"
-        return self.result
+        data["counts"] = self._format_result(counts,cl_reg_index,cl_reg_nbits)
+        result["data"] = data
+        result["status"] = "DONE"
+        return result
     }
 
     /**
@@ -442,16 +469,12 @@ final class QasmSimulator: Simulator {
      Returns:
         spaces inserted into dictionary keys at register boundries.
      */
-    private func _format_result(_ counts: [String:Int]) -> [String:Int] {
+    private func _format_result(_ counts: [String:Int], _ cl_reg_index: [Int], _ cl_reg_nbits: [Int]) -> [String:Int] {
         var fcounts: [String:Int] = [:]
         for (key, value) in counts {
-            let start = key.index(key.endIndex, offsetBy: -self._cl_reg_nbits[0])
+            let start = key.index(key.endIndex, offsetBy: -cl_reg_nbits[0])
             var new_key: [String] = [String(key[start..<key.endIndex])]
-            var zipped: [(Int,Int)] = []
-            for i in 1..<self._cl_reg_index.count {
-                zipped.append((self._cl_reg_index[i],self._cl_reg_nbits[i]))
-            }
-            for (index, nbits) in zipped {
+            for (index, nbits) in zip(cl_reg_index[1...],cl_reg_nbits[1...]) {
                 let start = key.index(key.endIndex, offsetBy: -(index+nbits))
                 let end = key.index(key.endIndex, offsetBy: -index)
                 new_key.append(String(key[start..<end]))

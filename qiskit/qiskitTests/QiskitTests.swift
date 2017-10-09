@@ -347,9 +347,9 @@ class QiskitTests: XCTestCase {
         try qp.set_api(token: QiskitTests.APItoken, url: qConfig.url.absoluteString)
 
         let asyncExpectation = self.expectation(description: "runJob")
-        qp.execute(["circuit"], backend: device) { (result,error) in
-            if error != nil {
-                XCTFail("Failure in runJob: \(error!)")
+        qp.execute(["circuit"], backend: device) { (result) in
+            if result.is_error() {
+                XCTFail("Failure in runJob: \(result.get_error())")
                 asyncExpectation.fulfill()
                 return
             }

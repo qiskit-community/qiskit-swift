@@ -131,7 +131,10 @@ final class SimulatorTools {
      Returns:
         a tuple of U gate parameters (theta, phi, lam)
      */
-    static func single_gate_params(_ gate: String, _ params: [Double]) -> (Double,Double,Double) {
+    static func single_gate_params(_ gate: String, _ _params: [Double]? = nil) -> (Double,Double,Double) {
+        guard let params = _params else {
+            return (0.0, 0.0, 0.0)
+        }
         if gate == "U" || gate == "u3" {
             return (params[0], params[1], params[2])
         }
@@ -155,7 +158,7 @@ final class SimulatorTools {
      Returns:
         A numpy array representing the matrix
      */
-    static func single_gate_matrix(_ gate: String, _ params: [Double]) -> [[Complex]] {
+    static func single_gate_matrix(_ gate: String, _ params: [Double]? = nil) -> [[Complex]] {
         let (theta, phi, lam) = SimulatorTools.single_gate_params(gate, params)
         return [[
                     Complex(real:cos(theta/2.0)),

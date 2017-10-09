@@ -384,8 +384,7 @@ final class JsonBackend: UnrollerBackend {
     func get_output() throws -> Any? {
         assert(self._is_circuit_valid(), "Invalid circuit! Has the Qasm parsing been called?. e.g: unroller.execute()")
         if JSONSerialization.isValidJSONObject(self.circuit) {
-            let data = try JSONSerialization.data(withJSONObject: self.circuit)
-            return String(data: data, encoding: .utf8)
+            return self.circuit
         }
         throw UnrollerError.invalidJSON
     }

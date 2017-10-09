@@ -15,9 +15,19 @@
 
 import Foundation
 
-protocol Simulator {
+final class QasmCppSimulator: BaseBackend {
 
-    static var __configuration : [String:Any] {get}
+    public required init(_ qobj: [String:Any]) {
+        super.init(qobj)
+        if let config = self.qobj["config"] as? [String:Any] {
+            self._configuration = config
+        }
+    }
 
-    func run(_ silent: Bool) throws -> [String:Any]
+    /**
+     Run simulation on C++ simulator.
+     */
+    override public func run(_ silent: Bool = true) throws -> Result {
+       throw SimulatorError.notImplemented(backend: self.configuration["name"] as! String)
+    }
 }

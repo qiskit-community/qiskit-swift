@@ -80,10 +80,10 @@ public final class GHZ {
 
             print("First version: not compiled")
             print("no mapping, simulator")
-            qp.execute(["ghz"], backend: "ibmqx_qasm_simulator",shots: 1024, coupling_map: nil) { (result,error) in
+            qp.execute(["ghz"], backend: "ibmqx_qasm_simulator", coupling_map: nil,shots: 1024) { (result) in
                 do {
-                    if error != nil {
-                        print(error!.description)
+                    if result.is_error() {
+                        print(result.get_error())
                         responseHandler?()
                         return
                     }
@@ -92,10 +92,10 @@ public final class GHZ {
 
                     print("Second version: map to qx2 coupling graph and simulate")
                     print("map to \(backend), simulator")
-                    qp.execute(["ghz"], backend: "ibmqx_qasm_simulator",shots: 1024, coupling_map: coupling_map) { (result,error) in
+                    qp.execute(["ghz"], backend: "ibmqx_qasm_simulator", coupling_map: coupling_map,shots: 1024) { (result) in
                         do {
-                            if error != nil {
-                                print(error!.description)
+                            if result.is_error() {
+                                print(result.get_error())
                                 responseHandler?()
                                 return
                             }
@@ -104,10 +104,10 @@ public final class GHZ {
 
                             print("Third version: map to qx2 coupling graph and simulate locally")
                             print("map to \(backend), local qasm simulator")
-                            qp.execute(["ghz"], backend: "local_qasm_simulator",shots: 1024, coupling_map: coupling_map) { (result,error) in
+                            qp.execute(["ghz"], backend: "local_qasm_simulator",coupling_map: coupling_map,shots: 1024) { (result) in
                                 do {
-                                    if error != nil {
-                                        print(error!.description)
+                                    if result.is_error() {
+                                        print(result.get_error())
                                         responseHandler?()
                                         return
                                     }
@@ -116,10 +116,10 @@ public final class GHZ {
 
                                     print("Fourth version: map to qx2 coupling graph and run on qx2")
                                     print("map to \(backend), backend")
-                                    qp.execute(["ghz"], backend: backend,shots: 1024, timeout:120, coupling_map: coupling_map) { (result,error) in
+                                    qp.execute(["ghz"], backend: backend,timeout:120, coupling_map: coupling_map,shots: 1024) { (result) in
                                         do {
-                                            if error != nil {
-                                                print(error!.description)
+                                            if result.is_error() {
+                                                print(result.get_error())
                                                 responseHandler?()
                                                 return
                                             }

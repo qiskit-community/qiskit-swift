@@ -56,12 +56,7 @@ public final class Result: CustomStringConvertible {
      the status of the results.
      */
     public var description: String {
-        do {
-            return try self.status()
-        }
-        catch {
-            return ""
-        }
+        return self.get_status() ?? ""
     }
 
     /**
@@ -126,26 +121,67 @@ public final class Result: CustomStringConvertible {
         return ret
     }
 
+    public func is_error() -> Bool {
+        if let status = self.__result["status"] as? String {
+            return status == "ERROR"
+        }
+        return false
+    }
+
     /**
      Get the status of the run.
      Returns:
      the status of the results.
      */
-    public func status() throws -> String {
+    public func get_status() -> String? {
         guard let status = self.__result["status"] as? String else {
-            throw QISKitError.missingStatus
+            return nil
         }
         return status
     }
 
-    public func get_error() throws -> [String:Any]? {
-        let status = try self.status()
-        if status == "ERROR" {
-            if let results = self.__result["result"] as? [[String:Any]] {
-                return results[0]
+    /**
+     Return statuses of all circuits
+
+     Return:
+     List of status result strings.
+     */
+    public func circuit_statuses() -> [String] {
+        var ret: [String] = []
+        if let results = self.__result["result"] as? [[String:Any]] {
+            for result in results {
+                if let status = result["status"] as? String {
+                    ret.append(status)
+                }
+            }
+        }
+        return ret
+    }
+
+    /**
+     Return the status of circuit at index icircuit.
+
+     Args:
+     icircuit (int): index of circuit
+     */
+    public func get_circuit_status(icircuit: Int) -> String? {
+        if let results = self.__result["result"] as? [[String:Any]] {
+            if !results.isEmpty && icircuit >= 0 && icircuit < results.count {
+                if let status = results[icircuit]["status"] as? String {
+                    return status
+                }
             }
         }
         return nil
+    }
+
+    public func get_error() -> String {
+        if self.is_error() {
+            if let result = self.__result["result"] as? String {
+                return result
+            }
+        }
+        return ""
     }
 
     /**
@@ -230,6 +266,24 @@ public final class Result: CustomStringConvertible {
     }
 
     /**
+     Get the circuit names of the results.
+
+     Returns:
+     A list of circuit names.
+     */
+    public func get_names() -> [String] {
+        var names: [String] = []
+        if let circuits = self.__qobj["circuits"] as? [[String:Any]] {
+            for circuit in circuits {
+                if let name = circuit["name"] as? String {
+                    names.append(name)
+                }
+            }
+        }
+        return names
+    }
+
+    /**
      Compute the mean value of an diagonal observable.
      Takes in an observable in dictionary format and then
      calculates the sum_i value(i) P(i) where value(i) is the value of
@@ -254,5 +308,68 @@ public final class Result: CustomStringConvertible {
             }
         }
         return temp
+    }
+
+    /**
+     Compute the polarization of each qubit for all circuits and pull out each circuits
+     xval into an array. Assumes that each circuit has the same number of qubits and that
+     all qubits are measured.
+
+     Args:
+     xvals_dict: dictionary of xvals for each circuit {'circuitname1': xval1,...}. If this
+     is none then the xvals list is just left as an array of zeros
+
+     Returns:
+     qubit_pol: mxn double array where m is the number of circuit, n the number of qubits
+     xvals: mx1 array of the circuit xvals
+     */
+    public func get_qubitpol_vs_xval(_ xvals_dict: [String:Double]? = nil) throws -> ([[Double]],[Double]) {
+        guard let circuits = self.__qobj["circuits"] as? [[String:Any]] else {
+            return ([],[])
+        }
+        if circuits.isEmpty {
+            return ([],[])
+        }
+        let ncircuits = circuits.count
+        //Is this the best way to get the number of qubits?
+        guard let compiled_circuit = circuits[0]["compiled_circuit"] as? [String:Any] else {
+            return ([],[])
+        }
+        guard let header = compiled_circuit["header"] as? [String:Any] else {
+            return ([],[])
+        }
+        guard let nqubits = header["number_of_qubits"] as? Int else {
+            return ([],[])
+        }
+        var qubitpol: [[Double]] = [[Double]](repeating: [Double](repeating: 0.0, count: nqubits), count: ncircuits)
+        var xvals: [Double] = [Double](repeating: 0.0, count: ncircuits)
+
+        //build Z operators for each qubit
+        var z_dicts:[[String:Int]] = []
+        for qubit_ind in 0..<nqubits {
+            z_dicts.append([:])
+            for qubit_state in 0..<Int(pow(2.0,Double(nqubits))) {
+                let binaryString = String(qubit_state, radix: 2)
+                let new_key = String(repeating: "0", count: nqubits - binaryString.characters.count) + binaryString
+                z_dicts[z_dicts.count-1][new_key] = -1
+                let index = new_key.index(new_key.startIndex, offsetBy: nqubits - qubit_ind - 1)
+                if new_key[index] == "1" {
+                    z_dicts[z_dicts.count-1][new_key] = 1
+                }
+            }
+        }
+        //go through each circuit and for eqch qubit and apply the operators using "average_data"
+        for circuit_ind in 0..<ncircuits {
+            if let name = circuits[circuit_ind]["name"] as? String {
+                if let dict = xvals_dict,
+                    let val = dict[name] {
+                    xvals[circuit_ind] = val
+                }
+                for qubit_ind in 0..<nqubits {
+                    qubitpol[circuit_ind][qubit_ind] = try self.average_data(name, z_dicts[qubit_ind])
+                }
+            }
+        }
+        return (qubitpol,xvals)
     }
 }

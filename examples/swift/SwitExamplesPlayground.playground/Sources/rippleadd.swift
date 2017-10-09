@@ -88,21 +88,21 @@ public final class RippleAdd {
             try qp.set_api(token: apiToken, url: qConfig.url.absoluteString)
 
             print("First version: not mapped")
-            qp.execute(["rippleadd"], backend: backend,shots: 1024, coupling_map: nil) { (result,error) in
+            qp.execute(["rippleadd"], backend: backend, coupling_map: nil,shots: 1024) { (result) in
                 do {
-                    if error != nil {
-                        print(error!.description)
+                    if result.is_error() {
+                        print(result.get_error())
                         responseHandler?()
                         return
                     }
                     print(result)
                     print(try result.get_counts("rippleadd"))
                     print("Second version: mapped to 2x8 array coupling graph")
-                    let qobj = try qp.compile(["rippleadd"], backend: backend, shots: 1024, coupling_map: coupling_map)
-                    qp.run(qobj) { (result,error) in
+                    let qobj = try qp.compile(["rippleadd"], backend: backend, coupling_map: coupling_map,shots: 1024)
+                    qp.run_async(qobj) { (result) in
                         do {
-                            if error != nil {
-                                print(error!.description)
+                            if result.is_error() {
+                                print(result.get_error())
                                 responseHandler?()
                                 return
                             }

@@ -15,25 +15,23 @@
 
 import Foundation
 
-/*
-Exception for errors raised by the Simulator object.
-*/
-public enum SimulatorError: LocalizedError, CustomStringConvertible {
-    case unknownSimulator(name: String)
-    case unrecognizedOperation(backend: String, operation: String)
-    case notImplemented(backend: String)
-   
+/**
+ Exceptions raised during compilation
+ */
+public enum QisKitCompilerError: LocalizedError, CustomStringConvertible {
+
+    case unknownFormat(name: String)
+    case internalError(error: Error)
+
     public var errorDescription: String? {
         return self.description
     }
     public var description: String {
         switch self {
-        case .unknownSimulator(let name):
-            return "Unknown simulator '\(name)'"
-        case .unrecognizedOperation(let backend,let operation):
-            return "\(backend) encountered unrecognized operation '\(operation)'"
-        case .notImplemented(let backend):
-            return "\(backend) not implemented"
+        case .unknownFormat(let name):
+            return "Unrecognized circuit format '\(name)'"
+        case .internalError(let error):
+            return error.localizedDescription
         }
     }
 }

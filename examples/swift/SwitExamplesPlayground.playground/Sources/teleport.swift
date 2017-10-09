@@ -98,10 +98,10 @@ public final class Teleport {
             print("Experiment does not support feedback, so we use the simulator")
 
             print("First version: not mapped")
-            qp.execute(["teleport"], backend: backend,shots: 1024, coupling_map: nil) { (result,error) in
+            qp.execute(["teleport"], backend: backend,coupling_map: nil,shots: 1024) { (result) in
                 do {
-                    if error != nil {
-                        print(error!.description)
+                    if result.is_error() {
+                        print(result.get_error())
                         responseHandler?()
                         return
                     }
@@ -109,10 +109,10 @@ public final class Teleport {
                     print(try result.get_counts("teleport"))
 
                     print("Second version: mapped to qx2 coupling graph")
-                    qp.execute(["teleport"], backend: backend,shots: 1024, coupling_map: coupling_map) { (result,error) in
+                    qp.execute(["teleport"], backend: backend,coupling_map: coupling_map,shots: 1024) { (result) in
                         do {
-                            if error != nil {
-                                print(error!.description)
+                            if result.is_error() {
+                                print(result.get_error())
                                 responseHandler?()
                                 return
                             }
