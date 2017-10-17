@@ -1550,9 +1550,6 @@ final class DAGCircuit: NSCopying {
      the desired behavior.
      */
     public func layers() throws -> [Layer] {
-        //print(self.multi_graph.vertexKeys)
-        //print(self.multi_graph.edgeKeys)
-
         var layers_list: [Layer] = []
         // node_map contains an input node or previous layer node for
         // each wire in the circuit.

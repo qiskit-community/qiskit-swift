@@ -65,7 +65,6 @@ final class JobProcessor {
                                    _ api: IBMQuantumExperience,
                                    _ wait: Int = 5,
                                    _ timeout: Int = 60,
-                                   _ silent: Bool = true,
                     _ responseHandler: @escaping ((_:Result,_:QISKitError?) -> Void)) {
         do {
             var qobj = q
@@ -135,7 +134,7 @@ final class JobProcessor {
                     responseHandler(Result(),QISKitError.missingJobId)
                     return
                 }
-                wait_for_job(jobId, api, wait: wait, timeout: timeout, silent: silent) { (json, error) -> Void in
+                wait_for_job(jobId, api, wait: wait, timeout: timeout) { (json, error) -> Void in
                     if error != nil {
                         responseHandler(Result(),QISKitError.internalError(error: error!))
                         return
@@ -158,12 +157,12 @@ final class JobProcessor {
         }
     }
 
-    private static func wait_for_job(_ jobId: String, _ api: IBMQuantumExperience, wait: Int = 5, timeout: Int = 60, silent: Bool = true,
+    private static func wait_for_job(_ jobId: String, _ api: IBMQuantumExperience, wait: Int = 5, timeout: Int = 60,
                              _ responseHandler: @escaping ((_:[String:Any]?, _:QISKitError?) -> Void)) {
-        wait_for_job(api, jobId, wait, timeout, silent, 0, responseHandler)
+        wait_for_job(api, jobId, wait, timeout, 0, responseHandler)
     }
 
-    private static func wait_for_job(_ api: IBMQuantumExperience, _ jobid: String, _ wait: Int, _ timeout: Int, _ silent: Bool, _ elapsed: Int,
+    private static func wait_for_job(_ api: IBMQuantumExperience, _ jobid: String, _ wait: Int, _ timeout: Int, _ elapsed: Int,
                               _ responseHandler: @escaping ((_:[String:Any]?, _:QISKitError?) -> Void)) {
         api.get_job(jobId: jobid) { (result, error) -> Void in
             if error != nil {
@@ -178,9 +177,7 @@ final class JobProcessor {
                 responseHandler(nil, QISKitError.missingStatus)
                 return
             }
-            if !silent {
-                print("status = \(status) (\(elapsed) seconds)")
-            }
+            SDKLogger.logDebug("status = %@ (%d seconds)",status,elapsed)
             if status != "RUNNING" {
                 if status == "ERROR_CREATING_JOB" || status == "ERROR_RUNNING_JOB" {
                     responseHandler(nil, QISKitError.errorStatus(status: status))
@@ -204,7 +201,7 @@ final class JobProcessor {
                 return
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(wait)) {
-                wait_for_job(api,jobid, wait, timeout, silent, elapsed + wait, responseHandler)
+                wait_for_job(api,jobid, wait, timeout, elapsed + wait, responseHandler)
             }
         }
     }
@@ -292,9 +289,8 @@ final class JobProcessor {
      Args:
      wait (int): Time interval to wait between requests for results
      timeout (int): Total time waiting for the results
-     silent (bool): If true, prints out results
      */
-    func submit(_ wait: Int = 5, _ timeout: Int = 120, _ silent: Bool = true) {
+    func submit(_ wait: Int = 5, _ timeout: Int = 120) {
         for q_job in self.q_jobs {
             if self._local_backends.contains(q_job.backend) {
                 DispatchQueue.global().async {
@@ -321,7 +317,7 @@ final class JobProcessor {
                         return
                     }
                     if backends.contains(q_job.backend) {
-                        JobProcessor.run_remote_backend(q_job.qobj,self._api!,wait,timeout,silent) { (result,error) in
+                        JobProcessor.run_remote_backend(q_job.qobj,self._api!,wait,timeout) { (result,error) in
                             if error != nil {
                                 self._job_done_callback(Result(["status": "ERROR","result": error!.localizedDescription],q_job.qobj))
                                 return

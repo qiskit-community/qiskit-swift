@@ -57,6 +57,7 @@
 		696613221F4C9E920031A146 /* DAGBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696613211F4C9E920031A146 /* DAGBackend.swift */; };
 		696613241F4CBA5B0031A146 /* NodeRealValueProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696613231F4CBA5B0031A146 /* NodeRealValueProtocol.swift */; };
 		696613261F4CD08B0031A146 /* Swap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696613251F4CD08B0031A146 /* Swap.swift */; };
+		696D7FD11F9556D200A2A397 /* SDKLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696D7FD01F9556D200A2A397 /* SDKLogger.swift */; };
 		6974E5951ECA1EF300D1AE97 /* QISKitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6974E5941ECA1EF300D1AE97 /* QISKitError.swift */; };
 		6977A01E1F05762A00CF52F2 /* libs.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6977A01D1F05762A00CF52F2 /* libs.bundle */; };
 		697D36AE1EE3493B00557541 /* OrderedDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 697D36AD1EE3493B00557541 /* OrderedDictionary.swift */; };
@@ -209,6 +210,7 @@
 		696613211F4C9E920031A146 /* DAGBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DAGBackend.swift; path = unroll/DAGBackend.swift; sourceTree = "<group>"; };
 		696613231F4CBA5B0031A146 /* NodeRealValueProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeRealValueProtocol.swift; path = _node/NodeRealValueProtocol.swift; sourceTree = "<group>"; };
 		696613251F4CD08B0031A146 /* Swap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Swap.swift; path = extensions/Swap.swift; sourceTree = "<group>"; };
+		696D7FD01F9556D200A2A397 /* SDKLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SDKLogger.swift; path = datastructures/SDKLogger.swift; sourceTree = "<group>"; };
 		6974E5941ECA1EF300D1AE97 /* QISKitError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QISKitError.swift; path = sdk/QISKitError.swift; sourceTree = "<group>"; };
 		6977A01D1F05762A00CF52F2 /* libs.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = libs.bundle; sourceTree = "<group>"; };
 		697D36AD1EE3493B00557541 /* OrderedDictionary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OrderedDictionary.swift; path = datastructures/OrderedDictionary.swift; sourceTree = "<group>"; };
@@ -368,6 +370,7 @@
 				690188731EE269B0005B4419 /* Queue.swift */,
 				69CED6191F1FA2B100FA8180 /* Random.swift */,
 				6931093E1EE98A6C00CD2CD1 /* RegBit.swift */,
+				696D7FD01F9556D200A2A397 /* SDKLogger.swift */,
 				695701371ED75C2E00C6CCAB /* Stack.swift */,
 				6908D0341EF5AC0500F77905 /* SyncLock.swift */,
 				69FE9CE61F4DC6E7006AFB2F /* String+Random.swift */,
@@ -754,6 +757,7 @@
 				693109411EE9953600CD2CD1 /* BackendError.swift in Sources */,
 				6908D0351EF5AC0500F77905 /* SyncLock.swift in Sources */,
 				693A9F461ECA369500112AC9 /* UBase.swift in Sources */,
+				696D7FD11F9556D200A2A397 /* SDKLogger.swift in Sources */,
 				6957013A1ED75C8B00C6CCAB /* HashableTuple.swift in Sources */,
 				DF8E1CD51EE501D000DCC35C /* NodeUniversalUnitary.swift in Sources */,
 				69467F5D1F4C7B21009E7E03 /* DAGCircuit.swift in Sources */,

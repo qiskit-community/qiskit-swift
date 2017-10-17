@@ -35,7 +35,7 @@ public class BaseBackend {
         self.qobj = qobj
     }
 
-    public func run(_ silent: Bool = true) throws -> Result {
+    public func run() throws -> Result {
         preconditionFailure("run not implemented")
     }
 }

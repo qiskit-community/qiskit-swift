@@ -169,12 +169,11 @@ public final class QuantumProgram {
                         "size": 4
                      }]
                  }],
-         verbose (bool): controls how information is returned.
 
      Returns:
         Sets up a quantum circuit.
      */
-    private func __init_specs(_ specs:[String: Any], verbose: Bool=false) throws {
+    private func __init_specs(_ specs:[String: Any]) throws {
         var quantumr:[QuantumRegister] = []
         var classicalr:[ClassicalRegister] = []
         if let circuits = specs["circuits"] as? [Any] {
@@ -205,25 +204,20 @@ public final class QuantumProgram {
      Args:
         name (str): the name of the quantum register
         size (int): the size of the quantum register
-        verbose (bool): controls how information is returned.
 
      Returns:
         internal reference to a quantum register in __quantum_registers
      */
     @discardableResult
-    public func create_quantum_register(_ name: String, _ size: Int, verbose: Bool=false) throws -> QuantumRegister {
+    public func create_quantum_register(_ name: String, _ size: Int) throws -> QuantumRegister {
         if let register = self.__quantum_registers[name] {
             if size != register.size {
                 throw QISKitError.registerSize
             }
-            if verbose {
-                print(">> quantum_register exists: \(name) \(size)")
-            }
+            SDKLogger.logDebug(">> quantum_register exists: %@ %d",name,size)
         }
         else {
-            if verbose {
-                print(">> new quantum_register created: \(name) \(size)")
-            }
+            SDKLogger.logDebug(">> new quantum_register created: %@ %d",name,size)
             try self.__quantum_registers[name] = QuantumRegister(name, size)
         }
         return self.__quantum_registers[name]!
@@ -267,25 +261,20 @@ public final class QuantumProgram {
      Args:
         name (str): the name of the Classical register
         size (int): the size of the Classical register
-        verbose (bool): controls how information is returned.
 
      Returns:
         internal reference to a Classical register in __classical_registers
      */
     @discardableResult
-    public func create_classical_register(_ name: String, _ size: Int, verbose: Bool=false) throws -> ClassicalRegister {
+    public func create_classical_register(_ name: String, _ size: Int) throws -> ClassicalRegister {
         if let register = self.__classical_registers[name] {
             if size != register.size {
                 throw QISKitError.registerSize
             }
-            if verbose {
-                print(">> classical register exists: \(name) \(size)")
-            }
+            SDKLogger.logDebug(">> classical register exists: %@ %d",name,size)
         }
         else {
-            if verbose {
-                print(">> new classical register created: \(name) \(size)")
-            }
+            SDKLogger.logDebug(">> new classical register created: %@ %d",name,size)
             try self.__classical_registers[name] = ClassicalRegister(name, size)
         }
         return self.__classical_registers[name]!
@@ -378,13 +367,12 @@ public final class QuantumProgram {
         name (str or None, optional): the name of the quantum circuit after
             loading qasm text into it. If no name is give the name is of
             the text file.
-        verbose (bool, optional): controls how information is returned.
+
      Retuns:
         Adds a quantum circuit with the gates given in the qasm file to the
         quantum program and returns the name to be used to get this circuit
      */
-     func load_qasm(qasm_file: String, name: String? = nil, verbose: Bool = false,
-                    basis_gates: String = "u1,u2,u3,cx,id") throws -> String {
+     func load_qasm(qasm_file: String, name: String? = nil, basis_gates: String = "u1,u2,u3,cx,id") throws -> String {
         var n: String = ""
         if name != nil {
             n = name!
@@ -392,7 +380,7 @@ public final class QuantumProgram {
         else {
             n = (qasm_file as NSString).lastPathComponent
         }
-        return try self.load_qasm(Qasm(filename:qasm_file),n,verbose,basis_gates)
+        return try self.load_qasm(Qasm(filename:qasm_file),n,basis_gates)
      }
 
     /**
@@ -402,13 +390,12 @@ public final class QuantumProgram {
         qasm_string (str): a string for the file name.
         name (str): the name of the quantum circuit after loading qasm
             text into it. If no name is give the name is of the text file.
-        verbose (bool): controls how information is returned.
+
      Retuns:
         Adds a quantum circuit with the gates given in the qasm string to the
         quantum program.
      */
-    public func load_qasm_text(qasm_string: String, name: String? = nil, verbose: Bool = false,
-                               basis_gates: String = "u1,u2,u3,cx,id") throws -> String {
+    public func load_qasm_text(qasm_string: String, name: String? = nil,basis_gates: String = "u1,u2,u3,cx,id") throws -> String {
         var n: String = ""
         if name != nil {
             n = name!
@@ -416,16 +403,14 @@ public final class QuantumProgram {
         else {
             n = String.randomAlphanumeric(length: 10)
         }
-        return try self.load_qasm(Qasm(data:qasm_string),n,verbose,basis_gates)
+        return try self.load_qasm(Qasm(data:qasm_string),n,basis_gates)
     }
 
-    private func load_qasm(_ qasm: Qasm, _ name: String, _ verbose: Bool, _ basis_gates: String) throws -> String {
+    private func load_qasm(_ qasm: Qasm, _ name: String, _ basis_gates: String) throws -> String {
         let node_circuit = try qasm.parse()
-        if verbose {
-            print("circuit name: \(name)")
-            print("******************************")
-            print(node_circuit.qasm(15))
-        }
+        SDKLogger.logDebug("circuit name: %@",name)
+        SDKLogger.logDebug("******************************")
+        SDKLogger.logDebug("%@",node_circuit.qasm(15))
 
         // current method to turn it a DAG quantum circuit.
         let unrolled_circuit = Unroller(node_circuit, CircuitBackend(basis_gates.components(separatedBy:",")))
@@ -916,8 +901,6 @@ public final class QuantumProgram {
         backend (str): a string representing the backend to compile to
         config (dict): a dictionary of configurations parameters for the
         compiler
-        silent (bool): is an option to print out the compiling information
-        or not
         basis_gates (str): a comma seperated string and are the base gates,
             which by default are: u1,u2,u3,cx,id
         coupling_map (dict): A directed graph of coupling::
@@ -979,7 +962,6 @@ public final class QuantumProgram {
     public func compile(_ name_of_circuits: [String],
                         backend: String = "local_qasm_simulator",
                         config: [String:Any]? = nil,
-                        silent: Bool = true,
                         basis_gates: String? = nil,
                         coupling_map: [Int:[Int]]? = nil,
                         initial_layout: OrderedDictionary<RegBit,RegBit>? = nil,
@@ -1014,7 +996,6 @@ public final class QuantumProgram {
                                                                           basis_gates: basis,
                                                                           coupling_map: coupling_map,
                                                                           initial_layout: initial_layout,
-                                                                          silent: silent,
                                                                           get_layout: true)
             // making the job to be added to qoj
             var job: [String:Any] = [:]
@@ -1058,25 +1039,21 @@ public final class QuantumProgram {
 
     /**
      Print the compiled circuits that are ready to run.
-     Args:
-     verbose (bool): controls how much is returned.
      */
     @discardableResult
-    public func get_execution_list(_ qobj: [String: Any], _ verbose: Bool = false) -> [String] {
+    public func get_execution_list(_ qobj: [String: Any]) -> [String] {
         var execution_list: [String] = []
-        if verbose {
-            if let iden = qobj["id"] as? String {
-                print("id: \(iden)")
+        if let iden = qobj["id"] as? String {
+            SDKLogger.logDebug("id: %@",iden)
+        }
+        if let config = qobj["config"] as? [String:Any] {
+            if let backend = config["backend"] as? String {
+                SDKLogger.logDebug("backend: %@",backend)
             }
-            if let config = qobj["config"] as? [String:Any] {
-                if let backend = config["backend"] as? String {
-                    print("backend: \(backend)")
-                }
-                print("qobj config:")
-                for (key,value) in config {
-                    if key != "backend" {
-                        print(" \(key) : \(value)")
-                    }
+            SDKLogger.logDebug("qobj config:")
+            for (key,value) in config {
+                if key != "backend" {
+                    SDKLogger.logDebug(" %@: %@", key,SDKLogger.debugString(value))
                 }
             }
         }
@@ -1084,16 +1061,12 @@ public final class QuantumProgram {
             for (_,circuit) in circuits {
                 if let name = circuit["name"] as? String {
                     execution_list.append(name)
-                    if verbose {
-                        print("  circuit name: \(name)")
-                    }
+                    SDKLogger.logDebug("  circuit name: %@",name)
                 }
-                if verbose {
-                    if let config = circuit["config"] as? [String:Any] {
-                        print("  circuit config:")
-                        for (key,value) in config {
-                            print("   \(key) : \(value)")
-                        }
+                if let config = circuit["config"] as? [String:Any] {
+                    SDKLogger.logDebug("  circuit config:")
+                    for (key,value) in config {
+                        SDKLogger.logDebug("   %@: %@", key,SDKLogger.debugString(value))
                     }
                 }
             }
@@ -1156,7 +1129,6 @@ public final class QuantumProgram {
      run or list of qobj.
      wait (int): Time interval to wait between requests for results
      timeout (int): Total time to wait until the execution stops
-     silent (bool): If true, prints out the running information
      callback (fn(result)): A function with signature:
      fn(result):
      The result param will be a Result object.
@@ -1164,12 +1136,10 @@ public final class QuantumProgram {
     public func run_async(_ qobj: [String:Any],
                           wait: Int = 5,
                           timeout: Int = 60,
-                          silent: Bool = true,
                           _ callback:  @escaping ((_:Result) -> Void)) {
         self._run_internal([qobj],
                            wait: wait,
                            timeout: timeout,
-                           silent: silent,
                            callbackSingle: callback)
     }
 
@@ -1184,7 +1154,6 @@ public final class QuantumProgram {
      qobj_list (list(dict)): The list of quantum objects to run.
      wait (int): Time interval to wait between requests for results
      timeout (int): Total time to wait until the execution stops
-     silent (bool): If true, prints out the running information
      callback (fn(results)): A function with signature:
      fn(results):
      The results param will be a list of Result objects, one
@@ -1193,19 +1162,16 @@ public final class QuantumProgram {
     public func run_batch_async(_ qobj_list: [[String:Any]],
                                 wait: Int = 5,
                                 timeout: Int = 120,
-                                silent: Bool = true,
                                 _ callback: ((_:[Result]) -> Void)?) {
         self._run_internal(qobj_list,
                            wait: wait,
                            timeout: timeout,
-                           silent: silent,
                            callbackMultiple: callback)
     }
 
     private func _run_internal(_ qobj_list: [[String:Any]],
                                wait: Int,
                                timeout: Int,
-                               silent: Bool,
                                callbackSingle: ((_:Result) -> Void)? = nil,
                                callbackMultiple: ((_:[Result]) -> Void)? = nil) {
         do {
@@ -1222,7 +1188,7 @@ public final class QuantumProgram {
                                             callbackMultiple)
                 self.jobProcessors[data.jobProcessor.identifier] = data
             }
-            job_processor.submit(wait, timeout, silent)
+            job_processor.submit(wait, timeout)
         } catch {
             var results: [Result] = []
             for qobj in qobj_list {
@@ -1273,8 +1239,6 @@ public final class QuantumProgram {
          compiler
          wait (int): wait time is how long to check if the job is completed
          timeout (int): is time until the execution stops
-         silent (bool): is an option to print out the compiling information
-         or not
          basis_gates (str): a comma seperated string and are the base gates,
          which by default are: u1,u2,u3,cx,id
          coupling_map (dict): A directed graph of coupling::
@@ -1312,7 +1276,6 @@ public final class QuantumProgram {
                         config: [String:Any]? = nil,
                         wait: Int = 5,
                         timeout: Int = 60,
-                        silent: Bool = true,
                         basis_gates: String? = nil,
                         coupling_map: [Int:[Int]]? = nil,
                         initial_layout: OrderedDictionary<RegBit,RegBit>? = nil,
@@ -1324,7 +1287,6 @@ public final class QuantumProgram {
             let qobj = try self.compile(name_of_circuits,
                              backend: backend,
                              config: config,
-                             silent: silent,
                              basis_gates: basis_gates,
                              coupling_map: coupling_map,
                              initial_layout: initial_layout,
@@ -1334,7 +1296,6 @@ public final class QuantumProgram {
             self.run_async(qobj,
                            wait: wait,
                            timeout: timeout,
-                           silent: silent,
                            callback)
         } catch {
             DispatchQueue.main.async {

@@ -121,7 +121,7 @@ class UnrollerTests: XCTestCase {
         print(QASM_source)
 
         let qobj = try qp.compile(["rippleadd"], backend: UnrollerTests.backend, coupling_map: UnrollerTests.coupling_map, shots: 1024)
-        qp.get_execution_list(qobj,true)
+        qp.get_execution_list(qobj)
        /* let asyncExpectation = self.expectation(description: "runJob")
         qp.run_async(qobj) { (result) in
             do {

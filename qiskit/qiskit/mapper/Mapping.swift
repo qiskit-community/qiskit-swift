@@ -63,15 +63,12 @@ final class Mapping {
                                   _ layout: OrderedDictionary<RegBit,RegBit>,
                                   _ qubit_subset: [RegBit],
                                   _ coupling: Coupling,
-                                  _ trials: Int,
-                                  _ verbose: Bool = false) throws -> (Bool, String?, Int?, OrderedDictionary<RegBit,RegBit>?, Bool) {
-        if verbose {
-            print("layer_permutation: ----- enter -----")
-            print("layer_permutation: layer_partition = \(layer_partition)")
-            print("layer_permutation: layout = \(layout)")
-            print("layer_permutation: qubit_subset = \(qubit_subset)")
-            print("layer_permutation: trials = \(trials)")
-        }
+                                  _ trials: Int) throws -> (Bool, String?, Int?, OrderedDictionary<RegBit,RegBit>?, Bool) {
+        SDKLogger.logDebug("layer_permutation: ----- enter -----")
+        SDKLogger.logDebug("layer_permutation: layer_partition = %@", SDKLogger.debugString(layer_partition))
+        SDKLogger.logDebug("layer_permutation: layout =  %@", SDKLogger.debugString(layout))
+        SDKLogger.logDebug("layer_permutation: qubit_subset = %@", SDKLogger.debugString(qubit_subset))
+        SDKLogger.logDebug("layer_permutation: trials = %d", trials)
 
         var rev_layout: OrderedDictionary<RegBit,RegBit> = OrderedDictionary<RegBit,RegBit>()
         for (a,b) in layout {
@@ -87,23 +84,17 @@ final class Mapping {
             }
         }
 
-        if verbose {
-            print("layer_permutation: gates = \(gates)")
-        }
+        SDKLogger.logDebug("layer_permutation: gates =  %@", SDKLogger.debugString(gates))
 
         // Can we already apply the gates?
         var dist: Int = 0
         for g in gates {
             dist += try coupling.distance(layout[g.0]!,layout[g.1]!)
         }
-        if verbose {
-            print("layer_permutation: dist = \(dist)")
-        }
+        SDKLogger.logDebug("layer_permutation: dist = %d",dist)
         if dist == gates.count {
-            if verbose {
-                print("layer_permutation: done already")
-                print("layer_permutation: ----- exit -----")
-            }
+            SDKLogger.logDebug("layer_permutation: done already")
+            SDKLogger.logDebug("layer_permutation: ----- exit -----")
             return (true, "", 0, layout, gates.isEmpty)
         }
 
@@ -113,9 +104,7 @@ final class Mapping {
         var best_circ: String? = nil  // initialize best swap circuit
         var best_layout: OrderedDictionary<RegBit,RegBit>? = nil  // initialize best final layout
         for trial in 0..<trials {
-            if verbose {
-                print("layer_permutation: trial \(trial)")
-            }
+            SDKLogger.logDebug("layer_permutation: trial %d",trial)
             var trial_layout = layout
             var rev_trial_layout = rev_layout
             var trial_circ = ""  // circuit produced in this trial
@@ -128,8 +117,6 @@ final class Mapping {
             for i in coupling.get_qubits() {
                 for j in coupling.get_qubits() {
                     let scale: Double = 1.0 + Random().normal(mean: 0.0, standardDeviation: 1.0 / Double(n))
-                    //print("scale \(scale")
-                    //print(try coupling.distance(i, j))
                     xi[i]![j] = scale * pow(Double(try coupling.distance(i, j)),2)
                     xi[j]![i] = xi[i]![j]
                 }
@@ -170,9 +157,7 @@ final class Mapping {
                             }
                             // Record progress if we succceed
                             if new_cost < min_cost {
-                                if verbose {
-                                    print("layer_permutation: progress! min_cost = \(min_cost)")
-                                }
+                                SDKLogger.logDebug("layer_permutation: progress! min_cost = %f", min_cost)
                                 progress_made = true
                                 min_cost = new_cost
                                 opt_layout = new_layout
@@ -189,9 +174,7 @@ final class Mapping {
                         trial_layout = opt_layout
                         rev_trial_layout = rev_opt_layout
                         circ += "swap \(opt_edge!.one.description),\(opt_edge!.two.description); "
-                        if verbose {
-                            print("layer_permutation: chose pair \(opt_edge!)")
-                        }
+                        SDKLogger.logDebug("layer_permutation: chose pair  %@", SDKLogger.debugString(opt_edge!))
                     }
                     else {
                         break
@@ -203,38 +186,28 @@ final class Mapping {
                 for g in gates {
                     dist += try coupling.distance(trial_layout[g.0]!,trial_layout[g.1]!)
                 }
-                if verbose {
-                    print("layer_permutation: dist = \(dist)")
-                }
+                SDKLogger.logDebug("layer_permutation: dist = %d",dist)
                 // If all gates can be applied now, we are finished
                 // Otherwise we need to consider a deeper swap circuit
                 if dist == gates.count {
-                    if verbose {
-                        print("layer_permutation: all can be applied now")
-                    }
+                    SDKLogger.logDebug("layer_permutation: all can be applied now")
                     trial_circ += circ
                     break
                 }
 
                 // Increment the depth
                 d += 1
-                if verbose {
-                    print("layer_permutation: increment depth to \(d)")
-                }
+                SDKLogger.logDebug("layer_permutation: increment depth to %d",d)
             }
             // Either we have succeeded at some depth d < dmax or failed
             var dist: Int = 0
             for g in gates {
                 dist += try coupling.distance(trial_layout[g.0]!,trial_layout[g.1]!)
             }
-            if verbose {
-                print("layer_permutation: dist = \(dist)")
-            }
+            SDKLogger.logDebug("layer_permutation: dist = %d",dist)
             if dist == gates.count {
                 if d < best_d {
-                    if verbose {
-                        print("layer_permutation: got circuit with depth \(d)")
-                    }
+                    SDKLogger.logDebug("layer_permutation: got circuit with depth %d",d)
                     best_circ = trial_circ
                     best_layout = trial_layout
                 }
@@ -242,16 +215,12 @@ final class Mapping {
             }
         }
         if best_circ == nil {
-            if verbose {
-                print("layer_permutation: failed!")
-                print("layer_permutation: ----- exit -----")
-            }
+            SDKLogger.logDebug("layer_permutation: failed!")
+            SDKLogger.logDebug("layer_permutation: ----- exit -----")
             return (false, nil, nil, nil, false)
         }
-        if verbose {
-            print("layer_permutation: done")
-            print("layer_permutation: ----- exit -----")
-        }
+        SDKLogger.logDebug("layer_permutation: done")
+        SDKLogger.logDebug("layer_permutation: ----- exit -----")
         return (true, best_circ, best_d, best_layout, false)
     }
 
@@ -260,7 +229,6 @@ final class Mapping {
 
      circuit_graph = input DAGCircuit
      coupling_graph = corresponding CouplingGraph
-     verbose = optional flag to print more information
 
      Adds "h" to the circuit basis.
 
@@ -269,7 +237,7 @@ final class Mapping {
      of coupling_graph. Raises an exception if the circuit_graph
      does not conform to the coupling_graph.
      */
-    static func direction_mapper(_ circuit_graph: DAGCircuit, _ coupling_graph: Coupling, _ verbose: Bool = false) throws -> DAGCircuit {
+    static func direction_mapper(_ circuit_graph: DAGCircuit, _ coupling_graph: Coupling) throws -> DAGCircuit {
         guard let basis = circuit_graph.basis["cx"] else {
             return circuit_graph
         }
@@ -294,16 +262,12 @@ final class Mapping {
             }
             let cxedge = TupleRegBit(data.qargs[0], data.qargs[1])
             if cg_edges.contains(cxedge) {
-                if verbose {
-                    print("cx \(cxedge.one.description), \(cxedge.two.description) -- OK")
-                }
+                SDKLogger.logDebug("cx %@, %@ -- OK",cxedge.one.description,cxedge.two.description)
                 continue
             }
             if cg_edges.contains(TupleRegBit(cxedge.two, cxedge.one)) {
                 try circuit_graph.substitute_circuit_one(cx_node,flipped_cx_circuit,wires: [RegBit("q", 0), RegBit("q", 1)])
-                if verbose {
-                    print("cx \(cxedge.one.description), \(cxedge.two.description) -FLIP")
-                }
+                SDKLogger.logDebug("cx %@, %@ -FLIP",cxedge.one.description,cxedge.two.description)
                 continue
             }
             throw MappingError.errorCouplingGraph(cxedge: cxedge)
@@ -321,7 +285,6 @@ final class Mapping {
      best_circ = swap circuit returned from swap algorithm
      circuit_graph = original input circuit
      layer_list = list of circuit objects for each layer
-     verbose = set True for more print output
 
      Return openqasm_output, the QASM string to append.
     */
@@ -331,8 +294,7 @@ final class Mapping {
                             _ best_d: Int,
                             _ best_circ: String,
                             _ circuit_graph: DAGCircuit,
-                            _ layer_list: [Layer],
-                            _ verbose: Bool = false) throws -> String {
+                            _ layer_list: [Layer]) throws -> String {
         var openqasm_output = ""
         let layout = best_layout
 
@@ -340,9 +302,7 @@ final class Mapping {
         // output all layers up to this point and ignore any
         // swap gates. Set the initial layout.
         if first_layer {
-            if verbose {
-                print("update_qasm_and_layout: first multi-qubit gate layer")
-            }
+            SDKLogger.logDebug("update_qasm_and_layout: first multi-qubit gate layer")
             // Output all layers up to this point
             openqasm_output += try circuit_graph.qasm(decls_only: true, add_swap: true,aliases: layout)
             for j in 0..<(i+1) {
@@ -353,15 +313,11 @@ final class Mapping {
         else {
             // Output any swaps
             if best_d > 0 {
-                if verbose {
-                    print("update_qasm_and_layout: swaps in this layer, depth \(best_d)")
-                }
+                SDKLogger.logDebug("update_qasm_and_layout: swaps in this layer, depth %d",best_d)
                 openqasm_output += best_circ
             }
             else {
-                if verbose {
-                    print("update_qasm_and_layout: no swaps in this layer")
-                }
+                SDKLogger.logDebug("update_qasm_and_layout: no swaps in this layer")
             }
             // Output this layer
             openqasm_output += try layer_list[i].graph.qasm(no_decls: true,aliases: layout)
@@ -379,7 +335,6 @@ final class Mapping {
         of coupling_graph (optional)
         basis (str, optional): basis string specifying basis of output
             DAGCircuit
-        verbose (bool, optional): print more information
 
      Returns:
          Returns a DAGCircuit object containing a circuit equivalent to
@@ -393,7 +348,6 @@ final class Mapping {
                             _ coupling_graph: Coupling,
                             _ init_layout: OrderedDictionary<RegBit,RegBit>? = nil,
                             _ b: String = "cx,u1,u2,u3,id",
-                            verbose: Bool = false,
                             trials: Int = 20) throws -> (DAGCircuit, OrderedDictionary<RegBit,RegBit>) {
         if circuit_graph.width() > coupling_graph.size() {
             throw MappingError.errorQubitsCouplingGraph
@@ -402,16 +356,14 @@ final class Mapping {
 
         // Schedule the input circuit
         let layerlist = try circuit_graph.layers()
-        if verbose {
-            print("schedule:")
-            for (i,layer) in layerlist.enumerated() {
-                let partition = layer.partition
-                var array: [String] = []
-                for regBit in partition {
-                    array.append(regBit.description)
-                }
-                print("    \(i): \(array.joined(separator: ","))")
+        SDKLogger.logDebug("schedule:")
+        for (i,layer) in layerlist.enumerated() {
+            let partition = layer.partition
+            var array: [String] = []
+            for regBit in partition {
+                array.append(regBit.description)
             }
+            SDKLogger.logDebug("    %d: %@",i,array.joined(separator: ","))
         }
 
         // Check input layout and create default layout if necessary
@@ -451,33 +403,28 @@ final class Mapping {
         var layout = initial_layout!
         var openqasm_output = ""
         var first_layer = true  // True until first layer is output
-        if verbose {
-            print("initial_layout = ", layout)
-        }
+        SDKLogger.logDebug("initial_layout = %@", SDKLogger.debugString(layout))
+
         // Iterate over layers
         for (i,layer) in layerlist.enumerated() {
             // Attempt to find a permutation for this layer
             let (success_flag, best_circ, best_d, best_layout, trivial_flag) =
                 try Mapping.layer_permutation(layer.partition, layout, qubit_subset, coupling_graph, trials)
-            if verbose {
-                print("swap_mapper: layer \(i)")
-                print("swap_mapper: success_flag=\(success_flag),best_d=\(best_d ?? 0),trivial_flag=\(trivial_flag)")
-            }
+            SDKLogger.logDebug("swap_mapper: layer: %d",i)
+            SDKLogger.logDebug("swap_mapper: success_flag=%@,best_d=%d,trivial_flag=%@",
+                                  success_flag ? "true" : "false",best_d ?? 0,trivial_flag ? "true" : "false")
+
             // If this layer is only single-qubit gates,
             // and we have yet to see multi-qubit gates,
             // continue to the next iteration
             if trivial_flag && first_layer {
-                if verbose {
-                    print("swap_mapper: skip to next layer")
-                }
+                SDKLogger.logDebug("swap_mapper: skip to next layer")
                 continue
             }
 
             // If this fails, try one gate at a time in this layer
             if !success_flag {
-                if verbose {
-                    print("swap_mapper: failed, layer \(i), retrying sequentially")
-                }
+                SDKLogger.logDebug("swap_mapper: failed, layer %d, retrying sequentially",i)
                 let serial_layerlist = try layer.graph.serial_layers()
 
                 // Go through each gate in the layer
@@ -485,10 +432,9 @@ final class Mapping {
                     let (success_flag, best_circ, best_d, best_layout, trivial_flag) =
                             try Mapping.layer_permutation(serial_layer.partition,
                                                           layout, qubit_subset, coupling_graph,trials)
-                    if verbose {
-                        print("swap_mapper: layer \(i), sublayer \(j)")
-                        print("swap_mapper: success_flag=\(success_flag) best_d=\(best_d ?? 0),trivial_flag=\(trivial_flag)")
-                    }
+                    SDKLogger.logDebug("swap_mapper: layer %d, sublayer %d",i,j)
+                    SDKLogger.logDebug("swap_mapper: success_flag=%@,best_d=%d,trivial_flag=%@",
+                                          success_flag ? "true" : "false",best_d ?? 0,trivial_flag ? "true" : "false")
 
                     // Give up if we fail again
                     if !success_flag {
@@ -498,15 +444,13 @@ final class Mapping {
                     // and we have yet to see multi-qubit gates,
                     // continue to the next inner iteration
                     if trivial_flag && first_layer {
-                        if verbose {
-                            print("swap_mapper: skip to next sublayer")
-                        }
+                        SDKLogger.logDebug("swap_mapper: skip to next sublayer")
                         continue
                     }
                     // Update the record of qubit positions for each inner iteration
                     let layout = best_layout!
                     // Update the QASM
-                    openqasm_output += try Mapping.update_qasm(j, first_layer, best_layout!, best_d!, best_circ!, circuit_graph, serial_layerlist, verbose)
+                    openqasm_output += try Mapping.update_qasm(j, first_layer, best_layout!, best_d!, best_circ!, circuit_graph, serial_layerlist)
                     // Update initial layout
                     if first_layer {
                         initial_layout = layout
@@ -518,7 +462,7 @@ final class Mapping {
                 // Update the qubit positions each iteration
                 layout = best_layout!
                 // Update the QASM
-                openqasm_output += try update_qasm(i, first_layer, best_layout!, best_d!, best_circ!, circuit_graph, layerlist, verbose)
+                openqasm_output += try update_qasm(i, first_layer, best_layout!, best_d!, best_circ!, circuit_graph, layerlist)
                 // Update initial layout
                 if first_layer {
                     initial_layout = layout
@@ -670,11 +614,11 @@ final class Mapping {
                 break
             }
         }
-        print("xi=", xi)
-        print("theta1=", theta1)
-        print("theta2=", theta2)
-        print("solutions=", solutions)
-        print("deltas=", deltas)
+         SDKLogger.logDebug("xi=", xi)
+         SDKLogger.logDebug("theta1=", theta1)
+         SDKLogger.logDebug("theta2=", theta2)
+         SDKLogger.logDebug("solutions=", solutions)
+         SDKLogger.logDebug("deltas=", deltas)
         assert (false, "Error! No solution found. This should not happen.")
         return (0.0,0.0,0.0)
     }

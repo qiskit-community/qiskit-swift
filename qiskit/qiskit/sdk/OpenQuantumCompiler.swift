@@ -30,8 +30,6 @@ final class OpenQuantumCompiler {
          circuits to run on different backends.
          Args:
          qasm_circuit (str): qasm text to compile
-         silent (bool): is an option to print out the compiling information
-         or not
          basis_gates (str): a comma seperated string and are the base gates,
                              which by default are: u1,u2,u3,cx,id
          coupling_map (dict): A directed graph of coupling::
@@ -66,7 +64,6 @@ final class OpenQuantumCompiler {
                         basis_gates: String = "u1,u2,u3,cx,id",
                         coupling_map: [Int:[Int]]? = nil,
                         initial_layout: OrderedDictionary<RegBit,RegBit>? = nil,
-                        silent: Bool = true,
                         get_layout: Bool = false,
                         format: String = "dag") throws -> CompiledCircuit {
 
@@ -75,20 +72,14 @@ final class OpenQuantumCompiler {
 
         // if a coupling map is given compile to the map
         if coupling_map != nil {
-            if !silent {
-                print("pre-mapping properties: \(try compiled_dag_circuit.property_summary())")
-            }
+            SDKLogger.logDebug("pre-mapping properties: %@", SDKLogger.debugString(try compiled_dag_circuit.property_summary()))
             // Insert swap gates
             let coupling = try Coupling(coupling_map)
-            if !silent {
-                print("initial layout: \(initial_layout ?? OrderedDictionary<RegBit,RegBit>())")
-            }
+            SDKLogger.logDebug("initial layout: %@", SDKLogger.debugString(initial_layout ?? OrderedDictionary<RegBit,RegBit>()))
             var layout:OrderedDictionary<RegBit,RegBit> = OrderedDictionary<RegBit,RegBit>()
-            (compiled_dag_circuit, layout) = try Mapping.swap_mapper(compiled_dag_circuit, coupling, initial_layout, verbose: false, trials: 20)
+            (compiled_dag_circuit, layout) = try Mapping.swap_mapper(compiled_dag_circuit, coupling, initial_layout, trials: 20)
             final_layout = layout
-            if !silent {
-                print("final layout: \(final_layout!)")
-            }
+            SDKLogger.logDebug("final layout: %@", SDKLogger.debugString(final_layout!))
             // Expand swaps
             compiled_dag_circuit = try _unroller_code(try compiled_dag_circuit.qasm())
             // Change cx directions
@@ -97,9 +88,7 @@ final class OpenQuantumCompiler {
             try Mapping.cx_cancellation(compiled_dag_circuit)
             // Simplify single qubit gates
             compiled_dag_circuit = try Mapping.optimize_1q_gates(compiled_dag_circuit)
-            if !silent {
-                print("post-mapping properties: \(try compiled_dag_circuit.property_summary())")
-            }
+            SDKLogger.logDebug("post-mapping properties: %@", SDKLogger.debugString(try compiled_dag_circuit.property_summary()))
         }
 
         let compiled_circuit = CompiledCircuit()

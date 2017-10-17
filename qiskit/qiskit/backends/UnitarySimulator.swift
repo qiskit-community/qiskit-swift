@@ -140,15 +140,12 @@ final class UnitarySimulator: BaseBackend {
 
     /**
      Run circuits in qobj
-
-     Args:
-         silent (bool, optional): Silence print statements. Default is True.
      */
-    override public func run(_ silent: Bool = true) throws -> Result {
+    override public func run() throws -> Result {
         var result_list: [[String:Any]] = []
         if let circuits = self.qobj["circuits"] as? [[String:Any]] {
             for circuit in circuits {
-                result_list.append(try self.run_circuit(circuit,silent))
+                result_list.append(try self.run_circuit(circuit))
             }
         }
         return Result(["result": result_list, "status": "COMPLETED"],self.qobj)
@@ -157,7 +154,7 @@ final class UnitarySimulator: BaseBackend {
     /**
      Apply the single-qubit gate.
      */
-    private func run_circuit(_ circuit: [String:Any], _ silent: Bool = true) throws -> [String:Any] {
+    private func run_circuit(_ circuit: [String:Any]) throws -> [String:Any] {
         var result: [String:Any] = [:]
         result["data"] = [:]
         guard let ccircuit = circuit["compiled_circuit"] as? [String:Any] else {
@@ -197,14 +194,10 @@ final class UnitarySimulator: BaseBackend {
                 }
             }
             else if name == "measure" {
-                if !silent {
-                    print("Warning have dropped measure from unitary simulator")
-                }
+                SDKLogger.logDebug("Warning have dropped measure from unitary simulator")
             }
             else if name == "reset" {
-                if !silent {
-                    print("Warning have dropped reset from unitary simulator")
-                }
+                SDKLogger.logDebug("Warning have dropped reset from unitary simulator")
             }
             else if name == "barrier" {
             }

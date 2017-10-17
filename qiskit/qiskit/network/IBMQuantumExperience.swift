@@ -496,7 +496,6 @@ public final class IBMQuantumExperience {
             responseHandler(nil, IBMQuantumExperienceError.missingStatus)
             return
         }
-        //print("Status: \(status)")
         guard let id_execution = execution["id"] as? String else {
             responseHandler(nil, IBMQuantumExperienceError.missingExecutionId)
             return
@@ -533,7 +532,6 @@ public final class IBMQuantumExperience {
             responseHandler(respond, nil)
             return
         }
-        //print("Waiting for results...")
         self.getCompleteResultFromExecution(id_execution: id_execution,
                                             timeOut: ((timeout > 300) ? 300 : timeout),
                                             access_token: access_token,

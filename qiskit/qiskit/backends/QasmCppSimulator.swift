@@ -27,7 +27,7 @@ final class QasmCppSimulator: BaseBackend {
     /**
      Run simulation on C++ simulator.
      */
-    override public func run(_ silent: Bool = true) throws -> Result {
+    override public func run() throws -> Result {
        throw SimulatorError.notImplemented(backend: self.configuration["name"] as! String)
     }
 }
