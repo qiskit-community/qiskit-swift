@@ -151,17 +151,22 @@ final class QasmSimulator: BaseBackend {
     /**
      Initialize the QasmSimulator object
      */
-    public required init(_ qobj: [String:Any]) {
-        super.init(qobj)
-        self._configuration = [
-            "name": "local_qasm_simulator",
-            "url": "https://github.com/IBM/qiskit-sdk-py",
-            "simulator": true,
-            "local": true,
-            "description": "A python simulator for qasm files",
-            "coupling_map": "all-to-all",
-            "basis_gates": "u1,u2,u3,cx,id"
-        ]
+    public required init(_ configuration: [String:Any]?) {
+        super.init(configuration)
+        if let conf = configuration {
+            self._configuration = conf
+        }
+        else {
+            self._configuration = [
+                "name": "local_qasm_simulator",
+                "url": "https://github.com/IBM/qiskit-sdk-swift",
+                "simulator": true,
+                "local": true,
+                "description": "A swift simulator for qasm files",
+                "coupling_map": "all-to-all",
+                "basis_gates": "u1,u2,u3,cx,id"
+            ]
+        }
     }
 
     /**
@@ -292,19 +297,31 @@ final class QasmSimulator: BaseBackend {
     /**
      Run circuits in qobj
      */
-    override public func run() throws -> Result {
-        var result_list: [[String:Any]] = []
-        if let config = self.qobj["config"] as? [String:Any] {
-            if let shots = config["shots"] as? Int {
-                self._shots = shots
+    override public func run(_ q_job: QuantumJob, response: @escaping ((_:Result) -> Void)) {
+        DispatchQueue.global().async {
+            var result = Result()
+            let job_id = UUID().uuidString
+            do {
+                let qobj = q_job.qobj
+                var result_list: [[String:Any]] = []
+                if let config = qobj["config"] as? [String:Any] {
+                    if let shots = config["shots"] as? Int {
+                        self._shots = shots
+                    }
+                }
+                if let circuits = qobj["circuits"] as? [[String:Any]] {
+                    for circuit in circuits {
+                        result_list.append(try self.run_circuit(circuit))
+                    }
+                }
+                result = Result(["job_id": job_id, "result": result_list, "status": "COMPLETED"],qobj)
+            } catch {
+                result = Result(["job_id": job_id, "status": "ERROR","result": error.localizedDescription],q_job.qobj)
+            }
+            DispatchQueue.main.async {
+                 response(result)
             }
         }
-        if let circuits = self.qobj["circuits"] as? [[String:Any]] {
-            for circuit in circuits {
-                result_list.append(try self.run_circuit(circuit))
-            }
-        }
-        return Result(["result": result_list, "status": "COMPLETED"],self.qobj)
     }
 
     /**

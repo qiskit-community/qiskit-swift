@@ -41,6 +41,5 @@ public enum SimulatorError: LocalizedError, CustomStringConvertible {
         case .missingOperationName:
             return "Missing Operation name"
         }
-
     }
 }

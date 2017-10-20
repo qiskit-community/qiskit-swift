@@ -104,12 +104,10 @@ public final class QuantumProgram {
     }
 
     private var jobProcessors: [String: JobProcessorData] = [:]
-    private var __LOCAL_BACKENDS: Set<String> = Set<String>()
 
     /**
      only exists once you set the api to use the online backends
      */
-    private var __api: IBMQuantumExperience? = nil
     private var __api_config: APIConfig
 
     private var __quantum_registers: [String: QuantumRegister] = [:]
@@ -124,6 +122,8 @@ public final class QuantumProgram {
     private var __init_circuit: QuantumCircuit? = nil
 
     private var config: Qconfig
+
+    private let backendUtils : BackendUtils = BackendUtils()
 
     static private func convert(_ name: String) throws -> String {
         do {
@@ -146,7 +146,6 @@ public final class QuantumProgram {
         self.__api_config = try APIConfig()
         self.config  = try Qconfig()
         self.__quantum_program = QProgram()
-        self.__LOCAL_BACKENDS = BackendUtils.local_backends()
         if let s = specs {
             try self.__init_specs(s)
         }
@@ -214,10 +213,10 @@ public final class QuantumProgram {
             if size != register.size {
                 throw QISKitError.registerSize
             }
-            SDKLogger.logDebug(">> quantum_register exists: %@ %d",name,size)
+            SDKLogger.logInfo(">> quantum_register exists: %@ %d",name,size)
         }
         else {
-            SDKLogger.logDebug(">> new quantum_register created: %@ %d",name,size)
+            SDKLogger.logInfo(">> new quantum_register created: %@ %d",name,size)
             try self.__quantum_registers[name] = QuantumRegister(name, size)
         }
         return self.__quantum_registers[name]!
@@ -271,10 +270,10 @@ public final class QuantumProgram {
             if size != register.size {
                 throw QISKitError.registerSize
             }
-            SDKLogger.logDebug(">> classical register exists: %@ %d",name,size)
+            SDKLogger.logInfo(">> classical register exists: %@ %d",name,size)
         }
         else {
-            SDKLogger.logDebug(">> new classical register created: %@ %d",name,size)
+            SDKLogger.logInfo(">> new classical register created: %@ %d",name,size)
             try self.__classical_registers[name] = ClassicalRegister(name, size)
         }
         return self.__classical_registers[name]!
@@ -408,9 +407,9 @@ public final class QuantumProgram {
 
     private func load_qasm(_ qasm: Qasm, _ name: String, _ basis_gates: String) throws -> String {
         let node_circuit = try qasm.parse()
-        SDKLogger.logDebug("circuit name: %@",name)
-        SDKLogger.logDebug("******************************")
-        SDKLogger.logDebug("%@",node_circuit.qasm(15))
+        SDKLogger.logInfo("circuit name: %@",name)
+        SDKLogger.logInfo("******************************")
+        SDKLogger.logInfo("%@",node_circuit.qasm(15))
 
         // current method to turn it a DAG quantum circuit.
         let unrolled_circuit = Unroller(node_circuit, CircuitBackend(basis_gates.components(separatedBy:",")))
@@ -531,7 +530,7 @@ public final class QuantumProgram {
      */
     public func set_api(token: String, url: String) throws {
         self.__api_config = try APIConfig(token,url)
-        self.__api = try IBMQuantumExperience(self.__api_config.token, try Qconfig(url: self.__api_config.url.absoluteString))
+        self.backendUtils.api = try IBMQuantumExperience(self.__api_config.token, try Qconfig(url: self.__api_config.url.absoluteString))
     }
 
     /**
@@ -545,7 +544,7 @@ public final class QuantumProgram {
      Returns a function handle to the API
      */
     public func get_api() -> IBMQuantumExperience? {
-        return self.__api
+        return self.backendUtils.api
     }
 
     /**
@@ -621,7 +620,7 @@ public final class QuantumProgram {
                 return
             }
             var ret = backends
-            ret.formUnion(self.__LOCAL_BACKENDS)
+            ret.formUnion(self.backendUtils.local_backends())
             responseHandler(ret,nil)
         }
     }
@@ -719,25 +718,25 @@ public final class QuantumProgram {
      backend is the name of the local or online simulator or experiment
     */
     public func get_backend_status(_ backend: String,
-                                  responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
+                                  responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
         self.online_backends() { (backends,error) in
             if error != nil {
-                responseHandler(nil,error)
+                responseHandler([:],error)
                 return
             }
             if backends.contains(backend) {
                 guard let api = self.get_api() else {
-                    responseHandler(nil,IBMQuantumExperienceError.errorBackend(backend: backend))
+                    responseHandler([:],IBMQuantumExperienceError.errorBackend(backend: backend))
                     return
                 }
                 api.backend_status(backend: backend,responseHandler: responseHandler)
                 return
             }
-            if self.__LOCAL_BACKENDS.contains(backend) {
+            if self.backendUtils.local_backends().contains(backend) {
                 responseHandler(["available" : true],nil)
                 return
             }
-            responseHandler(nil,IBMQuantumExperienceError.errorBackend(backend: backend))
+            responseHandler([:],IBMQuantumExperienceError.errorBackend(backend: backend))
         }
     }
 
@@ -745,19 +744,14 @@ public final class QuantumProgram {
      Return the configuration of the backend
      */
     public func get_backend_configuration(_ backend: String, _ list_format: Bool = false,
-                                   responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
+                                   responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
         guard let api = self.get_api() else {
-            do {
-                responseHandler(try BackendUtils.get_backend_configuration(backend),nil)
-            }
-            catch {
-                responseHandler(nil,IBMQuantumExperienceError.internalError(error: error))
-            }
+            self.backendUtils.get_backend_configuration(backend,responseHandler)
             return
         }
         api.available_backends() { (backends,error) in
             if error != nil {
-                responseHandler(nil,error)
+                responseHandler([:],error)
                 return
             }
             do {
@@ -796,14 +790,9 @@ public final class QuantumProgram {
                         }
                     }
                 }
-                do {
-                    responseHandler(try BackendUtils.get_backend_configuration(backend),nil)
-                }
-                catch {
-                     responseHandler(nil,IBMQuantumExperienceError.internalError(error: error))
-                }
+                responseHandler([:],IBMQuantumExperienceError.missingBackends)
             } catch {
-                responseHandler(nil,IBMQuantumExperienceError.internalError(error: error))
+                responseHandler([:],IBMQuantumExperienceError.internalError(error: error))
             }
         }
     }
@@ -813,40 +802,40 @@ public final class QuantumProgram {
      backend is the name of the experiment
      */
     public func get_backend_calibration(_ backend: String,
-                                       responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
+                                       responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
         self.online_backends() { (backends,error) in
             if error != nil {
-                responseHandler(nil,error)
+                responseHandler([:],error)
                 return
             }
             if backends.contains(backend) {
                 guard let api = self.get_api() else {
-                    responseHandler(nil,IBMQuantumExperienceError.errorBackend(backend: backend))
+                    responseHandler([:],IBMQuantumExperienceError.errorBackend(backend: backend))
                     return
                 }
                 api.backend_calibration(backend: backend) { (calibrations,error) in
                     if error != nil {
-                        responseHandler(nil,error)
+                        responseHandler([:],error)
                         return
                     }
                     do {
                         var calibrations_edit: [String:Any] = [:]
-                        for (key, vals) in calibrations! {
+                        for (key, vals) in calibrations {
                             let new_key = try QuantumProgram.convert(key)
                             calibrations_edit[new_key] = vals
                         }
                         responseHandler(calibrations_edit,nil)
                     } catch {
-                        responseHandler(nil,IBMQuantumExperienceError.internalError(error: error))
+                        responseHandler([:],IBMQuantumExperienceError.internalError(error: error))
                     }
                 }
                 return
             }
-            if self.__LOCAL_BACKENDS.contains(backend) {
+            if self.backendUtils.local_backends().contains(backend) {
                 responseHandler(["backend" : backend],nil)
                 return
             }
-            responseHandler(nil,IBMQuantumExperienceError.errorBackend(backend: backend))
+            responseHandler([:],IBMQuantumExperienceError.errorBackend(backend: backend))
         }
     }
 
@@ -855,40 +844,40 @@ public final class QuantumProgram {
      backend is the name of the experiment
      */
     public func get_backend_parameters(_ backend: String,
-                                        responseHandler: @escaping ((_:[String:Any]?, _:IBMQuantumExperienceError?) -> Void)) {
+                                        responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
         self.online_backends() { (backends,error) in
             if error != nil {
-                responseHandler(nil,error)
+                responseHandler([:],error)
                 return
             }
             if backends.contains(backend) {
                 guard let api = self.get_api() else {
-                    responseHandler(nil,IBMQuantumExperienceError.errorBackend(backend: backend))
+                    responseHandler([:],IBMQuantumExperienceError.errorBackend(backend: backend))
                     return
                 }
                 api.backend_parameters(backend: backend) { (parameters,error) in
                     if error != nil {
-                        responseHandler(nil,error)
+                        responseHandler([:],error)
                         return
                     }
                     do {
                         var parameters_edit: [String:Any] = [:]
-                        for (key, vals) in parameters! {
+                        for (key, vals) in parameters {
                             let new_key = try QuantumProgram.convert(key)
                             parameters_edit[new_key] = vals
                         }
                         responseHandler(parameters_edit,nil)
                     } catch {
-                        responseHandler(nil,IBMQuantumExperienceError.internalError(error: error))
+                        responseHandler([:],IBMQuantumExperienceError.internalError(error: error))
                     }
                 }
                 return
             }
-            if self.__LOCAL_BACKENDS.contains(backend) {
+            if self.backendUtils.local_backends().contains(backend) {
                 responseHandler(["backend" : backend],nil)
                 return
             }
-            responseHandler(nil,IBMQuantumExperienceError.errorBackend(backend: backend))
+            responseHandler([:],IBMQuantumExperienceError.errorBackend(backend: backend))
         }
     }
 
@@ -1044,16 +1033,16 @@ public final class QuantumProgram {
     public func get_execution_list(_ qobj: [String: Any]) -> [String] {
         var execution_list: [String] = []
         if let iden = qobj["id"] as? String {
-            SDKLogger.logDebug("id: %@",iden)
+            SDKLogger.logInfo("id: %@",iden)
         }
         if let config = qobj["config"] as? [String:Any] {
             if let backend = config["backend"] as? String {
-                SDKLogger.logDebug("backend: %@",backend)
+                SDKLogger.logInfo("backend: %@",backend)
             }
-            SDKLogger.logDebug("qobj config:")
+            SDKLogger.logInfo("qobj config:")
             for (key,value) in config {
                 if key != "backend" {
-                    SDKLogger.logDebug(" %@: %@", key,SDKLogger.debugString(value))
+                    SDKLogger.logInfo(" %@: %@", key,SDKLogger.debugString(value))
                 }
             }
         }
@@ -1061,12 +1050,12 @@ public final class QuantumProgram {
             for (_,circuit) in circuits {
                 if let name = circuit["name"] as? String {
                     execution_list.append(name)
-                    SDKLogger.logDebug("  circuit name: %@",name)
+                    SDKLogger.logInfo("  circuit name: %@",name)
                 }
                 if let config = circuit["config"] as? [String:Any] {
-                    SDKLogger.logDebug("  circuit config:")
+                    SDKLogger.logInfo("  circuit config:")
                     for (key,value) in config {
-                        SDKLogger.logDebug("   %@: %@", key,SDKLogger.debugString(value))
+                        SDKLogger.logInfo("   %@: %@", key,SDKLogger.debugString(value))
                     }
                 }
             }
@@ -1179,20 +1168,18 @@ public final class QuantumProgram {
             for qobj in qobj_list {
                 q_job_list.append(QuantumJob(qobj))
             }
-            let job_processor = try JobProcessor(q_job_list,
-                                            callback: self._jobs_done_callback,
-                                            api: self.__api)
+            let job_processor = try JobProcessor(self.backendUtils,q_job_list,self._jobs_done_callback)
             SyncLock.synchronized(self) {
                 let data = JobProcessorData(job_processor,
                                             callbackSingle,
                                             callbackMultiple)
                 self.jobProcessors[data.jobProcessor.identifier] = data
             }
-            job_processor.submit(wait, timeout)
+            job_processor.submit()
         } catch {
             var results: [Result] = []
             for qobj in qobj_list {
-                results.append(Result(["status": "ERROR","result": error.localizedDescription],qobj))
+                results.append(Result(["job_id": "0","status": "ERROR","result": error.localizedDescription],qobj))
             }
             DispatchQueue.main.async {
                 if callbackSingle != nil {
@@ -1299,7 +1286,7 @@ public final class QuantumProgram {
                            callback)
         } catch {
             DispatchQueue.main.async {
-                callback(Result(["status": "ERROR","result": error.localizedDescription],[:]))
+                callback(Result(["job_id": "0","status": "ERROR","result": error.localizedDescription],[:]))
             }
         }
     }

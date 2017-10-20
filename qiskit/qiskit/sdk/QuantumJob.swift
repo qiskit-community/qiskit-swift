@@ -18,19 +18,24 @@ import Foundation
 /**
  Creates a quantum circuit job
  */
-final class QuantumJob {
+public final class QuantumJob {
 
-    private var names: [String]
-    private let timeout: Int
-    private(set) var qobj: [String:Any] = [:]
-    private(set) var backend: String = ""
-    private var resources: [String:Any] = [:]
-    private let seed: Int?
-    private var result: Result? = nil
+    public private(set) var names: [String]
+    public let timeout: Int
+    public let wait: Int
+    public var qobj: [String:Any] {
+        return self._qobj
+    }
+    var _qobj: [String:Any] = [:]
+    public private(set) var backend: String = ""
+    public private(set) var resources: [String:Any] = [:]
+    public let seed: Int?
+    public private(set) var result: Result? = nil
 
     init(_ qobj: [String:Any],
-         _ timeout: Int = 60,
          _ seed: Int? = nil,
+         _ resources: [String:Any] = ["max_credits":3, "wait":5, "timeout":120],
+         _ shots: Int = 1024,
          _ names: [String]? = nil) {
 
         if let n = names {
@@ -39,27 +44,37 @@ final class QuantumJob {
         else {
             self.names = [String.randomAlphanumeric(length: 10)]
         }
-        self.timeout = timeout
-        self.qobj = qobj
+        if let t = resources["timeout"] as? Int {
+            self.timeout = t
+        }
+        else {
+            self.timeout = 120
+        }
+        if let w = resources["wait"] as? Int {
+            self.wait = w
+        }
+        else {
+            self.wait = 5
+        }
+        self._qobj = qobj
+        self.seed = seed
         if let config = self.qobj["config"] as? [String:Any] {
             if let backend = config["backend"] as? String {
                 self.backend = backend
             }
-            if let max_credits = config["max_credits"] {
-                self.resources = ["max_credits": max_credits]
-            }
         }
-        self.seed = seed
+        self.resources = resources
     }
 
     init(_ circuits: [DAGCircuit],
          _ backend: String = "local_qasm_simulator",
          _ circuit_config: [[String:Any]]? = nil,
-         _ timeout: Int = 60,
          _ seed: Int? = nil,
+         _ resources: [String:Any] = ["max_credits":3, "wait":5, "timeout":120],
          _ shots: Int = 1024,
          _ names: [String]? = nil,
-         _ do_compile: Bool = false) throws {
+         _ do_compile: Bool = false,
+         _ backendUtils: BackendUtils) throws {
 
         if let n = names {
             self.names = n
@@ -70,17 +85,26 @@ final class QuantumJob {
                 self.names.append(String.randomAlphanumeric(length: 10))
             }
         }
-        self.timeout = timeout
+        if let t = resources["timeout"] as? Int {
+            self.timeout = t
+        }
+        else {
+            self.timeout = 120
+        }
+        if let w = resources["wait"] as? Int {
+            self.wait = w
+        }
+        else {
+            self.wait = 5
+        }
         self.seed = seed
-        self.qobj = try self._create_qobj(circuits, circuit_config, backend, self.seed, shots, do_compile)
+        self._qobj = try self._create_qobj(circuits, circuit_config, backend, self.seed, shots, do_compile,backendUtils)
         if let config = self.qobj["config"] as? [String:Any] {
             if let backend = config["backend"] as? String {
                 self.backend = backend
             }
-            if let max_credits = config["max_credits"] {
-                self.resources = ["max_credits": max_credits]
-            }
         }
+        self.resources = resources
     }
 
     private func _create_qobj(_ circuits: [DAGCircuit],
@@ -88,7 +112,8 @@ final class QuantumJob {
                               _ backend: String,
                               _ seed: Int?,
                               _ shots: Int,
-                              _ do_compile: Bool) throws -> [String:Any] {
+                              _ do_compile: Bool,
+                              _ backendUtils: BackendUtils) throws -> [String:Any] {
         // local and remote backends currently need different
         // compilied circuit formats
         var formatted_circuits: [Any] = []
@@ -98,7 +123,7 @@ final class QuantumJob {
             }
         }
         else {
-            if BackendUtils.local_backends().contains(backend) {
+            if backendUtils.local_backends().contains(backend) {
                 for circuit in circuits {
                     formatted_circuits.append(try OpenQuantumCompiler.dag2json(circuit))
                 }

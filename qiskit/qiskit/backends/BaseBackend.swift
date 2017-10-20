@@ -22,20 +22,18 @@ import Foundation
  */
 public class BaseBackend {
 
-    public let qobj: [String:Any]
     public var configuration : [String:Any] {
         return self._configuration
     }
     var _configuration : [String:Any] = [:]
 
-    public required init(_ qobj: [String:Any]) {
+    public required init(_ configuration: [String:Any]?) {
         if type(of: self) == BaseBackend.self {
             fatalError("Abstract class instantiation.")
         }
-        self.qobj = qobj
     }
 
-    public func run() throws -> Result {
+    public func run(_ q_job: QuantumJob, response: @escaping ((_:Result) -> Void)) {
         preconditionFailure("run not implemented")
     }
 }

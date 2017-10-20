@@ -10,6 +10,7 @@
 		690188721EE24343005B4419 /* GraphError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 690188711EE24343005B4419 /* GraphError.swift */; };
 		690188741EE269B0005B4419 /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 690188731EE269B0005B4419 /* Queue.swift */; };
 		6908D0351EF5AC0500F77905 /* SyncLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6908D0341EF5AC0500F77905 /* SyncLock.swift */; };
+		690D12781F9914BE00569512 /* QeRemote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 690D12771F9914BE00569512 /* QeRemote.swift */; };
 		6913D0A21ECE41D6003C5FD3 /* InstructionSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6913D0A11ECE41D6003C5FD3 /* InstructionSet.swift */; };
 		691541811F4E1C4400B3E12D /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 691541801F4E1C4400B3E12D /* Result.swift */; };
 		692DBDFE1EE6E4440032F6CF /* Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692DBDFD1EE6E4440032F6CF /* Mapping.swift */; };
@@ -163,6 +164,7 @@
 		690188731EE269B0005B4419 /* Queue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Queue.swift; path = datastructures/Queue.swift; sourceTree = "<group>"; };
 		6908D0301EF5730200F77905 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; name = module.modulemap; path = module/module.modulemap; sourceTree = "<group>"; };
 		6908D0341EF5AC0500F77905 /* SyncLock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncLock.swift; path = datastructures/SyncLock.swift; sourceTree = "<group>"; };
+		690D12771F9914BE00569512 /* QeRemote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = QeRemote.swift; path = backends/QeRemote.swift; sourceTree = "<group>"; };
 		6913D0A11ECE41D6003C5FD3 /* InstructionSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = InstructionSet.swift; path = sdk/InstructionSet.swift; sourceTree = "<group>"; };
 		691541801F4E1C4400B3E12D /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Result.swift; path = sdk/Result.swift; sourceTree = "<group>"; };
 		692DBDFD1EE6E4440032F6CF /* Mapping.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Mapping.swift; path = mapper/Mapping.swift; sourceTree = "<group>"; };
@@ -348,9 +350,10 @@
 			isa = PBXGroup;
 			children = (
 				6953FF991F867C2900D54E26 /* BackendUtils.swift */,
+				6953FF9A1F867C2900D54E26 /* BaseBackend.swift */,
 				6953FF971F867C2800D54E26 /* QasmCppSimulator.swift */,
 				6953FF941F867C2800D54E26 /* QasmSimulator.swift */,
-				6953FF9A1F867C2900D54E26 /* BaseBackend.swift */,
+				690D12771F9914BE00569512 /* QeRemote.swift */,
 				6953FF961F867C2800D54E26 /* SimulatorError.swift */,
 				6953FF951F867C2800D54E26 /* SimulatorTools.swift */,
 				6953FF981F867C2900D54E26 /* UnitarySimulator.swift */,
@@ -746,6 +749,7 @@
 				DF8E1CE11EE5025C00DCC35C /* NodeOpaque.swift in Sources */,
 				695701361ED75C1C00C6CCAB /* GraphEdge.swift in Sources */,
 				69467F671F4C7B2C009E7E03 /* Layer.swift in Sources */,
+				690D12781F9914BE00569512 /* QeRemote.swift in Sources */,
 				697D36AE1EE3493B00557541 /* OrderedDictionary.swift in Sources */,
 				69458A281EE5A1760027F5A6 /* Coupling.swift in Sources */,
 				695701351ED75C1C00C6CCAB /* GraphVertex.swift in Sources */,

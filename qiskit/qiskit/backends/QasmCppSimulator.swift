@@ -17,17 +17,33 @@ import Foundation
 
 final class QasmCppSimulator: BaseBackend {
 
-    public required init(_ qobj: [String:Any]) {
-        super.init(qobj)
-        if let config = self.qobj["config"] as? [String:Any] {
-            self._configuration = config
+    public required init(_ configuration: [String:Any]?) {
+        super.init(configuration)
+        if let conf = configuration {
+            self._configuration = conf
+        }
+        else {
+            self._configuration = ["name": "local_qasm_cpp_simulator",
+                "url": "https://github.com/IBM/qiskit-sdk-swift",
+                "exe": "qasm_simulator",
+                "simulator": true,
+                "local": true,
+                "description": "A c++ simulator for qasm files",
+                "coupling_map": "all-to-all",
+                "basis_gates": "u1,u2,u3,cx,id"
+            ]
         }
     }
 
     /**
      Run simulation on C++ simulator.
      */
-    override public func run() throws -> Result {
-       throw SimulatorError.notImplemented(backend: self.configuration["name"] as! String)
+    override public func run(_ q_job: QuantumJob, response: @escaping ((_:Result) -> Void)) {
+        DispatchQueue.global().async {
+            DispatchQueue.main.async {
+                let job_id = UUID().uuidString
+                response(Result(["job_id": job_id, "status": "ERROR","result": SimulatorError.notImplemented(backend: self.configuration["name"] as! String).localizedDescription],q_job.qobj))
+            }
+        }
     }
 }

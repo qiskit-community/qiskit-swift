@@ -113,4 +113,7 @@ public final class SDKLogger {
         debugPrint(items, separator: separator, terminator: terminator, to: &text)
         return text
     }
+
+    private init() {
+    }
 }

@@ -99,17 +99,22 @@ final class UnitarySimulator: BaseBackend {
     private var _number_of_qubits: Int = 0
     private var _unitary_state: [[Complex]] = []
 
-    public required init(_ qobj: [String:Any]) {
-        super.init(qobj)
-        self._configuration = [
-            "name": "local_unitary_simulator",
-            "url": "https://github.com/IBM/qiskit-sdk-py",
-            "simulator": true,
-            "local": true,
-            "description": "A python simulator for unitary matrix",
-            "coupling_map": "all-to-all",
-            "basis_gates": "u1,u2,u3,cx,id"
-        ]
+    public required init(_ configuration: [String:Any]?) {
+        super.init(configuration)
+        if let conf = configuration {
+            self._configuration = conf
+        }
+        else {
+            self._configuration = [
+                "name": "local_unitary_simulator",
+                "url": "https://github.com/IBM/qiskit-sdk-swift",
+                "simulator": true,
+                "local": true,
+                "description": "A swift simulator for unitary matrix",
+                "coupling_map": "all-to-all",
+                "basis_gates": "u1,u2,u3,cx,id"
+            ]
+        }
     }
 
     /**
@@ -141,14 +146,26 @@ final class UnitarySimulator: BaseBackend {
     /**
      Run circuits in qobj
      */
-    override public func run() throws -> Result {
-        var result_list: [[String:Any]] = []
-        if let circuits = self.qobj["circuits"] as? [[String:Any]] {
-            for circuit in circuits {
-                result_list.append(try self.run_circuit(circuit))
+    override public func run(_ q_job: QuantumJob, response: @escaping ((_:Result) -> Void)) {
+        DispatchQueue.global().async {
+            var result = Result()
+            let job_id = UUID().uuidString
+            do {
+                let qobj = q_job.qobj
+                var result_list: [[String:Any]] = []
+                if let circuits = qobj["circuits"] as? [[String:Any]] {
+                    for circuit in circuits {
+                        result_list.append(try self.run_circuit(circuit))
+                    }
+                }
+                result = Result(["job_id": job_id, "result": result_list, "status": "COMPLETED"],qobj)
+            } catch {
+                result = Result(["job_id": job_id, "status": "ERROR","result": error.localizedDescription],q_job.qobj)
+            }
+            DispatchQueue.main.async {
+                response(result)
             }
         }
-        return Result(["result": result_list, "status": "COMPLETED"],self.qobj)
     }
 
     /**
@@ -194,10 +211,10 @@ final class UnitarySimulator: BaseBackend {
                 }
             }
             else if name == "measure" {
-                SDKLogger.logDebug("Warning have dropped measure from unitary simulator")
+                SDKLogger.logInfo("Warning have dropped measure from unitary simulator")
             }
             else if name == "reset" {
-                SDKLogger.logDebug("Warning have dropped reset from unitary simulator")
+                SDKLogger.logInfo("Warning have dropped reset from unitary simulator")
             }
             else if name == "barrier" {
             }
