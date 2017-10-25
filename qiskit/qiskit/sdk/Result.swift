@@ -18,22 +18,32 @@ import Foundation
 
 /**
  Result Class.
+
  Class internal properties.
+
  Methods to process the quantum program after it has been run
+
  Internal::
+
      qobj =  { -- the quantum object that was complied --}
-     result =
-         [
-             {
-             "data":
-                 {  #### DATA CAN BE A DIFFERENT DICTIONARY FOR EACH BACKEND ####
-                 "counts": {’00000’: XXXX, ’00001’: XXXXX},
-                 "time"  : xx.xxxxxxxx
+     result = {
+         "job_id": --job-id (string),
+                     #This string links the result with the job that computes it,
+                     #it should be issued by the backend it is run on.
+         "status": --status (string),
+         "result":
+             [
+                 {
+                 "data":
+                     {  #### DATA CAN BE A DIFFERENT DICTIONARY FOR EACH BACKEND ####
+                     "counts": {’00000’: XXXX, ’00001’: XXXXX},
+                     "time"  : xx.xxxxxxxx
+                     },
+                 "status": --status (string)--
                  },
-             "status": --status (string)--
-             },
-             ...
-        ]
+                 ...
+             ]
+     }
  */
 public final class Result: CustomStringConvertible {
 
@@ -57,6 +67,22 @@ public final class Result: CustomStringConvertible {
      */
     public var description: String {
         return self.get_status() ?? ""
+    }
+
+    public subscript(index: Int) -> [String:Any]? {
+        if let results = self.__result["result"] as? [[String:Any]] {
+            if index < results.count {
+                return results[index]
+            }
+        }
+        return [:]
+    }
+
+    public var count: Int {
+        if let results = self.__result["result"] as? [[String:Any]] {
+            return results.count
+        }
+        return 0
     }
 
     /**
@@ -173,6 +199,19 @@ public final class Result: CustomStringConvertible {
             }
         }
         return nil
+    }
+
+    /**
+     Return the job id assigned by the api if this is a remote job.
+
+     Returns:
+     a string containing the job id.
+     */
+    public func get_job_id() -> String {
+        if let job_id = self.__result["job_id"] as? String {
+            return job_id
+        }
+        return ""
     }
 
     public func get_error() -> String {
