@@ -23,16 +23,18 @@ children[1] is an integer (not a node).
 */
 public final class NodeIndexedId: Node {
 
-    public let identifer: Node?
+    public let identifier: Node
     public private(set) var _name: String = ""
     public private(set) var line: Int = 0
     public private(set) var file: String = ""
     public private(set) var index: Int = -1
     
-    @objc public init(identifier: Node, index: Node?) {
-        self.identifer = identifier
-        self.index = (index as? NodeNNInt)?.value ?? -1
-        if let _id = self.identifer as? NodeId{
+    @objc public init(identifier: Node, index: Node) {
+        self.identifier = identifier
+        if let _nnInt = index as? NodeNNInt {
+            self.index = _nnInt.value
+        }
+        if let _id = self.identifier as? NodeId {
             // Name of the qreg
             self._name = _id.name
             // Source line number
@@ -40,7 +42,6 @@ public final class NodeIndexedId: Node {
             // Source file name
             self.file = _id.file
         }
-            
    }
 
     public override var type: NodeType {
@@ -48,19 +49,14 @@ public final class NodeIndexedId: Node {
     }
 
     public override var name: String {
-        return _name
+        return self._name
     }
     
     public override func qasm(_ prec: Int) -> String {
-        guard let ident = identifer else {
-            assertionFailure("Invalid NodeIndexedId Operation")
-            return ""
-        }
-        var qasm: String = "\(ident.qasm(prec))"
-        if index >= 0 {
-            qasm += " [\(index)]"
+        var qasm: String = "\(self.identifier.qasm(prec))"
+        if self.index >= 0 {
+            qasm += " [\(self.index)]"
         }
         return qasm
     }
-    
 }

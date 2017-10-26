@@ -99,7 +99,7 @@ final class UnitarySimulator: BaseBackend {
     private var _number_of_qubits: Int = 0
     private var _unitary_state: [[Complex]] = []
 
-    public required init(_ configuration: [String:Any]?) {
+    public required init(_ configuration: [String:Any]? = nil) {
         super.init(configuration)
         if let conf = configuration {
             self._configuration = conf

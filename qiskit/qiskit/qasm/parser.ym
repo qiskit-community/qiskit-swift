@@ -139,8 +139,7 @@ id : ID { $$ = [ParseTree createId: $1 line: yylineno]; }
 // ----------------------------------------
 //  indexed_id : ID [ int ]
 // ----------------------------------------
-indexed_id : id { $$ = [ParseTree createIndexedId: $1 index: nil]; }
-| id '[' nninteger ']' { $$ = [ParseTree createIndexedId: $1 index: $3]; }
+indexed_id : id '[' nninteger ']' { $$ = [ParseTree createIndexedId: $1 index: $3]; }
 
 // ----------------------------------------
 //  primary : id

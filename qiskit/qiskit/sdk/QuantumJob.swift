@@ -33,10 +33,9 @@ public final class QuantumJob {
     public private(set) var result: Result? = nil
 
     init(_ qobj: [String:Any],
-         _ seed: Int? = nil,
-         _ resources: [String:Any] = ["max_credits":3, "wait":5, "timeout":120],
-         _ shots: Int = 1024,
-         _ names: [String]? = nil) {
+         seed: Int? = nil,
+         resources: [String:Any] = ["max_credits":3, "wait":5, "timeout":120],
+         names: [String]? = nil) {
 
         if let n = names {
             self.names = n
@@ -67,13 +66,13 @@ public final class QuantumJob {
     }
 
     init(_ circuits: [DAGCircuit],
-         _ backend: String = "local_qasm_simulator",
-         _ circuit_config: [[String:Any]]? = nil,
-         _ seed: Int? = nil,
-         _ resources: [String:Any] = ["max_credits":3, "wait":5, "timeout":120],
-         _ shots: Int = 1024,
-         _ names: [String]? = nil,
-         _ do_compile: Bool = false,
+         backend: String = "local_qasm_simulator",
+         circuit_config: [[String:Any]]? = nil,
+         seed: Int? = nil,
+         resources: [String:Any] = ["max_credits":3, "wait":5, "timeout":120],
+         shots: Int = 1024,
+         names: [String]? = nil,
+         do_compile: Bool = false,
          _ backendUtils: BackendUtils) throws {
 
         if let n = names {

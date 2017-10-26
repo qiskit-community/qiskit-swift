@@ -25,7 +25,7 @@ final class QeRemote: BaseBackend {
 
     var api: IBMQuantumExperience? = nil
 
-    public required init(_ configuration: [String:Any]?) {
+    public required init(_ configuration: [String:Any]? = nil) {
         super.init(configuration)
         if var conf = configuration {
             conf["local"] = false

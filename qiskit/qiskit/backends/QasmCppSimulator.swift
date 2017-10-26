@@ -17,7 +17,7 @@ import Foundation
 
 final class QasmCppSimulator: BaseBackend {
 
-    public required init(_ configuration: [String:Any]?) {
+    public required init(_ configuration: [String:Any]? = nil) {
         super.init(configuration)
         if let conf = configuration {
             self._configuration = conf

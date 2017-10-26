@@ -81,7 +81,7 @@ struct Complex: Equatable, Hashable, CustomStringConvertible, ExpressibleByInteg
     }
 
     public func abs() -> Double {
-        return self.radiusSquare
+        return self.radius
     }
 
     // e ** x+iy = e**x * (cos(y) + i sin(y))

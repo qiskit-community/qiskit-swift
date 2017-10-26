@@ -27,7 +27,7 @@ public class BaseBackend {
     }
     var _configuration : [String:Any] = [:]
 
-    public required init(_ configuration: [String:Any]?) {
+    public required init(_ configuration: [String:Any]? = nil) {
         if type(of: self) == BaseBackend.self {
             fatalError("Abstract class instantiation.")
         }

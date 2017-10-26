@@ -151,7 +151,7 @@ final class QasmSimulator: BaseBackend {
     /**
      Initialize the QasmSimulator object
      */
-    public required init(_ configuration: [String:Any]?) {
+    public required init(_ configuration: [String:Any]? = nil) {
         super.init(configuration)
         if let conf = configuration {
             self._configuration = conf

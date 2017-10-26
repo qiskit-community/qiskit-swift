@@ -394,6 +394,7 @@ public final class QuantumProgram {
         Adds a quantum circuit with the gates given in the qasm string to the
         quantum program.
      */
+    @discardableResult
     public func load_qasm_text(qasm_string: String, name: String? = nil,basis_gates: String = "u1,u2,u3,cx,id") throws -> String {
         var n: String = ""
         if name != nil {
@@ -410,7 +411,7 @@ public final class QuantumProgram {
         SDKLogger.logInfo("circuit name: %@",name)
         SDKLogger.logInfo("******************************")
         SDKLogger.logInfo("%@",node_circuit.qasm(15))
-
+       
         // current method to turn it a DAG quantum circuit.
         let unrolled_circuit = Unroller(node_circuit, CircuitBackend(basis_gates.components(separatedBy:",")))
         let circuit_unrolled = try unrolled_circuit.execute() as! QuantumCircuit
