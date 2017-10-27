@@ -271,7 +271,7 @@ final class QeRemote: BaseBackend {
                 return
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(wait)) {
-                SDKLogger.logInfo("status = %@ (%d seconds)",status,elapsed + wait)
+                SDKLogger.logInfo("status = \(status) (\(elapsed+wait) seconds)")
                 wait_for_job(api,jobid, wait, timeout, elapsed + wait, responseHandler)
             }
         }

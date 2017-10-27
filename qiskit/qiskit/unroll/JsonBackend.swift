@@ -18,31 +18,32 @@ import Foundation
 /**
  Backend for the unroller that composes qasm into json file.
 
- The input is a AST and a basis set and returns a json memory object
+ The input is a AST and a basis set and returns a json memory object::
 
- [
-     "header": [
-         "number_of_qubits": 2, // int
-         "number_of_clbits": 2, // int
-         "qubit_labels": [["q", 0], ["v", 0]], // list[list[string, int]]
-         "clbit_labels": [["c", 2]], // list[list[string, int]]
-     ]
+     {
+     "header": {
+     "number_of_qubits": 2, // int
+     "number_of_clbits": 2, // int
+     "qubit_labels": [["q", 0], ["v", 0]], // list[list[string, int]]
+     "clbit_labels": [["c", 2]], // list[list[string, int]]
+     }
      "operations": // list[map]
-     [
          [
-             "name": , // required -- string
-             "params": , // optional -- list[double]
-             "qubits": , // optional -- list[int]
-             "cbits": , //optional -- list[int]
-             "conditional":  // optional -- map
-             [
-                 "type": "equals", // string
-                 "mask": "0xHexadecimalString", // big int
-                 "val":  "0xHexadecimalString", // big int
-             ]
-         ],
-     ]
- ]
+             {
+                 "name": , // required -- string
+                 "params": , // optional -- list[double]
+                 "texparams": , // optional -- list[string]
+                 "qubits": , // optional -- list[int]
+                 "cbits": , //optional -- list[int]
+                 "conditional":  // optional -- map
+                     {
+                         "type": "equals", // string
+                         "mask": "0xHexadecimalString", // big int
+                         "val":  "0xHexadecimalString", // big int
+                     }
+             },
+         ]
+ }
  */
 final class JsonBackend: UnrollerBackend {
 
@@ -176,7 +177,7 @@ final class JsonBackend: UnrollerBackend {
     private func _add_condition() {
         if self.creg != nil {
             var mask: Int = 0
-            let conditional: [String:Any] = [:]
+            var conditional: [String:Any] = [:]
             for (cbit, index) in self._cbit_order_internal {
                 if cbit.name == self.creg! {
                     mask |= (1 << index)
@@ -185,7 +186,6 @@ final class JsonBackend: UnrollerBackend {
                 // need to know the total number of cbits.
                 // format_spec = "{0:#0{%d}X}" % number_of_clbits
                 // format_spec.format(mask)
-                var conditional: [String:Any] = [:]
                 conditional["type"] = "equals"
                 conditional["mask"] = String(format: "0x%X", mask)
                 conditional["val"] = String(format: "0x%X", self.cval!)

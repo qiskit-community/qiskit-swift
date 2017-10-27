@@ -46,7 +46,7 @@ final class JobProcessor {
         }
         // Call the callback when all jobs have finished
         if self.num_jobs == 0 {
-            SDKLogger.logInfo("%@",SDKLogger.debugString(result))
+            SDKLogger.logInfo(SDKLogger.debugString(result))
             self.callback?(self.identifier,self.jobs_results)
         }
     }

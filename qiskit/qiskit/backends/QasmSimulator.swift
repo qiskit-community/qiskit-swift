@@ -302,6 +302,7 @@ final class QasmSimulator: BaseBackend {
             var result = Result()
             let job_id = UUID().uuidString
             do {
+                self._shots = 0
                 let qobj = q_job.qobj
                 var result_list: [[String:Any]] = []
                 if let config = qobj["config"] as? [String:Any] {
@@ -346,8 +347,11 @@ final class QasmSimulator: BaseBackend {
         guard let ccircuit = circuit["compiled_circuit"] as? [String:Any] else {
             throw SimulatorError.missingCompiledCircuit
         }
+        self._number_of_qubits = 0
+        self._number_of_cbits = 0
         self._quantum_state = []
         self._classical_state = 0
+
         var cl_reg_index: [Int] = [] // starting bit index of classical register
         var cl_reg_nbits: [Int] = [] // number of bits in classical register
         if let header = ccircuit["header"]  as? [String:Any] {
@@ -384,7 +388,10 @@ final class QasmSimulator: BaseBackend {
                 for operation in operations {
                     if let conditional = operation["conditional"] as? [String:Any] {
                         if let m = conditional["mask"] as? String {
-                            if var mask = Int(m, radix: 16) {
+                            let scanner = Scanner(string: m)
+                            var n: UInt64 = 0
+                            if scanner.scanHexInt64(&n) {
+                                var mask = Int(n)
                                 if mask > 0 {
                                     var value: Int = self._classical_state & mask
                                     while ((mask & 0x1) == 0) {
@@ -392,8 +399,10 @@ final class QasmSimulator: BaseBackend {
                                         value >>= 1
                                     }
                                     if let v = conditional["val"] as? String {
-                                        if let val = Int(v, radix: 16) {
-                                            if value != val {
+                                        let scanner = Scanner(string: v)
+                                        var n: UInt64 = 0
+                                        if scanner.scanHexInt64(&n) {
+                                            if value != Int(n) {
                                                 continue
                                             }
                                         }

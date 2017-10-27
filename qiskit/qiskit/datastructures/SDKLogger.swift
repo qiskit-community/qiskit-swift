@@ -81,33 +81,33 @@ public final class SDKLogger {
         }
     }
 
-    static public func log(_ message: StaticString, type: LogType = .typeDefault, _ args: CVarArg...) {
+    static public func log(_ message: String, type: LogType = .typeDefault) {
         if isEnabled(type: type) {
             if #available(OSX 10.12, iOS 10.0, watchOS 3.0, tvOS 10.0, *) {
-                os_log(message, log: logger, type: SDKLogger.logTypeToOSLogType(type), args)
+                os_log("%@", log: logger, type: SDKLogger.logTypeToOSLogType(type), message)
             }
             else {
-                let text = NSString(format: String(describing: message), arguments: getVaList(args))
-                debugPrint(text)
+                debugPrint(message)
             }
         }
     }
     
-    static public func logInfo(_ message: StaticString, _ args: CVarArg...) {
-        log(message, type: .typeInfo, args)
+    static public func logInfo(_ message: String) {
+        log(message, type: .typeInfo)
     }
     
-    static public func logDebug(_ message: StaticString, _ args: CVarArg...) {
-        log(message, type: .typeDebug, args)
+    static public func logDebug(_ message: String) {
+        log(message, type: .typeDebug)
     }
     
-    static public func logError(_ message: StaticString, _ args: CVarArg...) {
-        log(message, type: .typeError, args)
+    static public func logError(_ message: String) {
+        log(message, type: .typeError)
     }
     
-    static public func logFault(_ message: StaticString, _ args: CVarArg...) {
-        log(message, type: .typeFault, args)
+    static public func logFault(_ message: String) {
+        log(message, type: .typeFault)
     }
+
     static public func debugString(_ items: Any..., separator: String = "", terminator: String = "") -> String {
         var text = ""
         debugPrint(items, separator: separator, terminator: terminator, to: &text)

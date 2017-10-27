@@ -213,10 +213,10 @@ public final class QuantumProgram {
             if size != register.size {
                 throw QISKitError.registerSize
             }
-            SDKLogger.logInfo(">> quantum_register exists: %@ %d",name,size)
+            SDKLogger.logInfo(">> quantum_register exists:\(name) \(size)")
         }
         else {
-            SDKLogger.logInfo(">> new quantum_register created: %@ %d",name,size)
+            SDKLogger.logInfo(">> new quantum_register created: \(name) \(size)")
             try self.__quantum_registers[name] = QuantumRegister(name, size)
         }
         return self.__quantum_registers[name]!
@@ -270,10 +270,10 @@ public final class QuantumProgram {
             if size != register.size {
                 throw QISKitError.registerSize
             }
-            SDKLogger.logInfo(">> classical register exists: %@ %d",name,size)
+            SDKLogger.logInfo(">> classical register exists: \(name) \(size)")
         }
         else {
-            SDKLogger.logInfo(">> new classical register created: %@ %d",name,size)
+            SDKLogger.logInfo(">> new classical register created: \(name) \(size)")
             try self.__classical_registers[name] = ClassicalRegister(name, size)
         }
         return self.__classical_registers[name]!
@@ -408,9 +408,9 @@ public final class QuantumProgram {
 
     private func load_qasm(_ qasm: Qasm, _ name: String, _ basis_gates: String) throws -> String {
         let node_circuit = try qasm.parse()
-        SDKLogger.logInfo("circuit name: %@",name)
+        SDKLogger.logInfo("circuit name: \(name)")
         SDKLogger.logInfo("******************************")
-        SDKLogger.logInfo("%@",node_circuit.qasm(15))
+        SDKLogger.logInfo(node_circuit.qasm(15))
        
         // current method to turn it a DAG quantum circuit.
         let unrolled_circuit = Unroller(node_circuit, CircuitBackend(basis_gates.components(separatedBy:",")))
@@ -991,18 +991,9 @@ public final class QuantumProgram {
             var job: [String:Any] = [:]
             job["name"] = name
             // config parameters used by the runner
-            let s: Any = seed != nil ? seed! : NSNull()
-            if var conf = config {
-                conf["seed"] = s
-                job["config"] = conf
-            }
-            else {
-                job["config"] = ["seed":s]
-            }
+            var conf: [String:Any] = config != nil ? config! : [:]
+            conf["coupling_map"] = coupling_map != nil ? Coupling.coupling_dict2list(coupling_map!) : NSNull()
             // TODO: Jay: make config options optional for different backends
-            if let map = coupling_map {
-                job["coupling_map"] = Coupling.coupling_dict2list(map)
-            }
             // Map the layout to a format that can be json encoded
             if let layout = compiledCircuit.final_layout {
                 var list_layout: [[[String:Int]]] = []
@@ -1011,18 +1002,23 @@ public final class QuantumProgram {
                     let vDict = [v.name : v.index]
                     list_layout.append([kDict,vDict])
                 }
-                job["layout"] = layout
+                conf["layout"] = layout
             }
-            job["basis_gates"] = basis
+            else {
+                conf["layout"] = NSNull()
+            }
+            conf["basis_gates"] = basis
+            conf["seed"] = seed != nil ? seed! : NSNull()
+
+            job["config"] = conf
 
             // the compuled circuit to be run saved as a dag
             job["compiled_circuit"] = try OpenQuantumCompiler.dag2json(compiledCircuit.dag!,basis_gates: basis)
             job["compiled_circuit_qasm"] = try compiledCircuit.dag!.qasm(qeflag:true)
             // add job to the qobj
-            if var circuits = qobj["circuits"] as? [Any] {
-                circuits.append(job)
-                qobj["circuits"] = circuits
-            }
+            var circuits = qobj["circuits"] as! [Any]
+            circuits.append(job)
+            qobj["circuits"] = circuits
         }
         return qobj
     }
@@ -1034,16 +1030,16 @@ public final class QuantumProgram {
     public func get_execution_list(_ qobj: [String: Any]) -> [String] {
         var execution_list: [String] = []
         if let iden = qobj["id"] as? String {
-            SDKLogger.logInfo("id: %@",iden)
+            SDKLogger.logInfo("id: \(iden)")
         }
         if let config = qobj["config"] as? [String:Any] {
             if let backend = config["backend"] as? String {
-                SDKLogger.logInfo("backend: %@",backend)
+                SDKLogger.logInfo("backend: \(backend)")
             }
             SDKLogger.logInfo("qobj config:")
             for (key,value) in config {
                 if key != "backend" {
-                    SDKLogger.logInfo(" %@: %@", key,SDKLogger.debugString(value))
+                    SDKLogger.logInfo(" \(key): \(SDKLogger.debugString(value))")
                 }
             }
         }
@@ -1051,12 +1047,12 @@ public final class QuantumProgram {
             for (_,circuit) in circuits {
                 if let name = circuit["name"] as? String {
                     execution_list.append(name)
-                    SDKLogger.logInfo("  circuit name: %@",name)
+                    SDKLogger.logInfo("  circuit name: \(name)")
                 }
                 if let config = circuit["config"] as? [String:Any] {
                     SDKLogger.logInfo("  circuit config:")
                     for (key,value) in config {
-                        SDKLogger.logInfo("   %@: %@", key,SDKLogger.debugString(value))
+                        SDKLogger.logInfo("   \(key): \(SDKLogger.debugString(value))")
                     }
                 }
             }

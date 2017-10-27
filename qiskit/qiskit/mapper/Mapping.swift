@@ -65,10 +65,10 @@ final class Mapping {
                                   _ coupling: Coupling,
                                   _ trials: Int) throws -> (Bool, String?, Int?, OrderedDictionary<RegBit,RegBit>?, Bool) {
         SDKLogger.logDebug("layer_permutation: ----- enter -----")
-        SDKLogger.logDebug("layer_permutation: layer_partition = %@", SDKLogger.debugString(layer_partition))
-        SDKLogger.logDebug("layer_permutation: layout =  %@", SDKLogger.debugString(layout))
-        SDKLogger.logDebug("layer_permutation: qubit_subset = %@", SDKLogger.debugString(qubit_subset))
-        SDKLogger.logDebug("layer_permutation: trials = %d", trials)
+        SDKLogger.logDebug("layer_permutation: layer_partition = \(SDKLogger.debugString(layer_partition))")
+        SDKLogger.logDebug("layer_permutation: layout = \(SDKLogger.debugString(layout))")
+        SDKLogger.logDebug("layer_permutation: qubit_subset = \(SDKLogger.debugString(qubit_subset))")
+        SDKLogger.logDebug("layer_permutation: trials = \(trials)")
 
         var rev_layout: OrderedDictionary<RegBit,RegBit> = OrderedDictionary<RegBit,RegBit>()
         for (a,b) in layout {
@@ -84,14 +84,14 @@ final class Mapping {
             }
         }
 
-        SDKLogger.logDebug("layer_permutation: gates =  %@", SDKLogger.debugString(gates))
+        SDKLogger.logDebug("layer_permutation: gates = \(SDKLogger.debugString(gates))")
 
         // Can we already apply the gates?
         var dist: Int = 0
         for g in gates {
             dist += try coupling.distance(layout[g.0]!,layout[g.1]!)
         }
-        SDKLogger.logDebug("layer_permutation: dist = %d",dist)
+        SDKLogger.logDebug("layer_permutation: dist = \(dist)")
         if dist == gates.count {
             SDKLogger.logDebug("layer_permutation: done already")
             SDKLogger.logDebug("layer_permutation: ----- exit -----")
@@ -104,7 +104,7 @@ final class Mapping {
         var best_circ: String? = nil  // initialize best swap circuit
         var best_layout: OrderedDictionary<RegBit,RegBit>? = nil  // initialize best final layout
         for trial in 0..<trials {
-            SDKLogger.logDebug("layer_permutation: trial %d",trial)
+            SDKLogger.logDebug("layer_permutation: trial \(trial)")
             var trial_layout = layout
             var rev_trial_layout = rev_layout
             var trial_circ = ""  // circuit produced in this trial
@@ -157,7 +157,7 @@ final class Mapping {
                             }
                             // Record progress if we succceed
                             if new_cost < min_cost {
-                                SDKLogger.logDebug("layer_permutation: progress! min_cost = %f", min_cost)
+                                SDKLogger.logDebug("layer_permutation: progress! min_cost = \(min_cost)")
                                 progress_made = true
                                 min_cost = new_cost
                                 opt_layout = new_layout
@@ -174,7 +174,7 @@ final class Mapping {
                         trial_layout = opt_layout
                         rev_trial_layout = rev_opt_layout
                         circ += "swap \(opt_edge!.one.description),\(opt_edge!.two.description); "
-                        SDKLogger.logDebug("layer_permutation: chose pair  %@", SDKLogger.debugString(opt_edge!))
+                        SDKLogger.logDebug("layer_permutation: chose pair \(SDKLogger.debugString(opt_edge!))")
                     }
                     else {
                         break
@@ -186,7 +186,7 @@ final class Mapping {
                 for g in gates {
                     dist += try coupling.distance(trial_layout[g.0]!,trial_layout[g.1]!)
                 }
-                SDKLogger.logDebug("layer_permutation: dist = %d",dist)
+                SDKLogger.logDebug("layer_permutation: dist = \(dist)")
                 // If all gates can be applied now, we are finished
                 // Otherwise we need to consider a deeper swap circuit
                 if dist == gates.count {
@@ -197,17 +197,17 @@ final class Mapping {
 
                 // Increment the depth
                 d += 1
-                SDKLogger.logDebug("layer_permutation: increment depth to %d",d)
+                SDKLogger.logDebug("layer_permutation: increment depth to \(d)")
             }
             // Either we have succeeded at some depth d < dmax or failed
             var dist: Int = 0
             for g in gates {
                 dist += try coupling.distance(trial_layout[g.0]!,trial_layout[g.1]!)
             }
-            SDKLogger.logDebug("layer_permutation: dist = %d",dist)
+            SDKLogger.logDebug("layer_permutation: dist = \(dist)")
             if dist == gates.count {
                 if d < best_d {
-                    SDKLogger.logDebug("layer_permutation: got circuit with depth %d",d)
+                    SDKLogger.logDebug("layer_permutation: got circuit with depth \(d)")
                     best_circ = trial_circ
                     best_layout = trial_layout
                 }
@@ -262,12 +262,12 @@ final class Mapping {
             }
             let cxedge = TupleRegBit(data.qargs[0], data.qargs[1])
             if cg_edges.contains(cxedge) {
-                SDKLogger.logDebug("cx %@, %@ -- OK",cxedge.one.description,cxedge.two.description)
+                SDKLogger.logDebug("cx \(cxedge.one.description), \(cxedge.two.description) -- OK")
                 continue
             }
             if cg_edges.contains(TupleRegBit(cxedge.two, cxedge.one)) {
                 try circuit_graph.substitute_circuit_one(cx_node,flipped_cx_circuit,wires: [RegBit("q", 0), RegBit("q", 1)])
-                SDKLogger.logDebug("cx %@, %@ -FLIP",cxedge.one.description,cxedge.two.description)
+                SDKLogger.logDebug("cx \(cxedge.one.description), \(cxedge.two.description) -FLIP")
                 continue
             }
             throw MappingError.errorCouplingGraph(cxedge: cxedge)
@@ -313,7 +313,7 @@ final class Mapping {
         else {
             // Output any swaps
             if best_d > 0 {
-                SDKLogger.logDebug("update_qasm_and_layout: swaps in this layer, depth %d",best_d)
+                SDKLogger.logDebug("update_qasm_and_layout: swaps in this layer, depth \(best_d)")
                 openqasm_output += best_circ
             }
             else {
@@ -363,7 +363,7 @@ final class Mapping {
             for regBit in partition {
                 array.append(regBit.description)
             }
-            SDKLogger.logDebug("    %d: %@",i,array.joined(separator: ","))
+            SDKLogger.logDebug("    \(i): \(array.joined(separator: ","))")
         }
 
         // Check input layout and create default layout if necessary
@@ -403,16 +403,15 @@ final class Mapping {
         var layout = initial_layout!
         var openqasm_output = ""
         var first_layer = true  // True until first layer is output
-        SDKLogger.logDebug("initial_layout = %@", SDKLogger.debugString(layout))
+        SDKLogger.logDebug("initial_layout = \(SDKLogger.debugString(layout))")
 
         // Iterate over layers
         for (i,layer) in layerlist.enumerated() {
             // Attempt to find a permutation for this layer
             let (success_flag, best_circ, best_d, best_layout, trivial_flag) =
                 try Mapping.layer_permutation(layer.partition, layout, qubit_subset, coupling_graph, trials)
-            SDKLogger.logDebug("swap_mapper: layer: %d",i)
-            SDKLogger.logDebug("swap_mapper: success_flag=%@,best_d=%d,trivial_flag=%@",
-                                  success_flag ? "true" : "false",best_d ?? 0,trivial_flag ? "true" : "false")
+            SDKLogger.logDebug("swap_mapper: layer: \(i)")
+            SDKLogger.logDebug("swap_mapper: success_flag=\(success_flag),best_d=\(best_d ?? 0),trivial_flag=\(trivial_flag)")
 
             // If this layer is only single-qubit gates,
             // and we have yet to see multi-qubit gates,
@@ -424,7 +423,7 @@ final class Mapping {
 
             // If this fails, try one gate at a time in this layer
             if !success_flag {
-                SDKLogger.logDebug("swap_mapper: failed, layer %d, retrying sequentially",i)
+                SDKLogger.logDebug("swap_mapper: failed, layer \(i), retrying sequentially")
                 let serial_layerlist = try layer.graph.serial_layers()
 
                 // Go through each gate in the layer
@@ -432,9 +431,8 @@ final class Mapping {
                     let (success_flag, best_circ, best_d, best_layout, trivial_flag) =
                             try Mapping.layer_permutation(serial_layer.partition,
                                                           layout, qubit_subset, coupling_graph,trials)
-                    SDKLogger.logDebug("swap_mapper: layer %d, sublayer %d",i,j)
-                    SDKLogger.logDebug("swap_mapper: success_flag=%@,best_d=%d,trivial_flag=%@",
-                                          success_flag ? "true" : "false",best_d ?? 0,trivial_flag ? "true" : "false")
+                    SDKLogger.logDebug("swap_mapper: layer \(i), sublayer \(j)")
+                    SDKLogger.logDebug("swap_mapper: success_flag=\(success_flag),best_d=\(best_d ?? 0),trivial_flag=\(trivial_flag)")
 
                     // Give up if we fail again
                     if !success_flag {
@@ -614,12 +612,12 @@ final class Mapping {
                 break
             }
         }
-         SDKLogger.logDebug("xi=", xi)
-         SDKLogger.logDebug("theta1=", theta1)
-         SDKLogger.logDebug("theta2=", theta2)
-         SDKLogger.logDebug("solutions=", solutions)
-         SDKLogger.logDebug("deltas=", deltas)
-        assert (false, "Error! No solution found. This should not happen.")
+        SDKLogger.logDebug("xi=\(xi)")
+        SDKLogger.logDebug("theta1=\(theta1)")
+        SDKLogger.logDebug("theta2=\(theta2)")
+        SDKLogger.logDebug("solutions=\(SDKLogger.debugString(solutions))")
+        SDKLogger.logDebug("deltas=\(SDKLogger.debugString(deltas))")
+        assert(false, "Error! No solution found. This should not happen.")
         return (0.0,0.0,0.0)
     }
 
