@@ -147,6 +147,7 @@ final class QasmSimulator: BaseBackend {
     private var _quantum_state: [Complex] = []
     private var _classical_state: Int = 0
     private var _shots: Int = 0
+    private let random: Random = Random()
 
     /**
      Initialize the QasmSimulator object
@@ -177,10 +178,10 @@ final class QasmSimulator: BaseBackend {
      */
     private func _add_qasm_single(_ gate: [[Complex]], _ qubit: Int) {
         var psi = self._quantum_state
-        let bit = 1 << qubit
+        let bit: Int = 1 << qubit
         for k1 in stride(from: 0, to: 1 << self._number_of_qubits, by: 1 << (qubit+1)) {
             for k2 in 0..<(1 << qubit) {
-                let k = k1 | k2
+                let k: Int = k1 | k2
                 let cache0 = psi[k]
                 let cache1 = psi[k | bit]
                 psi[k] = gate[0][0] * cache0 + gate[0][1] * cache1
@@ -218,7 +219,7 @@ final class QasmSimulator: BaseBackend {
      */
     private func _add_qasm_decision(_ qubit: Int) -> (Int,Double) {
         var probability_zero: Double = 0
-        let random_number = drand48()
+        let random_number = self.random.random()
         for ii in 0..<(1 << self._number_of_qubits) {
             if (ii & (1 << qubit)) == 0 {
                 probability_zero += pow(self._quantum_state[ii].abs(),2)
@@ -255,7 +256,7 @@ final class QasmSimulator: BaseBackend {
             }
         }
         // update classical state
-        let bit = 1 << cbit
+        let bit: Int = 1 << cbit
         self._classical_state = (self._classical_state & (~bit)) | (outcome << cbit)
     }
 
@@ -275,17 +276,17 @@ final class QasmSimulator: BaseBackend {
         self._quantum_state = [Complex](repeating: Complex(), count: _quantum_state.count)
         // measurement
         for ii in 0..<(1 << self._number_of_qubits) {
-            if (ii >> qubit) & 1 == outcome {
+            if ((ii >> qubit) & 1) == outcome {
                 temp[ii] = temp[ii]/norm
             }
             else {
-                temp[ii] = Complex()
+                temp[ii] = 0
             }
         }
         // reset
         if outcome == 1 {
             for ii in 0..<(1 << self._number_of_qubits) {
-                let iip = (~(1 << qubit)) & ii  // bit number qubit set to zero
+                let iip: Int = (~(1 << qubit)) & ii  // bit number qubit set to zero
                 self._quantum_state[iip] += temp[ii]
             }
         }
@@ -374,7 +375,10 @@ final class QasmSimulator: BaseBackend {
         }
         if let config = circuit["config"] as? [String:Any] {
             if let seed = config["seed"] as? Int {
-                srand48(seed)
+                self.random.seed(seed)
+            }
+            else {
+                self.random.seed(self.random.getrandbits())
             }
         }
         var outcomes: [String] = []
@@ -500,7 +504,7 @@ final class QasmSimulator: BaseBackend {
             for (index, nbits) in zip(cl_reg_index[1...],cl_reg_nbits[1...]) {
                 let start = key.index(key.endIndex, offsetBy: -(index+nbits))
                 let end = key.index(key.endIndex, offsetBy: -index)
-                new_key.append(String(key[start..<end]))
+                new_key.insert(String(key[start..<end]), at:0)
             }
             fcounts[new_key.joined(separator: " ")] = value
         }

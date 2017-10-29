@@ -14,30 +14,22 @@
 // =============================================================================
 
 import Foundation
+//import GameplayKit
 
 final class Random {
 
-    private var nextNextGaussian: Double? = {
-        srand48(Int(arc4random())) // intialize drand48 buffer once
-        return nil
-    }()
+    private var nextNextGaussian: Double? = nil
+    //private var source: GKMersenneTwisterRandomSource? = nil
 
-    private func nextDouble() -> Double {
-        return drand48()
-    }
-
-    /**
-    From java.util.Random nextGaussian
-    */
     private func nextGaussian() -> Double {
-        if let gaussian = nextNextGaussian {
+        if let gaussian = self.nextNextGaussian {
             self.nextNextGaussian = nil
             return gaussian
         } else {
             var v1, v2, s: Double
             repeat {
-                v1 = 2 * nextDouble() - 1 // between -1.0 and 1.0
-                v2 = 2 * nextDouble() - 1 // between -1.0 and 1.0
+                v1 = 2 * self.random() - 1 // between -1.0 and 1.0
+                v2 = 2 * self.random() - 1 // between -1.0 and 1.0
                 s = v1 * v1 + v2 * v2
             } while s >= 1 || s == 0
             let multiplier: Double = sqrt(-2 * log(s)/s)
@@ -47,13 +39,24 @@ final class Random {
     }
 
     func normal(mean: Double, standardDeviation: Double) -> Double {
+        self.seed(self.getrandbits())
         return self.nextGaussian() * standardDeviation + mean
+    }
+
+    func getrandbits() -> Int {
+        return Int(arc4random())
+    }
+
+    func seed(_ s: Int) {
+        srand48(s)
+        //self.source = GKMersenneTwisterRandomSource(seed: UInt64(s))
     }
 
     /**
     Return the next random floating point number in the range [0.0, 1.0).
     */
-    class func random() -> Double {
+    func random() -> Double {
+        //return Double(self.source?.nextUniform() ?? 0.0)
         return drand48()
     }
 }

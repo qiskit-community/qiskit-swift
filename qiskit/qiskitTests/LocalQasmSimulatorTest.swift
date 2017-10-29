@@ -228,7 +228,6 @@ class LocalQasmSimulatorTest: XCTestCase {
     /**
      Test single shot run.
      */
-    /*
     func test_teleport() {
         do {
             SDKLogger.logInfo("test_teleport")
@@ -253,7 +252,6 @@ class LocalQasmSimulatorTest: XCTestCase {
             try circuit.measure(qr[2], cr2[0])
             let backend = "local_qasm_simulator"
             let qobj = try qp.compile(["teleport"], backend: backend, shots: shots, seed: self.seed)
-            debugPrint(qobj)
             let asyncExpectation = self.expectation(description: "test_teleport")
             qp.run_async(qobj) { (results) in
                 do {
@@ -288,5 +286,4 @@ class LocalQasmSimulatorTest: XCTestCase {
             XCTFail("\(error)")
         }
     }
-     */
 }
