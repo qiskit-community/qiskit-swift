@@ -443,7 +443,7 @@ public final class IBMQuantumExperience {
                 data["codeType"] = "QASM2"
 
                 if seed != nil {
-                    if String(seed!).characters.count >= 11 {
+                    if String(seed!).count >= 11 {
                         responseHandler([:],IBMQuantumExperienceError.errorSeedLength)
                         return
                     }
@@ -641,7 +641,7 @@ public final class IBMQuantumExperience {
                     return
                 }
                 if seed != nil {
-                    if String(seed!).characters.count >= 11 {
+                    if String(seed!).count >= 11 {
                         responseHandler([:],IBMQuantumExperienceError.errorSeedLength)
                         return
                     }

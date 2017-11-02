@@ -130,12 +130,12 @@ public final class QuantumProgram {
             let first_cap_re = try NSRegularExpression(pattern:"(.)([A-Z][a-z]+)")
             let s1 = first_cap_re.stringByReplacingMatches(in: name,
                                                            options: [],
-                                                           range:  NSMakeRange(0, name.characters.count),
+                                                           range:  NSMakeRange(0, name.count),
                                                            withTemplate: "\\1_\\2")
             let all_cap_re = try NSRegularExpression(pattern:"([a-z0-9])([A-Z])")
             return all_cap_re.stringByReplacingMatches(in: s1,
                                                        options: [],
-                                                       range: NSMakeRange(0, s1.characters.count),
+                                                       range: NSMakeRange(0, s1.count),
                                                        withTemplate: "\\1_\\2").lowercased()
         } catch {
             throw QISKitError.internalError(error: error)

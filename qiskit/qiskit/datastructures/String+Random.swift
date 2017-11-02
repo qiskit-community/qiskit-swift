@@ -18,7 +18,7 @@ import Foundation
 extension String {
     static func randomAlphanumeric(length: Int) -> String {
         struct StaticVars {
-            static let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".characters
+            static let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
             static let lettersLength = UInt32(letters.count)
         }
         var array = [Character](repeating: " ", count: length)

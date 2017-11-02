@@ -389,7 +389,7 @@ public final class Result: CustomStringConvertible {
             z_dicts.append([:])
             for qubit_state in 0..<Int(pow(2.0,Double(nqubits))) {
                 let binaryString = String(qubit_state, radix: 2)
-                let new_key = String(repeating: "0", count: nqubits - binaryString.characters.count) + binaryString
+                let new_key = String(repeating: "0", count: nqubits - binaryString.count) + binaryString
                 z_dicts[z_dicts.count-1][new_key] = -1
                 let index = new_key.index(new_key.startIndex, offsetBy: nqubits - qubit_ind - 1)
                 if new_key[index] == "1" {

@@ -71,8 +71,8 @@ class QIskitParserTests: XCTestCase {
     }
 
     private static func firstDifferenceBetweenStrings(_ s1: String, _ s2: String) -> Int {
-        let len1 = s1.characters.count
-        let len2 = s2.characters.count
+        let len1 = s1.count
+        let len2 = s2.count
 
         let lenMin = min(len1, len2)
 

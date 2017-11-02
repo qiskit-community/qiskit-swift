@@ -461,7 +461,7 @@ final class QasmSimulator: BaseBackend {
             }
             // Turn classical_state (int) into bit string
             let binString = String(self._classical_state, radix: 2)
-            let filledBin: String = String(repeating: "0", count: self._number_of_cbits - binString.characters.count) + binString
+            let filledBin: String = String(repeating: "0", count: self._number_of_cbits - binString.count) + binString
             outcomes.append(filledBin)
         }
         // Return the results
