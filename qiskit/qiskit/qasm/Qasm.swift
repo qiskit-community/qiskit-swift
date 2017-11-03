@@ -57,6 +57,7 @@ final class Qasm {
             
             yyparse()
             semaphore.wait()
+            ParseTree.clearNodes()
         }
         if let error = errorMsg {
             throw QISKitError.parserError(msg: error)

@@ -25,7 +25,6 @@ public final class NodeExpressionList: Node {
     public private(set) var expressionList: [Node]? = nil
     
     @objc public init(expression: Node?) {
-        super.init()
         if let exp = expression {
             self.expressionList = [exp]
         }

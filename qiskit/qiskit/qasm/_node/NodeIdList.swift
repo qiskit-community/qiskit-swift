@@ -25,7 +25,6 @@ public final class NodeIdList: Node {
     public private(set) var identifiers: [Node]?
 
     @objc public init(identifier: Node?) {
-        super.init()
         if let ident = identifier {
             self.identifiers = [ident]
         }

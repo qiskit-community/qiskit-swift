@@ -29,7 +29,6 @@ public final class NodeCreg: Node {
     public private(set) var index: Int = 0
     
     @objc public init(indexedid: Node?, line: Int, file: String) {
-        
         self.indexedid = indexedid
         if let _id = self.indexedid as? NodeIndexedId {
             // Name of the qreg

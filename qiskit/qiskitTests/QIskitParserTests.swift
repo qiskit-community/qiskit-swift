@@ -204,9 +204,7 @@ class QIskitParserTests: XCTestCase {
     }
 
     func testParserRipple () {
-        
-        let asyncExpectation = self.expectation(description: "parser")
-        
+
         let qasmProgram: String =
             "OPENQASM 2.0;\n" +
                 "qreg cin[1];\n" +
@@ -249,70 +247,47 @@ class QIskitParserTests: XCTestCase {
                 "measure b[2] -> ans[2];\n" +
                 "measure b[3] -> ans[3];\n" +
                 "measure cout[0] -> ans[4];"
-        
-        yy_scan_string(qasmProgram)
-        
-        ParseSuccessBlock = { (n: NSObject?) -> Void in
-            XCTAssertNotNil(n)
-            if let node = n as? NodeMainProgram {
-                let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
-                let emittedQasm = node.qasm(15).components(separatedBy: whitespaceCharacterSet).joined()
-                let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
-                XCTAssertEqual(emittedQasm, targetQasm)
-                asyncExpectation.fulfill()
-            } else {
-                XCTFail("Main Program Node Type Expected!")
-                asyncExpectation.fulfill()
-                return
-            }
-            
+
+        do {
+            let parser = Qasm(data: qasmProgram)
+            let root = try parser.parse()
+            let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
+            let emittedQasm = root.qasm(15).components(separatedBy: whitespaceCharacterSet).joined()
+            let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
+            XCTAssertEqual(emittedQasm, targetQasm)
+        } catch let error {
+            XCTFail("\(error)")
         }
-        
-        ParseFailBlock = { (message: String?) -> Void in
-            if let msg = message {
-                XCTFail(msg)
-            } else {
-                XCTFail("Unknown Error")
-            }
-            asyncExpectation.fulfill()
-        }
-        
-        yyparse()
-        
-        self.waitForExpectations(timeout: 180, handler: { (error) in
-            XCTAssertNil(error, "Failure in parser")
-        })
-        
     }
     
     func testParserRippleAdd () {
-        do {
-            let qasmProgram: String =
+        let qasmProgram: String =
             "OPENQASM 2.0;" +
-            "qreg a[2];" +
-            "qreg b[2];" +
-            "qreg cin[1];" +
-            "qreg cout[1];" +
-            "creg ans[3];" +
-            "x a[0];" +
-            "x b[0];" +
-            "x b[1];" +
-            "cx a[0],b[0];" +
-            "cx a[0],cin[0];" +
-            "ccx cin[0],b[0],a[0];" +
-            "cx a[1],b[1];" +
-            "cx a[1],a[0];" +
-            "ccx a[0],b[1],a[1];" +
-            "cx a[1],cout[0];" +
-            "ccx a[0],b[1],a[1];" +
-            "cx a[1],a[0];" +
-            "cx a[0],b[1];" +
-            "ccx cin[0],b[0],a[0];" +
-            "cx a[0],cin[0];" +
-            "cx cin[0],b[0];" +
-            "measure b[0] -> ans[0];" +
-            "measure b[1] -> ans[1];" +
-            "measure cout[0] -> ans[2];"
+                "qreg a[2];" +
+                "qreg b[2];" +
+                "qreg cin[1];" +
+                "qreg cout[1];" +
+                "creg ans[3];" +
+                "x a[0];" +
+                "x b[0];" +
+                "x b[1];" +
+                "cx a[0],b[0];" +
+                "cx a[0],cin[0];" +
+                "ccx cin[0],b[0],a[0];" +
+                "cx a[1],b[1];" +
+                "cx a[1],a[0];" +
+                "ccx a[0],b[1],a[1];" +
+                "cx a[1],cout[0];" +
+                "ccx a[0],b[1],a[1];" +
+                "cx a[1],a[0];" +
+                "cx a[0],b[1];" +
+                "ccx cin[0],b[0],a[0];" +
+                "cx a[0],cin[0];" +
+                "cx cin[0],b[0];" +
+                "measure b[0] -> ans[0];" +
+                "measure b[1] -> ans[1];" +
+                "measure cout[0] -> ans[2];"
+        do {
             let parser = Qasm(data: qasmProgram)
             let root = try parser.parse()
             let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
@@ -325,115 +300,59 @@ class QIskitParserTests: XCTestCase {
     }
 
     func testParserExpressionList () {
-        
-        let asyncExpectation = self.expectation(description: "parser")
-        
+
+        let qasmProgram: String =
+                "OPENQASM 2.0;\n" +
+                "qreg qr[4];\n" +
+                "creg cr[4];\n" +
+                "h qr[0];\n" +
+                "x qr[1];\n" +
+                "y qr[2];\n" +
+                "z qr[3];\n" +
+                "cx qr[0],qr[2];\n" +
+                "barrier qr[0],qr[1],qr[2],qr[3];\n" +
+                "u1(0.3000000000000000) qr[0];\n" +
+                "u2(0.3000000000000000,0.2000000000000000) qr[1];\n" +
+                "u3(0.3000000000000000,0.2000000000000000,0.1000000000000000) qr[2];\n" +
+                "s qr[0];\n" +
+                "t qr[1];\n" +
+                "id qr[1];\n" +
+                "measure qr[0] -> cr[0];"
         do {
-            let qasmProgram: String =
-                    "OPENQASM 2.0;\n" +
-                    "qreg qr[4];\n" +
-                    "creg cr[4];\n" +
-                    "h qr[0];\n" +
-                    "x qr[1];\n" +
-                    "y qr[2];\n" +
-                    "z qr[3];\n" +
-                    "cx qr[0],qr[2];\n" +
-                    "barrier qr[0],qr[1],qr[2],qr[3];\n" +
-                    "u1(0.3000000000000000) qr[0];\n" +
-                    "u2(0.3000000000000000,0.2000000000000000) qr[1];\n" +
-                    "u3(0.3000000000000000,0.2000000000000000,0.1000000000000000) qr[2];\n" +
-                    "s qr[0];\n" +
-                    "t qr[1];\n" +
-                    "id qr[1];\n" +
-                    "measure qr[0] -> cr[0];"
-            
-            yy_scan_string(qasmProgram)
-            
-            ParseSuccessBlock = { (n: NSObject?) -> Void in
-                XCTAssertNotNil(n)
-                if let node = n as? NodeMainProgram {
-                    let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
-                    let emittedQasm = node.qasm(15).components(separatedBy: whitespaceCharacterSet).joined()
-                    let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
-                    XCTAssertEqual(emittedQasm, targetQasm)
-                    asyncExpectation.fulfill()
-                } else {
-                    XCTFail("Main Program Node Type Expected!")
-                    asyncExpectation.fulfill()
-                    return
-                }
-                
-            }
-            
-            ParseFailBlock = { (message: String?) -> Void in
-                if let msg = message {
-                    XCTFail(msg)
-                } else {
-                    XCTFail("Unknown Error")
-                }
-                asyncExpectation.fulfill()
-            }
-            
-            yyparse()
-            
-            self.waitForExpectations(timeout: 180, handler: { (error) in
-                XCTAssertNil(error, "Failure in parser")
-            })
-            
+            let parser = Qasm(data: qasmProgram)
+            let root = try parser.parse()
+            let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
+            let emittedQasm = root.qasm(15).components(separatedBy: whitespaceCharacterSet).joined()
+            let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
+            XCTAssertEqual(emittedQasm, targetQasm)
+        } catch let error {
+            XCTFail("\(error)")
         }
     }
  
     func testParserQPT () {
-        
-        let asyncExpectation = self.expectation(description: "parser")
-        
+
+        let qasmProgram: String =
+        "OPENQASM 2.0;\n" +
+        "gate pre q { }\n" +
+        "gate post q { }\n" +
+        "qreg q[1];\n" +
+        "creg c[1];\n" +
+        "pre q[0];\n" +
+        "barrier q;\n" +
+        "h q[0];\n" +
+        "barrier q;\n" +
+        "post q[0];\n" +
+        "measure q[0] -> c[0];\n"
         do {
-            let qasmProgram: String =
-            "OPENQASM 2.0;\n" +
-            "gate pre q { }\n" +
-            "gate post q { }\n" +
-            "qreg q[1];\n" +
-            "creg c[1];\n" +
-            "pre q[0];\n" +
-            "barrier q;\n" +
-            "h q[0];\n" +
-            "barrier q;\n" +
-            "post q[0];\n" +
-            "measure q[0] -> c[0];\n"
-            
-            yy_scan_string(qasmProgram)
-            
-            ParseSuccessBlock = { (n: NSObject?) -> Void in
-                XCTAssertNotNil(n)
-                if let node = n as? NodeMainProgram {
-                    let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
-                    let emittedQasm = node.qasm(15).components(separatedBy: whitespaceCharacterSet).joined()
-                    let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
-                    XCTAssertEqual(emittedQasm, targetQasm)
-                    asyncExpectation.fulfill()
-                } else {
-                    XCTFail("Main Program Node Type Expected!")
-                    asyncExpectation.fulfill()
-                    return
-                }
-                
-            }
-            
-            ParseFailBlock = { (message: String?) -> Void in
-                if let msg = message {
-                    XCTFail(msg)
-                } else {
-                    XCTFail("Unknown Error")
-                }
-                asyncExpectation.fulfill()
-            }
-            
-            yyparse()
-            
-            self.waitForExpectations(timeout: 180, handler: { (error) in
-                XCTAssertNil(error, "Failure in parser")
-            })
-            
+            let parser = Qasm(data: qasmProgram)
+            let root = try parser.parse()
+            let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
+            let emittedQasm = root.qasm(15).components(separatedBy: whitespaceCharacterSet).joined()
+            let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
+            XCTAssertEqual(emittedQasm, targetQasm)
+        } catch let error {
+            XCTFail("\(error)")
         }
     }
 }

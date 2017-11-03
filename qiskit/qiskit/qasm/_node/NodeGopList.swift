@@ -21,7 +21,6 @@ public final class NodeGopList: Node {
     public private(set) var gateops: [Node]?
     
     @objc public init(gateop: Node?) {
-        super.init()
         if let gop = gateop {
             self.gateops = [gop]
         }

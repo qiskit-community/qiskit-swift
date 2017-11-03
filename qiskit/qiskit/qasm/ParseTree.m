@@ -17,180 +17,195 @@
 #import "ParseTree.h"
 #import <qiskit/qiskit-Swift.h>
 
+static NSMutableArray<Node*>* gNodes = nil;
 
 @implementation ParseTree
 
++(Node*)addNode: (Node*) node {
+    @synchronized(self) {
+        if (node != nil) {
+            if (gNodes == nil) {
+                gNodes = [[NSMutableArray alloc] init];
+            }
+            [gNodes addObject: node];
+        }
+        return node;
+    }
+}
+
++(void)clearNodes {
+    @synchronized(self) {
+        if (gNodes != nil) {
+            [gNodes release];
+            gNodes = nil;
+        }
+    }
+}
+
 +(Node*) createBarrier: (Node*) primarylist {
     NodeBarrier *node = [[[NodeBarrier alloc] initWithList:primarylist] autorelease];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createBinaryOperation: (NSString*) op operand1: (Node*) o1 operand2: (Node*) o2 {
     NodeBinaryOp *node = [[[NodeBinaryOp alloc] initWithOp:op children: @[o1, o2]] autorelease];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createCX: (Node*) arg1 arg2: (Node*) arg2 {
     NodeCnot *node = [[[NodeCnot alloc] initWithArg1:arg1 arg2:arg2] autorelease];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createCReg: (Node*) indexed_id {
     NodeCreg *node = [[[NodeCreg alloc] initWithIndexedid:indexed_id line:0 file:@""] autorelease];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createCustomUnitary: (Node*) identifier arguments: (Node*) args bitlist: (Node*) bitlist {
     NodeCustomUnitary *node = [[[NodeCustomUnitary alloc] initWithIdentifier:identifier arguments:args bitlist:bitlist] autorelease];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createExpressionList: (Node*) elist expression: (Node*) exp {
-    
+    NodeExpressionList *node = nil;
     if (elist == nil) {
-        NodeExpressionList *nodeExpList = [[[NodeExpressionList alloc] initWithExpression:exp] autorelease];
-        return nodeExpList;
+        node = [[[NodeExpressionList alloc] initWithExpression:exp] autorelease];
     } else {
-        NodeExpressionList *nodeExpList = (NodeExpressionList*)elist;
-        if (nodeExpList != nil) {
-            [nodeExpList addExpressionWithExp:exp];
-        }
+        node = (NodeExpressionList*)elist;
+        [node addExpressionWithExp:exp];
     }
-    return elist;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createExternal: (Node*) identifier external: (NSString*) external {
     NodeExternal *node = [[[NodeExternal alloc] initWithOperation:external expression:identifier] autorelease];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createGate: (Node*) identifier list1: (Node*) list1 list2: (Node*) list2 list3: (Node*) list3 {
     NodeGate *node = [[[NodeGate alloc] initWithIdentifier:identifier arguments:list1 bitlist:list2 body:list3] autorelease];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createGateBody: (Node*) goplist {
     NodeGateBody *node = [[[NodeGateBody alloc] initWithGoplist:goplist] autorelease];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 
 +(Node*) createGopList: (Node*)goplist gate_op:(Node*) gop {
+    NodeGopList *node = nil;
     if (goplist == nil) {
-        NodeGopList *nodeGoplist = [[[NodeGopList alloc] initWithGateop: gop] autorelease];
-        return nodeGoplist;
+        node = [[[NodeGopList alloc] initWithGateop: gop] autorelease];
     } else {
-        NodeGopList *nodeGoplist = (NodeGopList*)goplist;
-        if (nodeGoplist != nil) {
-            [nodeGoplist addIdentifierWithGateop:gop];
-        }
+        node = (NodeGopList*)goplist;
+        [node addIdentifierWithGateop:gop];
     }
-    return goplist;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createId: (NSString*) identifer line: (int) line {
     NodeId *node = [[[NodeId alloc] initWithIdentifier:identifer line:line] autorelease];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createIdlist: (Node*) idlist identifier: (Node*) identifier {
-    
+    NodeIdList *node = nil;
     if (idlist == nil) {
-        NodeIdList *nodeIdList = [[[NodeIdList alloc] initWithIdentifier: identifier] autorelease];
-        return nodeIdList;
+        node = [[[NodeIdList alloc] initWithIdentifier: identifier] autorelease];
     } else {
-        NodeIdList *nodeIdList = (NodeIdList*)idlist;
-        [nodeIdList addIdentifierWithIdentifier:identifier];
+        node = (NodeIdList*)idlist;
+        [node addIdentifierWithIdentifier:identifier];
     }
-    return idlist;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createIf: (Node*) identifier nninteger: (Node*) integer quantum_op: (Node*) qop {
     NodeIf *node = [[[NodeIf alloc] initWithIdentifier:identifier nninteger:integer qop:qop] autorelease];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createInclude: (NSString*) file {
     NodeInclude *node = [[NodeInclude alloc] initWithFile:file];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createIndexedId: (Node*) identifier index: (Node*) nninteger {
     NodeIndexedId *node = [[[NodeIndexedId alloc] initWithIdentifier:identifier index:nninteger] autorelease];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createInt: (int) integer {
     NodeNNInt *node = [[[NodeNNInt alloc] initWithValue: integer] autorelease];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createMagic: (Node*) real {
     NodeMagic *node = [[[NodeMagic alloc] initWithVersion:real] autorelease];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createMainProgram: (Node*) magic include: (Node*) incld  program: (Node*) program {
     NodeMainProgram *node = [[[NodeMainProgram alloc] initWithMagic:magic incld:incld program:program] autorelease];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createMeasure: (Node*) argument1 argument: (Node*) argument2 {
     NodeMeasure *node = [[[NodeMeasure alloc] initWithArg1:argument1 arg2:argument2] autorelease];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createOpaque: (Node*) identifier list1: (Node*) list1 list2: (Node*) list2 {
-    Node *opaque = [[[NodeOpaque alloc] initWithIdentifier:identifier arguments:list1 bitlist:list2] autorelease];
-    return opaque;
+    Node *node = [[[NodeOpaque alloc] initWithIdentifier:identifier arguments:list1 bitlist:list2] autorelease];
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createPrefixOperation: (NSString*) op operand: (Node*) o {
     NodePrefix *node = [[[NodePrefix alloc] initWithOp:op children: @[o]] autorelease];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createPrimaryList: (Node*) list primary: (Node*) primary {
+    NodePrimaryList *node = nil;
     if (list == nil) {
-        NodePrimaryList *nodePrimaryList = [[[NodePrimaryList alloc]initWithIdentifier:primary] autorelease];
-        return nodePrimaryList;
+        node = [[[NodePrimaryList alloc]initWithIdentifier:primary] autorelease];
     } else {
-        NodePrimaryList *nodePrimaryList = (NodePrimaryList*)list;
-        [nodePrimaryList addIdentifierWithIdentifier:primary];
+        node = (NodePrimaryList*)list;
+        [node addIdentifierWithIdentifier:primary];
     }
-    return list;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createProgram: (Node*) program statement: (Node*) statement {
-    
+    NodeProgram *node = nil;
     if (program == nil) {
-        NodeProgram *nprogram = [[[NodeProgram alloc] initWithStatement:statement] autorelease];
-        return nprogram;
+        node = [[[NodeProgram alloc] initWithStatement:statement] autorelease];
     } else {
-        NodeProgram *p = (NodeProgram*)program;
-        [p addStatementWithStatement:statement];
+        node = (NodeProgram*)program;
+        [node addStatementWithStatement:statement];
     }
-    return program;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createQReg: (Node*) indexed_id {
     NodeQreg *node = [[[NodeQreg alloc] initWithIndexedid:indexed_id line:0 file:@""] autorelease]; // FIXME line, file
-    return node;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createReal: (double) real {
     NodeReal *node = [[[NodeReal alloc] initWithId: real] autorelease];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createReset: (Node*) identifier {
     NodeReset *node = [[[NodeReset alloc] initWithIndexedid:identifier] autorelease];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 +(Node*) createUniversalUnitary: (Node*) list1 list2: (Node*) list2 {
     NodeUniversalUnitary *node = [[[NodeUniversalUnitary alloc] initWithExplist:list1 indexedid:list2] autorelease];
-    return node;
+    return [ParseTree addNode:node];
 }
 
 @end

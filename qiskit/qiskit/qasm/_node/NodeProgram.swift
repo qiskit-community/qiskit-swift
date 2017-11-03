@@ -24,7 +24,6 @@ public final class NodeProgram: Node  {
     public private(set) var statements: [Node]? = nil
     
     @objc public init(statement: Node?) {
-        super.init()
         if let stmt = statement {
             self.statements = [stmt]
         }

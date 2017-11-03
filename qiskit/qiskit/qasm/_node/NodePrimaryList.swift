@@ -25,7 +25,6 @@ public final class NodePrimaryList: Node {
     public private(set) var identifiers: [Node]? = nil
    
     @objc public init(identifier: Node?) {
-        super.init()
         if let ident = identifier {
             self.identifiers = [ident]
         }

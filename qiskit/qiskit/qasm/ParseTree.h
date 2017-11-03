@@ -20,6 +20,7 @@
 
 @interface ParseTree : NSObject
 
++(void)clearNodes;
 +(Node*) createBarrier: (Node*) primarylist;
 +(Node*) createBinaryOperation: (NSString*) op operand1: (Node*) o1 operand2: (Node*) o2;
 +(Node*) createCX: (Node*) arg1 arg2: (Node*) arg2;
