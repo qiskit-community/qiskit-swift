@@ -22,16 +22,14 @@ children is a list of primary nodes. Primary nodes are indexedid or id.
 
 public final class NodePrimaryList: Node {
     
-    public private(set) var identifiers: [Node]? = nil
+    public private(set) var identifiers: [Node]
    
-    @objc public init(identifier: Node?) {
-        if let ident = identifier {
-            self.identifiers = [ident]
-        }
+    @objc public init(identifier: Node) {
+        self.identifiers = [identifier]
     }
     
     @objc public func addIdentifier(identifier: Node) {
-        identifiers?.append(identifier)
+        self.identifiers.append(identifier)
     }
     
     public override var type: NodeType {
@@ -39,16 +37,13 @@ public final class NodePrimaryList: Node {
     }
     
     public override var children: [Node] {
-        return (identifiers != nil) ? identifiers! : []
+        return self.identifiers
     }
     
     public override func qasm(_ prec: Int) -> String {
-        var qasms: [String] = []
-        if let list = identifiers {
-            qasms = list.flatMap({ (node: Node) -> String in
-                return node.qasm(prec)
-            })
-        }
+        let qasms: [String] = self.identifiers.flatMap({ (node: Node) -> String in
+            return node.qasm(prec)
+        })
         return qasms.joined(separator: ",")
     }
 }

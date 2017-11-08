@@ -24,8 +24,12 @@ import Foundation
 public final class NodeGateBody: Node {
     
     public let goplist: Node?
-    
-    @objc public init(goplist: Node?) {
+
+    @objc override public init() {
+        self.goplist = nil
+    }
+
+    @objc public init(goplist: Node) {
         self.goplist = goplist
     }
     
@@ -33,11 +37,9 @@ public final class NodeGateBody: Node {
         // Return a list of custom gate names in this gate body."""
         var _calls: [String] = []
         if let glist = goplist as? NodeGopList {
-            if let gops = glist.gateops {
-                for gop in gops {
-                    if gop.type == .N_CUSTOMUNITARY {
-                        _calls.append(gop.name)
-                    }
+            for gop in glist.gateops {
+                if gop.type == .N_CUSTOMUNITARY {
+                    _calls.append(gop.name)
                 }
             }
         }

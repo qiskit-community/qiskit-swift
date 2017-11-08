@@ -27,10 +27,10 @@ import Foundation
 
 public final class NodeGate: Node {
 
-    public let identifier: Node?
+    public let identifier: Node
     public let arguments: Node?
-    public let bitlist: Node?
-    public let body: Node?
+    public let bitlist: Node
+    public let body: Node
 
     public private(set) var _name: String = ""
     public private(set) var line: Int = 0
@@ -45,11 +45,29 @@ public final class NodeGate: Node {
     
     public var n_bits: Int {
         get {
-            return bitlist?.children.count ?? 0
+            return self.bitlist.children.count
+        }
+    }
+
+    @objc public init(identifier: Node, bitlist: Node, body: Node) {
+        self.identifier = identifier
+        self.arguments = nil
+        self.bitlist = bitlist
+        self.body = body
+
+        if let _id = self.identifier as? NodeId {
+            // Name of the qreg
+            self._name = _id.name
+            // Source line number
+            self.line = _id.line
+            // Source file name
+            self.file = _id.file
+            // Size of the register
+            self.index = _id.index
         }
     }
     
-    @objc public init(identifier: Node?, arguments: Node?, bitlist: Node?, body: Node?) {
+    @objc public init(identifier: Node, arguments: Node, bitlist: Node, body: Node) {
         self.identifier = identifier
         self.arguments = arguments
         self.bitlist = bitlist
@@ -65,7 +83,6 @@ public final class NodeGate: Node {
             // Size of the register
             self.index = _id.index
         }
-        
     }
     
     public override var type: NodeType {
@@ -78,18 +95,12 @@ public final class NodeGate: Node {
  
     public override var children: [Node] {
         var _children: [Node] = []
-        if let ident = identifier {
-            _children.append(ident)
-        }
+        _children.append(self.identifier)
         if let args = arguments {
             _children.append(args)
         }
-        if let btlist = bitlist {
-            _children.append(btlist)
-        }
-        if let body = body {
-            _children.append(body)
-        }
+        _children.append(self.bitlist)
+        _children.append(self.body)
         return _children
     }
     
@@ -98,12 +109,8 @@ public final class NodeGate: Node {
         if let args = self.arguments {
             qasm += "(" + args.qasm(prec) + ")"
         }
-        if let bits = self.bitlist {
-            qasm += " \(bits.qasm(prec))\n"
-        }
-        if let bdy = self.body {
-            qasm += "{\n \(bdy.qasm(prec)) }"
-        }
+        qasm += " \(self.bitlist.qasm(prec))\n"
+        qasm += "{\n \(self.body.qasm(prec)) }"
         return qasm
     }
     

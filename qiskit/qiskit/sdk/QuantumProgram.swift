@@ -377,7 +377,8 @@ public final class QuantumProgram {
             n = name!
         }
         else {
-            n = (qasm_file as NSString).lastPathComponent
+            let url = URL(fileURLWithPath: qasm_file)
+            n = url.lastPathComponent 
         }
         return try self.load_qasm(Qasm(filename:qasm_file),n,basis_gates)
      }

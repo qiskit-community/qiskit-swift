@@ -26,9 +26,9 @@ public final class NodeExternal: Node, NodeRealValueProtocol {
     public static let externalFunctions = ["sin", "cos", "tan", "exp", "ln", "sqrt"]
 
     public let operation: String
-    public let expression: Node?
+    public let expression: Node
     
-    @objc public init(operation: String, expression: Node?) {
+    @objc public init(operation: String, expression: Node) {
         self.operation = operation
         self.expression = expression
     }
@@ -38,18 +38,12 @@ public final class NodeExternal: Node, NodeRealValueProtocol {
     }
     
     public override var children: [Node] {
-        var _children: [Node] = []
-        if let exp = expression {
-            _children.append(exp)
-        }
-        return _children
+        return [self.expression]
     }
 
     public override func qasm(_ prec: Int) -> String {
-        var qasm = operation
-        if let exp = expression {
-            qasm += "( \(exp.qasm(prec)) )"
-        }
+        var qasm = self.operation
+        qasm += "( \(self.expression.qasm(prec)) )"
         return qasm
     }
 

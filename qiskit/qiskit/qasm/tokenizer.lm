@@ -5,7 +5,7 @@
 #pragma clang diagnostic ignored "-Wdocumentation"
 
 #import "y.tab.h"
-#import "ParserBlocks.h"
+#import "ParseTree.h"
 
 void yyerror(char *s);
 %}
@@ -27,82 +27,82 @@ void yyerror(char *s);
 }
 
 pi {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return PI;
 }
 
 sin {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return SIN;
 }
 
 cos {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return COS;
 }
 
 tan {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return TAN;
 }
 
 exp {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return EXP;
 }
 
 ln {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return LN;
 }
 
 sqrt {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return SQRT;
 }
 
 qreg {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return QREG;
 }
 
 creg {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return CREG;
 }
 
 gate {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return GATE;
 }
 
 measure {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return MEASURE;
 }
 
 if {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return IF;
 }
 
 reset {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return RESET;
 }
 
 barrier {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return BARRIER;
 }
 
 opaque {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return OPAQUE;
 }
 
 \"([^\\\"]|\\.)*\" { 
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return STRING;
 }
 
@@ -112,7 +112,7 @@ include {
 
 <INCLUDEFILE>[ \t]*      /* eat the whitespace */
 <INCLUDEFILE>[^ \t]+; {
-    const char* includePath = getIncludePath(yytext);
+    const char* includePath = [ParseTree getIncludePath: yytext];
     yyin = fopen(includePath, "r" );
     
     if ( ! yyin ) {
@@ -139,7 +139,7 @@ include {
 \n { yylineno++; }
 
 OPENQASM {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return OPENQASM;
 }
 
@@ -147,28 +147,28 @@ OPENQASM {
 }
 
 CX {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return CX;
 }
 
 U {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return U;
 }
 
 -> {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return ASSIGN;
 }
 
 == {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return MATCHES;
 }
 
 
 [a-z][a-zA-Z0-9_]* {
-    yylval.svalue = [NSString stringWithFormat:@"%s", yytext];
+    yylval.svalue = [ParseTree addString:yytext];
     return ID;
 }
 
@@ -188,8 +188,7 @@ int yywrap()
 
 void yyerror(char *s)
 {
-    if (ParseFailBlock)
-    ParseFailBlock([NSString stringWithFormat:@"%s line %d", s, yylineno]);
+    [ParseTree fail:yylineno msg:s];
 }
 
 #pragma clang diagnostic pop

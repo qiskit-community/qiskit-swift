@@ -31,17 +31,25 @@ Has properties:
 */
 public final class NodeCustomUnitary: Node {
     
-    public let identifier: Node?
+    public let identifier: Node
     public let arguments: Node?
-    public let bitlist: Node?
+    public let bitlist: Node
     public private(set) var _name: String = ""
 
-    @objc public init(identifier: Node?, arguments: Node?, bitlist: Node?) {
+    @objc public init(identifier: Node, bitlist: Node) {
+        self.identifier = identifier     // id
+        self.arguments = nil
+        self.bitlist = bitlist   // explist
+        if let _id = self.identifier as? NodeId {
+            _name = _id._name
+        }
+    }
+
+    @objc public init(identifier: Node, arguments: Node, bitlist: Node) {
         self.identifier = identifier     // id
         self.arguments = arguments   // anylist
         self.bitlist = bitlist   // explist
-    
-         if let _id = self.identifier as? NodeId {
+        if let _id = self.identifier as? NodeId {
             _name = _id._name
         }
     }
@@ -59,9 +67,7 @@ public final class NodeCustomUnitary: Node {
         if let args = self.arguments {
             qasm += " (" + args.qasm(prec) + ")"
         }
-        if let bits = self.bitlist {
-            qasm += " \(bits.qasm(prec));"
-        }
+        qasm += " \(self.bitlist.qasm(prec));"
         return qasm
     }
 }

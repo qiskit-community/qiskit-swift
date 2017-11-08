@@ -33,7 +33,7 @@ import Foundation
  The nodes are connected by directed edges that correspond to qubits and
  bits.
  */
-final class DAGCircuit: NSCopying {
+final class DAGCircuit {
 
     /**
      Map from a wire's name (reg,idx) to a Bool that is True if the
@@ -102,20 +102,24 @@ final class DAGCircuit: NSCopying {
 
     }
 
-    public func copy(with zone: NSZone? = nil) -> Any {
-        let copy =  DAGCircuit()
-        copy.wire_type = self.wire_type
-        copy.input_map = self.input_map
-        copy.output_map = self.output_map
-        copy.node_counter = self.node_counter
-        copy.basis = self.basis
-        copy.multi_graph = self.multi_graph.copy(with: zone) as! Graph<CircuitVertexData,CircuitEdgeData>
-        copy.qregs = self.qregs
-        copy.cregs = self.cregs
-        copy.gates = self.gates
-        copy.prec = self.prec
-        
-        return copy
+    public init(_ circuit: DAGCircuit) {
+        self.wire_type = circuit.wire_type
+        self.input_map = circuit.input_map
+        self.output_map = circuit.output_map
+        self.node_counter = circuit.node_counter
+        self.basis = circuit.basis
+        self.multi_graph = circuit.multi_graph.copy()
+        self.qregs = circuit.qregs
+        self.cregs = circuit.cregs
+        self.gates = circuit.gates
+        self.prec = circuit.prec
+    }
+
+    /**
+     Return a deep copy of self
+     */
+    public func deepcopy() -> DAGCircuit {
+        return DAGCircuit(self)
     }
 
     /**
@@ -227,13 +231,6 @@ final class DAGCircuit: NSCopying {
         for n in nlist {
             self._remove_op_node(n.key)
         }
-    }
-
-    /**
-     Return a deep copy of self
-     */
-    public func deepcopy() -> DAGCircuit {
-        return self.copy(with: nil) as! DAGCircuit
     }
 
     /**

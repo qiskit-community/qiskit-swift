@@ -23,10 +23,10 @@ import Foundation
  */
 public final class NodeCnot: Node {
 
-    public let arg1: Node?
-    public let arg2: Node?
+    public let arg1: Node
+    public let arg2: Node
     
-    @objc public init(arg1: Node?, arg2: Node?) {
+    @objc public init(arg1: Node, arg2: Node) {
         self.arg1 = arg1
         self.arg2 = arg2
     }
@@ -36,28 +36,13 @@ public final class NodeCnot: Node {
     }
     
     public override var children: [Node] {
-        var _children: [Node] = []
-        
-        if let a1 = arg1 {
-            _children.append(a1)
-        }
-        
-        if let a2 = arg2 {
-            _children.append(a2)
-        }
-        
-        return _children
+        return [self.arg1,self.arg2]
     }
     
     public override func qasm(_ prec: Int) -> String {
         var qasm: String = "CX"
-        if let a1 = arg1 {
-            qasm += " \(a1.qasm(prec))"
-        }
-        
-        if let a2 = arg2 {
-            qasm += ", \(a2.qasm(prec))"
-        }
+        qasm += " \(self.arg1.qasm(prec))"
+        qasm += ", \(self.arg2.qasm(prec))"
         qasm += ";"
         return qasm
     }

@@ -16,14 +16,17 @@
 
 import Foundation
 
-class CouplingVertexData: NSCopying {
+final class CouplingVertexData: GraphDataCopying {
     let name: RegBit
 
     init(_ name: RegBit) {
         self.name = name
     }
+    init(_ instance: CouplingVertexData) {
+        self.name = instance.name
+    }
 
-    public func copy(with zone: NSZone? = nil) -> Any {
-        return CouplingVertexData(self.name)
+    func copy() -> GraphDataCopying {
+        return CouplingVertexData(self)
     }
 }

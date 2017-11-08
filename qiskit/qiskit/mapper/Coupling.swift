@@ -87,7 +87,7 @@ final class Coupling: CustomStringConvertible {
     /**
      G is the coupling digraph
      */
-    private var G: Graph<CouplingVertexData,NSString> = Graph<CouplingVertexData,NSString>(directed: true)
+    private var G: Graph<CouplingVertexData,EmptyGraphData> = Graph<CouplingVertexData,EmptyGraphData>(directed: true)
 
     /**
      dist is a dict of dicts from node pairs to distances

@@ -23,8 +23,8 @@ import Foundation
  */
 public final class NodeOpaque: Node {
 
-    public let identifier: Node?
-    public let arguments: Node?
+    public let identifier: Node
+    public let arguments: Node
     public let bitlist: Node?
     
     public private(set) var _name: String = ""
@@ -34,18 +34,33 @@ public final class NodeOpaque: Node {
     
     public var n_args: Int {
         get{
-            return arguments?.children.count ?? 0
+            return self.arguments.children.count
         }
     }
     
     public var n_bits: Int {
         get {
-            return bitlist?.children.count ?? 0
+            return self.bitlist?.children.count ?? 0
         }
     }
 
-    
-    @objc public init(identifier: Node?, arguments: Node?, bitlist: Node?) {
+    @objc public init(identifier: Node, arguments: Node) {
+        self.identifier = identifier
+        self.arguments = arguments
+        self.bitlist = nil
+        if let _id = self.identifier as? NodeId{
+            // Name of the qreg
+            self._name = _id.name
+            // Source line number
+            self.line = _id.line
+            // Source file name
+            self.file = _id.file
+            // Size of the register
+            self.index = _id.index
+        }
+    }
+
+    @objc public init(identifier: Node, arguments: Node, bitlist: Node) {
         self.identifier = identifier
         self.arguments = arguments
         self.bitlist = bitlist
@@ -71,12 +86,8 @@ public final class NodeOpaque: Node {
     
     public override var children: [Node] {
         var _children: [Node] = []
-        if let ident = identifier {
-            _children.append(ident)
-        }
-        if let l1 = arguments {
-            _children.append(l1)
-        }
+        _children.append(self.identifier)
+        _children.append(self.arguments)
         if let l2 = bitlist {
             _children.append(l2)
         }
@@ -86,23 +97,11 @@ public final class NodeOpaque: Node {
 
     public override func qasm(_ prec: Int) -> String {
         var qasm: String = "opaque"
-        
-        guard let ident = identifier else {
-            assertionFailure("Invalid NodeOpaque Operation")
-            return ""
-        }
-
-        guard let l1 = arguments else {
-            assertionFailure("Invalid NodeOpaque Operation")
-            return ""
-        }
-        
         if let l2 = bitlist {
-            qasm += " \(ident.qasm(prec)) ( \(l1.qasm(prec)) ) \(l2.qasm(prec));"
+            qasm += " \(self.identifier.qasm(prec)) ( \(self.arguments.qasm(prec)) ) \(l2.qasm(prec));"
         } else {
-            qasm += " \(ident.qasm(prec)) \(l1.qasm(prec));"
+            qasm += " \(self.identifier.qasm(prec)) \(self.arguments.qasm(prec));"
         }
-        
         return qasm
     }
 }

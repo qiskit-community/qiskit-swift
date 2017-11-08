@@ -18,35 +18,62 @@
 
 @class Node;
 
+extern int yylineno;
+
+typedef struct yy_buffer_state *YY_BUFFER_STATE;
+YY_BUFFER_STATE  yy_scan_string(const char *s);
+
+typedef unsigned long StringIdType;
+typedef unsigned long NodeIdType;
+
+int yyparse(void);
+
+extern void (^ParseSuccessBlock)(NSObject *node);
+extern void (^ParseFailBlock)(int line, const char *msg);
+
 @interface ParseTree : NSObject
 
-+(void)clearNodes;
-+(Node*) createBarrier: (Node*) primarylist;
-+(Node*) createBinaryOperation: (NSString*) op operand1: (Node*) o1 operand2: (Node*) o2;
-+(Node*) createCX: (Node*) arg1 arg2: (Node*) arg2;
-+(Node*) createCReg: (Node*) indexed_id;
-+(Node*) createCustomUnitary: (Node*) identifier arguments: (Node*) args bitlist: (Node*) bitlist;
-+(Node*) createExpressionList: (Node*) elist expression: (Node*) exp;
-+(Node*) createExternal: (Node*) identifier external: (NSString*) external;
-+(Node*) createGate: (Node*) identifier list1: (Node*) list1 list2: (Node*) list2 list3: (Node*) list3;
-+(Node*) createGateBody: (Node*) goplist;
-+(Node*) createGopList: (Node*)goplist gate_op:(Node*) gop;
-+(Node*) createId: (NSString*) identifer line: (int) line;
-+(Node*) createIdlist: (Node*) idlist identifier: (Node*) identifier;
-+(Node*) createIf: (Node*) identifier nninteger: (Node*) integer quantum_op: (Node*) qop;
-+(Node*) createInclude: (NSString*) file;
-+(Node*) createIndexedId: (Node*) identifier index: (Node*) nninteger;
-+(Node*) createInt: (int) integer;
-+(Node*) createMagic: (Node*) real;
-+(Node*) createMainProgram: (Node*) magic include: (Node*) incld program: (Node*) program;
-+(Node*) createMeasure: (Node*) argument1 argument: (Node*) argument2;
-+(Node*) createOpaque: (Node*) identifier list1: (Node*) list1 list2: (Node*) list2;
-+(Node*) createPrefixOperation: (NSString*) op operand: (Node*) o;
-+(Node*) createPrimaryList: (Node*) list primary: (Node*) primary;
-+(Node*) createProgram: (Node*) program statement: (Node*) statement;
-+(Node*) createQReg: (Node*) indexed_id;
-+(Node*) createReal: (double) real;
-+(Node*) createReset: (Node*) identifier;
-+(Node*) createUniversalUnitary: (Node*) list1 list2: (Node*) list2;
++(void)success: (NodeIdType) mainProgram;
++(void)fail: (int) line msg: (const char*) msg;
++(const char*) getIncludePath: (const char*) path;
++(void)  clearState;
++(StringIdType) addString: (const char*) str;
++(NodeIdType) createBarrier: (NodeIdType) primarylist;
++(NodeIdType) createBinaryOperation: (const char*) op operand1: (NodeIdType) o1 operand2: (NodeIdType) o2;
++(NodeIdType) createCX: (NodeIdType) arg1 arg2: (NodeIdType) arg2;
++(NodeIdType) createCReg: (NodeIdType) indexed_id;
++(NodeIdType) createCustomUnitary: (NodeIdType) identifier bitlist: (NodeIdType) bitlist;
++(NodeIdType) createCustomUnitary: (NodeIdType) identifier arguments: (NodeIdType) args bitlist: (NodeIdType) bitlist;
++(NodeIdType) createExpressionList: (NodeIdType) exp;
++(NodeIdType) createExpressionList: (NodeIdType) elist expression: (NodeIdType) exp;
++(NodeIdType) createExternal: (NodeIdType) identifier external: (StringIdType) external;
++(NodeIdType) createGate: (NodeIdType) identifier list2: (NodeIdType) list2 list3: (NodeIdType) list3;
++(NodeIdType) createGate: (NodeIdType) identifier list1: (NodeIdType) list1 list2: (NodeIdType) list2 list3: (NodeIdType) list3;
++(NodeIdType) createGateBody;
++(NodeIdType) createGateBodyWithList: (NodeIdType) goplist;
++(NodeIdType) createGopList:(NodeIdType) gop;
++(NodeIdType) createGopList: (NodeIdType)goplist gate_op:(NodeIdType) gop;
++(NodeIdType) createId: (StringIdType) identifer line: (int) line;
++(NodeIdType) createIdlist: (NodeIdType) identifier;
++(NodeIdType) createIdlist: (NodeIdType) idlist identifier: (NodeIdType) identifier;
++(NodeIdType) createIf: (NodeIdType) identifier nninteger: (NodeIdType) integer quantum_op: (NodeIdType) qop;
++(NodeIdType) createInclude: (StringIdType) file;
++(NodeIdType) createIndexedId: (NodeIdType) identifier index: (NodeIdType) nninteger;
++(NodeIdType) createInt: (int) integer;
++(NodeIdType) createMagic: (NodeIdType) real;
++(NodeIdType) createMainProgram: (NodeIdType) magic program: (NodeIdType) program;
++(NodeIdType) createMainProgram: (NodeIdType) magic include: (NodeIdType) incld program: (NodeIdType) program;
++(NodeIdType) createMeasure: (NodeIdType) argument1 argument: (NodeIdType) argument2;
++(NodeIdType) createOpaque: (NodeIdType) identifier list1: (NodeIdType) list1;
++(NodeIdType) createOpaque: (NodeIdType) identifier list1: (NodeIdType) list1 list2: (NodeIdType) list2;
++(NodeIdType) createPrefixOperation: (const char*) op operand: (NodeIdType) o;
++(NodeIdType) createPrimaryList: (NodeIdType) primary;
++(NodeIdType) createPrimaryList: (NodeIdType) list primary: (NodeIdType) primary;
++(NodeIdType) createProgram: (NodeIdType) statement;
++(NodeIdType) createProgram: (NodeIdType) program statement: (NodeIdType) statement;
++(NodeIdType) createQReg: (NodeIdType) indexed_id;
++(NodeIdType) createReal: (double) real;
++(NodeIdType) createReset: (NodeIdType) identifier;
++(NodeIdType) createUniversalUnitary: (NodeIdType) list1 list2: (NodeIdType) list2;
 
 @end

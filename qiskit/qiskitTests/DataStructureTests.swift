@@ -41,7 +41,7 @@ class DataStructureTests: XCTestCase {
 
     func testTopologicalSort() {
         do {
-            let g = Graph<NSString,NSString>(directed: true)
+            let g = Graph<EmptyGraphData,EmptyGraphData>(directed: true)
             g.add_edge(5, 2)
             g.add_edge(5, 0)
             g.add_edge(4, 0)
@@ -59,7 +59,7 @@ class DataStructureTests: XCTestCase {
     }
 
     func testPredecessors() {
-        let g = Graph<NSString,NSString>(directed: true)
+        let g = Graph<EmptyGraphData,EmptyGraphData>(directed: true)
         g.add_edge(5, 2)
         g.add_edge(5, 0)
         g.add_edge(4, 0)
@@ -82,7 +82,7 @@ class DataStructureTests: XCTestCase {
     }
 
     func testAncestors() {
-        let g = Graph<NSString,NSString>(directed: true)
+        let g = Graph<EmptyGraphData,EmptyGraphData>(directed: true)
         g.add_edge(5, 2)
         g.add_edge(5, 0)
         g.add_edge(4, 0)
@@ -105,7 +105,7 @@ class DataStructureTests: XCTestCase {
     }
 
     func testSuccessors() {
-        let g = Graph<NSString,NSString>(directed: true)
+        let g = Graph<EmptyGraphData,EmptyGraphData>(directed: true)
         g.add_edge(5, 2)
         g.add_edge(5, 0)
         g.add_edge(4, 0)
@@ -128,7 +128,7 @@ class DataStructureTests: XCTestCase {
     }
 
     func testDescendants() {
-        let g = Graph<NSString,NSString>(directed: true)
+        let g = Graph<EmptyGraphData,EmptyGraphData>(directed: true)
         g.add_edge(5, 2)
         g.add_edge(5, 0)
         g.add_edge(4, 0)
@@ -152,7 +152,7 @@ class DataStructureTests: XCTestCase {
 
     func testWeaklyConnetectedComponents() {
         do {
-            let g = Graph<NSString,NSString>(directed: true)
+            let g = Graph<EmptyGraphData,EmptyGraphData>(directed: true)
             g.add_edge(1, 0)
             g.add_edge(2, 3)
             g.add_edge(3, 4)
@@ -166,7 +166,7 @@ class DataStructureTests: XCTestCase {
 
     func testLongestPath() {
         do {
-            var g = Graph<NSString,NSString>(directed: true)
+            var g = Graph<EmptyGraphData,EmptyGraphData>(directed: true)
             g.add_edge(0, 1)
             g.add_edge(0, 2)
             g.add_edge(1, 3)
@@ -183,7 +183,7 @@ class DataStructureTests: XCTestCase {
             var count = try g.dag_longest_path_length()
             XCTAssertEqual(count, 5)
 
-            g = Graph<NSString,NSString>(directed: true)
+            g = Graph<EmptyGraphData,EmptyGraphData>(directed: true)
             g.add_edge(5, 2)
             g.add_edge(5, 0)
             g.add_edge(4, 0)
@@ -200,7 +200,7 @@ class DataStructureTests: XCTestCase {
         }
     }
 
-    private class func formatList(_ list: [GraphVertex<NSString>]) -> String {
+    private class func formatList(_ list: [GraphVertex<EmptyGraphData>]) -> String {
         var str = ""
         for vertex in list {
             if !str.isEmpty {

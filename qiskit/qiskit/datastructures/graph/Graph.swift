@@ -15,6 +15,10 @@
 
 import Foundation
 
+protocol GraphDataCopying {
+    func copy() -> GraphDataCopying
+}
+
 enum SearchProcessType {
     case vertexEarly
     case vertexLate
@@ -35,7 +39,13 @@ final class BFSState {
     fileprivate(set) var parent: [Int:Int] = [:]
 }
 
-typealias BFSHandler<VertexDataType: NSCopying,EdgeDataType: NSCopying> = (SearchProcessType,
+final class EmptyGraphData: GraphDataCopying {
+    func copy() -> GraphDataCopying {
+        return EmptyGraphData()
+    }
+}
+
+typealias BFSHandler<VertexDataType: GraphDataCopying,EdgeDataType: GraphDataCopying> = (SearchProcessType,
                         GraphVertex<VertexDataType>?,
                         [GraphEdge<EdgeDataType>],
                         BFSState) throws -> (Void)
@@ -51,12 +61,12 @@ final class DFSState {
     fileprivate(set) var parent: [Int:Int] = [:]
 }
 
-typealias DFSHandler<VertexDataType: NSCopying,EdgeDataType: NSCopying> = (SearchProcessType,
+typealias DFSHandler<VertexDataType: GraphDataCopying,EdgeDataType: GraphDataCopying> = (SearchProcessType,
                                                         GraphVertex<VertexDataType>?,
                                                         [GraphEdge<EdgeDataType>],
                                                         DFSState) throws -> (Void)
 
-final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying {
+final class Graph<VertexDataType: GraphDataCopying,EdgeDataType: GraphDataCopying> {
 
     public private(set) var vertices: OrderedDictionary<Int,GraphVertex<VertexDataType>> =
                                                 OrderedDictionary<Int,GraphVertex<VertexDataType>>()
@@ -99,16 +109,16 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
         self.isDirected = directed
     }
 
-    public func copy(with zone: NSZone? = nil) -> Any {
+    public func copy() -> Graph<VertexDataType,EdgeDataType> {
         let copy = Graph(directed: self.isDirected)
         for (_,v) in self.vertices {
-            let vertex = v.copy(with: zone) as! GraphVertex<VertexDataType>
+            let vertex = v.copy()
             copy.vertices[vertex.key] = vertex
         }
         for (key,multiEdges) in self._edges {
             var newMultiEdges: [GraphEdge<EdgeDataType>] = [] 
             for edge in multiEdges {
-                newMultiEdges.append(edge.copy(with: zone) as! GraphEdge<EdgeDataType>)
+                newMultiEdges.append(edge.copy())
             }
             copy._edges[key] = newMultiEdges
         }
@@ -645,7 +655,7 @@ final class Graph<VertexDataType: NSCopying,EdgeDataType: NSCopying>: NSCopying 
     }
 
     public func to_undirected() -> Graph {
-        let graph = self.copy(with: nil) as! Graph<VertexDataType,EdgeDataType>
+        let graph = self.copy()
         if !graph.isDirected {
             return graph
         }

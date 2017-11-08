@@ -145,14 +145,12 @@ final class Unroller {
         }
         var bits: [[RegBit]] = []
         var maxidx: Int = 0
-        if let blchildren = node.bitlist?.children {
-            for node_element in blchildren {
-                let bitList = try self._process_bit_id(node_element)
-                if maxidx < bitList.count {
-                    maxidx = bitList.count
-                }
-                bits.append(bitList)
+        for node_element in node.bitlist.children {
+            let bitList = try self._process_bit_id(node_element)
+            if maxidx < bitList.count {
+                maxidx = bitList.count
             }
+            bits.append(bitList)
         }
 
         if let gate = self.gates[name] {
@@ -278,11 +276,8 @@ final class Unroller {
      Process a CNOT gate node.
      */
     private func _process_cnot(_ node: NodeCnot) throws {
-        guard let argument1 = node.arg1 else { throw UnrollerError.errorQregSize(qasm: node.qasm(self.precision)) }
-        guard let argument2 = node.arg2 else { throw UnrollerError.errorQregSize(qasm: node.qasm(self.precision)) }
-
-        let id0 = try self._process_bit_id(argument1)
-        let id1 = try self._process_bit_id(argument2)
+        let id0 = try self._process_bit_id(node.arg1)
+        let id1 = try self._process_bit_id(node.arg2)
         
         if !(id0.count == id1.count || id0.count == 1 || id1.count == 1) {
             throw UnrollerError.errorQregSize(qasm: node.qasm(self.precision))
@@ -307,11 +302,8 @@ final class Unroller {
      Process a measurement node.
      */
     private func _process_measure(_ node: NodeMeasure) throws {
-        guard let argument1 = node.arg1 else { throw UnrollerError.errorRegSize(qasm: node.qasm(self.precision)) }
-        guard let argument2 = node.arg2 else { throw UnrollerError.errorRegSize(qasm: node.qasm(self.precision)) }
-
-        let id0 = try self._process_bit_id(argument1)
-        let id1 = try self._process_bit_id(argument2)
+        let id0 = try self._process_bit_id(node.arg1)
+        let id1 = try self._process_bit_id(node.arg2)
         if id0.count != id1.count {
             throw UnrollerError.errorRegSize(qasm: node.qasm(self.precision))
         }
@@ -352,9 +344,7 @@ final class Unroller {
     private func _process_node(_ node: Node) throws -> ProcessNodesReturn {
         switch node.type {
         case .N_MAINPROGRAM:
-            if let pnode = (node as! NodeMainProgram).program {
-                try self._process_node(pnode)
-            }
+            try self._process_node((node as! NodeMainProgram).program)
         case .N_PROGRAM:
             try self._process_children(node)
         case .N_QREG:
@@ -393,14 +383,11 @@ final class Unroller {
             try self._process_custom_unitary(node as! NodeCustomUnitary)
         case .N_UNIVERSALUNITARY:
             let unode = node as! NodeUniversalUnitary
-            if let c0 = unode.explist,
-                let c1 = unode.indexedid {
-                let args = try self._process_node(c0).nodes
-                if args.count >= 3 {
-                    let qid = try self._process_bit_id(c1)
-                    for element in qid {
-                        try self.backend!.u((args[0], args[1], args[2]), element, self.arg_stack.items)
-                    }
+            let args = try self._process_node(unode.explist).nodes
+            if args.count >= 3 {
+                let qid = try self._process_bit_id(unode.indexedid)
+                for element in qid {
+                    try self.backend!.u((args[0], args[1], args[2]), element, self.arg_stack.items)
                 }
             }
         case .N_CNOT:

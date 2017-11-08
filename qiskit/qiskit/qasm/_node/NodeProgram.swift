@@ -21,16 +21,14 @@ children is a list of nodes (statements).
 */
 public final class NodeProgram: Node  {
 
-    public private(set) var statements: [Node]? = nil
+    public private(set) var statements: [Node]
     
-    @objc public init(statement: Node?) {
-        if let stmt = statement {
-            self.statements = [stmt]
-        }
+    @objc public init(statement: Node) {
+        self.statements = [statement]
     }
     
     @objc public func addStatement(statement: Node) {
-        statements?.append(statement)
+        self.statements.append(statement)
     }
     
     public override var type: NodeType {
@@ -38,23 +36,13 @@ public final class NodeProgram: Node  {
     }
     
     public override var children: [Node] {
-        var _children: [Node] = []
-        if let stmnts = statements {
-            for s in stmnts {
-                _children.append(s)
-            }
-        }
-        return _children
+        return self.statements
     }
     
     public override func qasm(_ prec: Int) -> String {
-        
-        var qasms: [String] = []
-        if let stmt = statements {
-            qasms += stmt.flatMap({ (node: Node) -> String in
-                                    return node.qasm(prec)
-                                    })
-        }
+        let qasms: [String] = self.statements.flatMap({ (node: Node) -> String in
+            return node.qasm(prec)
+        })
         return qasms.joined(separator: "\n")
     }
 }

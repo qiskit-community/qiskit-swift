@@ -25,11 +25,11 @@ import Foundation
  */
 public final class NodeIf: Node {
   
-    public let nodeId: Node?
-    public let nodeNNInt: Node?
-    public let nodeQop: Node?
+    public let nodeId: Node
+    public let nodeNNInt: Node
+    public let nodeQop: Node
     
-    @objc public init(identifier: Node?, nninteger: Node?, qop: Node?) {
+    @objc public init(identifier: Node, nninteger: Node, qop: Node) {
         nodeId = identifier
         nodeNNInt = nninteger
         nodeQop = qop
@@ -40,31 +40,14 @@ public final class NodeIf: Node {
     }
 
     public override var children: [Node] {
-        var _children: [Node] = []
-        if let ident = nodeId {
-            _children.append(ident)
-        }
-        if let nnint = nodeNNInt {
-            _children.append(nnint)
-        }
-        if let qop = nodeQop {
-            _children.append(qop)
-        }
-        
-        return _children
+        return [self.nodeId,self.nodeNNInt,self.nodeQop]
     }
     
     public override func qasm(_ prec: Int) -> String {
         var qasm: String = "if"
-        if let ident = nodeId {
-            qasm += " (\(ident.qasm(prec))"
-        }
-        if let nnint = nodeNNInt {
-            qasm += " == \(nnint.qasm(prec))"
-        }
-        if let qop = nodeQop {
-            qasm += " ) \(qop.qasm(prec))"
-        }
+        qasm += " (\(self.nodeId.qasm(prec))"
+        qasm += " == \(self.nodeNNInt.qasm(prec))"
+        qasm += " ) \(self.nodeQop.qasm(prec))"
         return qasm
     }
 }

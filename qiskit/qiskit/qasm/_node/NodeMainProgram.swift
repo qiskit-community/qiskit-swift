@@ -18,11 +18,17 @@ import Foundation
 
 public final class NodeMainProgram: Node {
     
-    public let magic: Node?
+    public let magic: Node
     public let incld: Node?
-    public let program: Node?
-    
-    @objc public init(magic: Node?, incld: Node?, program: Node?) {
+    public let program: Node
+
+    @objc public init(magic: Node, program: Node) {
+        self.magic = magic
+        self.incld = nil
+        self.program = program
+    }
+
+    @objc public init(magic: Node, incld: Node, program: Node) {
         self.magic = magic
         self.incld = incld
         self.program = program
@@ -33,9 +39,9 @@ public final class NodeMainProgram: Node {
     }
     
     public override func qasm(_ prec: Int) -> String {
-        var qasm: String = magic?.qasm(prec) ?? ""
-        qasm += "\(incld?.qasm(prec) ?? "")\n"
-        qasm += "\(program?.qasm(prec) ?? "")\n"
+        var qasm: String = self.magic.qasm(prec)
+        qasm += "\(self.incld?.qasm(prec) ?? "")\n"
+        qasm += "\(self.program.qasm(prec))\n"
         return qasm
     }
 }

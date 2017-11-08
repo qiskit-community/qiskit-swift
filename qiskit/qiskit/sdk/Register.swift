@@ -41,19 +41,13 @@ extension Register {
     }
 
     func checkProperties() throws {
-        var matches: Int = 0
-        do {
-            let regex = try NSRegularExpression(pattern: "[a-z][a-zA-Z0-9_]*")
-            let nsString = self.name as NSString
-            matches = regex.numberOfMatches(in: name, options: [], range: NSRange(location: 0, length: nsString.length))
-        } catch {
-            throw QISKitError.internalError(error: error)
-        }
-        if matches <= 0 {
-            throw QISKitError.regName
-        }
         if self.size <= 0 {
             throw QISKitError.regSize
         }
+        let wholeRange = self.name.startIndex..<self.name.endIndex
+        if let match = self.name.range(of: "[a-z][a-zA-Z0-9_]*", options: .regularExpression), wholeRange == match {
+            return
+        }
+        throw QISKitError.regName
     }
 }

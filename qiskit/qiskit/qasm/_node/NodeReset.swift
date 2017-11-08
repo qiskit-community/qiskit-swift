@@ -22,9 +22,9 @@ children[0] is a primary node (id or indexedid)
 
 public final class NodeReset: Node {
     
-    public let indexedid: Node?
+    public let indexedid: Node
  
-    @objc public init(indexedid: Node?) {
+    @objc public init(indexedid: Node) {
         self.indexedid = indexedid
     }
     
@@ -33,19 +33,11 @@ public final class NodeReset: Node {
     }
     
     public override var children: [Node] {
-        var _children: [Node] = []
-        if let a = indexedid {
-            _children.append(a)
-        }
-        return _children
+        return [self.indexedid]
     }
 
     public override func qasm(_ prec: Int) -> String {
-        guard let iid = indexedid else {
-            assertionFailure("Invalid NodeReset Operation")
-            return ""
-        }
-        return "reset \(iid.qasm(prec));"
+        return "reset \(self.indexedid.qasm(prec));"
     }
 
 }

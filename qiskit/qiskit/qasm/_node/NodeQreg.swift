@@ -21,13 +21,13 @@ import Foundation
  */
 public final class NodeQreg: Node {
 
-    public let indexedid: Node?
+    public let indexedid: Node
     public private(set) var _name: String = ""
     public private(set) var line: Int = 0
     public private(set) var file: String = ""
     public private(set) var index: Int = 0
     
-    @objc public init(indexedid: Node?, line: Int, file: String) {
+    @objc public init(indexedid: Node, line: Int, file: String) {
         self.indexedid = indexedid
         if let _id = self.indexedid as? NodeIndexedId {
             // Name of the qreg
@@ -50,19 +50,10 @@ public final class NodeQreg: Node {
     }
 
     public override var children: [Node] {
-        var _children: [Node] = []
-        if let a = indexedid {
-            _children.append(a)
-        }
-        return _children
+        return [self.indexedid]
     }
     
     public override func qasm(_ prec: Int) -> String {
-        guard let iid = indexedid else {
-            assertionFailure("Invalid NodeQreg Operation")
-            return ""
-        }
-        return "qreg " + iid.qasm(prec) + ";"
+        return "qreg " + self.indexedid.qasm(prec) + ";"
     }
-    
 }

@@ -173,7 +173,6 @@
 		69DAB5551FAB60D50093C27B /* NodeRealValueProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696613231F4CBA5B0031A146 /* NodeRealValueProtocol.swift */; };
 		69DAB5571FAB60D50093C27B /* parser.ym in Sources */ = {isa = PBXBuildFile; fileRef = DF79735B1ED071F600C01457 /* parser.ym */; };
 		69DAB5581FAB60D50093C27B /* tokenizer.lm in Sources */ = {isa = PBXBuildFile; fileRef = DF79735C1ED071F600C01457 /* tokenizer.lm */; };
-		69DAB55A1FAB60D50093C27B /* ParserBlocks.m in Sources */ = {isa = PBXBuildFile; fileRef = DF7973601ED0747B00C01457 /* ParserBlocks.m */; };
 		69DAB55C1FAB60D50093C27B /* ParseTree.m in Sources */ = {isa = PBXBuildFile; fileRef = DF7973711ED3429D00C01457 /* ParseTree.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		69DAB55E1FAB60D50093C27B /* Qasm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692DBE051EE702490032F6CF /* Qasm.swift */; };
 		69DAB55F1FAB60D50093C27B /* QasmException.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBB49981EF98011001DE633 /* QasmException.swift */; };
@@ -208,7 +207,6 @@
 		69DAB57C1FAB60D60093C27B /* IBMQuantumExperience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D310851ECA182000B3E752 /* IBMQuantumExperience.swift */; };
 		69DAB57D1FAB60D60093C27B /* IBMQuantumExperienceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69FEC8371ECB37E0002324E2 /* IBMQuantumExperienceError.swift */; };
 		69DAB57E1FAB60D60093C27B /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D310871ECA182000B3E752 /* Credentials.swift */; };
-		69DAB57F1FAB62090093C27B /* ParserBlocks.h in Headers */ = {isa = PBXBuildFile; fileRef = DF79735F1ED0747B00C01457 /* ParserBlocks.h */; };
 		69DAB5801FAB62090093C27B /* ParseTree.h in Headers */ = {isa = PBXBuildFile; fileRef = DF7973701ED3429D00C01457 /* ParseTree.h */; };
 		69DAB5811FAB622B0093C27B /* libs.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6977A01D1F05762A00CF52F2 /* libs.bundle */; };
 		69DBD7301ECA48BE0099CB1D /* CCX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DBD72F1ECA48BE0099CB1D /* CCX.swift */; };
@@ -243,8 +241,6 @@
 		69FEC8381ECB37E0002324E2 /* IBMQuantumExperienceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69FEC8371ECB37E0002324E2 /* IBMQuantumExperienceError.swift */; };
 		DF79735D1ED071F600C01457 /* parser.ym in Sources */ = {isa = PBXBuildFile; fileRef = DF79735B1ED071F600C01457 /* parser.ym */; };
 		DF79735E1ED071F600C01457 /* tokenizer.lm in Sources */ = {isa = PBXBuildFile; fileRef = DF79735C1ED071F600C01457 /* tokenizer.lm */; };
-		DF7973611ED0747B00C01457 /* ParserBlocks.h in Headers */ = {isa = PBXBuildFile; fileRef = DF79735F1ED0747B00C01457 /* ParserBlocks.h */; };
-		DF7973621ED0747B00C01457 /* ParserBlocks.m in Sources */ = {isa = PBXBuildFile; fileRef = DF7973601ED0747B00C01457 /* ParserBlocks.m */; };
 		DF7973721ED3429D00C01457 /* ParseTree.h in Headers */ = {isa = PBXBuildFile; fileRef = DF7973701ED3429D00C01457 /* ParseTree.h */; };
 		DF7973731ED3429D00C01457 /* ParseTree.m in Sources */ = {isa = PBXBuildFile; fileRef = DF7973711ED3429D00C01457 /* ParseTree.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		DF7F720D1ED863F50055D210 /* QIskitParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7F720C1ED863F50055D210 /* QIskitParserTests.swift */; };
@@ -399,9 +395,6 @@
 		69FEC8371ECB37E0002324E2 /* IBMQuantumExperienceError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IBMQuantumExperienceError.swift; path = qiskit/network/IBMQuantumExperienceError.swift; sourceTree = SOURCE_ROOT; };
 		DF79735B1ED071F600C01457 /* parser.ym */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; path = parser.ym; sourceTree = "<group>"; };
 		DF79735C1ED071F600C01457 /* tokenizer.lm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; path = tokenizer.lm; sourceTree = "<group>"; };
-		DF79735F1ED0747B00C01457 /* ParserBlocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserBlocks.h; sourceTree = "<group>"; };
-		DF7973601ED0747B00C01457 /* ParserBlocks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParserBlocks.m; sourceTree = "<group>"; };
-		DF7973671ED0808D00C01457 /* Parser-PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Parser-PrefixHeader.pch"; sourceTree = "<group>"; };
 		DF7973681ED083F600C01457 /* qiskitTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "qiskitTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		DF7973701ED3429D00C01457 /* ParseTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParseTree.h; sourceTree = "<group>"; };
 		DF7973711ED3429D00C01457 /* ParseTree.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParseTree.m; sourceTree = "<group>"; };
@@ -733,11 +726,8 @@
 				6977A01D1F05762A00CF52F2 /* libs.bundle */,
 				DF79735B1ED071F600C01457 /* parser.ym */,
 				DF79735C1ED071F600C01457 /* tokenizer.lm */,
-				DF79735F1ED0747B00C01457 /* ParserBlocks.h */,
-				DF7973601ED0747B00C01457 /* ParserBlocks.m */,
 				DF7973701ED3429D00C01457 /* ParseTree.h */,
 				DF7973711ED3429D00C01457 /* ParseTree.m */,
-				DF7973671ED0808D00C01457 /* Parser-PrefixHeader.pch */,
 				692DBE051EE702490032F6CF /* Qasm.swift */,
 				DFBB49981EF98011001DE633 /* QasmException.swift */,
 			);
@@ -752,7 +742,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				69DAB5801FAB62090093C27B /* ParseTree.h in Headers */,
-				69DAB57F1FAB62090093C27B /* ParserBlocks.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -762,7 +751,6 @@
 			files = (
 				DFBC4FBA1EC73BF800027640 /* qiskit.h in Headers */,
 				DF7973721ED3429D00C01457 /* ParseTree.h in Headers */,
-				DF7973611ED0747B00C01457 /* ParserBlocks.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -994,7 +982,6 @@
 				69DAB5551FAB60D50093C27B /* NodeRealValueProtocol.swift in Sources */,
 				69DAB5571FAB60D50093C27B /* parser.ym in Sources */,
 				69DAB5581FAB60D50093C27B /* tokenizer.lm in Sources */,
-				69DAB55A1FAB60D50093C27B /* ParserBlocks.m in Sources */,
 				69DAB55C1FAB60D50093C27B /* ParseTree.m in Sources */,
 				69DAB55E1FAB60D50093C27B /* Qasm.swift in Sources */,
 				69DAB55F1FAB60D50093C27B /* QasmException.swift in Sources */,
@@ -1154,7 +1141,6 @@
 				69D310891ECA182000B3E752 /* IBMQuantumExperience.swift in Sources */,
 				69F7B6211F107D0100FDE7C4 /* CU3.swift in Sources */,
 				DF8E1CEB1EE502D200DCC35C /* NodeIf.swift in Sources */,
-				DF7973621ED0747B00C01457 /* ParserBlocks.m in Sources */,
 				DF8E1CF51EE5037D00DCC35C /* NodeExternal.swift in Sources */,
 				695701341ED75C1C00C6CCAB /* Graph.swift in Sources */,
 				696613241F4CBA5B0031A146 /* NodeRealValueProtocol.swift in Sources */,
@@ -1206,7 +1192,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "qiskit/qasm/Parser-PrefixHeader.pch";
 				INFOPLIST_FILE = qiskit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
@@ -1235,7 +1220,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "qiskit/qasm/Parser-PrefixHeader.pch";
 				INFOPLIST_FILE = qiskit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
@@ -1374,7 +1358,6 @@
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				FRAMEWORK_VERSION = A;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "qiskit/qasm/Parser-PrefixHeader.pch";
 				INFOPLIST_FILE = qiskit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
@@ -1404,7 +1387,6 @@
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				FRAMEWORK_VERSION = A;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "qiskit/qasm/Parser-PrefixHeader.pch";
 				INFOPLIST_FILE = qiskit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";

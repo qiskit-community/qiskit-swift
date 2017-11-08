@@ -25,7 +25,7 @@ public final class NodeMagic:  Node {
 
     public let nodeVersion: NodeReal?
 
-    @objc public init(version: Node?) {
+    @objc public init(version: Node) {
         self.nodeVersion = (version as? NodeReal)
     }
 

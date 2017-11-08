@@ -15,30 +15,18 @@
 
 import Foundation
 
-final class CircuitEdgeData: NSCopying {
-    public var name: RegBit {
-        get{
-            return _name
-        }set(value) {
-           _name = value
-            if self._name.name == "q" && self._name.index == 0 {
-                var i:Int = 0
-                i += 1
-            }
-        }
-    }
-
-    private var _name: RegBit
+final class CircuitEdgeData: GraphDataCopying {
+    public var name: RegBit
 
     public init(_ name: RegBit) {
-        self._name = name
-        if self.name.name == "q" && self.name.index == 0 {
-            var i:Int = 0
-            i += 1
-        }
+        self.name = name
     }
 
-    public func copy(with zone: NSZone? = nil) -> Any {
-        return CircuitEdgeData(self.name)
+    init(_ instance: CircuitEdgeData) {
+        self.name = instance.name
+    }
+
+    func copy() -> GraphDataCopying {
+        return CircuitEdgeData(self)
     }
 }

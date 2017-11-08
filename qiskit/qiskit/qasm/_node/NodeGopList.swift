@@ -18,26 +18,22 @@ import Foundation
 
 public final class NodeGopList: Node {
 
-    public private(set) var gateops: [Node]?
+    public private(set) var gateops: [Node]
     
-    @objc public init(gateop: Node?) {
-        if let gop = gateop {
-            self.gateops = [gop]
-        }
+    @objc public init(gateop: Node) {
+        self.gateops = [gateop]
     }
     
     @objc public func addIdentifier(gateop: Node) {
-        gateops?.append(gateop)
+        self.gateops.append(gateop)
     }
     
     public func calls() -> [String] {
         // Return a list of custom gate names in this gate body."""
         var _calls: [String] = []
-        if let gops = self.gateops {
-            for gop in gops {
-                if gop.type == .N_CUSTOMUNITARY {
-                    _calls.append(gop.name)
-                }
+        for gop in self.gateops {
+            if gop.type == .N_CUSTOMUNITARY {
+                _calls.append(gop.name)
             }
         }
         return _calls
@@ -48,16 +44,13 @@ public final class NodeGopList: Node {
     }
     
     public override var children: [Node] {
-        return (gateops != nil) ? gateops! : []
+        return self.gateops
     }
     
     public override func qasm(_ prec: Int) -> String {
-        var qasms: [String] = []
-        if let list = gateops {
-            qasms = list.flatMap({ (node: Node) -> String in
-                return node.qasm(prec)
-            })
-        }
+        let qasms: [String] = self.gateops.flatMap({ (node: Node) -> String in
+            return node.qasm(prec)
+        })
         return qasms.joined(separator: "\n")
     }
 }

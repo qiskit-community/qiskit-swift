@@ -1,6 +1,5 @@
 %{
 
-#import "ParserBlocks.h"
 #import "ParseTree.h"
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunreachable-code"
@@ -13,8 +12,8 @@ void yyerror(char *s);
 %union {
     int ivalue;
     double fvalue;
-    __unsafe_unretained NSString *svalue;
-    __unsafe_unretained Node *node;
+    unsigned long svalue;
+    unsigned long node;
 }
 
 %token <svalue> OPENQASM
@@ -98,12 +97,12 @@ void yyerror(char *s);
 // mainprogram : magic ';' program
 // ----------------------------------------
 mainprogram : magic ';' program {
-    $$ = [ParseTree createMainProgram: $1 include: nil program: $3];
-    ParseSuccessBlock((NSObject*)$$);
+    $$ = [ParseTree createMainProgram: $1 program: $3];
+    [ParseTree success: $$];
 }
 | magic ';' include program {
     $$ = [ParseTree createMainProgram: $1 include: $3 program: $4];
-    ParseSuccessBlock((NSObject*)$$);
+    [ParseTree success: $$];
 }
 
 // ----------------------------------------
@@ -115,7 +114,7 @@ include : incld string ';' { $$ = [ParseTree createInclude: $2]; }
 //  program : statement
 //          | program statement
 // ----------------------------------------
-program : statement { $$ = [ ParseTree createProgram: nil statement: $1]; }
+program : statement { $$ = [ ParseTree createProgram: $1]; }
 | program statement { $$ = [ ParseTree createProgram: $1 statement: $2]; }
 
 // ----------------------------------------
@@ -152,7 +151,7 @@ primary : id { $$ = $1; }
 //  id_list : id
 //          | id_list ',' id
 // ----------------------------------------
-id_list : id { $$ = [ParseTree createIdlist: nil identifier: $1]; }
+id_list : id { $$ = [ParseTree createIdlist: $1]; }
 | id_list ',' id { $$ = [ParseTree createIdlist: $1 identifier: $3]; }
 
 
@@ -160,14 +159,14 @@ id_list : id { $$ = [ParseTree createIdlist: nil identifier: $1]; }
 //  gate_id_list : id
 //               | gate_id_list ',' id
 // ----------------------------------------
-gate_id_list : id { $$ = [ParseTree createIdlist: nil identifier: $1]; }
+gate_id_list : id { $$ = [ParseTree createIdlist: $1]; }
 | gate_id_list ',' id { $$ = [ParseTree createIdlist: $1 identifier: $3]; }
 
 // ----------------------------------------
 //  bit_list : bit
 //           | bit_list ',' bit
 // ----------------------------------------
-bit_list : id { $$ = [ParseTree createIdlist: nil identifier: $1]; }
+bit_list : id { $$ = [ParseTree createIdlist: $1]; }
 | bit_list ',' id { $$ = [ParseTree createIdlist: $1 identifier: $3]; }
 
 
@@ -175,7 +174,7 @@ bit_list : id { $$ = [ParseTree createIdlist: nil identifier: $1]; }
 //  primary_list : primary
 //               | primary_list ',' primary
 // ----------------------------------------
-primary_list : primary { $$ = [ParseTree createPrimaryList: nil primary:$1]; }
+primary_list : primary { $$ = [ParseTree createPrimaryList:$1]; }
 | primary_list ',' primary  { $$ = [ParseTree createPrimaryList: $1 primary:$3]; }
 
 
@@ -210,8 +209,8 @@ creg_decl : CREG indexed_id { $$ = [ParseTree createCReg: $2]; }
 //            | GATE id gate_scope '(' gate_id_list ')' bit_list gate_body
 //
 // ----------------------------------------
-gate_decl : GATE id bit_list gate_body { $$ = [ParseTree createGate: $2 list1: nil list2: $3 list3: $4]; }
-| GATE id '(' ')' bit_list gate_body  { $$ = [ParseTree createGate: $2 list1: nil list2: $5 list3: $6]; }
+gate_decl : GATE id bit_list gate_body { $$ = [ParseTree createGate: $2 list2: $3 list3: $4]; }
+| GATE id '(' ')' bit_list gate_body  { $$ = [ParseTree createGate: $2 list2: $5 list3: $6]; }
 | GATE id '(' gate_id_list ')' bit_list gate_body { $$ = [ParseTree createGate: $2 list1: $4 list2: $6 list3: $7]; }
 
 
@@ -225,8 +224,8 @@ gate_decl : GATE id bit_list gate_body { $$ = [ParseTree createGate: $2 list1: n
 // Error handling: gete_op will throw if there's a problem so we won't
 //                 get here with in the gate_op_list
 // ----------------------------------------
-gate_body : '{' gate_op_list '}' { $$ = [ParseTree createGateBody: $2]; }
-| '{' '}' { $$ = [ParseTree createGateBody: nil]; }
+gate_body : '{' gate_op_list '}' { $$ = [ParseTree createGateBodyWithList: $2]; }
+| '{' '}' { $$ = [ParseTree createGateBody]; }
 
 // ----------------------------------------
 //  gate_op_list : gate_op
@@ -235,7 +234,7 @@ gate_body : '{' gate_op_list '}' { $$ = [ParseTree createGateBody: $2]; }
 // Error handling: gete_op will throw if there's a problem so we won't
 //                 get here with errors
 // ----------------------------------------
-gate_op_list : gate_op { $$ = [ParseTree createGopList: nil gate_op: $1]; }
+gate_op_list : gate_op { $$ = [ParseTree createGopList: $1]; }
 | gate_op_list gate_op { $$ = [ParseTree createGopList: $1 gate_op: $2]; }
 
 
@@ -254,8 +253,8 @@ gate_op_list : gate_op { $$ = [ParseTree createGopList: nil gate_op: $1]; }
 // ----------------------------------------
 unitary_op : U '(' exp_list ')'  primary  { $$ = [ParseTree createUniversalUnitary: $3 list2: $5]; }
 | CX primary ',' primary { $$ = [ParseTree createCX: $2 arg2: $4]; }
-| id primary_list { $$ = [ParseTree createCustomUnitary: $1 arguments: nil bitlist: $2]; }
-| id '(' ')' primary_list { $$ = [ParseTree createCustomUnitary: $1 arguments: nil bitlist: $4]; }
+| id primary_list { $$ = [ParseTree createCustomUnitary: $1 bitlist: $2]; }
+| id '(' ')' primary_list { $$ = [ParseTree createCustomUnitary: $1 bitlist: $4]; }
 | id '(' exp_list ')' primary_list { $$ = [ParseTree createCustomUnitary: $1 arguments: $3 bitlist: $5]; }
 
 // ----------------------------------------
@@ -271,8 +270,8 @@ unitary_op : U '(' exp_list ')'  primary  { $$ = [ParseTree createUniversalUnita
 // ----------------------------------------
 gate_op : U '(' exp_list ')' id ';' { $$ = [ParseTree createUniversalUnitary: $3 list2: $5]; }
 | CX id ',' id  ';' { $$ = [ParseTree createCX: $2 arg2: $4]; }
-| id id_list ';' { $$ = [ParseTree createCustomUnitary: $1 arguments: nil bitlist: $2]; }
-| id '(' ')' id_list ';' { $$ = [ParseTree createCustomUnitary: $1 arguments: nil bitlist: $4]; }
+| id id_list ';' { $$ = [ParseTree createCustomUnitary: $1 bitlist: $2]; }
+| id '(' ')' id_list ';' { $$ = [ParseTree createCustomUnitary: $1 bitlist: $4]; }
 | id '(' exp_list ')' id_list ';' { $$ = [ParseTree createCustomUnitary: $1 arguments: $3 bitlist: $5]; }
 | BARRIER id_list ';' { $$ = [ParseTree createBarrier: $2]; }
 
@@ -284,8 +283,8 @@ gate_op : U '(' exp_list ')' id ';' { $$ = [ParseTree createUniversalUnitary: $3
 //
 // These are like gate declaratons only wihtout a body.
 // ----------------------------------------
-opaque : OPAQUE id bit_list { $$ = [ParseTree createOpaque: $2 list1: $3 list2: nil]; }
-| OPAQUE id '(' ')' bit_list { $$ = [ParseTree createOpaque: $2 list1: $5 list2: nil]; }
+opaque : OPAQUE id bit_list { $$ = [ParseTree createOpaque: $2 list1: $3]; }
+| OPAQUE id '(' ')' bit_list { $$ = [ParseTree createOpaque: $2 list1: $5]; }
 | OPAQUE id '(' gate_id_list ')' bit_list { $$ = [ParseTree createOpaque: $2 list1: $4 list2: $6]; }
 
 // ----------------------------------------
@@ -355,25 +354,25 @@ unary : nninteger { $$ = $1; }
 // Prefix
 // ----------------------------------------
 prefix_expression : unary { $$ = $1; }
-| '+' prefix_expression { $$ = [ParseTree createPrefixOperation: @"+" operand: $2]; }
-| '-' prefix_expression { $$ = [ParseTree createPrefixOperation: @"-" operand: $2]; }
+| '+' prefix_expression { $$ = [ParseTree createPrefixOperation: "+" operand: $2]; }
+| '-' prefix_expression { $$ = [ParseTree createPrefixOperation: "-" operand: $2]; }
 
 additive_expression : prefix_expression { $$ = $1; }
-| additive_expression '+' prefix_expression { $$ = [ParseTree createBinaryOperation: @"+" operand1: $1 operand2: $3];  }
-| additive_expression '-' prefix_expression { $$ = [ParseTree createBinaryOperation: @"-" operand1: $1 operand2: $3];  }
+| additive_expression '+' prefix_expression { $$ = [ParseTree createBinaryOperation: "+" operand1: $1 operand2: $3];  }
+| additive_expression '-' prefix_expression { $$ = [ParseTree createBinaryOperation: "-" operand1: $1 operand2: $3];  }
 
 multiplicative_expression : additive_expression { $$ = $1; }
-| multiplicative_expression '*' additive_expression { $$ = [ParseTree createBinaryOperation: @"*" operand1: $1 operand2: $3]; }
-| multiplicative_expression '/' additive_expression { $$ = [ParseTree createBinaryOperation: @"/" operand1: $1 operand2: $3]; }
+| multiplicative_expression '*' additive_expression { $$ = [ParseTree createBinaryOperation: "*" operand1: $1 operand2: $3]; }
+| multiplicative_expression '/' additive_expression { $$ = [ParseTree createBinaryOperation: "/" operand1: $1 operand2: $3]; }
 
 expression : multiplicative_expression { $$ = $1; }
-| expression '^' multiplicative_expression { $$ = [ParseTree createBinaryOperation: @"^" operand1: $1 operand2: $3]; }
+| expression '^' multiplicative_expression { $$ = [ParseTree createBinaryOperation: "^" operand1: $1 operand2: $3]; }
 
 // ----------------------------------------
 // exp_list : exp
 //          | exp_list ',' exp
 // ----------------------------------------
-exp_list : expression { $$ = [ParseTree createExpressionList: nil expression: $1];  }
+exp_list : expression { $$ = [ParseTree createExpressionList: $1];  }
 | expression ',' exp_list { $$ = [ParseTree createExpressionList: $3 expression: $1]; }
 
 // ----------------------------------------

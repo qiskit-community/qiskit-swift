@@ -15,18 +15,25 @@
 
 import Foundation
 
-class CircuitVertexData: NSCopying {
+class CircuitVertexData: GraphDataCopying {
     let type: String
 
-    init(type: String) {
+    init(_ type: String) {
         if Swift.type(of: self) == CircuitVertexData.self {
             fatalError("Abstract class instantiation.")
         }
         self.type = type
     }
 
-    public func copy(with zone: NSZone? = nil) -> Any {
-        preconditionFailure("copy not implemented")
+    init(_ instance: CircuitVertexData) {
+        if Swift.type(of: self) == CircuitVertexData.self {
+            fatalError("Abstract class instantiation.")
+        }
+        self.type = instance.type
+    }
+
+    func copy() -> GraphDataCopying {
+        fatalError("copy Abstract class not implemented.")
     }
 }
 
@@ -38,7 +45,19 @@ class CircuitVertexInOutData: CircuitVertexData {
             fatalError("Abstract class instantiation.")
         }
         self.name = name
-        super.init(type: type)
+        super.init(type)
+    }
+
+    init(_ instance: CircuitVertexInOutData) {
+        if Swift.type(of: self) == CircuitVertexInOutData.self {
+            fatalError("Abstract class instantiation.")
+        }
+        self.name = instance.name
+        super.init(instance)
+    }
+
+    override func copy() -> GraphDataCopying {
+        fatalError("copy Abstract class not implemented.")
     }
 }
 
@@ -48,8 +67,12 @@ final class CircuitVertexInData: CircuitVertexInOutData {
         super.init(name: name, type: "in")
     }
 
-    public override func copy(with zone: NSZone? = nil) -> Any {
-        return CircuitVertexInData(self.name)
+    init(_ instance: CircuitVertexInData) {
+        super.init(instance)
+    }
+
+    override func copy() -> GraphDataCopying {
+        return CircuitVertexInData(self)
     }
 }
 
@@ -59,8 +82,12 @@ final class CircuitVertexOutData: CircuitVertexInOutData {
         super.init(name: name, type: "out")
     }
 
-    public override func copy(with zone: NSZone? = nil) -> Any {
-        return CircuitVertexOutData(self.name)
+    init(_ instance: CircuitVertexOutData) {
+        super.init(instance)
+    }
+
+    override func copy() -> GraphDataCopying {
+        return CircuitVertexOutData(self)
     }
 }
 
@@ -77,11 +104,19 @@ final class CircuitVertexOpData: CircuitVertexData {
         self.cargs = cargs
         self.params = params
         self.condition = condition
-        super.init(type: "op")
+        super.init("op")
     }
 
-    public override func copy(with zone: NSZone? = nil) -> Any {
-        return CircuitVertexOpData(self.name,self.qargs,self.cargs,self.params,self.condition)
+    init(_ instance: CircuitVertexOpData) {
+        self.name = instance.name
+        self.qargs = instance.qargs
+        self.cargs = instance.cargs
+        self.params = instance.params
+        self.condition = instance.condition
+        super.init(instance)
+    }
+
+    override func copy() -> GraphDataCopying {
+        return CircuitVertexOpData(self)
     }
 }
-

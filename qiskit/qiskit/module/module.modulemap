@@ -1,4 +1,3 @@
 module qiskitPrivate {
-    header "../qasm/ParserBlocks.h"
     header "../qasm/ParseTree.h"
 }

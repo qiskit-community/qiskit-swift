@@ -15,7 +15,7 @@
 
 import Foundation
 
-final class GraphEdge<EdgeDataType: NSCopying> {
+final class GraphEdge<EdgeDataType: GraphDataCopying> {
 
     public var data: EdgeDataType? = nil
     public let source: Int
@@ -26,10 +26,10 @@ final class GraphEdge<EdgeDataType: NSCopying> {
         self.neighbor = neighbor
     }
 
-    public func copy(with zone: NSZone? = nil) -> Any {
+    public func copy() -> GraphEdge<EdgeDataType> {
         let copy = GraphEdge<EdgeDataType>(self.source,self.neighbor)
         if self.data != nil {
-            let d = self.data!.copy(with: zone) as! EdgeDataType
+            let d = self.data!.copy() as! EdgeDataType
             copy.data = d
         }
         return copy

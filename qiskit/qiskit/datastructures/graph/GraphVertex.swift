@@ -15,7 +15,7 @@
 
 import Foundation
 
-final class GraphVertex<VertexDataType: NSCopying> : Hashable, Equatable {
+final class GraphVertex<VertexDataType: GraphDataCopying> : Hashable, Equatable {
 
     public let key: Int
     public var data: VertexDataType? = nil
@@ -43,10 +43,10 @@ final class GraphVertex<VertexDataType: NSCopying> : Hashable, Equatable {
         self._neighbors.remove(key)
     }
 
-    public func copy(with zone: NSZone? = nil) -> Any {
+    public func copy() -> GraphVertex<VertexDataType> {
         let copy = GraphVertex<VertexDataType>(self.key)
         if self.data != nil {
-            let d = self.data!.copy(with: zone) as! VertexDataType
+            let d = self.data!.copy() as! VertexDataType
             copy.data = d
         }
         copy._neighbors =  self._neighbors

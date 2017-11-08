@@ -44,20 +44,20 @@ final class Qasm {
                 }
             }
 
-            ParseFailBlock = { (message: String?) -> Void in
+            ParseFailBlock = { (line: Int32, message: UnsafePointer<Int8>?) -> Void in
                 defer {
                     semaphore.signal()
                 }
                 if let msg = message {
-                    errorMsg = msg
+                    errorMsg = "line \(line): \(String(cString: msg))"
                 } else {
-                    errorMsg = "Unknown Error"
+                    errorMsg = "line \(line): Unknown Error"
                 }
             }
             
             yyparse()
             semaphore.wait()
-            ParseTree.clearNodes()
+            ParseTree.clearState()
         }
         if let error = errorMsg {
             throw QISKitError.parserError(msg: error)
