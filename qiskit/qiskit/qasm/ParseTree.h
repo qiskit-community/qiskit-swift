@@ -13,67 +13,61 @@
 // limitations under the License.
 // =============================================================================
 
+#ifndef ParseTree_h
+#define ParseTree_h
 
-#import <Foundation/Foundation.h>
-
-@class Node;
+#include <math.h>
 
 extern int yylineno;
 
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 YY_BUFFER_STATE  yy_scan_string(const char *s);
 
-typedef unsigned long StringIdType;
-typedef unsigned long NodeIdType;
+typedef long StringIdType;
+typedef long NodeIdType;
 
 int yyparse(void);
 
-extern void (^ParseSuccessBlock)(NSObject *node);
-extern void (^ParseFailBlock)(int line, const char *msg);
+extern void (*ParseSuccess)(NodeIdType);
+extern void (*ParseFail)(int,const char*);
+extern const char* (*GetIncludePath)(const char*);
+extern StringIdType (*AddString)(const char*);
+extern NodeIdType (*CreateBarrier)(NodeIdType);
+extern NodeIdType (*CreateBinaryOperation)(const char*,NodeIdType,NodeIdType);
+extern NodeIdType (*CreateCX)(NodeIdType,NodeIdType);
+extern NodeIdType (*CreateCReg)(NodeIdType);
+extern NodeIdType (*CreateCustomUnitary2)(NodeIdType,NodeIdType);
+extern NodeIdType (*CreateCustomUnitary3)(NodeIdType,NodeIdType,NodeIdType);
+extern NodeIdType (*CreateExpressionList1)(NodeIdType);
+extern NodeIdType (*CreateExpressionList2)(NodeIdType,NodeIdType);
+extern NodeIdType (*CreateExternal)(NodeIdType,StringIdType);
+extern NodeIdType (*CreateGate3)(NodeIdType,NodeIdType,NodeIdType);
+extern NodeIdType (*CreateGate4)(NodeIdType,NodeIdType,NodeIdType,NodeIdType);
+extern NodeIdType (*CreateGateBody0)(void);
+extern NodeIdType (*CreateGateBody1)(NodeIdType);
+extern NodeIdType (*CreateGopList1)(NodeIdType);
+extern NodeIdType (*CreateGopList2)(NodeIdType,NodeIdType);
+extern NodeIdType (*CreateId)(StringIdType,long);
+extern NodeIdType (*CreateIdlist1)(NodeIdType);
+extern NodeIdType (*CreateIdlist2)(NodeIdType,NodeIdType);
+extern NodeIdType (*CreateIf)(NodeIdType,NodeIdType,NodeIdType);
+extern NodeIdType (*CreateInclude)(StringIdType);
+extern NodeIdType (*CreateIndexedId)(NodeIdType,NodeIdType);
+extern NodeIdType (*CreateInt)(long);
+extern NodeIdType (*CreateMagic)(NodeIdType);
+extern NodeIdType (*CreateMainProgram2)(NodeIdType,NodeIdType);
+extern NodeIdType (*CreateMainProgram3)(NodeIdType,NodeIdType,NodeIdType);
+extern NodeIdType (*CreateMeasure)(NodeIdType,NodeIdType);
+extern NodeIdType (*CreateOpaque2)(NodeIdType,NodeIdType);
+extern NodeIdType (*CreateOpaque3)(NodeIdType,NodeIdType,NodeIdType);
+extern NodeIdType (*CreatePrefixOperation)(const char*,NodeIdType);
+extern NodeIdType (*CreatePrimaryList1)(NodeIdType);
+extern NodeIdType (*CreatePrimaryList2)(NodeIdType,NodeIdType);
+extern NodeIdType (*CreateProgram1)(NodeIdType);
+extern NodeIdType (*CreateProgram2)(NodeIdType,NodeIdType);
+extern NodeIdType (*CreateQReg)(NodeIdType);
+extern NodeIdType (*CreateReal)(double);
+extern NodeIdType (*CreateReset)(NodeIdType);
+extern NodeIdType (*CreateUniversalUnitary)(NodeIdType,NodeIdType);
 
-@interface ParseTree : NSObject
-
-+(void)success: (NodeIdType) mainProgram;
-+(void)fail: (int) line msg: (const char*) msg;
-+(const char*) getIncludePath: (const char*) path;
-+(void)  clearState;
-+(StringIdType) addString: (const char*) str;
-+(NodeIdType) createBarrier: (NodeIdType) primarylist;
-+(NodeIdType) createBinaryOperation: (const char*) op operand1: (NodeIdType) o1 operand2: (NodeIdType) o2;
-+(NodeIdType) createCX: (NodeIdType) arg1 arg2: (NodeIdType) arg2;
-+(NodeIdType) createCReg: (NodeIdType) indexed_id;
-+(NodeIdType) createCustomUnitary: (NodeIdType) identifier bitlist: (NodeIdType) bitlist;
-+(NodeIdType) createCustomUnitary: (NodeIdType) identifier arguments: (NodeIdType) args bitlist: (NodeIdType) bitlist;
-+(NodeIdType) createExpressionList: (NodeIdType) exp;
-+(NodeIdType) createExpressionList: (NodeIdType) elist expression: (NodeIdType) exp;
-+(NodeIdType) createExternal: (NodeIdType) identifier external: (StringIdType) external;
-+(NodeIdType) createGate: (NodeIdType) identifier list2: (NodeIdType) list2 list3: (NodeIdType) list3;
-+(NodeIdType) createGate: (NodeIdType) identifier list1: (NodeIdType) list1 list2: (NodeIdType) list2 list3: (NodeIdType) list3;
-+(NodeIdType) createGateBody;
-+(NodeIdType) createGateBodyWithList: (NodeIdType) goplist;
-+(NodeIdType) createGopList:(NodeIdType) gop;
-+(NodeIdType) createGopList: (NodeIdType)goplist gate_op:(NodeIdType) gop;
-+(NodeIdType) createId: (StringIdType) identifer line: (int) line;
-+(NodeIdType) createIdlist: (NodeIdType) identifier;
-+(NodeIdType) createIdlist: (NodeIdType) idlist identifier: (NodeIdType) identifier;
-+(NodeIdType) createIf: (NodeIdType) identifier nninteger: (NodeIdType) integer quantum_op: (NodeIdType) qop;
-+(NodeIdType) createInclude: (StringIdType) file;
-+(NodeIdType) createIndexedId: (NodeIdType) identifier index: (NodeIdType) nninteger;
-+(NodeIdType) createInt: (int) integer;
-+(NodeIdType) createMagic: (NodeIdType) real;
-+(NodeIdType) createMainProgram: (NodeIdType) magic program: (NodeIdType) program;
-+(NodeIdType) createMainProgram: (NodeIdType) magic include: (NodeIdType) incld program: (NodeIdType) program;
-+(NodeIdType) createMeasure: (NodeIdType) argument1 argument: (NodeIdType) argument2;
-+(NodeIdType) createOpaque: (NodeIdType) identifier list1: (NodeIdType) list1;
-+(NodeIdType) createOpaque: (NodeIdType) identifier list1: (NodeIdType) list1 list2: (NodeIdType) list2;
-+(NodeIdType) createPrefixOperation: (const char*) op operand: (NodeIdType) o;
-+(NodeIdType) createPrimaryList: (NodeIdType) primary;
-+(NodeIdType) createPrimaryList: (NodeIdType) list primary: (NodeIdType) primary;
-+(NodeIdType) createProgram: (NodeIdType) statement;
-+(NodeIdType) createProgram: (NodeIdType) program statement: (NodeIdType) statement;
-+(NodeIdType) createQReg: (NodeIdType) indexed_id;
-+(NodeIdType) createReal: (double) real;
-+(NodeIdType) createReset: (NodeIdType) identifier;
-+(NodeIdType) createUniversalUnitary: (NodeIdType) list1 list2: (NodeIdType) list2;
-
-@end
+#endif

@@ -13,38 +13,36 @@
 // limitations under the License.
 // =============================================================================
 
-
 import Foundation
 
 /*
-Node for an OPENQASM expression list.
-children are expression nodes.
+Node for an OPENQASM primarylist.
+children is a list of primary nodes. Primary nodes are indexedid or id.
 */
-public final class NodeExpressionList: Node {
-
-    public private(set) var expressionList: [Node]
+final class NodePrimaryList: Node {
     
-    @objc public init(expression: Node) {
-        self.expressionList = [expression]
-    }
-
-    @objc public func addExpression(exp: Node) {
-        self.expressionList.insert(exp, at: 0)
+    private(set) var identifiers: [Node]
+   
+    init(identifier: Node) {
+        self.identifiers = [identifier]
     }
     
-    public override var type: NodeType {
-        return .N_EXPRESSIONLIST
+    func addIdentifier(identifier: Node) {
+        self.identifiers.append(identifier)
     }
     
-    public override var children: [Node] {
-        return self.expressionList
+    var type: NodeType {
+        return .N_PRIMARYLIST
     }
     
-    public override func qasm(_ prec: Int) -> String {
-        var qasms: [String] = []
-        for node in self.expressionList {
-            qasms.append(node.qasm(prec))
-        }
+    var children: [Node] {
+        return self.identifiers
+    }
+    
+    func qasm(_ prec: Int) -> String {
+        let qasms: [String] = self.identifiers.flatMap({ (node: Node) -> String in
+            return node.qasm(prec)
+        })
         return qasms.joined(separator: ",")
     }
 }

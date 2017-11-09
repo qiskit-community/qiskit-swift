@@ -17,46 +17,50 @@
 import Foundation
 
 /*
- Node for an OPENQASM creg statement.
-children[0] is an indexedid node.
+Node for an OPENQASM indexed id.
+children[0] is an id node.
+children[1] is an integer (not a node).
 */
-public final class NodeCreg: Node {
+final class NodeIndexedId: Node {
 
-    public let indexedid: Node
-    public private(set) var _name: String = ""
-    public private(set) var line: Int = 0
-    public private(set) var file: String = ""
-    public private(set) var index: Int = 0
+    let identifier: Node
+    private(set) var _name: String = ""
+    private(set) var line: Int = 0
+    private(set) var file: String = ""
+    private(set) var index: Int = -1
     
-    @objc public init(indexedid: Node, line: Int, file: String) {
-        self.indexedid = indexedid
-        if let _id = self.indexedid as? NodeIndexedId {
+    init(identifier: Node, index: Node) {
+        self.identifier = identifier
+        if let _nnInt = index as? NodeNNInt {
+            self.index = _nnInt.value
+        }
+        if let _id = self.identifier as? NodeId {
             // Name of the qreg
             self._name = _id.name
             // Source line number
             self.line = _id.line
             // Source file name
             self.file = _id.file
-            // Size of the register
-            self.index = _id.index
         }
     }
 
-    public override var type: NodeType {
-        return .N_CREG
+    var type: NodeType {
+        return .N_INDEXEDID
     }
-    
-    public override var name: String {
+
+    var name: String {
         return self._name
     }
-    
-    public override var children: [Node] {
-        return [self.indexedid]
-    }
-    
-    public override func qasm(_ prec: Int) -> String {
-        return "creg " + self.indexedid.qasm(prec) + ";"
-    }
-    
 
+    var children: [Node] {
+        return []
+    }
+    
+    func qasm(_ prec: Int) -> String {
+        var qasm: String = "\(self.identifier.qasm(prec))"
+        if self.index >= 0 {
+            qasm += " [\(self.index)]"
+        }
+        return qasm
+    }
 }

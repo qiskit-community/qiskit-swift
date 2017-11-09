@@ -13,45 +13,36 @@
 // limitations under the License.
 // =============================================================================
 
-
 import Foundation
 
-public final class NodeGopList: Node {
+/*
+Node for an OPENQASM program.
+children is a list of nodes (statements).
+*/
+final class NodeProgram: Node  {
 
-    public private(set) var gateops: [Node]
+    private(set) var statements: [Node]
     
-    @objc public init(gateop: Node) {
-        self.gateops = [gateop]
+    init(statement: Node) {
+        self.statements = [statement]
     }
     
-    @objc public func addIdentifier(gateop: Node) {
-        self.gateops.append(gateop)
+    func addStatement(statement: Node) {
+        self.statements.append(statement)
     }
     
-    public func calls() -> [String] {
-        // Return a list of custom gate names in this gate body."""
-        var _calls: [String] = []
-        for gop in self.gateops {
-            if gop.type == .N_CUSTOMUNITARY {
-                _calls.append(gop.name)
-            }
-        }
-        return _calls
+    var type: NodeType {
+        return .N_PROGRAM
     }
     
-    public override var type: NodeType {
-        return .N_GATEOPLIST
+    var children: [Node] {
+        return self.statements
     }
     
-    public override var children: [Node] {
-        return self.gateops
-    }
-    
-    public override func qasm(_ prec: Int) -> String {
-        let qasms: [String] = self.gateops.flatMap({ (node: Node) -> String in
+    func qasm(_ prec: Int) -> String {
+        let qasms: [String] = self.statements.flatMap({ (node: Node) -> String in
             return node.qasm(prec)
         })
         return qasms.joined(separator: "\n")
     }
 }
-

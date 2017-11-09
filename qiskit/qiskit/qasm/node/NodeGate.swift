@@ -24,32 +24,27 @@ import Foundation
  Otherwise, children[1] is an expressionlist node,
  children[2] is an idlist node, and children[3] is a gatebody node.
  */
+final class NodeGate: Node {
 
-public final class NodeGate: Node {
+    let identifier: Node
+    let arguments: Node?
+    let bitlist: Node
+    let body: Node
 
-    public let identifier: Node
-    public let arguments: Node?
-    public let bitlist: Node
-    public let body: Node
+    private(set) var _name: String = ""
+    private(set) var line: Int = 0
+    private(set) var file: String = ""
+    private(set) var index: Int = 0
 
-    public private(set) var _name: String = ""
-    public private(set) var line: Int = 0
-    public private(set) var file: String = ""
-    public private(set) var index: Int = 0
-
-    public var n_args: Int {
-        get{
-            return arguments?.children.count ?? 0
-        }
+    var n_args: Int {
+        return arguments?.children.count ?? 0
     }
     
-    public var n_bits: Int {
-        get {
-            return self.bitlist.children.count
-        }
+    var n_bits: Int {
+        return self.bitlist.children.count
     }
 
-    @objc public init(identifier: Node, bitlist: Node, body: Node) {
+    init(identifier: Node, bitlist: Node, body: Node) {
         self.identifier = identifier
         self.arguments = nil
         self.bitlist = bitlist
@@ -67,7 +62,7 @@ public final class NodeGate: Node {
         }
     }
     
-    @objc public init(identifier: Node, arguments: Node, bitlist: Node, body: Node) {
+    init(identifier: Node, arguments: Node, bitlist: Node, body: Node) {
         self.identifier = identifier
         self.arguments = arguments
         self.bitlist = bitlist
@@ -85,15 +80,15 @@ public final class NodeGate: Node {
         }
     }
     
-    public override var type: NodeType {
+    var type: NodeType {
         return .N_GATE
     }
     
-    public override var name: String {
+    var name: String {
         return _name
     }
  
-    public override var children: [Node] {
+    var children: [Node] {
         var _children: [Node] = []
         _children.append(self.identifier)
         if let args = arguments {
@@ -104,15 +99,13 @@ public final class NodeGate: Node {
         return _children
     }
     
-    public override func qasm(_ prec: Int) -> String {
+    func qasm(_ prec: Int) -> String {
         var qasm = "gate \(self.name)"
         if let args = self.arguments {
             qasm += "(" + args.qasm(prec) + ")"
         }
         qasm += " \(self.bitlist.qasm(prec))\n"
-        qasm += "{\n \(self.body.qasm(prec)) }"
+        qasm += "{\n \(self.body.qasm(prec)) \n}"
         return qasm
     }
-    
- 
 }

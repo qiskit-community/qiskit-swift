@@ -17,34 +17,34 @@
 import Foundation
 
 /*
- Node for an OPENQASM idlist.
- children is a list of id nodes.
- */
-public final class NodeIdList: Node {
-    
-    public private(set) var identifiers: [Node]
+Node for an OPENQASM expression list.
+children are expression nodes.
+*/
+final class NodeExpressionList: Node {
 
-    @objc public init(identifier: Node) {
-        self.identifiers = [identifier]
+    private(set) var expressionList: [Node]
+    
+    init(expression: Node) {
+        self.expressionList = [expression]
+    }
+
+    func addExpression(exp: Node) {
+        self.expressionList.insert(exp, at: 0)
     }
     
-    @objc public func addIdentifier(identifier: Node) {
-        self.identifiers.append(identifier)
+    var type: NodeType {
+        return .N_EXPRESSIONLIST
     }
     
-    public override var type: NodeType {
-        return .N_IDLIST
+    var children: [Node] {
+        return self.expressionList
     }
     
-    public override var children: [Node] {
-        return self.identifiers
-    }
-    
-    public override func qasm(_ prec: Int) -> String {
-        let qasms: [String] = self.identifiers.flatMap({ (node: Node) -> String in
-            return node.qasm(prec)
-        })
+    func qasm(_ prec: Int) -> String {
+        var qasms: [String] = []
+        for node in self.expressionList {
+            qasms.append(node.qasm(prec))
+        }
         return qasms.joined(separator: ",")
     }
 }
-

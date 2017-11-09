@@ -15,30 +15,7 @@
 
 
 import Foundation
-/*
- Node for an OPENQASM measure statement.
- children[0] is a primary node (id or indexedid)
- children[1] is a primary node (id or indexedid)
- */
-public final class NodeMeasure: Node {
 
-    public let arg1: Node
-    public let arg2: Node
-    
-    @objc public init(arg1: Node, arg2: Node) {
-        self.arg1 = arg1
-        self.arg2 = arg2
-    }
-    
-    public override var type: NodeType {
-        return .N_MEASURE
-    }
-    
-    public override var children: [Node] {
-        return [arg1,arg2]
-    }
-    
-    public override func qasm(_ prec: Int) -> String {
-        return "measure \(arg1.qasm(prec)) -> \(arg2.qasm(prec));"
-    }
+protocol NodeRealValueProtocol {
+    func real(_ nested_scope: [[String:NodeRealValueProtocol]]?) throws -> Double
 }

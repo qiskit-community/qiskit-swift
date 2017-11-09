@@ -21,24 +21,24 @@ import Foundation
  children is a list of gate operation nodes.
  These are one of barrier, custom_unitary, U, or CX.
 */
-public final class NodeGateBody: Node {
+final class NodeGateBody: Node {
     
-    public let goplist: Node?
+    let goplist: Node?
 
-    @objc override public init() {
+    init() {
         self.goplist = nil
     }
 
-    @objc public init(goplist: Node) {
+    init(goplist: Node) {
         self.goplist = goplist
     }
     
-    public func calls() -> [String] {
+    func calls() -> [String] {
         // Return a list of custom gate names in this gate body."""
         var _calls: [String] = []
         if let glist = goplist as? NodeGopList {
-            for gop in glist.gateops {
-                if gop.type == .N_CUSTOMUNITARY {
+            for g in glist.gateops {
+                if let gop = g as? NodeCustomUnitary {
                     _calls.append(gop.name)
                 }
             }
@@ -46,18 +46,18 @@ public final class NodeGateBody: Node {
         return _calls
     }
  
-    public override var type: NodeType {
+    var type: NodeType {
         return .N_GATEBODY
     }
    
-    public override var children: [Node] {
+   var children: [Node] {
         if let glist = goplist as? NodeGopList {
             return glist.children
         }
         return []
     }
     
-    public override func qasm(_ prec: Int) -> String {
+    func qasm(_ prec: Int) -> String {
         var qasms: [String] = []
         if let glist = goplist as? NodeGopList {
             qasms = glist.children.flatMap({ (node: Node) -> String in

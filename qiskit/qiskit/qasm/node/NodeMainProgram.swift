@@ -13,31 +13,39 @@
 // limitations under the License.
 // =============================================================================
 
+
 import Foundation
 
-/*
-Node for an OPENQASM reset statement.
-children[0] is a primary node (id or indexedid)
-*/
+final class NodeMainProgram: Node {
+    
+    let magic: Node
+    let incld: Node?
+    let program: Node
 
-public final class NodeReset: Node {
-    
-    public let indexedid: Node
- 
-    @objc public init(indexedid: Node) {
-        self.indexedid = indexedid
-    }
-    
-    public override var type: NodeType {
-        return .N_RESET
-    }
-    
-    public override var children: [Node] {
-        return [self.indexedid]
+    init(magic: Node, program: Node) {
+        self.magic = magic
+        self.incld = nil
+        self.program = program
     }
 
-    public override func qasm(_ prec: Int) -> String {
-        return "reset \(self.indexedid.qasm(prec));"
+    init(magic: Node, incld: Node, program: Node) {
+        self.magic = magic
+        self.incld = incld
+        self.program = program
+    }
+    
+    var type: NodeType {
+        return .N_MAINPROGRAM
     }
 
+    var children: [Node] {
+        return []
+    }
+    
+    func qasm(_ prec: Int) -> String {
+        var qasm: String = self.magic.qasm(prec)
+        qasm += "\(self.incld?.qasm(prec) ?? "")\n"
+        qasm += "\(self.program.qasm(prec))\n"
+        return qasm
+    }
 }

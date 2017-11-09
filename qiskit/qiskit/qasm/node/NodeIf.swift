@@ -23,27 +23,27 @@ import Foundation
  children[2] is quantum operation node, including U, CX, custom_unitary,
  measure, reset, (and BUG: barrier, if).
  */
-public final class NodeIf: Node {
+final class NodeIf: Node {
   
-    public let nodeId: Node
-    public let nodeNNInt: Node
-    public let nodeQop: Node
+    let nodeId: Node
+    let nodeNNInt: Node
+    let nodeQop: Node
     
-    @objc public init(identifier: Node, nninteger: Node, qop: Node) {
+    init(identifier: Node, nninteger: Node, qop: Node) {
         nodeId = identifier
         nodeNNInt = nninteger
         nodeQop = qop
     }
     
-    public override var type: NodeType {
+    var type: NodeType {
         return .N_IF
     }
 
-    public override var children: [Node] {
+    var children: [Node] {
         return [self.nodeId,self.nodeNNInt,self.nodeQop]
     }
     
-    public override func qasm(_ prec: Int) -> String {
+    func qasm(_ prec: Int) -> String {
         var qasm: String = "if"
         qasm += " (\(self.nodeId.qasm(prec))"
         qasm += " == \(self.nodeNNInt.qasm(prec))"

@@ -27,82 +27,82 @@ void yyerror(char *s);
 }
 
 pi {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return PI;
 }
 
 sin {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return SIN;
 }
 
 cos {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return COS;
 }
 
 tan {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return TAN;
 }
 
 exp {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return EXP;
 }
 
 ln {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return LN;
 }
 
 sqrt {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return SQRT;
 }
 
 qreg {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return QREG;
 }
 
 creg {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return CREG;
 }
 
 gate {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return GATE;
 }
 
 measure {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return MEASURE;
 }
 
 if {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return IF;
 }
 
 reset {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return RESET;
 }
 
 barrier {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return BARRIER;
 }
 
 opaque {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return OPAQUE;
 }
 
 \"([^\\\"]|\\.)*\" { 
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return STRING;
 }
 
@@ -112,7 +112,7 @@ include {
 
 <INCLUDEFILE>[ \t]*      /* eat the whitespace */
 <INCLUDEFILE>[^ \t]+; {
-    const char* includePath = [ParseTree getIncludePath: yytext];
+    const char* includePath = GetIncludePath(yytext);
     yyin = fopen(includePath, "r" );
     
     if ( ! yyin ) {
@@ -139,7 +139,7 @@ include {
 \n { yylineno++; }
 
 OPENQASM {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return OPENQASM;
 }
 
@@ -147,28 +147,28 @@ OPENQASM {
 }
 
 CX {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return CX;
 }
 
 U {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return U;
 }
 
 -> {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return ASSIGN;
 }
 
 == {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return MATCHES;
 }
 
 
 [a-z][a-zA-Z0-9_]* {
-    yylval.svalue = [ParseTree addString:yytext];
+    yylval.svalue = AddString(yytext);
     return ID;
 }
 
@@ -188,7 +188,7 @@ int yywrap()
 
 void yyerror(char *s)
 {
-    [ParseTree fail:yylineno msg:s];
+    ParseFail(yylineno,s);
 }
 
 #pragma clang diagnostic pop

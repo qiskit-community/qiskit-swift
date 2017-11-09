@@ -21,30 +21,26 @@ import Foundation
  and children[2] is an idlist node.
  Otherwise, children[1] is an idlist node.
  */
-public final class NodeOpaque: Node {
+final class NodeOpaque: Node {
 
-    public let identifier: Node
-    public let arguments: Node
-    public let bitlist: Node?
+    let identifier: Node
+    let arguments: Node
+    let bitlist: Node?
     
-    public private(set) var _name: String = ""
-    public private(set) var line: Int = 0
-    public private(set) var file: String = ""
-    public private(set) var index: Int = 0
+    private(set) var _name: String = ""
+    private(set) var line: Int = 0
+    private(set) var file: String = ""
+    private(set) var index: Int = 0
     
-    public var n_args: Int {
-        get{
-            return self.arguments.children.count
-        }
+    var n_args: Int {
+        return self.arguments.children.count
     }
     
-    public var n_bits: Int {
-        get {
-            return self.bitlist?.children.count ?? 0
-        }
+    var n_bits: Int {
+        return self.bitlist?.children.count ?? 0
     }
 
-    @objc public init(identifier: Node, arguments: Node) {
+    init(identifier: Node, arguments: Node) {
         self.identifier = identifier
         self.arguments = arguments
         self.bitlist = nil
@@ -60,7 +56,7 @@ public final class NodeOpaque: Node {
         }
     }
 
-    @objc public init(identifier: Node, arguments: Node, bitlist: Node) {
+    init(identifier: Node, arguments: Node, bitlist: Node) {
         self.identifier = identifier
         self.arguments = arguments
         self.bitlist = bitlist
@@ -76,15 +72,15 @@ public final class NodeOpaque: Node {
         }
     }
     
-    public override var type: NodeType {
+    var type: NodeType {
         return .N_OPAQUE
     }
    
-    public override var name: String {
+    var name: String {
         return _name
     }
     
-    public override var children: [Node] {
+    var children: [Node] {
         var _children: [Node] = []
         _children.append(self.identifier)
         _children.append(self.arguments)
@@ -93,9 +89,8 @@ public final class NodeOpaque: Node {
         }
         return _children
     }
-    
 
-    public override func qasm(_ prec: Int) -> String {
+    func qasm(_ prec: Int) -> String {
         var qasm: String = "opaque"
         if let l2 = bitlist {
             qasm += " \(self.identifier.qasm(prec)) ( \(self.arguments.qasm(prec)) ) \(l2.qasm(prec));"

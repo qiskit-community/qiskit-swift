@@ -16,6 +16,24 @@
 
 import Foundation
 
-public protocol NodeRealValueProtocol {
-    func real(_ nested_scope: [[String:NodeRealValueProtocol]]?) throws -> Double
+final class NodeInclude: Node {
+    
+    let file: String
+    
+    init(file: String) {
+        self.file = file
+    }
+    
+    var type: NodeType {
+        return .N_INCLUDE
+    }
+
+    var children: [Node] {
+        return []
+    }
+
+    func qasm(_ prec: Int) -> String {
+        let qasm: String = "include \(file);"
+        return qasm
+    }
 }

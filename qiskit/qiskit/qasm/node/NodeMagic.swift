@@ -16,32 +16,37 @@
 
 import Foundation
 
-public final class NodeMainProgram: Node {
-    
-    public let magic: Node
-    public let incld: Node?
-    public let program: Node
+/*
+Node for an OPENQASM file identifier/version statement ("magic number").
+children[0] is a floating point number (not a node).
+*/
+final class NodeMagic:  Node {
 
-    @objc public init(magic: Node, program: Node) {
-        self.magic = magic
-        self.incld = nil
-        self.program = program
+    let nodeVersion: NodeReal?
+
+    init(version: Node) {
+        self.nodeVersion = (version as? NodeReal)
     }
 
-    @objc public init(magic: Node, incld: Node, program: Node) {
-        self.magic = magic
-        self.incld = incld
-        self.program = program
+    var type: NodeType {
+        return .N_MAGIC
     }
     
-    public override var type: NodeType {
-        return .N_MAINPROGRAM
+    var children: [Node] {
+        var _children: [Node] = []
+        
+        if let version = nodeVersion {
+            _children.append(version)
+        }
+        
+        return _children
     }
     
-    public override func qasm(_ prec: Int) -> String {
-        var qasm: String = self.magic.qasm(prec)
-        qasm += "\(self.incld?.qasm(prec) ?? "")\n"
-        qasm += "\(self.program.qasm(prec))\n"
-        return qasm
+    func qasm(_ prec: Int) -> String {
+        guard let version = nodeVersion else {
+            assertionFailure("Invalid NodeMagic Operation")
+            return ""
+        }
+        return "OPENQASM \(version.value.format(1));"
     }
 }

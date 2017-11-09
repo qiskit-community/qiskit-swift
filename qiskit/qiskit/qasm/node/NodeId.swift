@@ -21,35 +21,39 @@ import Foundation
  The node has no children but has fields name, line, and file.
  There is a flag is_bit that is set when XXXXX to help with scoping.
  */
-public final class NodeId: Node, NodeRealValueProtocol {
+final class NodeId: Node, NodeRealValueProtocol {
 
-    public private(set) var _name: String = ""
-    public private(set) var line: Int = 0
-    public private(set) var file: String = ""
-    public private(set) var index: Int = 0  // FIXME where does the index come from?
-    public private(set) var is_bit: Bool = false
+    private(set) var _name: String = ""
+    private(set) var line: Int = 0
+    private(set) var file: String = ""
+    private(set) var index: Int = 0  // FIXME where does the index come from?
+    private(set) var is_bit: Bool = false
     
-    @objc public init(identifier: String, line: Int) {
+    init(identifier: String, line: Int) {
         self._name = identifier
         self.line = line
         self.file = "" // FIXME find the name
         self.is_bit = false
     }
     
-    public override var type: NodeType {
+    var type: NodeType {
         return .N_ID
     }
     
-    public override var name: String {
-        return _name
+    var name: String {
+        return self._name
     }
 
-    public override func qasm(_ prec: Int) -> String {
+    var children: [Node] {
+        return []
+    }
+
+    func qasm(_ prec: Int) -> String {
         let qasm: String = _name
         return qasm
     }
 
-    public func real(_ nested_scope: [[String:NodeRealValueProtocol]]?) throws -> Double {
+    func real(_ nested_scope: [[String:NodeRealValueProtocol]]?) throws -> Double {
         guard let scope = nested_scope else {
             throw QasmException.errorLocalParameter(qasm: self.qasm(15))
         }

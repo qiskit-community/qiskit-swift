@@ -21,33 +21,33 @@ import Foundation
  children[0] is an id node with the name of the function.
  children[1] is an expression node.
  */
-public final class NodeExternal: Node, NodeRealValueProtocol {
+final class NodeExternal: Node, NodeRealValueProtocol {
 
-    public static let externalFunctions = ["sin", "cos", "tan", "exp", "ln", "sqrt"]
+    private static let externalFunctions = ["sin", "cos", "tan", "exp", "ln", "sqrt"]
 
-    public let operation: String
-    public let expression: Node
+    let operation: String
+    let expression: Node
     
-    @objc public init(operation: String, expression: Node) {
+    init(operation: String, expression: Node) {
         self.operation = operation
         self.expression = expression
     }
     
-    public override var type: NodeType {
+    var type: NodeType {
         return .N_EXTERNAL
     }
     
-    public override var children: [Node] {
+    var children: [Node] {
         return [self.expression]
     }
 
-    public override func qasm(_ prec: Int) -> String {
+    func qasm(_ prec: Int) -> String {
         var qasm = self.operation
         qasm += "( \(self.expression.qasm(prec)) )"
         return qasm
     }
 
-    public func real(_ nested_scope: [[String:NodeRealValueProtocol]]?) throws -> Double {
+    func real(_ nested_scope: [[String:NodeRealValueProtocol]]?) throws -> Double {
         if let expr = self.expression as? NodeRealValueProtocol {
             let arg = try expr.real(nested_scope)
             if self.operation == "sin" {

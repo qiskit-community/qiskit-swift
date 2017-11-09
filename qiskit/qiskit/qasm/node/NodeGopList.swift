@@ -13,37 +13,45 @@
 // limitations under the License.
 // =============================================================================
 
+
 import Foundation
 
-/*
-Node for an OPENQASM primarylist.
-children is a list of primary nodes. Primary nodes are indexedid or id.
-*/
+final class NodeGopList: Node {
 
-public final class NodePrimaryList: Node {
+   private(set) var gateops: [Node]
     
-    public private(set) var identifiers: [Node]
-   
-    @objc public init(identifier: Node) {
-        self.identifiers = [identifier]
+    init(gateop: Node) {
+        self.gateops = [gateop]
     }
     
-    @objc public func addIdentifier(identifier: Node) {
-        self.identifiers.append(identifier)
+    func addIdentifier(gateop: Node) {
+        self.gateops.append(gateop)
     }
     
-    public override var type: NodeType {
-        return .N_PRIMARYLIST
+    func calls() -> [String] {
+        // Return a list of custom gate names in this gate body."""
+        var _calls: [String] = []
+        for g in self.gateops {
+            if let gop = g as? NodeCustomUnitary {
+                _calls.append(gop.name)
+            }
+        }
+        return _calls
     }
     
-    public override var children: [Node] {
-        return self.identifiers
+    var type: NodeType {
+        return .N_GATEOPLIST
     }
     
-    public override func qasm(_ prec: Int) -> String {
-        let qasms: [String] = self.identifiers.flatMap({ (node: Node) -> String in
+    var children: [Node] {
+        return self.gateops
+    }
+    
+    func qasm(_ prec: Int) -> String {
+        let qasms: [String] = self.gateops.flatMap({ (node: Node) -> String in
             return node.qasm(prec)
         })
-        return qasms.joined(separator: ",")
+        return qasms.joined(separator: "\n")
     }
 }
+

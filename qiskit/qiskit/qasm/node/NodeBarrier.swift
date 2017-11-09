@@ -15,29 +15,28 @@
 
 
 import Foundation
-
 /*
-Node for an OPENQASM integer.
-This node has no children. The data is in the value field.
-*/
-public final class NodeNNInt: Node, NodeRealValueProtocol {
+ class Barrier(Node):
+ Node for an OPENQASM barrier statement.
+ children[0] is a primarylist node.
+ */
+final class NodeBarrier: Node {
 
-    public let value: Int
+    let list: Node
+    
+    init(list: Node) {
+        self.list = list
+    }
 
-    @objc public init(value: Int) {
-        self.value = value
+    var type: NodeType {
+        return .N_BARRIER
     }
     
-    public override var type: NodeType {
-        return .N_INT
-    }
-    
-    public override func qasm(_ prec: Int) -> String {
-        let qasm: String = "\(value)"
-        return qasm
+    var children: [Node] {
+        return [self.list]
     }
 
-    public func real(_ nested_scope: [[String:NodeRealValueProtocol]]?) throws -> Double {
-        return Double(self.value)
+    func qasm(_ prec: Int) -> String {
+        return "barrier \(self.list.qasm(prec));"
     }
 }

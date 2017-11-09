@@ -95,13 +95,12 @@ final class Unroller {
 
      Return a list of tuples (name,index).
      */
-    private func _process_bit_id(_ node: Node) throws -> [RegBit] {
-        if node.type == .N_INDEXEDID {
+    private func _process_bit_id(_ n: Node) throws -> [RegBit] {
+        if let node = n as? NodeIndexedId {
             // An indexed bit or qubit
-            let n = node as! NodeIndexedId
-            return [RegBit(node.name, n.index)]
+            return [RegBit(node.name, node.index)]
         }
-        if node.type == .N_ID {
+        if let node = n as? NodeId {
             // A qubit or qreg or creg
             var bits: [String:RegBit] = [:]
             if let map = self.bit_stack.peek() {

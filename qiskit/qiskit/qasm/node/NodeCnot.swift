@@ -13,4 +13,38 @@
 // limitations under the License.
 // =============================================================================
 
-#include "ParseTree.h"
+
+import Foundation
+
+/*
+ Node for an OPENQASM CNOT statement.
+ children[0], children[1] are id nodes if CX is inside a gate body,
+ otherwise they are primary nodes.
+ */
+final class NodeCnot: Node {
+
+    let arg1: Node
+    let arg2: Node
+    
+    init(arg1: Node, arg2: Node) {
+        self.arg1 = arg1
+        self.arg2 = arg2
+    }
+    
+    var type: NodeType {
+        return .N_CNOT
+    }
+    
+    var children: [Node] {
+        return [self.arg1,self.arg2]
+    }
+    
+    func qasm(_ prec: Int) -> String {
+        var qasm: String = "CX"
+        qasm += " \(self.arg1.qasm(prec))"
+        qasm += ", \(self.arg2.qasm(prec))"
+        qasm += ";"
+        return qasm
+    }
+
+}

@@ -17,34 +17,34 @@
 import Foundation
 
 /*
- Node for an OPENQASM CNOT statement.
- children[0], children[1] are id nodes if CX is inside a gate body,
- otherwise they are primary nodes.
+ Node for an OPENQASM idlist.
+ children is a list of id nodes.
  */
-public final class NodeCnot: Node {
+final class NodeIdList: Node {
+    
+    private(set) var identifiers: [Node]
 
-    public let arg1: Node
-    public let arg2: Node
-    
-    @objc public init(arg1: Node, arg2: Node) {
-        self.arg1 = arg1
-        self.arg2 = arg2
+    init(identifier: Node) {
+        self.identifiers = [identifier]
     }
     
-    public override var type: NodeType {
-        return .N_CNOT
+    func addIdentifier(identifier: Node) {
+        self.identifiers.append(identifier)
     }
     
-    public override var children: [Node] {
-        return [self.arg1,self.arg2]
+    var type: NodeType {
+        return .N_IDLIST
     }
     
-    public override func qasm(_ prec: Int) -> String {
-        var qasm: String = "CX"
-        qasm += " \(self.arg1.qasm(prec))"
-        qasm += ", \(self.arg2.qasm(prec))"
-        qasm += ";"
-        return qasm
+    var children: [Node] {
+        return self.identifiers
     }
-
+    
+    func qasm(_ prec: Int) -> String {
+        let qasms: [String] = self.identifiers.flatMap({ (node: Node) -> String in
+            return node.qasm(prec)
+        })
+        return qasms.joined(separator: ",")
+    }
 }
+

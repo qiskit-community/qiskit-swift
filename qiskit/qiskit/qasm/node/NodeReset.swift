@@ -16,33 +16,27 @@
 import Foundation
 
 /*
-Node for an OPENQASM program.
-children is a list of nodes (statements).
+Node for an OPENQASM reset statement.
+children[0] is a primary node (id or indexedid)
 */
-public final class NodeProgram: Node  {
+final class NodeReset: Node {
+    
+    let indexedid: Node
+ 
+    init(indexedid: Node) {
+        self.indexedid = indexedid
+    }
+    
+    var type: NodeType {
+        return .N_RESET
+    }
+    
+    var children: [Node] {
+        return [self.indexedid]
+    }
 
-    public private(set) var statements: [Node]
-    
-    @objc public init(statement: Node) {
-        self.statements = [statement]
+    func qasm(_ prec: Int) -> String {
+        return "reset \(self.indexedid.qasm(prec));"
     }
-    
-    @objc public func addStatement(statement: Node) {
-        self.statements.append(statement)
-    }
-    
-    public override var type: NodeType {
-        return .N_PROGRAM
-    }
-    
-    public override var children: [Node] {
-        return self.statements
-    }
-    
-    public override func qasm(_ prec: Int) -> String {
-        let qasms: [String] = self.statements.flatMap({ (node: Node) -> String in
-            return node.qasm(prec)
-        })
-        return qasms.joined(separator: "\n")
-    }
+
 }

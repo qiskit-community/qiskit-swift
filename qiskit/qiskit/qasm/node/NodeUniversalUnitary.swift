@@ -13,23 +13,31 @@
 // limitations under the License.
 // =============================================================================
 
-
 import Foundation
+/*
+Node for an OPENQASM U statement.
+children[0] is an expressionlist node.
+children[1] is a primary node (id or indexedid).
+*/
+final class NodeUniversalUnitary: Node {
 
-public final class NodeInclude: Node {
+    let explist: Node
+    let indexedid: Node
     
-    public let file: String
-    
-    @objc public init(file: String) {
-        self.file = file
+    init(explist: Node, indexedid: Node) {
+        self.explist = explist
+        self.indexedid = indexedid
     }
     
-    public override var type: NodeType {
-        return .N_INCLUDE
+    var type: NodeType {
+        return .N_UNIVERSALUNITARY
     }
-    
-    public override func qasm(_ prec: Int) -> String {
-        let qasm: String = "include \(file);"
-        return qasm
+
+    var children: [Node] {
+        return [self.explist,self.indexedid]
+    }
+
+    func qasm(_ prec: Int) -> String {
+        return "U (\(self.explist.qasm(prec))) \(self.indexedid.qasm(prec));"
     }
 }

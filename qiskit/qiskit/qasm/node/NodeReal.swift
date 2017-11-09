@@ -14,30 +14,32 @@
 // =============================================================================
 
 import Foundation
+
 /*
-Node for an OPENQASM U statement.
-children[0] is an expressionlist node.
-children[1] is a primary node (id or indexedid).
+Node for an OPENQASM real number.
+This node has no children. The data is in the value field.
 */
-public final class NodeUniversalUnitary: Node {
+final class NodeReal: Node, NodeRealValueProtocol {
 
-    public let explist: Node
-    public let indexedid: Node
+    let value: Double
     
-    @objc public init(explist: Node, indexedid: Node) {
-        self.explist = explist
-        self.indexedid = indexedid
+    init(id: Double) {
+        self.value = id
     }
     
-    public override var type: NodeType {
-        return .N_UNIVERSALUNITARY
+    var type: NodeType {
+        return .N_REAL
     }
 
-    public override var children: [Node] {
-        return [self.explist,self.indexedid]
+    var children: [Node] {
+        return []
+    }
+    
+    func qasm(_ prec: Int) -> String {
+        return self.value.format(prec)
     }
 
-    public override func qasm(_ prec: Int) -> String {
-        return "U (\(self.explist.qasm(prec))) \(self.indexedid.qasm(prec));"
+    func real(_ nested_scope: [[String:NodeRealValueProtocol]]?) throws -> Double {
+        return self.value
     }
 }

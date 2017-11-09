@@ -16,27 +16,29 @@
 
 import Foundation
 /*
- class Barrier(Node):
- Node for an OPENQASM barrier statement.
- children[0] is a primarylist node.
+ Node for an OPENQASM measure statement.
+ children[0] is a primary node (id or indexedid)
+ children[1] is a primary node (id or indexedid)
  */
-public final class NodeBarrier: Node {
+final class NodeMeasure: Node {
 
-    public let list: Node
+    let arg1: Node
+    let arg2: Node
     
-    @objc public init(list: Node) {
-        self.list = list
-    }
-
-    public override var type: NodeType {
-        return .N_BARRIER
+    init(arg1: Node, arg2: Node) {
+        self.arg1 = arg1
+        self.arg2 = arg2
     }
     
-    public override var children: [Node] {
-        return [self.list]
+    var type: NodeType {
+        return .N_MEASURE
     }
-
-    public override func qasm(_ prec: Int) -> String {
-        return "barrier \(self.list.qasm(prec));"
+    
+    var children: [Node] {
+        return [arg1,arg2]
+    }
+    
+    func qasm(_ prec: Int) -> String {
+        return "measure \(arg1.qasm(prec)) -> \(arg2.qasm(prec));"
     }
 }

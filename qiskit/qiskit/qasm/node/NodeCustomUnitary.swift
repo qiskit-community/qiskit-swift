@@ -29,14 +29,14 @@ Has properties:
 .arguments = None or exp_list node
 .bitlist = primary_list node
 */
-public final class NodeCustomUnitary: Node {
+final class NodeCustomUnitary: Node {
     
-    public let identifier: Node
-    public let arguments: Node?
-    public let bitlist: Node
-    public private(set) var _name: String = ""
+    let identifier: Node
+    let arguments: Node?
+    let bitlist: Node
+    private(set) var _name: String = ""
 
-    @objc public init(identifier: Node, bitlist: Node) {
+    init(identifier: Node, bitlist: Node) {
         self.identifier = identifier     // id
         self.arguments = nil
         self.bitlist = bitlist   // explist
@@ -45,7 +45,7 @@ public final class NodeCustomUnitary: Node {
         }
     }
 
-    @objc public init(identifier: Node, arguments: Node, bitlist: Node) {
+    init(identifier: Node, arguments: Node, bitlist: Node) {
         self.identifier = identifier     // id
         self.arguments = arguments   // anylist
         self.bitlist = bitlist   // explist
@@ -54,15 +54,19 @@ public final class NodeCustomUnitary: Node {
         }
     }
     
-    public override var type: NodeType {
+    var type: NodeType {
         return .N_CUSTOMUNITARY
     }
 
-    public override var name: String {
-        return _name
+    var name: String {
+        return self._name
     }
 
-    public override func qasm(_ prec: Int) -> String {
+    var children: [Node] {
+        return []
+    }
+
+    func qasm(_ prec: Int) -> String {
         var qasm = "\(self.name)"
         if let args = self.arguments {
             qasm += " (" + args.qasm(prec) + ")"

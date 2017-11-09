@@ -13,29 +13,35 @@
 // limitations under the License.
 // =============================================================================
 
+
 import Foundation
 
 /*
-Node for an OPENQASM real number.
+Node for an OPENQASM integer.
 This node has no children. The data is in the value field.
 */
-public final class NodeReal: Node, NodeRealValueProtocol {
+final class NodeNNInt: Node, NodeRealValueProtocol {
 
-    public let value: Double
-    
-    @objc public init(id: Double) {
-        self.value = id
+    let value: Int
+
+    init(value: Int) {
+        self.value = value
     }
     
-    public override var type: NodeType {
-        return .N_REAL
+    var type: NodeType {
+        return .N_INT
     }
 
-    public override func qasm(_ prec: Int) -> String {
-        return self.value.format(prec)
+    var children: [Node] {
+        return []
+    }
+    
+    func qasm(_ prec: Int) -> String {
+        let qasm: String = "\(value)"
+        return qasm
     }
 
-    public func real(_ nested_scope: [[String:NodeRealValueProtocol]]?) throws -> Double {
-        return self.value
+    func real(_ nested_scope: [[String:NodeRealValueProtocol]]?) throws -> Double {
+        return Double(self.value)
     }
 }

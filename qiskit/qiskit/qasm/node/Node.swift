@@ -15,7 +15,7 @@
 
 import Foundation
 
-public enum NodeType: String {
+enum NodeType: String {
     case N_BARRIER = "barrier"
     case N_BINARYOP = "binop"
     case N_CNOT = "cnot"
@@ -43,24 +43,11 @@ public enum NodeType: String {
     case N_RESET = "reset"
     case N_QREG = "qreg"
     case N_UNIVERSALUNITARY = "universal_unitary"
-    case N_UNDEFINED = "undefined"
 }
 
-public class Node : NSObject {
-
-    var name: String {
-        return self.type.rawValue
-    }
+protocol Node {
+    var type: NodeType { get }
+    var children: [Node] { get }
     
-    var type: NodeType {
-        return .N_UNDEFINED
-    }
-    
-    var children: [Node] {
-        preconditionFailure("Node children not implemented")
-    }
-    
-    func qasm(_ prec: Int) -> String {
-        preconditionFailure("Node qasm not implemented")
-    }
+    func qasm(_ prec: Int) -> String
 }
