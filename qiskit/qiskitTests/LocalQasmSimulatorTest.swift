@@ -32,23 +32,10 @@ class LocalQasmSimulatorTest: XCTestCase {
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
-        let bundle = Bundle(for: type(of: self))
-        guard let path = bundle.path(forResource: "qasm", ofType: "bundle") else {
-            XCTFail("Bundle qasm not found")
-            return
-        }
-        guard let qasmBundle = Bundle(path: path) else {
-            XCTFail("Bundle not found \(path)")
-            return
-        }
-        guard let url = qasmBundle.url(forResource: "example", withExtension: "qasm") else {
-            XCTFail("Bundle example path not found")
-            return
-        }
         do {
             self.seed = 88
             self.qp = try QuantumProgram()
-            try self.qp!.load_qasm_text(qasm_string: try String(contentsOf: url, encoding: .utf8), name: "example")
+            try self.qp!.load_qasm_text(qasm_string: Example.QASM, name: "example")
             let basis_gates: [String] = []  // unroll to base gates
             let unroller = Unroller(try Qasm(data: try self.qp!.get_qasm("example")).parse(),JsonBackend(basis_gates))
             let circuit = try unroller.execute()
@@ -72,7 +59,7 @@ class LocalQasmSimulatorTest: XCTestCase {
                 ]
             ]
         } catch {
-            XCTFail("\(url.lastPathComponent): \(error)")
+            XCTFail("LocalQasmSimulatorTest: \(error)")
         }
     }
     

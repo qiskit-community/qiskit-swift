@@ -4,8 +4,8 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdocumentation"
 
-#import "y.tab.h"
-#import "ParseTree.h"
+#include "y.tab.h"
+#include "ParseTree.h"
 
 void yyerror(char *s);
 %}
@@ -112,13 +112,12 @@ include {
 
 <INCLUDEFILE>[ \t]*      /* eat the whitespace */
 <INCLUDEFILE>[^ \t]+; {
-    const char* includePath = GetIncludePath(yytext);
-    yyin = fopen(includePath, "r" );
-    
-    if ( ! yyin ) {
+    const char* contents = GetIncludeContents(yytext);
+    if ( ! contents ) {
         yyterminate();
     }
-    yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
+    yypush_buffer_state(YY_CURRENT_BUFFER);
+    yy_scan_string(contents);
     yylineno = 1;
     BEGIN(INITIAL);
 }

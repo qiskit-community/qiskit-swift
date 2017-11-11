@@ -18,7 +18,7 @@ import XCTest
 
 class QIskitParserTests: XCTestCase {
 
-    private static let qasmProgram1: String =
+    private static let qasmProgram1 =
                 "OPENQASM 2.0;\n" +
                     "qreg q[5];\n" +
                     "creg c[5];\n" +
@@ -31,7 +31,7 @@ class QIskitParserTests: XCTestCase {
                     "measure q[3] -> c[3];\n" +
                     "measure q[4] -> c[4];"
 
-    private static let qasmProgram2: String =
+    private static let qasmProgram2 =
                 "OPENQASM 2.0;\n" +
                     "qreg q[3];\n" +
                     "qreg a[2];\n" +
@@ -51,7 +51,7 @@ class QIskitParserTests: XCTestCase {
                     "if(syn==3) x q[1];\n" +
                     "measure q -> c;\n"
 
-    private static let qasmProgram3: String =
+    private static let qasmProgram3 =
             "OPENQASM 2.0;\n" +
             "qreg q[3];\n" +
             "creg c[2];\n" +
@@ -59,6 +59,12 @@ class QIskitParserTests: XCTestCase {
             "cx q[0],q[2];\n" +
             "measure q[0] -> c[0];\n" +
             "measure q[2] -> c[1];"
+
+    private static let qasmSamples : [String] = [
+        Adder.QASM, BigAdder.QASM, InverseQFT1.QASM, InversQFT2.QASM, Ipea3pi8.QASM, Pea3pi8.QASM,
+        QEC.QASM, QFT.QASM, QPT.QASM, RB.QASM, Teleport.QASM, WState.QASM, Q011_3_qubit_grover_50.QASM,
+        Deutsch.QASM, ISwap.QASM, QE_QFT_3.QASM, QE_QFT_4.QASM, QE_QFT_5.QASM, W3Test.QASM
+    ]
 
     override func setUp() {
         super.setUp()
@@ -123,43 +129,25 @@ class QIskitParserTests: XCTestCase {
 
 
     func testExamples() {
-        let bundle = Bundle(for: type(of: self))
-        guard let path = bundle.path(forResource: "qasm", ofType: "bundle") else {
-            XCTFail("Bundle qasm not found")
-            return
-        }
-        guard let qasmBundle = Bundle(path: path) else {
-            XCTFail("Bundle not found \(path)")
-            return
-        }
-        guard var urls = qasmBundle.urls(forResourcesWithExtension: "qasm", subdirectory: "generic") else {
-            XCTFail("Bundle generic path not found")
-            return
-        }
-        guard let urlIBMqx2 = qasmBundle.urls(forResourcesWithExtension: "qasm", subdirectory: "ibmqx2") else {
-            XCTFail("Bundle generic path not found")
-            return
-        }
-        urls.append(contentsOf: urlIBMqx2)
         var differences: [String: (String,String)] = [:]
-        for url in urls {
+        for qasm in QIskitParserTests.qasmSamples {
             do {
-                let (qasmProgram,qasm) = try QIskitParserTests.runParser(try String(contentsOf: url, encoding: .utf8))
+                let (qasmProgram,qasm) = try QIskitParserTests.runParser(qasm)
                 let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
                 let emittedQasm = qasm.components(separatedBy: whitespaceCharacterSet).joined()
                 
                 let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
                 
                 if emittedQasm != targetQasm {
-                    differences[url.lastPathComponent] = (emittedQasm,targetQasm)
+                    differences[qasm] = (emittedQasm,targetQasm)
                 }
             } catch {
-                XCTFail("\(url.lastPathComponent): \(error)")
+                XCTFail("\(error)")
             }
         }
         if !differences.isEmpty {
-            for (name,difference) in differences {
-                print("File: \(name) doesn't match:")
+            for (qasm,difference) in differences {
+                print("Qasm: \(qasm) doesn't match:")
                 print("Emmited: \(difference.0)")
                 print("Original: \(difference.1)")
             }

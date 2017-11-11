@@ -26,11 +26,11 @@ YY_BUFFER_STATE  yy_scan_string(const char *s);
 typedef long StringIdType;
 typedef long NodeIdType;
 
-int yyparse(void);
+extern int yyparse(void);
 
 extern void (*ParseSuccess)(NodeIdType);
 extern void (*ParseFail)(int,const char*);
-extern const char* (*GetIncludePath)(const char*);
+extern const char* (*GetIncludeContents)(const char*);
 extern StringIdType (*AddString)(const char*);
 extern NodeIdType (*CreateBarrier)(NodeIdType);
 extern NodeIdType (*CreateBinaryOperation)(const char*,NodeIdType,NodeIdType);

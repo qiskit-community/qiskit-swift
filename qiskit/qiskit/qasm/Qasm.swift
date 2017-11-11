@@ -60,8 +60,8 @@ final class Qasm {
                     Qasm.errorMsg = "line \(line): Unknown Error"
                 }
             }
-            GetIncludePath = { (name: UnsafePointer<Int8>?) -> UnsafePointer<Int8>? in
-                return Qasm.getIncludePath(name)
+            GetIncludeContents = { (name: UnsafePointer<Int8>?) -> UnsafePointer<Int8>? in
+                return Qasm.getIncludeContents(name)
             }
             AddString = { (str: UnsafePointer<Int8>?) -> StringIdType in
                 return Qasm.addString(str!)
@@ -191,19 +191,18 @@ final class Qasm {
         return Qasm.root!
     }
 
-    static private func getIncludePath(_ n: UnsafePointer<Int8>?) -> UnsafePointer<Int8> {
-        var includPath = ""
+    static private func getIncludeContents(_ n: UnsafePointer<Int8>?) -> UnsafePointer<Int8>? {
         if let name = n {
             var fileName = String(cString: name)
             fileName = fileName.replacingOccurrences(of: "\"", with: "")
             fileName = fileName.replacingOccurrences(of: ";", with: "")
-            fileName = fileName.replacingOccurrences(of: " ", with: "")
-            let bundle = Bundle(for: Qasm.self)
-            if let libsBundlePath = bundle.path(forResource: "libs", ofType: "bundle") {
-                includPath = "\(libsBundlePath)/\(fileName)"
+            fileName = fileName.replacingOccurrences(of: " ", with: "").lowercased()
+            if fileName == "qelib1.inc" {
+                let cArray = QELib1.QASM.cString(using: .utf8)
+                return UnsafePointer<Int8>(cArray!)
             }
         }
-        return UnsafePointer<Int8>(includPath)
+       return nil
     }
 
     static private func addNode(_ node: Node) -> NodeIdType {
