@@ -19,8 +19,17 @@ import XCTest
 /**
  Test local qasm simulator.
  */
-class LocalQasmSimulatorTest: XCTestCase {
+class LocalQasmSimulatorTests: XCTestCase {
 
+    #if os(Linux)
+    static let allTests = [
+        ("test_qasm_simulator_single_shot",test_qasm_simulator_single_shot),
+        ("test_qasm_simulator",test_qasm_simulator),
+        ("test_if_statement",test_if_statement),
+        ("test_teleport",test_teleport)
+    ]
+    #endif
+    
     private var seed: Int = 0
     private var qp: QuantumProgram? = nil
     private var qobj: [String:Any] = [:]
@@ -45,7 +54,7 @@ class LocalQasmSimulatorTest: XCTestCase {
                                                 "seed": self.seed]
             self.qobj = ["id": "test_sim_single_shot",
                 "config": [
-                    "max_credits": LocalQasmSimulatorTest.resources["max_credits"],
+                    "max_credits": LocalQasmSimulatorTests.resources["max_credits"],
                     "shots": 1024,
                     "backend": "local_qasm_simulator",
                 ],
@@ -81,7 +90,7 @@ class LocalQasmSimulatorTest: XCTestCase {
         self.qobj["config"] = config
         let q_job = QuantumJob(self.qobj,
                                 seed: self.seed,
-                                resources: LocalQasmSimulatorTest.resources)
+                                resources: LocalQasmSimulatorTests.resources)
         let asyncExpectation = self.expectation(description: "test_qasm_simulator_single_shot")
         QasmSimulator().run(q_job) { (result) in
             XCTAssertEqual(result.get_status(), "COMPLETED")
@@ -99,7 +108,7 @@ class LocalQasmSimulatorTest: XCTestCase {
         let expected: [String:Int] = ["100 100": 113, "011 011": 124, "101 101": 118, "111 111": 116, "000 000": 132, "010 010": 135, "110 110": 141, "001 001": 145]
         let q_job = QuantumJob(self.qobj,
                                seed: self.seed,
-                               resources: LocalQasmSimulatorTest.resources)
+                               resources: LocalQasmSimulatorTests.resources)
         let asyncExpectation = self.expectation(description: "test_qasm_simulator")
         QasmSimulator().run(q_job) { (result) in
             do {

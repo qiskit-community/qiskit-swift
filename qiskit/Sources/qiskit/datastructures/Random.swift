@@ -44,11 +44,19 @@ final class Random {
     }
 
     func getrandbits() -> Int {
-        return Int(arc4random())
+        #if os(Linux)
+            return Int(random())
+        #else
+            return Int(arc4random())
+        #endif
     }
 
     func seed(_ s: Int) {
-        srand48(s)
+        #if os(Linux)
+            srand(s);
+        #else
+            srand48(s)
+        #endif
         //self.source = GKMersenneTwisterRandomSource(seed: UInt64(s))
     }
 
@@ -57,6 +65,10 @@ final class Random {
     */
     func random() -> Double {
         //return Double(self.source?.nextUniform() ?? 0.0)
-        return drand48()
+        #if os(Linux)
+            return rand()
+        #else
+            return drand48()
+        #endif
     }
 }

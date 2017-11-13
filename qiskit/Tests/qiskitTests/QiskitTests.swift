@@ -17,7 +17,17 @@ import XCTest
 @testable import qiskit
 
 class QiskitTests: XCTestCase {
-    
+
+    #if os(Linux)
+    static let allTests = [
+        ("test5Qubit",test5Qubit),
+        ("testMakeBell1",testMakeBell1),
+        ("testRippleCarryAdder",testRippleCarryAdder),
+        ("testQFTAndMeasure2",testQFTAndMeasure2),
+        ("test4Developers",test4Developers)
+    ]
+    #endif
+
     // enter your token in your test schema environment variable "QUANTUM_TOKEN"
     static private var APItoken = ""
     static private let TESTURL = "https://quantumexperience.ng.bluemix.net/api/"
@@ -258,7 +268,7 @@ class QiskitTests: XCTestCase {
          }
     }
 
-    func test4developers() {
+    func test4Developers() {
         do {
             let str: String =
             "OPENQASM 2.0;\n" +

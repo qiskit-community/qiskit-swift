@@ -18,6 +18,19 @@ import XCTest
 
 class DataStructureTests: XCTestCase {
 
+    #if os(Linux)
+    static let allTests = [
+        ("testOrderedDictionary",testOrderedDictionary),
+        ("testTopologicalSort",testTopologicalSort),
+        ("testPredecessors",testPredecessors),
+        ("testAncestors",testAncestors),
+        ("testSuccessors",testSuccessors),
+        ("testDescendants",testDescendants),
+        ("testWeaklyConnetectedComponents",testWeaklyConnetectedComponents),
+        ("testLongestPath",testLongestPath),
+    ]
+    #endif
+
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.

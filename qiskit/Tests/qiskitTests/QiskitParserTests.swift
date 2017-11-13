@@ -16,7 +16,20 @@
 import XCTest
 @testable import qiskit
 
-class QIskitParserTests: XCTestCase {
+class QiskitParserTests: XCTestCase {
+
+    #if os(Linux)
+    static let allTests = [
+        ("testExamples",testExamples),
+        ("testParser",testParser),
+        ("testErrorCorrection",testErrorCorrection),
+        ("testParserBell",testParserBell),
+        ("testParserRipple",testParserRipple),
+        ("testParserRippleAdd",testParserRippleAdd),
+        ("testParserExpressionList",testParserExpressionList),
+        ("testParserQPT",testParserQPT)
+    ]
+    #endif
 
     private static let qasmProgram1 =
                 "OPENQASM 2.0;\n" +
@@ -130,9 +143,9 @@ class QIskitParserTests: XCTestCase {
 
     func testExamples() {
         var differences: [String: (String,String)] = [:]
-        for qasm in QIskitParserTests.qasmSamples {
+        for qasm in QiskitParserTests.qasmSamples {
             do {
-                let (qasmProgram,qasm) = try QIskitParserTests.runParser(qasm)
+                let (qasmProgram,qasm) = try QiskitParserTests.runParser(qasm)
                 let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
                 let emittedQasm = qasm.components(separatedBy: whitespaceCharacterSet).joined()
                 
@@ -157,7 +170,7 @@ class QIskitParserTests: XCTestCase {
 
     func testParser() {
         do {
-            let (qasmProgram,qasm) = try QIskitParserTests.runParser(QIskitParserTests.qasmProgram1)
+            let (qasmProgram,qasm) = try QiskitParserTests.runParser(QiskitParserTests.qasmProgram1)
             let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
             let emittedQasm = qasm.components(separatedBy: whitespaceCharacterSet).joined()
             let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
@@ -169,7 +182,7 @@ class QIskitParserTests: XCTestCase {
     
     func testErrorCorrection() {
         do {
-            let (qasmProgram,qasm) = try QIskitParserTests.runParser(QIskitParserTests.qasmProgram2)
+            let (qasmProgram,qasm) = try QiskitParserTests.runParser(QiskitParserTests.qasmProgram2)
             let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
             let emittedQasm = qasm.components(separatedBy: whitespaceCharacterSet).joined()
             let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()
@@ -181,7 +194,7 @@ class QIskitParserTests: XCTestCase {
 
     func testParserBell () {
         do {
-            let (qasmProgram,qasm) = try QIskitParserTests.runParser(QIskitParserTests.qasmProgram3)
+            let (qasmProgram,qasm) = try QiskitParserTests.runParser(QiskitParserTests.qasmProgram3)
             let whitespaceCharacterSet = CharacterSet.whitespacesAndNewlines
             let emittedQasm = qasm.components(separatedBy: whitespaceCharacterSet).joined()
             let targetQasm = qasmProgram.components(separatedBy: whitespaceCharacterSet).joined()

@@ -18,6 +18,25 @@ import qiskit
 
 class QiskitProgramTests: XCTestCase {
 
+    #if os(Linux)
+    static let allTests = [
+        ("testCreateProgram",testCreateProgram),
+        ("testConfigScriptsFile",testConfigScriptsFile),
+        ("testGetComponents",testGetComponents),
+        ("testGetIndividualComponents",testGetIndividualComponents),
+        ("testCreateClassicalRegister",testCreateClassicalRegister),
+        ("testCreateQuantumRegister",testCreateQuantumRegister),
+        ("testCreateCircuit",testCreateCircuit),
+        ("testCreateSeveralCircuits",testCreateSeveralCircuits),
+        ("testPrintCircuit",testPrintCircuit),
+        ("testPrintProgram",testPrintProgram),
+        ("testAddGates",testAddGates),
+        ("testCreateCircuitMultipleRegisters",testCreateCircuitMultipleRegisters),
+        ("testContactMultipleHorizontalRegisters",testContactMultipleHorizontalRegisters),
+        ("testCompileProgram",testCompileProgram)
+    ]
+    #endif
+
     private static let QPS_SPECS: [String: Any] = [
         "name": "program-name",
         "circuits": [[
@@ -112,7 +131,7 @@ class QiskitProgramTests: XCTestCase {
         }
     }
 
-    func testCreateServeralCircuits() {
+    func testCreateSeveralCircuits() {
         do {
             let qprogram = try QuantumProgram()
             let qr = try qprogram.create_quantum_register("qr", 3)
