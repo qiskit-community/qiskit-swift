@@ -43,148 +43,148 @@ final class Qasm {
     func parse() throws -> NodeMainProgram {
 
         Qasm.lock.lock()
-            Qasm.semaphore = DispatchSemaphore(value: 0)
-            Qasm.root = nil
-            Qasm.errorMsg = nil
-            let buf: YY_BUFFER_STATE = yy_scan_string(self.data)
+        Qasm.semaphore = DispatchSemaphore(value: 0)
+        Qasm.root = nil
+        Qasm.errorMsg = nil
+        let buf: YY_BUFFER_STATE = yy_scan_string(self.data)
 
-            ParseSuccess = { (index: NodeIdType) -> Void in
-                defer {
-                    Qasm.semaphore.signal()
-                }
-                Qasm.root = Qasm.getNode(index) as? NodeMainProgram
+        ParseSuccess = { (index: NodeIdType) -> Void in
+            defer {
+                Qasm.semaphore.signal()
             }
-            ParseFail = { (line: Int32, message: UnsafePointer<Int8>?) -> Void in
-                defer {
-                    Qasm.semaphore.signal()
-                }
-                if let msg = message {
-                    Qasm.errorMsg = "line \(line): \(String(cString: msg))"
-                } else {
-                    Qasm.errorMsg = "line \(line): Unknown Error"
-                }
+            Qasm.root = Qasm.getNode(index) as? NodeMainProgram
+        }
+        ParseFail = { (line: Int32, message: UnsafePointer<Int8>?) -> Void in
+            defer {
+                Qasm.semaphore.signal()
             }
-            GetIncludeContents = { (name: UnsafePointer<Int8>?) -> UnsafePointer<Int8>? in
-                return Qasm.getIncludeContents(name)
+            if let msg = message {
+                Qasm.errorMsg = "line \(line): \(String(cString: msg))"
+            } else {
+                Qasm.errorMsg = "line \(line): Unknown Error"
             }
-            AddString = { (str: UnsafePointer<Int8>?) -> StringIdType in
-                return Qasm.addString(str!)
-            }
-            CreateBarrier = { (primarylist: NodeIdType) -> NodeIdType in
-                return Qasm.createBarrier(primarylist: primarylist)
-            }
-            CreateBinaryOperation = { (op: UnsafePointer<Int8>?, operand1: NodeIdType, operand2: NodeIdType) -> NodeIdType in
-                return Qasm.createBinaryOperation(op: op!, operand1: operand1, operand2: operand2)
-            }
-            CreateCX = { (arg1: NodeIdType, arg2: NodeIdType) -> NodeIdType in
-                 return Qasm.createCX(arg1: arg1, arg2: arg2)
-            }
-            CreateCReg = { (indexed_id: NodeIdType) -> NodeIdType in
-                return Qasm.createCReg(indexed_id: indexed_id)
-            }
-            CreateCustomUnitary2 = { (identifier: NodeIdType, bitlist: NodeIdType) -> NodeIdType in
-                return Qasm.createCustomUnitary(identifier: identifier, bitlist: bitlist)
-            }
-            CreateCustomUnitary3 = { (identifier: NodeIdType, arguments: NodeIdType, bitlist: NodeIdType) -> NodeIdType in
-                return Qasm.createCustomUnitary(identifier: identifier, arguments: arguments, bitlist: bitlist)
-            }
-            CreateExpressionList1 = { (exp: NodeIdType) -> NodeIdType in
-                return Qasm.createExpressionList(exp: exp)
-            }
-            CreateExpressionList2 = { (elist: NodeIdType, expression: NodeIdType) -> NodeIdType in
-                return Qasm.createExpressionList(elist: elist, expression: expression)
-            }
-            CreateExternal = { (identifier: NodeIdType, external: StringIdType) -> NodeIdType in
-                return Qasm.createExternal(identifier: identifier, external: external)
-            }
-            CreateGate3 = { (identifier: NodeIdType, list2: NodeIdType, list3: NodeIdType) -> NodeIdType in
-                return Qasm.createGate(identifier: identifier, list2: list2, list3: list3)
-            }
-            CreateGate4 = { (identifier: NodeIdType, list1: NodeIdType, list2: NodeIdType, list3: NodeIdType) -> NodeIdType in
-                return Qasm.createGate(identifier: identifier, list1: list1, list2: list2, list3: list3)
-            }
-            CreateGateBody0 = { () -> NodeIdType in
-                return Qasm.createGateBody()
-            }
-            CreateGateBody1 = { (goplist: NodeIdType) -> NodeIdType in
-                return Qasm.createGateBody(goplist: goplist)
-            }
-            CreateGopList1 = { (gop: NodeIdType) -> NodeIdType in
-                return Qasm.createGopList(gop: gop)
-            }
-            CreateGopList2 = { (goplist: NodeIdType, gate_op: NodeIdType) -> NodeIdType in
-                return Qasm.createGopList(goplist: goplist, gate_op: gate_op)
-            }
-            CreateId = { (identifier: StringIdType, line: Int) -> NodeIdType in
-                return Qasm.createId(identifier: identifier, line: line)
-            }
-            CreateIdlist1 = { (identifier: NodeIdType) -> NodeIdType in
-                return Qasm.createIdlist(identifier: identifier)
-            }
-            CreateIdlist2 = { (idlist: NodeIdType, identifier: NodeIdType) -> NodeIdType in
-                return Qasm.createIdlist(idlist: idlist, identifier: identifier)
-            }
-            CreateIf = { (identifier: NodeIdType, nninteger: NodeIdType, quantum_op: NodeIdType) -> NodeIdType in
-                return Qasm.createIf(identifier: identifier, nninteger: nninteger, quantum_op: quantum_op)
-            }
-            CreateInclude = { (file: StringIdType) -> NodeIdType in
-                return Qasm.createInclude(file: file)
-            }
-            CreateIndexedId = { (identifier: NodeIdType, index: NodeIdType) -> NodeIdType in
-                return Qasm.createIndexedId(identifier: identifier, index: index)
-            }
-            CreateInt = { (integer: Int) -> NodeIdType in
-                return Qasm.createInt(integer: integer)
-            }
-            CreateMagic = { (real: NodeIdType) -> NodeIdType in
-                return Qasm.createMagic(real: real)
-            }
-            CreateMainProgram2 = { (magic: NodeIdType, program: NodeIdType) -> NodeIdType in
-                return Qasm.createMainProgram(magic: magic, program: program)
-            }
-            CreateMainProgram3 = { (magic: NodeIdType, incld: NodeIdType, program: NodeIdType) -> NodeIdType in
-                return Qasm.createMainProgram(magic: magic, incld: incld, program: program)
-            }
-            CreateMeasure = { (argument1: NodeIdType, argument2: NodeIdType) -> NodeIdType in
-                return Qasm.createMeasure(argument1: argument1, argument2: argument2)
-            }
-            CreateOpaque2 = { (identifier: NodeIdType, list1: NodeIdType) -> NodeIdType in
-                return Qasm.createOpaque(identifier: identifier, list1: list1)
-            }
-            CreateOpaque3 = { (identifier: NodeIdType, list1: NodeIdType, list2: NodeIdType) -> NodeIdType in
-                return Qasm.createOpaque(identifier: identifier, list1: list1, list2: list2)
-            }
-            CreatePrefixOperation = { (op: UnsafePointer<Int8>?,operand: NodeIdType) -> NodeIdType in
-                return Qasm.createPrefixOperation(op: op!,operand: operand)
-            }
-            CreatePrimaryList1 = { (primary: NodeIdType) -> NodeIdType in
-                return Qasm.createPrimaryList(primary: primary)
-            }
-            CreatePrimaryList2 = { (list: NodeIdType, primary: NodeIdType) -> NodeIdType in
-                return Qasm.createPrimaryList(list: list, primary: primary)
-            }
-            CreateProgram1 = { (statement: NodeIdType) -> NodeIdType in
-                return Qasm.createProgram(statement: statement)
-            }
-            CreateProgram2 = { (program: NodeIdType, statement: NodeIdType) -> NodeIdType in
-                return Qasm.createProgram(program: program, statement: statement)
-            }
-            CreateQReg = { (indexed_id: NodeIdType) -> NodeIdType in
-                return Qasm.createQReg(indexed_id: indexed_id)
-            }
-            CreateReal = { (real: Double) -> NodeIdType in
-                return Qasm.createReal(real: real)
-            }
-            CreateReset = { (identifier: NodeIdType) -> NodeIdType in
-                return Qasm.createReset(identifier: identifier)
-            }
-            CreateUniversalUnitary = { (list1: NodeIdType, list2: NodeIdType) -> NodeIdType in
-                return Qasm.createUniversalUnitary(list1: list1, list2: list2)
-            }
-            
-            yyparse()
-            Qasm.semaphore.wait()
-            Qasm.clearState()
+        }
+        GetIncludeContents = { (name: UnsafePointer<Int8>?) -> UnsafePointer<Int8>? in
+            return Qasm.getIncludeContents(name)
+        }
+        AddString = { (str: UnsafePointer<Int8>?) -> StringIdType in
+            return Qasm.addString(str!)
+        }
+        CreateBarrier = { (primarylist: NodeIdType) -> NodeIdType in
+            return Qasm.createBarrier(primarylist: primarylist)
+        }
+        CreateBinaryOperation = { (op: UnsafePointer<Int8>?, operand1: NodeIdType, operand2: NodeIdType) -> NodeIdType in
+            return Qasm.createBinaryOperation(op: op!, operand1: operand1, operand2: operand2)
+        }
+        CreateCX = { (arg1: NodeIdType, arg2: NodeIdType) -> NodeIdType in
+             return Qasm.createCX(arg1: arg1, arg2: arg2)
+        }
+        CreateCReg = { (indexed_id: NodeIdType) -> NodeIdType in
+            return Qasm.createCReg(indexed_id: indexed_id)
+        }
+        CreateCustomUnitary2 = { (identifier: NodeIdType, bitlist: NodeIdType) -> NodeIdType in
+            return Qasm.createCustomUnitary(identifier: identifier, bitlist: bitlist)
+        }
+        CreateCustomUnitary3 = { (identifier: NodeIdType, arguments: NodeIdType, bitlist: NodeIdType) -> NodeIdType in
+            return Qasm.createCustomUnitary(identifier: identifier, arguments: arguments, bitlist: bitlist)
+        }
+        CreateExpressionList1 = { (exp: NodeIdType) -> NodeIdType in
+            return Qasm.createExpressionList(exp: exp)
+        }
+        CreateExpressionList2 = { (elist: NodeIdType, expression: NodeIdType) -> NodeIdType in
+            return Qasm.createExpressionList(elist: elist, expression: expression)
+        }
+        CreateExternal = { (identifier: NodeIdType, external: StringIdType) -> NodeIdType in
+            return Qasm.createExternal(identifier: identifier, external: external)
+        }
+        CreateGate3 = { (identifier: NodeIdType, list2: NodeIdType, list3: NodeIdType) -> NodeIdType in
+            return Qasm.createGate(identifier: identifier, list2: list2, list3: list3)
+        }
+        CreateGate4 = { (identifier: NodeIdType, list1: NodeIdType, list2: NodeIdType, list3: NodeIdType) -> NodeIdType in
+            return Qasm.createGate(identifier: identifier, list1: list1, list2: list2, list3: list3)
+        }
+        CreateGateBody0 = { () -> NodeIdType in
+            return Qasm.createGateBody()
+        }
+        CreateGateBody1 = { (goplist: NodeIdType) -> NodeIdType in
+            return Qasm.createGateBody(goplist: goplist)
+        }
+        CreateGopList1 = { (gop: NodeIdType) -> NodeIdType in
+            return Qasm.createGopList(gop: gop)
+        }
+        CreateGopList2 = { (goplist: NodeIdType, gate_op: NodeIdType) -> NodeIdType in
+            return Qasm.createGopList(goplist: goplist, gate_op: gate_op)
+        }
+        CreateId = { (identifier: StringIdType, line: Int) -> NodeIdType in
+            return Qasm.createId(identifier: identifier, line: line)
+        }
+        CreateIdlist1 = { (identifier: NodeIdType) -> NodeIdType in
+            return Qasm.createIdlist(identifier: identifier)
+        }
+        CreateIdlist2 = { (idlist: NodeIdType, identifier: NodeIdType) -> NodeIdType in
+            return Qasm.createIdlist(idlist: idlist, identifier: identifier)
+        }
+        CreateIf = { (identifier: NodeIdType, nninteger: NodeIdType, quantum_op: NodeIdType) -> NodeIdType in
+            return Qasm.createIf(identifier: identifier, nninteger: nninteger, quantum_op: quantum_op)
+        }
+        CreateInclude = { (file: StringIdType) -> NodeIdType in
+            return Qasm.createInclude(file: file)
+        }
+        CreateIndexedId = { (identifier: NodeIdType, index: NodeIdType) -> NodeIdType in
+            return Qasm.createIndexedId(identifier: identifier, index: index)
+        }
+        CreateInt = { (integer: Int) -> NodeIdType in
+            return Qasm.createInt(integer: integer)
+        }
+        CreateMagic = { (real: NodeIdType) -> NodeIdType in
+            return Qasm.createMagic(real: real)
+        }
+        CreateMainProgram2 = { (magic: NodeIdType, program: NodeIdType) -> NodeIdType in
+            return Qasm.createMainProgram(magic: magic, program: program)
+        }
+        CreateMainProgram3 = { (magic: NodeIdType, incld: NodeIdType, program: NodeIdType) -> NodeIdType in
+            return Qasm.createMainProgram(magic: magic, incld: incld, program: program)
+        }
+        CreateMeasure = { (argument1: NodeIdType, argument2: NodeIdType) -> NodeIdType in
+            return Qasm.createMeasure(argument1: argument1, argument2: argument2)
+        }
+        CreateOpaque2 = { (identifier: NodeIdType, list1: NodeIdType) -> NodeIdType in
+            return Qasm.createOpaque(identifier: identifier, list1: list1)
+        }
+        CreateOpaque3 = { (identifier: NodeIdType, list1: NodeIdType, list2: NodeIdType) -> NodeIdType in
+            return Qasm.createOpaque(identifier: identifier, list1: list1, list2: list2)
+        }
+        CreatePrefixOperation = { (op: UnsafePointer<Int8>?,operand: NodeIdType) -> NodeIdType in
+            return Qasm.createPrefixOperation(op: op!,operand: operand)
+        }
+        CreatePrimaryList1 = { (primary: NodeIdType) -> NodeIdType in
+            return Qasm.createPrimaryList(primary: primary)
+        }
+        CreatePrimaryList2 = { (list: NodeIdType, primary: NodeIdType) -> NodeIdType in
+            return Qasm.createPrimaryList(list: list, primary: primary)
+        }
+        CreateProgram1 = { (statement: NodeIdType) -> NodeIdType in
+            return Qasm.createProgram(statement: statement)
+        }
+        CreateProgram2 = { (program: NodeIdType, statement: NodeIdType) -> NodeIdType in
+            return Qasm.createProgram(program: program, statement: statement)
+        }
+        CreateQReg = { (indexed_id: NodeIdType) -> NodeIdType in
+            return Qasm.createQReg(indexed_id: indexed_id)
+        }
+        CreateReal = { (real: Double) -> NodeIdType in
+            return Qasm.createReal(real: real)
+        }
+        CreateReset = { (identifier: NodeIdType) -> NodeIdType in
+            return Qasm.createReset(identifier: identifier)
+        }
+        CreateUniversalUnitary = { (list1: NodeIdType, list2: NodeIdType) -> NodeIdType in
+            return Qasm.createUniversalUnitary(list1: list1, list2: list2)
+        }
+
+        yyparse()
+        Qasm.semaphore.wait()
+        Qasm.clearState()
         Qasm.lock.unlock()
         if let error = Qasm.errorMsg {
             throw QISKitError.parserError(msg: error)

@@ -140,8 +140,9 @@ final class BackendUtils {
     private func register_local_backend(_ cls: BaseBackend.Type, _ configuration: [String:Any]? = nil) -> String {
         let backend_instance = cls.init(configuration)
         if let name = backend_instance.configuration["name"] as? String {
+            let backend = LocalRegisteredBackend(name,backend_instance.configuration,cls)
             self.lock.lock()
-            self._registered_backends[name] = LocalRegisteredBackend(name,backend_instance.configuration,cls)
+            self._registered_backends[name] = backend
             self.lock.unlock()
             return name
         }
@@ -151,8 +152,9 @@ final class BackendUtils {
     private func register_remote_backend(_ configuration: [String:Any]? = nil, _ api: IBMQuantumExperience) -> String {
         let backend_instance = QeRemote(configuration)
         if let name = backend_instance.configuration["name"] as? String {
+            let backend = RemoteRegisteredBackend(name,backend_instance.configuration,api)
             self.lock.lock()
-            self._registered_backends[name] = RemoteRegisteredBackend(name,backend_instance.configuration,api)
+            self._registered_backends[name] = backend
             self.lock.unlock()
             return name
         }
@@ -201,13 +203,13 @@ final class BackendUtils {
     func local_backends() -> Set<String> {
         var names = Set<String>()
         self.lock.lock()
-            for (_,backend) in self._registered_backends {
-                if let local = backend.configuration["local"] as? Bool {
-                    if local {
-                        names.insert(backend.name)
-                    }
+        for (_,backend) in self._registered_backends {
+            if let local = backend.configuration["local"] as? Bool {
+                if local {
+                    names.insert(backend.name)
                 }
             }
+        }
         self.lock.unlock()
         return names
     }

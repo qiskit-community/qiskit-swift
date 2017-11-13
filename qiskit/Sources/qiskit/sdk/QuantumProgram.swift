@@ -1171,10 +1171,10 @@ public final class QuantumProgram {
                 q_job_list.append(QuantumJob(qobj))
             }
             let job_processor = try JobProcessor(self.backendUtils,q_job_list,self._jobs_done_callback)
-            self.lock.lock()
             let data = JobProcessorData(job_processor,
                                         callbackSingle,
                                         callbackMultiple)
+            self.lock.lock()
             self.jobProcessors[data.jobProcessor.identifier] = data
             self.lock.unlock()
             job_processor.submit()
@@ -1204,17 +1204,18 @@ public final class QuantumProgram {
      */
     private func _jobs_done_callback(_ identifier: String, _ jobs_results: [Result]) {
         self.lock.lock()
-        if let data = self.jobProcessors.removeValue(forKey:identifier) {
+        let data = self.jobProcessors.removeValue(forKey:identifier)
+        self.lock.unlock()
+        if data != nil {
             DispatchQueue.main.async {
-                if data.callbackSingle != nil {
-                    data.callbackSingle?(jobs_results[0])
+                if data!.callbackSingle != nil {
+                    data!.callbackSingle?(jobs_results[0])
                 }
                 else {
-                    data.callbackMultiple?(jobs_results)
+                    data!.callbackMultiple?(jobs_results)
                 }
             }
         }
-        self.lock.unlock()
     }
 
     /**
