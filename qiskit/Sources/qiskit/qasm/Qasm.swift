@@ -14,7 +14,7 @@
 // =============================================================================
 
 import Foundation
-import qiskitPrivate
+import CQasmParser
 
 typealias NodeIdType = Int
 typealias StringIdType = Int
