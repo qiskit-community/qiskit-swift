@@ -14,7 +14,7 @@
 // =============================================================================
 
 import XCTest
-@testable import qiskit
+@testable import qiskitTests
 
 XCTMain([
     testCase(DataStructureTests.allTests),

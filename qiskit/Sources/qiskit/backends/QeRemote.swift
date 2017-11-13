@@ -14,6 +14,9 @@
 // =============================================================================
 
 import Foundation
+#if os(Linux)
+import Dispatch
+#endif
 
 /**
  Backend class interfacing with the Quantum Experience remotely.

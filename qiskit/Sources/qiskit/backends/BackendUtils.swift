@@ -14,6 +14,9 @@
 // =============================================================================
 
 import Foundation
+#if os(Linux)
+import Dispatch
+#endif
 
 class RegisteredBackend {
     let name: String
@@ -62,6 +65,7 @@ final class BackendUtils {
     private var _registered_backends: [String:RegisteredBackend] = [:]
     private var _api: IBMQuantumExperience?
     private var needsUpdate: Bool = true
+    private let lock = NSRecursiveLock()    
 
     var api: IBMQuantumExperience? {
         get {
@@ -111,9 +115,9 @@ final class BackendUtils {
             responseHandler(backends,nil)
             return
         }
-        SyncLock.synchronized(self) {
-            self._registered_backends = [:]
-        }
+        self.lock.lock()
+        self._registered_backends = [:]
+        self.lock.unlock()
         var backend_name_list = self.discover_local_backends()
         if self.api == nil {
             self.needsUpdate = false
@@ -136,9 +140,9 @@ final class BackendUtils {
     private func register_local_backend(_ cls: BaseBackend.Type, _ configuration: [String:Any]? = nil) -> String {
         let backend_instance = cls.init(configuration)
         if let name = backend_instance.configuration["name"] as? String {
-            SyncLock.synchronized(self) {
-                self._registered_backends[name] = LocalRegisteredBackend(name,backend_instance.configuration,cls)
-            }
+            self.lock.lock()
+            self._registered_backends[name] = LocalRegisteredBackend(name,backend_instance.configuration,cls)
+            self.lock.unlock()
             return name
         }
         return ""
@@ -147,9 +151,9 @@ final class BackendUtils {
     private func register_remote_backend(_ configuration: [String:Any]? = nil, _ api: IBMQuantumExperience) -> String {
         let backend_instance = QeRemote(configuration)
         if let name = backend_instance.configuration["name"] as? String {
-            SyncLock.synchronized(self) {
-                self._registered_backends[name] = RemoteRegisteredBackend(name,backend_instance.configuration,api)
-            }
+            self.lock.lock()
+            self._registered_backends[name] = RemoteRegisteredBackend(name,backend_instance.configuration,api)
+            self.lock.unlock()
             return name
         }
         return ""
@@ -162,9 +166,9 @@ final class BackendUtils {
                 return
             }
             var backend: RegisteredBackend? = nil
-            SyncLock.synchronized(self) {
-                backend = self._registered_backends[backend_name]
-            }
+            self.lock.lock()
+            backend = self._registered_backends[backend_name]
+            self.lock.unlock()
             if backend == nil {
                 responseHandler(nil,IBMQuantumExperienceError.badBackendError(backend: backend_name))
                 return
@@ -180,9 +184,9 @@ final class BackendUtils {
                 return
             }
             var backend: RegisteredBackend? = nil
-            SyncLock.synchronized(self) {
-                backend = self._registered_backends[backend_name]
-            }
+            self.lock.lock()
+            backend = self._registered_backends[backend_name]
+            self.lock.unlock()
             if backend == nil {
                 responseHandler([:],IBMQuantumExperienceError.badBackendError(backend: backend_name))
                 return
@@ -196,7 +200,7 @@ final class BackendUtils {
      */
     func local_backends() -> Set<String> {
         var names = Set<String>()
-        SyncLock.synchronized(self) {
+        self.lock.lock()
             for (_,backend) in self._registered_backends {
                 if let local = backend.configuration["local"] as? Bool {
                     if local {
@@ -204,7 +208,7 @@ final class BackendUtils {
                     }
                 }
             }
-        }
+        self.lock.unlock()
         return names
     }
 
@@ -213,15 +217,15 @@ final class BackendUtils {
      */
     private func remote_backends() -> Set<String> {
         var names = Set<String>()
-        SyncLock.synchronized(self) {
-            for (_,backend) in self._registered_backends {
-                if let local = backend.configuration["local"] as? Bool {
-                    if !local {
-                        names.insert(backend.name)
-                    }
+        self.lock.lock()
+        for (_,backend) in self._registered_backends {
+            if let local = backend.configuration["local"] as? Bool {
+                if !local {
+                    names.insert(backend.name)
                 }
             }
         }
+        self.lock.unlock()
         return names
     }
 }

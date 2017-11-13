@@ -14,6 +14,9 @@
 // =============================================================================
 
 import Foundation
+#if os(Linux)
+import Dispatch
+#endif
 
 /**
 Contains a (slow) Python simulator that returns the unitary of the circuit.

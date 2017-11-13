@@ -15,6 +15,9 @@
 
 import Foundation
 import CQasmParser
+#if os(Linux)
+import Dispatch
+#endif
 
 typealias NodeIdType = Int
 typealias StringIdType = Int
@@ -27,6 +30,7 @@ final class Qasm {
     static private var semaphore = DispatchSemaphore(value: 0)
     static private var root: NodeMainProgram? = nil
     static private var errorMsg: String? = nil
+    static private let lock = NSRecursiveLock()
     
     init(filename: String) throws {
         self.data  = try String(contentsOfFile: filename, encoding: String.Encoding.utf8)
@@ -38,7 +42,7 @@ final class Qasm {
 
     func parse() throws -> NodeMainProgram {
 
-        SyncLock.synchronized(Qasm.self) {
+        Qasm.lock.lock()
             Qasm.semaphore = DispatchSemaphore(value: 0)
             Qasm.root = nil
             Qasm.errorMsg = nil
@@ -181,7 +185,7 @@ final class Qasm {
             yyparse()
             Qasm.semaphore.wait()
             Qasm.clearState()
-        }
+        Qasm.lock.unlock()
         if let error = Qasm.errorMsg {
             throw QISKitError.parserError(msg: error)
         }

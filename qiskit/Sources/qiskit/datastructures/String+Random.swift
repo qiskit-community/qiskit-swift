@@ -22,8 +22,15 @@ extension String {
             static let lettersLength = UInt32(letters.count)
         }
         var array = [Character](repeating: " ", count: length)
+        #if os(Linux)
+            srandom(UInt32(time(nil)))
+        #endif
         for i in 0..<length {
-            let pos = Int(arc4random_uniform(StaticVars.lettersLength))
+            #if os(Linux)
+                let pos = Int(UInt32(random()) % StaticVars.lettersLength)
+            #else
+                let pos = Int(arc4random_uniform(StaticVars.lettersLength))
+            #endif
             let index = StaticVars.letters.index(StaticVars.letters.startIndex, offsetBy: pos)
             array[i] = StaticVars.letters[index]
         }

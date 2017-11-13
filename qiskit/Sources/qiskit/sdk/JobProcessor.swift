@@ -14,6 +14,9 @@
 // =============================================================================
 
 import Foundation
+#if os(Linux)
+import Dispatch
+#endif
 
 /**
  Process a bunch of jobs and collect the results
@@ -26,6 +29,7 @@ final class JobProcessor {
     private let callback: ((_:String, _:[Result]) -> Void)?
     private var num_jobs: Int
     private var jobs_results: [Result] = []
+    private let lock = NSRecursiveLock()
 
     init(_ backendUtils: BackendUtils,
          _ q_jobs: [QuantumJob],
@@ -38,12 +42,12 @@ final class JobProcessor {
     }
 
     private func _job_done_callback(_ result: Result) {
-        SyncLock.synchronized(self) {
-            self.jobs_results.append(result)
-            if self.num_jobs > 0 {
-                self.num_jobs -= 1
-            }
+        self.lock.lock()
+        self.jobs_results.append(result)
+        if self.num_jobs > 0 {
+            self.num_jobs -= 1
         }
+        self.lock.unlock()
         // Call the callback when all jobs have finished
         if self.num_jobs == 0 {
             SDKLogger.logInfo(SDKLogger.debugString(result))

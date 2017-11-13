@@ -14,6 +14,9 @@
 // =============================================================================
 
 import Foundation
+#if os(Linux)
+import Dispatch
+#endif
 
 /**
 Quantum Program Class.
@@ -103,6 +106,7 @@ public final class QuantumProgram {
         }
     }
 
+    private let lock = NSRecursiveLock()
     private var jobProcessors: [String: JobProcessorData] = [:]
 
     /**
@@ -1167,12 +1171,12 @@ public final class QuantumProgram {
                 q_job_list.append(QuantumJob(qobj))
             }
             let job_processor = try JobProcessor(self.backendUtils,q_job_list,self._jobs_done_callback)
-            SyncLock.synchronized(self) {
-                let data = JobProcessorData(job_processor,
-                                            callbackSingle,
-                                            callbackMultiple)
-                self.jobProcessors[data.jobProcessor.identifier] = data
-            }
+            self.lock.lock()
+            let data = JobProcessorData(job_processor,
+                                        callbackSingle,
+                                        callbackMultiple)
+            self.jobProcessors[data.jobProcessor.identifier] = data
+            self.lock.unlock()
             job_processor.submit()
         } catch {
             var results: [Result] = []
@@ -1199,18 +1203,18 @@ public final class QuantumProgram {
      jobs_results (list): list of Result objects
      */
     private func _jobs_done_callback(_ identifier: String, _ jobs_results: [Result]) {
-        SyncLock.synchronized(self) {
-            if let data = self.jobProcessors.removeValue(forKey:identifier) {
-                DispatchQueue.main.async {
-                    if data.callbackSingle != nil {
-                        data.callbackSingle?(jobs_results[0])
-                    }
-                    else {
-                        data.callbackMultiple?(jobs_results)
-                    }
+        self.lock.lock()
+        if let data = self.jobProcessors.removeValue(forKey:identifier) {
+            DispatchQueue.main.async {
+                if data.callbackSingle != nil {
+                    data.callbackSingle?(jobs_results[0])
+                }
+                else {
+                    data.callbackMultiple?(jobs_results)
                 }
             }
         }
+        self.lock.unlock()
     }
 
     /**

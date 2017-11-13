@@ -53,7 +53,7 @@ final class Random {
 
     func seed(_ s: Int) {
         #if os(Linux)
-            srand(s);
+            srand(UInt32(s));
         #else
             srand48(s)
         #endif
@@ -66,7 +66,7 @@ final class Random {
     func random() -> Double {
         //return Double(self.source?.nextUniform() ?? 0.0)
         #if os(Linux)
-            return rand()
+            return Double(Double(rand()) / Double(RAND_MAX))
         #else
             return drand48()
         #endif
