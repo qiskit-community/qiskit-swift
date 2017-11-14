@@ -24,7 +24,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		DF3EA6001ECDD14200B86267 /* qiskit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = qiskit.xcodeproj; path = ../qiskit/qiskit.xcodeproj; sourceTree = "<group>"; };
+		DF3EA6001ECDD14200B86267 /* qiskit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = qiskit.xcodeproj; path = ../qiskit.xcodeproj; sourceTree = "<group>"; };
 		DFE7AF761EB4C1D100D8DD72 /* QisSwiftDeveloperTutorial.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = QisSwiftDeveloperTutorial.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 /* End PBXFileReference section */
 

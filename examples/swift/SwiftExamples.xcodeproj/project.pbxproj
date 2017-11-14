@@ -25,7 +25,7 @@
 
 /* Begin PBXFileReference section */
 		DF554A621F14090D0048E972 /* SwitExamplesPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = SwitExamplesPlayground.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		DF554A631F1409490048E972 /* qiskit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = qiskit.xcodeproj; path = "Carthage/Checkouts/qiskit-sdk-swift/qiskit/qiskit.xcodeproj"; sourceTree = "<group>"; };
+		DF554A631F1409490048E972 /* qiskit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = qiskit.xcodeproj; path = "Carthage/Checkouts/qiskit-sdk-swift/qiskit.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
