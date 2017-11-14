@@ -34,6 +34,9 @@ Pods/
 Cartfile.resolved
 Carthage/
 
+# Swift Package Manager
+.build/
+
 ## MISC
 .swiftlint.yml
 *~
