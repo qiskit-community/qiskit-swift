@@ -64,8 +64,10 @@ final class Qasm {
                 Qasm.errorMsg = "line \(line): Unknown Error"
             }
         }
-        GetIncludeContents = { (name: UnsafePointer<Int8>?) -> UnsafePointer<Int8>? in
-            return Qasm.getIncludeContents(name)
+        GetIncludeContents = { (name: UnsafePointer<Int8>?,
+                                contents: UnsafeMutablePointer<Int8>?,
+                                size: Int) -> Int in
+            return Qasm.getIncludeContents(name, contents, size)
         }
         AddString = { (str: UnsafePointer<Int8>?) -> StringIdType in
             return Qasm.addString(str!)
@@ -195,18 +197,27 @@ final class Qasm {
         return Qasm.root!
     }
 
-    static private func getIncludeContents(_ n: UnsafePointer<Int8>?) -> UnsafePointer<Int8>? {
-        if let name = n {
-            var fileName = String(cString: name)
-            fileName = fileName.replacingOccurrences(of: "\"", with: "")
-            fileName = fileName.replacingOccurrences(of: ";", with: "")
-            fileName = fileName.replacingOccurrences(of: " ", with: "").lowercased()
-            if fileName == "qelib1.inc" {
-                let cArray = QELib1.QASM.cString(using: .utf8)
-                return UnsafePointer<Int8>(cArray!)
-            }
+    static private func getIncludeContents(_ n: UnsafePointer<Int8>?,
+                                            _ c: UnsafeMutablePointer<Int8>?,
+                                            _ size: Int) -> Int {
+        guard let name = n, let contents = c else {
+            return 0
         }
-       return nil
+        var fileName = String(cString: name)
+        fileName = fileName.replacingOccurrences(of: "\"", with: "")
+        fileName = fileName.replacingOccurrences(of: ";", with: "")
+        fileName = fileName.replacingOccurrences(of: " ", with: "").lowercased()
+        if fileName != "qelib1.inc" {
+            return 0
+        }
+        guard let bytes = QELib1.QASM.cString(using: .utf8) else {
+            return 0
+        }
+        if bytes.count <= size {
+            let p = UnsafeMutablePointer<Int8>(mutating:bytes)
+            contents.moveAssign(from: p, count: bytes.count)
+        }
+        return bytes.count
     }
 
     static private func addNode(_ node: Node) -> NodeIdType {

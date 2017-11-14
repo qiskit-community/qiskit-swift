@@ -30,7 +30,7 @@ extern int yyparse(void);
 
 extern void (*ParseSuccess)(NodeIdType);
 extern void (*ParseFail)(int,const char*);
-extern const char* (*GetIncludeContents)(const char*);
+extern long (*GetIncludeContents)(const char*,char*,long);
 extern StringIdType (*AddString)(const char*);
 extern NodeIdType (*CreateBarrier)(NodeIdType);
 extern NodeIdType (*CreateBinaryOperation)(const char*,NodeIdType,NodeIdType);

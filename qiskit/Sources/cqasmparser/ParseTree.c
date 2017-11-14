@@ -17,7 +17,7 @@
 
 void (*ParseSuccess)(NodeIdType);
 void (*ParseFail)(int,const char*);
-const char* (*GetIncludeContents)(const char*);
+long (*GetIncludeContents)(const char*,char*,long);
 StringIdType (*AddString)(const char*);
 NodeIdType (*CreateBarrier)(NodeIdType);
 NodeIdType (*CreateBinaryOperation)(const char*,NodeIdType,NodeIdType);

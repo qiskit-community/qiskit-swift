@@ -112,14 +112,28 @@ include {
 
 <INCLUDEFILE>[ \t]*      /* eat the whitespace */
 <INCLUDEFILE>[^ \t]+; {
-    const char* contents = GetIncludeContents(yytext);
-    if ( ! contents ) {
+    long size = 0;
+    long sizeNeeded = 2200;
+    char* contents = NULL;
+    while (sizeNeeded > size) {
+        size = sizeNeeded;
+        if (contents != NULL) {
+            free(contents);
+        }
+        contents = calloc(size + 1, sizeof(char));
+        sizeNeeded = GetIncludeContents(yytext,contents,size);
+    }
+    if (sizeNeeded <= 0) {
+        free(contents);
         yyterminate();
     }
-    yypush_buffer_state(YY_CURRENT_BUFFER);
-    yy_scan_string(contents);
-    yylineno = 1;
-    BEGIN(INITIAL);
+    else {
+        yypush_buffer_state(YY_CURRENT_BUFFER);
+        yy_scan_string(contents);
+        free(contents);
+        yylineno = 1;
+        BEGIN(INITIAL);
+    }
 }
 
 <INCLUDEFILE>.|\n {

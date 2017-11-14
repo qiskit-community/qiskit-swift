@@ -975,20 +975,34 @@ case 21:
 YY_RULE_SETUP
 #line 114 "tokenizer.l"
 {
-    const char* contents = GetIncludeContents(yytext);
-    if ( ! contents ) {
+    long size = 0;
+    long sizeNeeded = 2200;
+    char* contents = NULL;
+    while (sizeNeeded > size) {
+        size = sizeNeeded;
+        if (contents != NULL) {
+            free(contents);
+        }
+        contents = calloc(size + 1, sizeof(char));
+        sizeNeeded = GetIncludeContents(yytext,contents,size);
+    }
+    if (sizeNeeded <= 0) {
+        free(contents);
         yyterminate();
     }
-    yypush_buffer_state(YY_CURRENT_BUFFER);
-    yy_scan_string(contents);
-    yylineno = 1;
-    BEGIN(INITIAL);
+    else {
+        yypush_buffer_state(YY_CURRENT_BUFFER);
+        yy_scan_string(contents);
+        free(contents);
+        yylineno = 1;
+        BEGIN(INITIAL);
+    }
 }
 	YY_BREAK
 case 22:
 /* rule 22 can match eol */
 YY_RULE_SETUP
-#line 125 "tokenizer.l"
+#line 139 "tokenizer.l"
 {
     fprintf(stderr, "%4d bad include line\n", yylineno);
     yyterminate();
@@ -996,7 +1010,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(INCLUDEFILE):
-#line 131 "tokenizer.l"
+#line 145 "tokenizer.l"
 {
     yypop_buffer_state();
     if ( !YY_CURRENT_BUFFER ) {
@@ -1007,12 +1021,12 @@ case YY_STATE_EOF(INCLUDEFILE):
 case 23:
 /* rule 23 can match eol */
 YY_RULE_SETUP
-#line 138 "tokenizer.l"
+#line 152 "tokenizer.l"
 { yylineno++; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 140 "tokenizer.l"
+#line 154 "tokenizer.l"
 {
     yylval.svalue = AddString(yytext);
     return OPENQASM;
@@ -1020,13 +1034,13 @@ YY_RULE_SETUP
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 145 "tokenizer.l"
+#line 159 "tokenizer.l"
 {
 }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 148 "tokenizer.l"
+#line 162 "tokenizer.l"
 {
     yylval.svalue = AddString(yytext);
     return CX;
@@ -1034,7 +1048,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 153 "tokenizer.l"
+#line 167 "tokenizer.l"
 {
     yylval.svalue = AddString(yytext);
     return U;
@@ -1042,7 +1056,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 158 "tokenizer.l"
+#line 172 "tokenizer.l"
 {
     yylval.svalue = AddString(yytext);
     return ASSIGN;
@@ -1050,7 +1064,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 163 "tokenizer.l"
+#line 177 "tokenizer.l"
 {
     yylval.svalue = AddString(yytext);
     return MATCHES;
@@ -1058,7 +1072,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 169 "tokenizer.l"
+#line 183 "tokenizer.l"
 {
     yylval.svalue = AddString(yytext);
     return ID;
@@ -1066,23 +1080,23 @@ YY_RULE_SETUP
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 174 "tokenizer.l"
+#line 188 "tokenizer.l"
 {
 }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 177 "tokenizer.l"
+#line 191 "tokenizer.l"
 {
     return yytext[0];
 }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 181 "tokenizer.l"
+#line 195 "tokenizer.l"
 ECHO;
 	YY_BREAK
-#line 1086 "lex.yy.c"
+#line 1100 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2040,7 +2054,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 181 "tokenizer.l"
+#line 195 "tokenizer.l"
 
 
 
