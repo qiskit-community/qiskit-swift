@@ -27,5 +27,6 @@ let package = Package(
         .testTarget(
             name: "qiskitTests",
             dependencies: ["qiskit"]),
-    ]
+    ],
+    swiftLanguageVersions: [4]
 )
