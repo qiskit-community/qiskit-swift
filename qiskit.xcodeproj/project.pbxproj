@@ -267,6 +267,10 @@
 		6932AB921FB9FDC800382CF7 /* ParseTree.c in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB8B1FB9FDB800382CF7 /* ParseTree.c */; };
 		6932AB931FB9FDCB00382CF7 /* tokenizer.l in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB8A1FB9FDB800382CF7 /* tokenizer.l */; };
 		6932AB941FB9FDDA00382CF7 /* ParseTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 6932AB851FB9FDA300382CF7 /* ParseTree.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		698248241FBCC7390097E8E5 /* CRandom.h in Headers */ = {isa = PBXBuildFile; fileRef = 698248221FBCC7390097E8E5 /* CRandom.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		698248281FBCC7580097E8E5 /* CRandom.c in Sources */ = {isa = PBXBuildFile; fileRef = 698248271FBCC7580097E8E5 /* CRandom.c */; };
+		698248291FBCCA900097E8E5 /* CRandom.h in Headers */ = {isa = PBXBuildFile; fileRef = 698248221FBCC7390097E8E5 /* CRandom.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		6982482A1FBCCAA60097E8E5 /* CRandom.c in Sources */ = {isa = PBXBuildFile; fileRef = 698248271FBCC7580097E8E5 /* CRandom.c */; };
 		69CB0D5A1FB7B21700A1D546 /* DataStructureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69CB0D261FB7B0E300A1D546 /* DataStructureTests.swift */; };
 		69CB0D5B1FB7B21700A1D546 /* LocalQasmSimulatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69CB0D241FB7B0E300A1D546 /* LocalQasmSimulatorTests.swift */; };
 		69CB0D5C1FB7B21700A1D546 /* example.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69CB0D321FB7B11D00A1D546 /* example.swift */; };
@@ -439,6 +443,9 @@
 		6932AB891FB9FDB800382CF7 /* parser.y */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; name = parser.y; path = Sources/cqasmparser/parser.y; sourceTree = "<group>"; };
 		6932AB8A1FB9FDB800382CF7 /* tokenizer.l */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; name = tokenizer.l; path = Sources/cqasmparser/tokenizer.l; sourceTree = "<group>"; };
 		6932AB8B1FB9FDB800382CF7 /* ParseTree.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ParseTree.c; path = Sources/cqasmparser/ParseTree.c; sourceTree = "<group>"; };
+		698248221FBCC7390097E8E5 /* CRandom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CRandom.h; path = Sources/crandom/include/CRandom.h; sourceTree = "<group>"; };
+		698248231FBCC7390097E8E5 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; name = module.modulemap; path = Sources/crandom/include/module.modulemap; sourceTree = "<group>"; };
+		698248271FBCC7580097E8E5 /* CRandom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = CRandom.c; path = Sources/crandom/CRandom.c; sourceTree = "<group>"; };
 		69CB0D241FB7B0E300A1D546 /* LocalQasmSimulatorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LocalQasmSimulatorTests.swift; path = Tests/qiskitTests/LocalQasmSimulatorTests.swift; sourceTree = "<group>"; };
 		69CB0D251FB7B0E300A1D546 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Tests/qiskitTests/Info.plist; sourceTree = "<group>"; };
 		69CB0D261FB7B0E300A1D546 /* DataStructureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DataStructureTests.swift; path = Tests/qiskitTests/DataStructureTests.swift; sourceTree = "<group>"; };
@@ -501,6 +508,7 @@
 			isa = PBXGroup;
 			children = (
 				DFBC4F641EC7384100027640 /* qiskit */,
+				6982481E1FBCC6FE0097E8E5 /* crandom */,
 				6932AB731FB9FACE00382CF7 /* cqasmparser */,
 			);
 			name = Sources;
@@ -582,6 +590,24 @@
 				6932AA191FB9F5B200382CF7 /* String+Random.swift */,
 			);
 			name = "Data Structures";
+			sourceTree = "<group>";
+		};
+		6982481E1FBCC6FE0097E8E5 /* crandom */ = {
+			isa = PBXGroup;
+			children = (
+				698248271FBCC7580097E8E5 /* CRandom.c */,
+				6982481F1FBCC7150097E8E5 /* include */,
+			);
+			name = crandom;
+			sourceTree = "<group>";
+		};
+		6982481F1FBCC7150097E8E5 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				698248221FBCC7390097E8E5 /* CRandom.h */,
+				698248231FBCC7390097E8E5 /* module.modulemap */,
+			);
+			name = include;
 			sourceTree = "<group>";
 		};
 		699AAB521EE47FDB0015DB83 /* node */ = {
@@ -843,6 +869,7 @@
 			files = (
 				6932AB941FB9FDDA00382CF7 /* ParseTree.h in Headers */,
 				6932AB721FB9F9B400382CF7 /* qiskit.h in Headers */,
+				698248291FBCCA900097E8E5 /* CRandom.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -852,6 +879,7 @@
 			files = (
 				6932AB711FB9F9A900382CF7 /* qiskit.h in Headers */,
 				6932AB871FB9FDA300382CF7 /* ParseTree.h in Headers */,
+				698248241FBCC7390097E8E5 /* CRandom.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1102,6 +1130,7 @@
 				6932AA8C1FB9F6CF00382CF7 /* RX.swift in Sources */,
 				6932AB631FB9F93A00382CF7 /* NodeReset.swift in Sources */,
 				6932AB481FB9F8EC00382CF7 /* Node.swift in Sources */,
+				6982482A1FBCCAA60097E8E5 /* CRandom.c in Sources */,
 				6932AA811FB9F6AD00382CF7 /* CRZ.swift in Sources */,
 				6932AA7E1FB9F6A200382CF7 /* Barrier.swift in Sources */,
 				6932AB501FB9F90000382CF7 /* NodeExternal.swift in Sources */,
@@ -1237,6 +1266,7 @@
 				6932AA1B1FB9F5B200382CF7 /* Double+Format.swift in Sources */,
 				6932AA691FB9F69300382CF7 /* RZ.swift in Sources */,
 				6932AB471FB9F8CB00382CF7 /* NodeCnot.swift in Sources */,
+				698248281FBCC7580097E8E5 /* CRandom.c in Sources */,
 				6932AA6B1FB9F69300382CF7 /* U2.swift in Sources */,
 				6932A9F71FB9F50500382CF7 /* BackendUtils.swift in Sources */,
 				6932AB3C1FB9F8CB00382CF7 /* NodeMainProgram.swift in Sources */,
@@ -1318,7 +1348,7 @@
 				PRODUCT_NAME = qiskit;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/Sources/cqasmparser/include";
+				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/Sources/cqasmparser/include $(SRCROOT)/Sources/crandom/include";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1346,7 +1376,7 @@
 				PRODUCT_NAME = qiskit;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/Sources/cqasmparser/include";
+				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/Sources/cqasmparser/include $(SRCROOT)/Sources/crandom/include";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -1484,7 +1514,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.ibm.research.qiskit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/Sources/cqasmparser/include";
+				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/Sources/cqasmparser/include $(SRCROOT)/Sources/crandom/include";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -1513,7 +1543,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.ibm.research.qiskit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/Sources/cqasmparser/include";
+				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/Sources/cqasmparser/include $(SRCROOT)/Sources/crandom/include";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;

@@ -381,7 +381,7 @@ final class QasmSimulator: BaseBackend {
                 self.random.seed(seed)
             }
             else {
-                self.random.seed(self.random.getrandbits())
+                self.random.seed(time(nil))
             }
         }
         var outcomes: [String] = []

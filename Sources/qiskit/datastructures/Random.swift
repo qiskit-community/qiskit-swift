@@ -14,12 +14,19 @@
 // =============================================================================
 
 import Foundation
-//import GameplayKit
+import CRandom
 
 final class Random {
 
     private var nextNextGaussian: Double? = nil
-    //private var source: GKMersenneTwisterRandomSource? = nil
+    private var mt: [UInt] = Array<UInt>(repeating: 0, count: Int(N))
+    private var mti: Int32 = N + 1
+
+    init() {
+    }
+    init(_ seed: Int) {
+        self.seed(seed)
+    }
 
     private func nextGaussian() -> Double {
         if let gaussian = self.nextNextGaussian {
@@ -39,36 +46,25 @@ final class Random {
     }
 
     func normal(mean: Double, standardDeviation: Double) -> Double {
-        self.seed(self.getrandbits())
         return self.nextGaussian() * standardDeviation + mean
     }
 
-    func getrandbits() -> Int {
-        #if os(Linux)
-            return Int(random())
-        #else
-            return Int(arc4random())
-        #endif
-    }
-
-    func seed(_ s: Int) {
-        #if os(Linux)
-            srand(UInt32(s));
-        #else
-            srand48(s)
-        #endif
-        //self.source = GKMersenneTwisterRandomSource(seed: UInt64(s))
+    func seed(_ seed: Int) {
+        self.mt = Array<UInt>(repeating: 0, count: Int(N))
+        self.mti = N + 1
+        var randomState = CRandomState(mt:&self.mt, mti:  self.mti)
+        var initKey: [UInt] = [UInt(seed)]
+        init_by_array(&randomState,&initKey, Int32(initKey.count));
+        self.mti = randomState.mti
     }
 
     /**
     Return the next random floating point number in the range [0.0, 1.0).
     */
     func random() -> Double {
-        //return Double(self.source?.nextUniform() ?? 0.0)
-        #if os(Linux)
-            return Double(Double(rand()) / Double(RAND_MAX))
-        #else
-            return drand48()
-        #endif
+        var randomState = CRandomState(mt:&self.mt, mti: self.mti)
+        let result = genrand_res53(&randomState)
+        self.mti = randomState.mti
+        return result
     }
 }

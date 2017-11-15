@@ -116,7 +116,7 @@ final class Mapping {
             }
             for i in coupling.get_qubits() {
                 for j in coupling.get_qubits() {
-                    let scale: Double = 1.0 + Random().normal(mean: 0.0, standardDeviation: 1.0 / Double(n))
+                    let scale: Double = 1.0 + Random(time(nil)).normal(mean: 0.0, standardDeviation: 1.0 / Double(n))
                     xi[i]![j] = scale * pow(Double(try coupling.distance(i, j)),2)
                     xi[j]![i] = xi[i]![j]
                 }

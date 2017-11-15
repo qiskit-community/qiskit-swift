@@ -105,7 +105,7 @@ class LocalQasmSimulatorTests: XCTestCase {
      Test data counts output for single circuit run against reference.
      */
     func test_qasm_simulator() {
-        let expected: [String:Int] = ["100 100": 113, "011 011": 124, "101 101": 118, "111 111": 116, "000 000": 132, "010 010": 135, "110 110": 141, "001 001": 145]
+        let expected = ["100 100": 137, "011 011": 131, "101 101": 117, "111 111": 127, "000 000": 131, "010 010": 141, "110 110": 116, "001 001": 124]
         let q_job = QuantumJob(self.qobj,
                                seed: self.seed,
                                resources: LocalQasmSimulatorTests.resources)

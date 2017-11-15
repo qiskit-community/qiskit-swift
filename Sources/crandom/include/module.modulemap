@@ -1,0 +1,4 @@
+module CRandom {
+    header "CRandom.h"
+    export *
+}
