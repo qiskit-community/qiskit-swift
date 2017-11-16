@@ -126,7 +126,13 @@ machine:
 - Open the QisSwiftPlayground.xcodeproj
 - Compile the qiskit framework
 - Add your API token to the file "QisSwiftDeveloperTutorial.playground"
-- Swift Playgrounds run automatically 
+- Swift Playgrounds run automatically
+
+5. Using Swift Package Manager (OSX and Ubuntu)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- For Ubuntu download and install the latest Swift runtime from https://swift.org/download/
+- From the top folder, run "swift build" or "swift test" to run the Unit tests
+- Once "swift build" is run, you can try the command line examples from .build/debug/qiskitexamples program. If you run without options, it will show correct usage.
 
 
 Authors (alphabetical)
