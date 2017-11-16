@@ -70,7 +70,7 @@ public final class QFT {
         #if os(Linux)
             return Decimal(pow(Double(x),Double(y)))
         #else
-            return pow(x,y)
+            return pow(Decimal(x),y)
         #endif
     }
 
