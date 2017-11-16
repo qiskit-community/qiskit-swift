@@ -10,6 +10,8 @@ let package = Package(
         .library(
             name: "qiskit",
             targets: ["qiskit"]),
+        .executable(
+            name: "qiskitexamples", targets: ["examples"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -27,6 +29,9 @@ let package = Package(
         .target(
             name: "qiskit",
             dependencies: ["crandom","cqasmparser"]),
+        .target(
+            name: "examples", 
+            dependencies: ["qiskit"]),
         .testTarget(
             name: "qiskitTests",
             dependencies: ["qiskit"]),

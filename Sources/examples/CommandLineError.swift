@@ -12,19 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // =============================================================================
-import qiskit
-import Cocoa
-import PlaygroundSupport
-import XCPlayground
 
-var apitoken = "NONE"
+import Foundation
 
-GHZ.ghz(apitoken) {
-    QFT.qft(apitoken) {
-        RippleAdd.rippleAdd(apitoken) {
-            Teleport.teleport(apitoken)
+/**
+ Command Line Exceptions
+ */
+public enum CommandLineError: LocalizedError, CustomStringConvertible {
+
+    case missingToken
+    case invalidArgument(argument: String)
+    case invalidOption(option: String)
+
+    public var errorDescription: String? {
+        return self.description
+    }
+    public var description: String {
+        switch self {
+        case .missingToken:
+            return "Missing IBM Quantum Experience token."
+        case .invalidArgument(let argument):
+            return "Invalid argument \(argument)."
+        case .invalidOption(let option):
+            return "Invalid option \(option)."
         }
     }
 }
-
-PlaygroundPage.current.needsIndefiniteExecution = true
