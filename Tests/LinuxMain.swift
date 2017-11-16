@@ -15,6 +15,10 @@
 
 import XCTest
 @testable import qiskitTests
+import qiskit
+
+// do not show logging less than error
+SDKLogger.type = .typeError
 
 XCTMain([
     testCase(DataStructureTests.allTests),
