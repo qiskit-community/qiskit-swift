@@ -40,7 +40,11 @@ final class Request {
         if self.retries < 0 {
             throw IBMQuantumExperienceError.retriesPositive
         }
-        let sessionConfig = URLSessionConfiguration.ephemeral
+        #if os(Linux)
+            let sessionConfig = URLSessionConfiguration.default
+        #else
+            let sessionConfig = URLSessionConfiguration.ephemeral
+        #endif
         sessionConfig.allowsCellularAccess = true
         sessionConfig.timeoutIntervalForRequest = Request.REACHTIMEOUT
         sessionConfig.timeoutIntervalForResource = Request.CONNTIMEOUT

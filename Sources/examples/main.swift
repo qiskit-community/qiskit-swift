@@ -13,8 +13,9 @@
 // limitations under the License.
 // =============================================================================
 
-// do not show logging less than error
 #if os(Linux)
+// do not show logging less than error
+import qiskit
 SDKLogger.type = .typeError
 #endif
 

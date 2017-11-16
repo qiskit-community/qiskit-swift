@@ -66,13 +66,21 @@ public final class QFT {
     // Make a quantum program for the GHZ state.
     //##############################################################
 
+    private static func qftpow(_ x: Int, _ y: Int) -> Decimal {
+        #if os(Linux)
+            return Decimal(pow(Double(x),Double(y)))
+        #else
+            return pow(x,y)
+        #endif
+    }
+
     /**
      n-qubit input state for QFT that produces output 1.
      */
     private class func input_state(_ circ: QuantumCircuit, _ q: QuantumRegister, _ n: Int) throws {
         for j in 0..<n {
             try circ.h(q[j])
-            try circ.u1(Double.pi/NSDecimalNumber(decimal:pow(2,j)).doubleValue, q[j]).inverse()
+            try circ.u1(Double.pi/NSDecimalNumber(decimal:QFT.qftpow(2,j)).doubleValue, q[j]).inverse()
         }
     }
     /**
@@ -81,7 +89,7 @@ public final class QFT {
     private class func qft(_ circ: QuantumCircuit, _ q: QuantumRegister, _ n: Int) throws {
         for j in 0..<n {
             for k in 0..<j {
-                try circ.cu1(Double.pi/NSDecimalNumber(decimal:pow(2,j-k)).doubleValue, q[j], q[k])
+                try circ.cu1(Double.pi/NSDecimalNumber(decimal:QFT.qftpow(2,j-k)).doubleValue, q[j], q[k])
             }
             try circ.h(q[j])
         }
