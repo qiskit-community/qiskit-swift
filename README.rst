@@ -118,7 +118,7 @@ machine:
 
 -  Create an `IBM Quantum Experience <https://quantumexperience.ng.bluemix.net>`__ account if you haven't already done so
 -  Get an API token from the Quantum Experience website under “My Account” > “Personal Access Token”
--  When developing your own project, you will pass your API token to a network object called Qconfig.swift.
+-  When developing your own project, you will pass your API token to the QuantumProgram instance set_api method. Please see the examples under Sources/examples/ or the playground tutorial.
 
 5. Build and run the Swift Playground Tutorial 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -128,7 +128,7 @@ machine:
 - Add your API token to the file "QisSwiftDeveloperTutorial.playground"
 - Swift Playgrounds run automatically
 
-5. Using Swift Package Manager (OSX and Ubuntu)
+6. Using Swift Package Manager (OSX and Ubuntu)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - For Ubuntu download and install the latest Swift runtime from https://swift.org/download/
 - From the top folder, run "swift build" or "swift test" to run the Unit tests
