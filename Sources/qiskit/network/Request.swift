@@ -157,54 +157,10 @@ final class Request {
             return
         }
         let task = self.urlSession.dataTask(with: request) { (data, response, error) -> Void in
-            if error != nil {
-                DispatchQueue.main.async {
-                    responseHandler(nil, IBMQuantumExperienceError.internalError(error: error!))
-                }
-                return
-            }
-            if response == nil {
-                DispatchQueue.main.async {
-                    responseHandler(nil, IBMQuantumExperienceError.nullResponse(url: url.absoluteString))
-                }
-                return
-            }
-            guard let httpResponse = response as? HTTPURLResponse else {
-                DispatchQueue.main.async {
-                    responseHandler(nil, IBMQuantumExperienceError.invalidHTTPResponse(response: response!))
-                }
-                return
-            }
-            if data == nil {
-                DispatchQueue.main.async {
-                    responseHandler(nil, IBMQuantumExperienceError.nullResponseData(url: url.absoluteString))
-                }
-                return
-            }
             do {
-                let jsonAny = try JSONSerialization.jsonObject(with: data!, options: .allowFragments)
-                var msg = ""
-                if let json = jsonAny as? [String:Any] {
-                    if let errorObj = json["error"] as? [String:Any] {
-                        if let status = errorObj["status"] as? Int {
-                            msg.append("Status: \(status)")
-                        }
-                        if let code = errorObj["code"] as? String {
-                            msg.append("; Code: \(code)")
-                        }
-                        if let message = errorObj["message"] as? String {
-                            msg.append("; Msg: \(message)")
-                        }
-                    }
-                }
-                if httpResponse.statusCode != Request.HTTPSTATUSOK {
-                    DispatchQueue.main.async {
-                        responseHandler(nil, IBMQuantumExperienceError.httpError(status: httpResponse.statusCode, msg: msg))
-                    }
-                    return
-                }
+                let out = try Request.response_good(url, data, response, error)
                 DispatchQueue.main.async {
-                    responseHandler(jsonAny, nil)
+                    responseHandler(out, nil)
                 }
             } catch let error {
                 DispatchQueue.main.async {
@@ -291,49 +247,12 @@ final class Request {
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: data, options: .prettyPrinted)
         } catch let error {
-            DispatchQueue.main.async {
-                responseHandler(nil, IBMQuantumExperienceError.internalError(error: error))
-            }
+            responseHandler(nil, IBMQuantumExperienceError.internalError(error: error))
             return
         }
         let task = self.urlSession.dataTask(with: request) { (data, response, error) -> Void in
-            if error != nil {
-                responseHandler(nil, IBMQuantumExperienceError.internalError(error: error!))
-                return
-            }
-            if response == nil {
-                responseHandler(nil, IBMQuantumExperienceError.nullResponse(url: url.absoluteString))
-                return
-            }
-            guard let httpResponse = response as? HTTPURLResponse else {
-                responseHandler(nil, IBMQuantumExperienceError.invalidHTTPResponse(response: response!))
-                return
-            }
-            if data == nil {
-                responseHandler(nil, IBMQuantumExperienceError.nullResponseData(url: url.absoluteString))
-                return
-            }
             do {
-                let jsonAny = try JSONSerialization.jsonObject(with: data!, options: .allowFragments)
-                var msg = ""
-                if let json = jsonAny as? [String:Any] {
-                    if let errorObj = json["error"] as? [String:Any] {
-                        if let status = errorObj["status"] as? Int {
-                            msg.append("Status: \(status)")
-                        }
-                        if let code = errorObj["code"] as? String {
-                            msg.append("; Code: \(code)")
-                        }
-                        if let message = errorObj["message"] as? String {
-                            msg.append("; Msg: \(message)")
-                        }
-                    }
-                }
-                if httpResponse.statusCode != Request.HTTPSTATUSOK {
-                    responseHandler(nil, IBMQuantumExperienceError.httpError(status: httpResponse.statusCode, msg: msg))
-                    return
-                }
-                responseHandler(jsonAny, nil)
+                responseHandler(try Request.response_good(url, data, response, error), nil)
             } catch let error {
                 responseHandler(nil, IBMQuantumExperienceError.internalError(error: error))
             }
@@ -412,47 +331,65 @@ final class Request {
         request.httpMethod = "GET"
         request.addValue(self.credential.config.client_application, forHTTPHeaderField: Request.HEADER_CLIENT_APPLICATION)
         let task = self.urlSession.dataTask(with: request) { (data, response, error) -> Void in
-            if error != nil {
-                responseHandler(nil, IBMQuantumExperienceError.internalError(error: error!))
-                return
-            }
-            if response == nil {
-                responseHandler(nil, IBMQuantumExperienceError.nullResponse(url: url.absoluteString))
-                return
-            }
-            guard let httpResponse = response as? HTTPURLResponse else {
-                responseHandler(nil, IBMQuantumExperienceError.invalidHTTPResponse(response: response!))
-                return
-            }
-            if data == nil {
-                responseHandler(nil, IBMQuantumExperienceError.nullResponseData(url: url.absoluteString))
-                return
-            }
             do {
-                let jsonAny = try JSONSerialization.jsonObject(with: data!, options: .allowFragments)
-                var msg = ""
-                if let json = jsonAny as? [String:Any] {
-                    if let errorObj = json["error"] as? [String:Any] {
-                        if let status = errorObj["status"] as? Int {
-                            msg.append("Status: \(status)")
-                        }
-                        if let code = errorObj["code"] as? String {
-                            msg.append("; Code: \(code)")
-                        }
-                        if let message = errorObj["message"] as? String {
-                            msg.append("; Msg: \(message)")
-                        }
-                    }
-                }
-                if httpResponse.statusCode != Request.HTTPSTATUSOK {
-                    responseHandler(nil, IBMQuantumExperienceError.httpError(status: httpResponse.statusCode, msg: msg))
-                    return
-                }
-                responseHandler(jsonAny, nil)
+                responseHandler(try Request.response_good(url, data, response, error), nil)
             } catch let error {
                 responseHandler(nil, IBMQuantumExperienceError.internalError(error: error))
             }
         }
         task.resume()
+    }
+
+    static private func response_good(_ url: URL, _ data: Data?, _ response: URLResponse?, _ error: Error?) throws -> Any {
+        if error != nil {
+            throw error!
+        }
+        if response == nil {
+            throw IBMQuantumExperienceError.nullResponse(url: url.absoluteString)
+        }
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw IBMQuantumExperienceError.invalidHTTPResponse(response: response!)
+        }
+        if data == nil {
+            throw IBMQuantumExperienceError.nullResponseData(url: url.absoluteString)
+        }
+        var contentType: String = ""
+        for (key,v) in httpResponse.allHeaderFields {
+            if let name = key as? String, let value = v as? String {
+                if name.lowercased() == "content-type" {
+                    contentType = value.lowercased()
+                    break
+                }
+            }
+        }
+        if contentType.hasPrefix("text/html;") {
+            guard let value = String(data: data!, encoding: String.Encoding.utf8) else {
+                throw IBMQuantumExperienceError.nullResponseData(url: url.absoluteString)
+            }
+            return value
+        }
+        do {
+            let jsonAny = try JSONSerialization.jsonObject(with: data!, options: .allowFragments)
+            var msg = ""
+            if let json = jsonAny as? [String:Any] {
+                if let errorObj = json["error"] as? [String:Any] {
+                    if let status = errorObj["status"] as? Int {
+                        msg.append("Status: \(status)")
+                    }
+                    if let code = errorObj["code"] as? String {
+                        msg.append("; Code: \(code)")
+                    }
+                    if let message = errorObj["message"] as? String {
+                        msg.append("; Msg: \(message)")
+                    }
+                }
+            }
+            if httpResponse.statusCode != Request.HTTPSTATUSOK {
+                throw IBMQuantumExperienceError.httpError(status: httpResponse.statusCode, msg: msg)
+            }
+            return jsonAny
+        } catch let error {
+            throw IBMQuantumExperienceError.internalError(error: error)
+        }
     }
 }

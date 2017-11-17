@@ -1017,4 +1017,27 @@ public final class IBMQuantumExperience {
             }
         }
     }
+
+    /**
+     Get the API Version of the QX Platform
+     */
+    public func api_version(responseHandler: @escaping ((_:String, _:IBMQuantumExperienceError?) -> Void)) {
+        self.getRequest() { (req,error) -> Void in
+            if error != nil {
+                responseHandler("", error)
+                return
+            }
+            req!.get(path: "version") { (out, error) -> Void in
+                if error != nil {
+                    responseHandler("", error)
+                    return
+                }
+                guard let version = out as? String else {
+                    responseHandler("",IBMQuantumExperienceError.invalidResponseData)
+                    return
+                }
+                responseHandler(version, nil)
+            }
+        }
+    }
 }
