@@ -94,8 +94,9 @@ public final class QFT {
             try circ.h(q[j])
         }
     }
-
-    public class func qft(_ apiToken: String, _ responseHandler: (() -> Void)? = nil) {
+    @discardableResult
+    public class func qft(_ apiToken: String, _ responseHandler: (() -> Void)? = nil) -> RequestTask {
+        var reqTask = RequestTask()
         do {
             print()
             print("#################################################################")
@@ -143,7 +144,7 @@ public final class QFT {
             //##############################################################
             try qp.set_api(token: apiToken, url: qConfig.url.absoluteString)
 
-            qp.execute(["qft3", "qft4", "qft5"], backend:"ibmqx_qasm_simulator", coupling_map: coupling_map,shots: 1024) { (result) in
+            let r = qp.execute(["qft3", "qft4", "qft5"], backend:"ibmqx_qasm_simulator", coupling_map: coupling_map,shots: 1024) { (result) in
                 do {
                     if result.is_error() {
                         print(result.get_error())
@@ -158,7 +159,7 @@ public final class QFT {
                     print(try result.get_counts("qft4"))
                     print(try result.get_counts("qft5"))
 
-                    qp.execute(["qft3"], backend:backend,timeout:120, coupling_map: coupling_map,shots: 1024) { (result) in
+                    let r = qp.execute(["qft3"], backend:backend,timeout:120, coupling_map: coupling_map,shots: 1024) { (result) in
                         do {
                             if result.is_error() {
                                 print(result.get_error())
@@ -173,14 +174,17 @@ public final class QFT {
                         }
                         responseHandler?()
                     }
+                    reqTask += r
                 } catch {
                     print(error.localizedDescription)
                     responseHandler?()
                 }
             }
+            reqTask += r
         } catch {
             print(error.localizedDescription)
             responseHandler?()
         }
+        return reqTask
     }
 }

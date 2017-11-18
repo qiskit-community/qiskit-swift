@@ -619,8 +619,9 @@ public final class QuantumProgram {
     /**
      All the backends that are seen by QISKIT.
      */
-    public func available_backends(responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) {
-        self.online_backends() { (backends,error) in
+    @discardableResult
+    public func available_backends(responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.online_backends() { (backends,error) in
             if error != nil {
                 responseHandler([],error)
                 return
@@ -639,12 +640,13 @@ public final class QuantumProgram {
      List of online backends if the online api has been set or an empty
      list of it has not been set.
     */
-    public func online_backends(responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) {
+    @discardableResult
+    public func online_backends(responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         guard let api = self.get_api() else {
             responseHandler(Set<String>(),nil)
-            return
+            return RequestTask()
         }
-        api.available_backends() { (backends,error) in
+        return api.available_backends() { (backends,error) in
             if error != nil {
                 responseHandler([],error)
                 return
@@ -666,12 +668,13 @@ public final class QuantumProgram {
      -------
      List of online simulator names.
      */
-    public func online_simulators(responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) {
+    @discardableResult
+    public func online_simulators(responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         guard let api = self.get_api() else {
             responseHandler(Set<String>(),nil)
-            return
+            return RequestTask()
         }
-        api.available_backends() { (backends,error) in
+        return api.available_backends() { (backends,error) in
             if error != nil {
                 responseHandler([],error)
                 return
@@ -694,12 +697,13 @@ public final class QuantumProgram {
     /**
      Gets online devices via QX API calls
      */
-    public func online_devices(responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) {
+    @discardableResult
+    public func online_devices(responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         guard let api = self.get_api() else {
             responseHandler(Set<String>(),nil)
-            return
+            return RequestTask()
         }
-        api.available_backends() { (backends,error) in
+        return api.available_backends() { (backends,error) in
             if error != nil {
                 responseHandler([],error)
                 return
@@ -723,9 +727,11 @@ public final class QuantumProgram {
      Return the online backend status via QX API call or by local
      backend is the name of the local or online simulator or experiment
     */
+    @discardableResult
     public func get_backend_status(_ backend: String,
-                                  responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
-        self.online_backends() { (backends,error) in
+                                  responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.online_backends() { (backends,error) in
             if error != nil {
                 responseHandler([:],error)
                 return
@@ -735,7 +741,8 @@ public final class QuantumProgram {
                     responseHandler([:],IBMQuantumExperienceError.errorBackend(backend: backend))
                     return
                 }
-                api.backend_status(backend: backend,responseHandler: responseHandler)
+                let r = api.backend_status(backend: backend,responseHandler: responseHandler)
+                reqTask.add(r)
                 return
             }
             if self.backendUtils.local_backends().contains(backend) {
@@ -744,18 +751,20 @@ public final class QuantumProgram {
             }
             responseHandler([:],IBMQuantumExperienceError.errorBackend(backend: backend))
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     /**
      Return the configuration of the backend
      */
+    @discardableResult
     public func get_backend_configuration(_ backend: String, _ list_format: Bool = false,
-                                   responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
+                                   responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         guard let api = self.get_api() else {
-            self.backendUtils.get_backend_configuration(backend,responseHandler)
-            return
+            return self.backendUtils.get_backend_configuration(backend,responseHandler)
         }
-        api.available_backends() { (backends,error) in
+        return api.available_backends() { (backends,error) in
             if error != nil {
                 responseHandler([:],error)
                 return
@@ -807,9 +816,11 @@ public final class QuantumProgram {
      Return the online backend calibrations via QX API call
      backend is the name of the experiment
      */
+    @discardableResult
     public func get_backend_calibration(_ backend: String,
-                                       responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
-        self.online_backends() { (backends,error) in
+                                       responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.online_backends() { (backends,error) in
             if error != nil {
                 responseHandler([:],error)
                 return
@@ -819,7 +830,7 @@ public final class QuantumProgram {
                     responseHandler([:],IBMQuantumExperienceError.errorBackend(backend: backend))
                     return
                 }
-                api.backend_calibration(backend: backend) { (calibrations,error) in
+                let r = api.backend_calibration(backend: backend) { (calibrations,error) in
                     if error != nil {
                         responseHandler([:],error)
                         return
@@ -835,6 +846,7 @@ public final class QuantumProgram {
                         responseHandler([:],IBMQuantumExperienceError.internalError(error: error))
                     }
                 }
+                reqTask.add(r)
                 return
             }
             if self.backendUtils.local_backends().contains(backend) {
@@ -843,15 +855,19 @@ public final class QuantumProgram {
             }
             responseHandler([:],IBMQuantumExperienceError.errorBackend(backend: backend))
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     /**
      Return the online backend parameters via QX API call
      backend is the name of the experiment
      */
+    @discardableResult
     public func get_backend_parameters(_ backend: String,
-                                        responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
-        self.online_backends() { (backends,error) in
+                                        responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.online_backends() { (backends,error) in
             if error != nil {
                 responseHandler([:],error)
                 return
@@ -861,7 +877,7 @@ public final class QuantumProgram {
                     responseHandler([:],IBMQuantumExperienceError.errorBackend(backend: backend))
                     return
                 }
-                api.backend_parameters(backend: backend) { (parameters,error) in
+                let r = api.backend_parameters(backend: backend) { (parameters,error) in
                     if error != nil {
                         responseHandler([:],error)
                         return
@@ -877,6 +893,7 @@ public final class QuantumProgram {
                         responseHandler([:],IBMQuantumExperienceError.internalError(error: error))
                     }
                 }
+                reqTask.add(r)
                 return
             }
             if self.backendUtils.local_backends().contains(backend) {
@@ -885,6 +902,8 @@ public final class QuantumProgram {
             }
             responseHandler([:],IBMQuantumExperienceError.errorBackend(backend: backend))
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     /**
@@ -1029,6 +1048,67 @@ public final class QuantumProgram {
     }
 
     /**
+     hange configuration parameters for a compile qobj. Only parameters which
+     don't affect the circuit compilation can change, e.g., the coupling_map
+     cannot be changed here!
+
+     Notes:
+        If the inputs are left as None then the qobj is not updated
+
+     Args:
+         qobj (dict): already compile qobj
+         backend (str): see .compile
+         config (dict): see .compile
+         shots (int): see .compile
+         max_credits (int): see .compile
+         seed (int): see .compile
+
+     Returns:
+        qobj: updated qobj
+     */
+    public func reconfig(qobj: [String:Any],
+                         backend: String? = nil,
+                         config: [String:Any]? = nil,
+                         shots: Int? = nil,
+                         max_credits: Int? = nil,
+                         seed: Int? = nil) -> [String:Any] {
+        var newQobj = qobj
+        var conf: [String:Any] = [:]
+        if let c = newQobj["config"] as? [String:Any] {
+            conf = c
+        }
+        if let b = backend {
+            conf["backend"] = b
+        }
+        if let s = shots {
+            conf["shots"] = s
+        }
+        if let mc = max_credits {
+            conf["max_credits"] = mc
+        }
+        newQobj["config"] = conf
+        if let circuits = newQobj["circuits"] as? [[String:Any]] {
+            var newCircuits: [[String:Any]] = []
+            for var circuit in circuits {
+                if let s = seed {
+                    circuit["seed"] = s
+                }
+                if let c = config {
+                    var conf: [String:Any] = [:]
+                    if let cc = circuit["config"] as? [String:Any] {
+                        conf = cc
+                    }
+                    conf.merge(c) { (_, new) in new }
+                    circuit["config"] = conf
+                }
+                newCircuits.append(circuit)
+            }
+            newQobj["circuits"] = newCircuits
+        }
+        return newQobj
+    }
+
+    /**
      Print the compiled circuits that are ready to run.
      */
     @discardableResult
@@ -1124,11 +1204,12 @@ public final class QuantumProgram {
      fn(result):
      The result param will be a Result object.
      */
+    @discardableResult
     public func run_async(_ qobj: [String:Any],
                           wait: Int = 5,
                           timeout: Int = 60,
-                          _ callback:  @escaping ((_:Result) -> Void)) {
-        self._run_internal([qobj],
+                          _ callback:  @escaping ((_:Result) -> Void)) -> RequestTask {
+        return self._run_internal([qobj],
                            wait: wait,
                            timeout: timeout,
                            callbackSingle: callback)
@@ -1150,11 +1231,12 @@ public final class QuantumProgram {
      The results param will be a list of Result objects, one
      Result per qobj in the input list.
      */
+    @discardableResult
     public func run_batch_async(_ qobj_list: [[String:Any]],
                                 wait: Int = 5,
                                 timeout: Int = 120,
-                                _ callback: ((_:[Result]) -> Void)?) {
-        self._run_internal(qobj_list,
+                                _ callback: ((_:[Result]) -> Void)?) -> RequestTask {
+        return self._run_internal(qobj_list,
                            wait: wait,
                            timeout: timeout,
                            callbackMultiple: callback)
@@ -1164,7 +1246,7 @@ public final class QuantumProgram {
                                wait: Int,
                                timeout: Int,
                                callbackSingle: ((_:Result) -> Void)? = nil,
-                               callbackMultiple: ((_:[Result]) -> Void)? = nil) {
+                               callbackMultiple: ((_:[Result]) -> Void)? = nil) -> RequestTask {
         do {
             var q_job_list: [QuantumJob] = []
             for qobj in qobj_list {
@@ -1177,7 +1259,7 @@ public final class QuantumProgram {
             self.lock.lock()
             self.jobProcessors[data.jobProcessor.identifier] = data
             self.lock.unlock()
-            job_processor.submit()
+            return job_processor.submit()
         } catch {
             var results: [Result] = []
             for qobj in qobj_list {
@@ -1192,6 +1274,7 @@ public final class QuantumProgram {
                 }
             }
         }
+        return RequestTask()
     }
 
     /**
@@ -1261,6 +1344,7 @@ public final class QuantumProgram {
         status done and populates the internal __quantum_program with the
         data
      */
+    @discardableResult
     public func execute(_ name_of_circuits: [String],
                         backend: String = "local_qasm_simulator",
                         config: [String:Any]? = nil,
@@ -1272,7 +1356,7 @@ public final class QuantumProgram {
                         shots: Int = 1024,
                         max_credits: Int = 3,
                         seed: Int? = nil,
-                        _ callback: @escaping ((_:Result) -> Void)) {
+                        _ callback: @escaping ((_:Result) -> Void)) -> RequestTask {
         do {
             let qobj = try self.compile(name_of_circuits,
                              backend: backend,
@@ -1283,7 +1367,7 @@ public final class QuantumProgram {
                              shots: shots,
                              max_credits: max_credits,
                              seed: seed)
-            self.run_async(qobj,
+            return self.run_async(qobj,
                            wait: wait,
                            timeout: timeout,
                            callback)
@@ -1292,5 +1376,6 @@ public final class QuantumProgram {
                 callback(Result(["job_id": "0","status": "ERROR","result": error.localizedDescription],[:]))
             }
         }
+        return RequestTask()
     }
 }

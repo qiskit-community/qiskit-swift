@@ -51,8 +51,8 @@ final class Request {
         self.urlSession = URLSession(configuration: sessionConfig)
     }
 
-    func initialize(responseHandler: @escaping ((_:Request, _:IBMQuantumExperienceError?) -> Void)) {
-        self.credential.initialize(self) { (error) -> Void in
+    func initialize(responseHandler: @escaping ((_:Request, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.credential.initialize(self) { (error) -> Void in
             responseHandler(self,error)
         }
     }
@@ -61,37 +61,39 @@ final class Request {
      Check is the user's token is valid
      */
     private func check_token(_ error: IBMQuantumExperienceError?,
-                             responseHandler: @escaping ((_:Bool, _:IBMQuantumExperienceError?) -> Void)) {
+                             responseHandler: @escaping ((_:Bool, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         if error != nil {
             if case IBMQuantumExperienceError.httpError(let status, _) = error! {
                 if status == 401 {
-                    self.credential.obtain_token(self) { (error) -> Void in
+                    return self.credential.obtain_token(self) { (error) -> Void in
                         responseHandler(true,error)
                     }
-                    return
                 }
             }
         }
         responseHandler(false,error)
+        return RequestTask()
     }
 
     func post(path: String,
               params: String = "",
               data: [String : Any] = [:],
-              responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
-        self.postRetry(path: path, params: params, data: data, retries: self.retries, responseHandler: responseHandler)
+              responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.postRetry(path: path, params: params, data: data, retries: self.retries, responseHandler: responseHandler)
     }
 
     private func postRetry(path: String,
               params: String,
               data: [String : Any],
               retries: Int,
-              responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
-        self.postWithCheckToken(path: path, params: params, data: data) { (json, error) in
+              responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.postWithCheckToken(path: path, params: params, data: data) { (json, error) in
             if error != nil {
                 if retries > 0 {
                     DispatchQueue.main.asyncAfter(deadline: .now() + self.timeout_interval) {
-                        self.postRetry(path: path, params: params, data: data, retries: retries-1,responseHandler: responseHandler)
+                        let r = self.postRetry(path: path, params: params, data: data, retries: retries-1,responseHandler: responseHandler)
+                        reqTask.add(r)
                     }
                     return
                 }
@@ -100,14 +102,17 @@ final class Request {
                 responseHandler(json, error)
             }
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     private func postWithCheckToken(path: String,
                                     params: String,
                                     data: [String : Any],
-                                    responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
-        self.postInternal(path: path, params: params, data: data) { (json, error) in
-            self.check_token(error) { (postAgain, error) in
+                                    responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.postInternal(path: path, params: params, data: data) { (json, error) in
+            let r = self.check_token(error) { (postAgain, error) in
                 if error != nil {
                     responseHandler(nil, error)
                     return
@@ -116,33 +121,37 @@ final class Request {
                     responseHandler(json, error)
                     return
                 }
-                self.postInternal(path: path, params: params, data: data) { (json, error) in
+                let r = self.postInternal(path: path, params: params, data: data) { (json, error) in
                     responseHandler(json, error)
                 }
+                reqTask.add(r)
             }
+            reqTask.add(r)
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     private func postInternal(path: String,
                               params: String = "",
                               data: [String : Any] = [:],
-                              responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
+                              responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         guard let token = self.credential.get_token() else {
             responseHandler(nil, IBMQuantumExperienceError.missingTokenId)
-            return
+            return RequestTask()
         }
         let fullPath = "\(path)?access_token=\(token)\(params)"
         guard let url = URL(string: fullPath, relativeTo: self.credential.config.url) else {
             responseHandler(nil,
                     IBMQuantumExperienceError.invalidURL(url: "\(self.credential.config.url.description)\(fullPath)"))
-            return
+            return RequestTask()
         }
-        postInternal(url: url, data: data, responseHandler: responseHandler)
+        return postInternal(url: url, data: data, responseHandler: responseHandler)
     }
 
     func postInternal(url: URL,
                       data: [String : Any] = [:],
-                      responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
+                      responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData,
                                  timeoutInterval: Request.CONNTIMEOUT)
         request.httpMethod = "POST"
@@ -154,40 +163,50 @@ final class Request {
             DispatchQueue.main.async {
                 responseHandler(nil, IBMQuantumExperienceError.internalError(error: error))
             }
-            return
+            return RequestTask()
         }
+        var reqTask = RequestTask()
         let task = self.urlSession.dataTask(with: request) { (data, response, error) -> Void in
             do {
-                let out = try Request.response_good(url, data, response, error)
+                let out = try Request.response_good(reqTask, url, data, response, error)
                 DispatchQueue.main.async {
                     responseHandler(out, nil)
                 }
             } catch let error {
                 DispatchQueue.main.async {
-                    responseHandler(nil, IBMQuantumExperienceError.internalError(error: error))
+                    if let e = error as? IBMQuantumExperienceError {
+                        responseHandler(nil, e)
+                    }
+                    else {
+                        responseHandler(nil, IBMQuantumExperienceError.internalError(error: error))
+                    }
                 }
             }
         }
+        reqTask += RequestTask(task)
         task.resume()
+        return reqTask
     }
 
     func put(path: String,
               params: String = "",
               data: [String : Any] = [:],
-              responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
-        self.putRetry(path: path, params: params, data: data, retries: self.retries, responseHandler: responseHandler)
+              responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.putRetry(path: path, params: params, data: data, retries: self.retries, responseHandler: responseHandler)
     }
 
     private func putRetry(path: String,
                            params: String,
                            data: [String : Any],
                            retries: Int,
-                           responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
-        self.putWithCheckToken(path: path, params: params, data: data) { (json, error) in
+                           responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.putWithCheckToken(path: path, params: params, data: data) { (json, error) in
             if error != nil {
                 if retries > 0 {
                     DispatchQueue.main.asyncAfter(deadline: .now() + self.timeout_interval) {
-                        self.putRetry(path: path, params: params, data: data, retries: retries-1,responseHandler: responseHandler)
+                        let r = self.putRetry(path: path, params: params, data: data, retries: retries-1,responseHandler: responseHandler)
+                        reqTask.add(r)
                     }
                     return
                 }
@@ -196,14 +215,17 @@ final class Request {
                 responseHandler(json, error)
             }
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     private func putWithCheckToken(path: String,
                                     params: String,
                                     data: [String : Any],
-                                    responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
-        self.putInternal(path: path, params: params, data: data) { (json, error) in
-            self.check_token(error) { (putAgain, error) in
+                                    responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.putInternal(path: path, params: params, data: data) { (json, error) in
+            let r = self.check_token(error) { (putAgain, error) in
                 if error != nil {
                     responseHandler(nil, error)
                     return
@@ -212,33 +234,37 @@ final class Request {
                     responseHandler(json, error)
                     return
                 }
-                self.putInternal(path: path, params: params, data: data) { (json, error) in
+                let r = self.putInternal(path: path, params: params, data: data) { (json, error) in
                     responseHandler(json, error)
                 }
+                reqTask.add(r)
             }
+            reqTask.add(r)
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     private func putInternal(path: String,
                               params: String = "",
                               data: [String : Any] = [:],
-                              responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
+                              responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         guard let token = self.credential.get_token() else {
             responseHandler(nil, IBMQuantumExperienceError.missingTokenId)
-            return
+            return RequestTask()
         }
         let fullPath = "\(path)?access_token=\(token)\(params)"
         guard let url = URL(string: fullPath, relativeTo: self.credential.config.url) else {
             responseHandler(nil,
                             IBMQuantumExperienceError.invalidURL(url: "\(self.credential.config.url.description)\(fullPath)"))
-            return
+            return RequestTask()
         }
-        putInternal(url: url, data: data, responseHandler: responseHandler)
+        return putInternal(url: url, data: data, responseHandler: responseHandler)
     }
 
     private func putInternal(url: URL,
                       data: [String : Any] = [:],
-                      responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
+                      responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData,
                                  timeoutInterval: Request.CONNTIMEOUT)
         request.httpMethod = "PUT"
@@ -248,33 +274,43 @@ final class Request {
             request.httpBody = try JSONSerialization.data(withJSONObject: data, options: .prettyPrinted)
         } catch let error {
             responseHandler(nil, IBMQuantumExperienceError.internalError(error: error))
-            return
+            return RequestTask()
         }
+        var reqTask = RequestTask()
         let task = self.urlSession.dataTask(with: request) { (data, response, error) -> Void in
             do {
-                responseHandler(try Request.response_good(url, data, response, error), nil)
+                responseHandler(try Request.response_good(reqTask, url, data, response, error), nil)
             } catch let error {
-                responseHandler(nil, IBMQuantumExperienceError.internalError(error: error))
+                if let e = error as? IBMQuantumExperienceError {
+                    responseHandler(nil, e)
+                }
+                else {
+                    responseHandler(nil, IBMQuantumExperienceError.internalError(error: error))
+                }
             }
         }
+        reqTask += RequestTask(task)
         task.resume()
+        return reqTask
     }
 
     func get(path: String, params: String = "", with_token: Bool = true,
-             responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
-        self.getRetry(path: path, params: params, with_token: with_token, retries: self.retries, responseHandler: responseHandler)
+             responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.getRetry(path: path, params: params, with_token: with_token, retries: self.retries, responseHandler: responseHandler)
     }
 
     private func getRetry(path: String,
                           params: String,
                           with_token: Bool,
                           retries: Int,
-                          responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
-        self.getWithCheckToken(path: path, params: params, with_token: with_token) { (json, error) in
+                          responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.getWithCheckToken(path: path, params: params, with_token: with_token) { (json, error) in
             if error != nil {
                 if retries > 0 {
                     DispatchQueue.main.asyncAfter(deadline: .now() + self.timeout_interval) {
-                        self.getRetry(path: path, params: params, with_token: with_token, retries: retries-1,responseHandler: responseHandler)
+                        let r = self.getRetry(path: path, params: params, with_token: with_token, retries: retries-1,responseHandler: responseHandler)
+                        reqTask.add(r)
                     }
                     return
                 }
@@ -283,14 +319,17 @@ final class Request {
                 responseHandler(json, error)
             }
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     private func getWithCheckToken(path: String,
                                    params: String,
                                    with_token: Bool,
-                                   responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
-        self.getInternal(path: path, params: params, with_token: with_token) { (json, error) in
-            self.check_token(error) { (retry, error) in
+                                   responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.getInternal(path: path, params: params, with_token: with_token) { (json, error) in
+            let r = self.check_token(error) { (retry, error) in
                 if error != nil {
                     responseHandler(nil, error)
                     return
@@ -299,17 +338,21 @@ final class Request {
                     responseHandler(json, error)
                     return
                 }
-                self.getInternal(path: path, params: params, with_token: with_token) { (json, error) in
+                let r = self.getInternal(path: path, params: params, with_token: with_token) { (json, error) in
                     responseHandler(json, error)
                 }
+                reqTask.add(r)
             }
+            reqTask.add(r)
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     private func getInternal(path: String,
                              params: String,
                              with_token: Bool,
-                             responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) {
+                             responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         var access_token = ""
         if with_token {
             if let token = self.credential.get_token() {
@@ -317,32 +360,49 @@ final class Request {
             }
             else {
                 responseHandler(nil, IBMQuantumExperienceError.missingTokenId)
-                return
+                return RequestTask()
             }
         }
         let fullPath = "\(path)\(access_token)\(params)"
         guard let url = URL(string: fullPath, relativeTo:self.credential.config.url) else {
             responseHandler(nil,
                 IBMQuantumExperienceError.invalidURL(url: "\(self.credential.config.url.description)\(fullPath)"))
-            return
+            return RequestTask()
         }
         var request = URLRequest(url:url, cachePolicy:.reloadIgnoringLocalCacheData,
                                  timeoutInterval:Request.CONNTIMEOUT)
         request.httpMethod = "GET"
         request.addValue(self.credential.config.client_application, forHTTPHeaderField: Request.HEADER_CLIENT_APPLICATION)
+        var reqTask = RequestTask()
         let task = self.urlSession.dataTask(with: request) { (data, response, error) -> Void in
             do {
-                responseHandler(try Request.response_good(url, data, response, error), nil)
+                responseHandler(try Request.response_good(reqTask, url, data, response, error), nil)
             } catch let error {
-                responseHandler(nil, IBMQuantumExperienceError.internalError(error: error))
+                if let e = error as? IBMQuantumExperienceError {
+                    responseHandler(nil, e)
+                }
+                else {
+                    responseHandler(nil, IBMQuantumExperienceError.internalError(error: error))
+                }
             }
         }
+        reqTask += RequestTask(task)
         task.resume()
+        return reqTask
     }
 
-    static private func response_good(_ url: URL, _ data: Data?, _ response: URLResponse?, _ error: Error?) throws -> Any {
+    static private func response_good(_ requestTask: RequestTask, _ url: URL, _ data: Data?, _ response: URLResponse?, _ error: Error?) throws -> Any {
         if error != nil {
-            throw error!
+            #if os(Linux)
+                throw IBMQuantumExperienceError.internalError(error: error!)
+            #else
+                if (error! as NSError).code == NSURLErrorCancelled {
+                    throw IBMQuantumExperienceError.requestCancelled(error: error!)
+                }
+                else {
+                    throw IBMQuantumExperienceError.internalError(error: error!)
+                }
+            #endif
         }
         if response == nil {
             throw IBMQuantumExperienceError.nullResponse(url: url.absoluteString)

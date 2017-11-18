@@ -42,14 +42,14 @@ public final class IBMQuantumExperience {
         self.config = config
     }
 
-    private func getRequest(_ responseHandler: @escaping ((_:Request?, _:IBMQuantumExperienceError?) -> Void)) {
+    private func getRequest(_ responseHandler: @escaping ((_:Request?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         if let req = self.request {
             responseHandler(req,nil)
-            return
+            return RequestTask()
         }
         do {
             let req = try Request(self.token,self.config)
-            req.initialize() { (request,error) -> Void in
+            return req.initialize() { (request,error) -> Void in
                 self.request = request
                 responseHandler(self.request,error)
             }
@@ -58,6 +58,7 @@ public final class IBMQuantumExperience {
         } catch {
             responseHandler(nil,IBMQuantumExperienceError.internalError(error: error))
         }
+        return RequestTask()
     }
 
     /**
@@ -65,7 +66,7 @@ public final class IBMQuantumExperience {
      */
     private func _check_backend(_ back: String,
                                 _ endpoint: String,
-                                _ responseHandler: @escaping ((_:String?, _:IBMQuantumExperienceError?) -> Void)) {
+                                _ responseHandler: @escaping ((_:String?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         // First check against hacks for old backend names
         let original_backend = back
         let backend = back.lowercased()
@@ -116,10 +117,10 @@ public final class IBMQuantumExperience {
         }
         if ret != nil {
             responseHandler(ret,nil)
-            return
+            return RequestTask()
         }
         // Check for new-style backends
-        self.available_backends() { (backends,error) -> Void in
+        return self.available_backends() { (backends,error) -> Void in
             if error != nil {
                 responseHandler(nil,error)
                 return
@@ -161,11 +162,13 @@ public final class IBMQuantumExperience {
      - parameter idExecution: execution identifier
      - parameter responseHandler: Closure to be called upon completion
      */
+    @discardableResult
     public func get_execution(id_execution: String,
                               access_token: String? = nil,
                               user_id: String? = nil,
-                              responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
-        self.getRequest() { (req,error) -> Void in
+                              responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
                 responseHandler([:], error)
                 return
@@ -180,7 +183,7 @@ public final class IBMQuantumExperience {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
                 return
             }
-            req!.get(path: "Executions/\(id_execution)") { (out, error) -> Void in
+            let r = req!.get(path: "Executions/\(id_execution)") { (out, error) -> Void in
                 if error != nil {
                     responseHandler([:], error)
                     return
@@ -193,7 +196,7 @@ public final class IBMQuantumExperience {
                     responseHandler(execution, error)
                     return
                 }
-                self.get_code(id_code: codeId) { (code, error) -> Void in
+                let r = self.get_code(id_code: codeId) { (code, error) -> Void in
                     if error != nil {
                         responseHandler([:], error)
                         return
@@ -201,18 +204,24 @@ public final class IBMQuantumExperience {
                     execution["code"] = code
                     responseHandler(execution, error)
                 }
+                reqTask.add(r)
             }
+            reqTask.add(r)
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     /**
      Get the result of a execution, byt the execution id
      */
+    @discardableResult
     public func get_result_from_execution(id_execution: String,
                                           access_token: String? = nil,
                                           user_id: String? = nil,
-                                          responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
-        self.getRequest() { (req,error) -> Void in
+                                          responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
                 responseHandler([:], error)
                 return
@@ -227,7 +236,7 @@ public final class IBMQuantumExperience {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
                 return
             }
-            req!.get(path: "Executions/\(id_execution)") { (out, error) -> Void in
+            let r = req!.get(path: "Executions/\(id_execution)") { (out, error) -> Void in
                 if error != nil {
                     responseHandler([:], error)
                     return
@@ -264,17 +273,22 @@ public final class IBMQuantumExperience {
                 }
                 responseHandler(result, error)
             }
+            reqTask.add(r)
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     /**
      Get a code, by its id
      */
+    @discardableResult
     public func get_code(id_code: String,
                          access_token: String? = nil,
                          user_id: String? = nil,
-                         responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
-        self.getRequest() { (req,error) -> Void in
+                         responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
                 responseHandler([:], error)
                 return
@@ -289,8 +303,7 @@ public final class IBMQuantumExperience {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
                 return
             }
-
-            req!.get(path: "Codes/\(id_code)") { (out, error) -> Void in
+            let r = req!.get(path: "Codes/\(id_code)") { (out, error) -> Void in
                 if error != nil {
                     responseHandler([:], error)
                     return
@@ -299,8 +312,8 @@ public final class IBMQuantumExperience {
                     responseHandler([:],IBMQuantumExperienceError.invalidResponseData)
                     return
                 }
-                req!.get(path:"Codes/\(id_code)/executions",
-                params:"filter={\"limit\":3}") { (executions, error) -> Void in
+                let r = req!.get(path:"Codes/\(id_code)/executions",
+                            params:"filter={\"limit\":3}") { (executions, error) -> Void in
                     if error != nil {
                         responseHandler([:], error)
                         return
@@ -308,18 +321,24 @@ public final class IBMQuantumExperience {
                     code["executions"] = executions
                     responseHandler(code, error)
                 }
+                reqTask.add(r)
             }
+            reqTask.add(r)
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     /**
      Get the image of a code, by its id
      */
+    @discardableResult
     public func get_image_code(id_code: String,
                                access_token: String? = nil,
                                user_id: String? = nil,
-                               responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
-        self.getRequest() { (req,error) -> Void in
+                               responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
                 responseHandler([:], error)
                 return
@@ -334,8 +353,7 @@ public final class IBMQuantumExperience {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
                 return
             }
-
-            req!.get(path: "Codes/\(id_code)/export/png/url") { (out, error) -> Void in
+            let r = req!.get(path: "Codes/\(id_code)/export/png/url") { (out, error) -> Void in
                 if error != nil {
                     responseHandler([:], error)
                     return
@@ -346,16 +364,21 @@ public final class IBMQuantumExperience {
                 }
                 responseHandler(image, error)
             }
+            reqTask.add(r)
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     /**
      Get the last codes of the user
      */
+    @discardableResult
     public func get_last_codes(access_token: String? = nil,
                                user_id: String? = nil,
-                               responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
-        self.getRequest() { (req,error) -> Void in
+                               responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
                 responseHandler([:], error)
                 return
@@ -370,8 +393,7 @@ public final class IBMQuantumExperience {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
                 return
             }
-
-            req!.get(path: "users/\(req!.credential.get_user_id()!)/codes/latest",
+            let r = req!.get(path: "users/\(req!.credential.get_user_id()!)/codes/latest",
                          params: "&includeExecutions=true") { (out, error) -> Void in
                 if error != nil {
                     responseHandler([:], error)
@@ -388,12 +410,16 @@ public final class IBMQuantumExperience {
                     responseHandler([:],IBMQuantumExperienceError.invalidResponseData)
                 }
             }
+            reqTask.add(r)
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     /**
      Execute and experiment
      */
+    @discardableResult
     public func run_experiment(qasm: String,
                                backend: String = "simulator",
                                shots: Int = 1,
@@ -402,8 +428,9 @@ public final class IBMQuantumExperience {
                                timeout: Int = 60,
                                access_token: String? = nil,
                                user_id: String? = nil,
-                               responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
-        self.getRequest() { (req,error) -> Void in
+                               responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
                 responseHandler([:], error)
                 return
@@ -418,8 +445,7 @@ public final class IBMQuantumExperience {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
                 return
             }
-
-            self._check_backend(backend, "experiment") { (backend_type,error) -> Void in
+            let r = self._check_backend(backend, "experiment") { (backend_type,error) -> Void in
                 if error != nil {
                     responseHandler([:], error)
                     return
@@ -450,39 +476,54 @@ public final class IBMQuantumExperience {
                         responseHandler([:],IBMQuantumExperienceError.errorSeedLength)
                         return
                     }
-                    req!.post(path: "codes/execute",
+                    let r = req!.post(path: "codes/execute",
                                   params: "&shots=\(shots)&seed=\(seed!)&deviceRunType=\(backend_type!)",
                     data: data) { (out, error) -> Void in
+                        if error != nil {
+                            responseHandler([:], error)
+                            return
+                        }
                         guard let execution = out as? [String:Any] else {
                             responseHandler([:],IBMQuantumExperienceError.invalidResponseData)
                             return
                         }
-                        self.post_run_experiment(execution: execution,
+                        let r = self.post_run_experiment(execution: execution,
                                                  error: error,
                                                  timeout: timeout,
                                                  access_token: access_token,
                                                  user_id: user_id,
                                                  responseHandler: responseHandler)
+                        reqTask.add(r)
                     }
+                    reqTask.add(r)
                 }
                 else {
-                    req!.post(path: "codes/execute",
+                    let r = req!.post(path: "codes/execute",
                                   params: "&shots=\(shots)&deviceRunType=\(backend_type!)",
                     data: data) { (out, error) -> Void in
+                        if error != nil {
+                            responseHandler([:], error)
+                            return
+                        }
                         guard let execution = out as? [String:Any] else {
                             responseHandler([:],IBMQuantumExperienceError.invalidResponseData)
                             return
                         }
-                        self.post_run_experiment(execution: execution,
+                        let r = self.post_run_experiment(execution: execution,
                                                  error: error,
                                                  timeout: timeout,
                                                  access_token: access_token,
                                                  user_id: user_id,
                                                  responseHandler: responseHandler)
+                        reqTask.add(r)
                     }
+                    reqTask.add(r)
                 }
             }
+            reqTask.add(r)
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     private func post_run_experiment(execution: [String:Any],
@@ -490,23 +531,23 @@ public final class IBMQuantumExperience {
                                      timeout: Int,
                                      access_token: String?,
                                      user_id: String?,
-                                     responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
+                                     responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         if error != nil {
             responseHandler([:], error)
-            return
+            return RequestTask()
         }
         var respond: [String:Any] = [:]
         guard let statusMap = execution["status"] as? [String:Any] else {
             responseHandler([:], IBMQuantumExperienceError.missingStatus)
-            return
+            return RequestTask()
         }
         guard let status = statusMap["id"] as? String else {
             responseHandler([:], IBMQuantumExperienceError.missingStatus)
-            return
+            return RequestTask()
         }
         guard let id_execution = execution["id"] as? String else {
             responseHandler([:], IBMQuantumExperienceError.missingExecutionId)
-            return
+            return RequestTask()
         }
         var result: [String:Any] = [:]
         respond["status"] = status
@@ -515,7 +556,6 @@ public final class IBMQuantumExperience {
         if let infoQueue = execution["infoQueue"] as? [String:Any] {
             respond["infoQueue"] = infoQueue
         }
-
         if status == "DONE" {
             if let executionResult = execution["result"] as? [String:Any] {
                 if let data =  executionResult["data"] as? [String:Any] {
@@ -533,14 +573,14 @@ public final class IBMQuantumExperience {
                 }
             }
             responseHandler(respond, nil)
-            return
+            return RequestTask()
         }
         if status == "ERROR" {
             respond.removeValue(forKey: "infoQueue")
             responseHandler(respond, nil)
-            return
+            return RequestTask()
         }
-        self.getCompleteResultFromExecution(id_execution: id_execution,
+        return self.getCompleteResultFromExecution(id_execution: id_execution,
                                             timeOut: ((timeout > 300) ? 300 : timeout),
                                             access_token: access_token,
                                             user_id: user_id) { (result, error) in
@@ -562,13 +602,14 @@ public final class IBMQuantumExperience {
                                                 timeOut: Int,
                                                 access_token: String?,
                                                 user_id: String?,
-                                                responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
-        self.getRequest() { (req,error) -> Void in
+                                                responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
                 responseHandler([:], error)
                 return
             }
-            self.get_result_from_execution(id_execution: id_execution,
+            let r = self.get_result_from_execution(id_execution: id_execution,
                                            access_token: access_token,
                                            user_id: user_id) { (execution, error) -> Void in
                 if error != nil {
@@ -579,19 +620,24 @@ public final class IBMQuantumExperience {
                     responseHandler(execution, error)
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                    self.getCompleteResultFromExecution(id_execution: id_execution,
+                    let r = self.getCompleteResultFromExecution(id_execution: id_execution,
                                                         timeOut: timeOut-1,
                                                         access_token: access_token,
                                                         user_id: user_id,
                                                         responseHandler: responseHandler)
+                    reqTask.add(r)
                 }
             }
+            reqTask.add(r)
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     /**
      Runs a job. Asynchronous.
      */
+    @discardableResult
     public func run_job(qasms: [[String:Any]],
                         backend: String = "simulator",
                         shots: Int = 1,
@@ -599,9 +645,9 @@ public final class IBMQuantumExperience {
                         seed: Int? = nil,
                         access_token: String? = nil,
                         user_id: String? = nil,
-                        responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
-
-        self.getRequest() { (req,error) -> Void in
+                        responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
                 responseHandler([:], error)
                 return
@@ -616,7 +662,6 @@ public final class IBMQuantumExperience {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
                 return
             }
-
             var data: [String : Any] = [:]
             var qasmArray: [[String:Any]] = []
             for var dict in qasms {
@@ -629,8 +674,7 @@ public final class IBMQuantumExperience {
             data["qasms"] = qasmArray 
             data["shots"] = shots 
             data["maxCredits"] = maxCredits
-
-            self._check_backend(backend, "job") { (backend_type,error) -> Void in
+            let r = self._check_backend(backend, "job") { (backend_type,error) -> Void in
                 if error != nil {
                     responseHandler([:], error)
                     return
@@ -653,8 +697,7 @@ public final class IBMQuantumExperience {
                 var backendDict: [String:String] = [:]
                 backendDict["name"] = backend_type!
                 data["backend"] = backendDict
-
-                req!.post(path: "Jobs", data: data) { (out, error) -> Void in
+                let r = req!.post(path: "Jobs", data: data) { (out, error) -> Void in
                     if error != nil {
                         responseHandler([:], error)
                         return
@@ -665,10 +708,12 @@ public final class IBMQuantumExperience {
                     }
                     responseHandler(json, error)
                 }
-
+                reqTask.add(r)
             }
-
+            reqTask.add(r)
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     /**
@@ -677,11 +722,13 @@ public final class IBMQuantumExperience {
      - parameter jobId: job identifier
      - parameter responseHandler: Closure to be called upon completion
      */
+    @discardableResult
     public func get_job(jobId: String,
                         access_token: String? = nil,
                         user_id: String? = nil,
-                        responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
-        self.getRequest() { (req,error) -> Void in
+                        responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
                 responseHandler([:], error)
                 return
@@ -696,7 +743,11 @@ public final class IBMQuantumExperience {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
                 return
             }
-            req!.get(path: "Jobs/\(jobId)") { (out, error) -> Void in
+            let r = req!.get(path: "Jobs/\(jobId)") { (out, error) -> Void in
+                if error != nil {
+                    responseHandler([:], error)
+                    return
+                }
                 guard var job = out as? [String:Any] else {
                     responseHandler([:],IBMQuantumExperienceError.invalidResponseData)
                     return
@@ -722,7 +773,10 @@ public final class IBMQuantumExperience {
                 }
                 responseHandler(job, error)
             }
+            reqTask.add(r)
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     /**
@@ -730,11 +784,13 @@ public final class IBMQuantumExperience {
      -limit: max result
      - parameter responseHandler: Closure to be called upon completion
      */
+    @discardableResult
     public func get_jobs(limit: Int = 50,
                          access_token: String? = nil,
                          user_id: String? = nil,
-                         responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
-        self.getRequest() { (req,error) -> Void in
+                         responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
                 responseHandler([:], error)
                 return
@@ -749,24 +805,33 @@ public final class IBMQuantumExperience {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
                 return
             }
-            req!.get(path: "Jobs", params: "&filter={\"limit\":\(limit)}") { (out, error) -> Void in
+            let r = req!.get(path: "Jobs", params: "&filter={\"limit\":\(limit)}") { (out, error) -> Void in
+                if error != nil {
+                    responseHandler([:], error)
+                    return
+                }
                 guard let json = out as? [String:Any] else {
                     responseHandler([:],IBMQuantumExperienceError.invalidResponseData)
                     return
                 }
                 responseHandler(json, error)
             }
+            reqTask.add(r)
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     /**
      Get the status of a chip
      */
+    @discardableResult
     public func backend_status(backend: String = "ibmqx4",
                                access_token: String? = nil,
                                user_id: String? = nil,
-                               responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
-        self._check_backend(backend, "status") { (backend_type,error) -> Void in
+                               responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self._check_backend(backend, "status") { (backend_type,error) -> Void in
             if error != nil {
                 responseHandler([:], error)
                 return
@@ -775,12 +840,16 @@ public final class IBMQuantumExperience {
                 responseHandler([:],IBMQuantumExperienceError.missingBackend(backend: backend))
                 return
             }
-            self.getRequest() { (req,error) -> Void in
+            let r = self.getRequest() { (req,error) -> Void in
                 if error != nil {
                     responseHandler([:], error)
                     return
                 }
-                req!.get(path:"Backends/\(backend_type!)/queue/status",with_token: false) { (out, error) -> Void in
+                let r = req!.get(path:"Backends/\(backend_type!)/queue/status",with_token: false) { (out, error) -> Void in
+                    if error != nil {
+                        responseHandler([:], error)
+                        return
+                    }
                     guard let status = out as? [String:Any] else {
                         responseHandler([:],IBMQuantumExperienceError.invalidResponseData)
                         return
@@ -798,18 +867,24 @@ public final class IBMQuantumExperience {
                     ret["backend"] = backend_type!
                     responseHandler(ret, error)
                 }
+                reqTask.add(r)
             }
+            reqTask.add(r)
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     /**
      Get the calibration of a real chip
      */
+    @discardableResult
     public func backend_calibration(backend: String = "ibmqx4",
                                     access_token: String? = nil,
                                     user_id: String? = nil,
-                                    responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
-        self.getRequest() { (req,error) -> Void in
+                                    responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
                 responseHandler([:], error)
                 return
@@ -824,7 +899,7 @@ public final class IBMQuantumExperience {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
                 return
             }
-            self._check_backend(backend, "calibration") { (backend_type,error) -> Void in
+            let r = self._check_backend(backend, "calibration") { (backend_type,error) -> Void in
                 if error != nil {
                     responseHandler([:], error)
                     return
@@ -837,7 +912,7 @@ public final class IBMQuantumExperience {
                     responseHandler(["backend" : backend_type!],nil)
                     return
                 }
-                req!.get(path:"Backends/\(backend_type!)/calibration") { (out, error) -> Void in
+                let r = req!.get(path:"Backends/\(backend_type!)/calibration") { (out, error) -> Void in
                     if error != nil {
                         responseHandler([:], error)
                         return
@@ -849,18 +924,24 @@ public final class IBMQuantumExperience {
                     ret["backend"] = backend_type!
                     responseHandler(ret,error)
                 }
+                reqTask.add(r)
             }
+            reqTask.add(r)
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     /**
      Get the parameters of calibration of a real chip
      */
+    @discardableResult
     public func backend_parameters(backend: String = "ibmqx4",
                                    access_token: String? = nil,
                                    user_id: String? = nil,
-                                  responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
-        self.getRequest() { (req,error) -> Void in
+                                  responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
                 responseHandler([:], error)
                 return
@@ -875,7 +956,7 @@ public final class IBMQuantumExperience {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
                 return
             }
-            self._check_backend(backend, "calibration") { (backend_type,error) -> Void in
+            let r = self._check_backend(backend, "calibration") { (backend_type,error) -> Void in
                 if error != nil {
                     responseHandler([:], error)
                     return
@@ -888,7 +969,7 @@ public final class IBMQuantumExperience {
                     responseHandler(["backend" : backend_type!],nil)
                     return
                 }
-                req!.get(path:"Backends/\(backend_type!)/parameters") { (out, error) -> Void in
+                let r = req!.get(path:"Backends/\(backend_type!)/parameters") { (out, error) -> Void in
                     if error != nil {
                         responseHandler([:], error)
                         return
@@ -900,17 +981,23 @@ public final class IBMQuantumExperience {
                     ret["backend"] = backend_type!
                     responseHandler(ret,error)
                 }
+                reqTask.add(r)
             }
+            reqTask.add(r)
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     /**
      Get the backends availables to use in the QX Platform
      */
+    @discardableResult
     public func available_backends(access_token: String? = nil,
                                    user_id: String? = nil,
-                                   responseHandler: @escaping ((_:[[String:Any]], _:IBMQuantumExperienceError?) -> Void)) {
-        self.getRequest() { (req,error) -> Void in
+                                   responseHandler: @escaping ((_:[[String:Any]], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
                 responseHandler([], error)
                 return
@@ -925,8 +1012,7 @@ public final class IBMQuantumExperience {
                 responseHandler([],IBMQuantumExperienceError.invalidCredentials)
                 return
             }
-
-            req!.get(path: "Backends") { (out, error) -> Void in
+            let r = req!.get(path: "Backends") { (out, error) -> Void in
                 if error != nil {
                     responseHandler([], error)
                     return
@@ -945,16 +1031,21 @@ public final class IBMQuantumExperience {
                 }
                 responseHandler(ret, nil)
             }
+            reqTask.add(r)
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     /**
      Get the backend simulators available to use in the QX Platform
      */
+    @discardableResult
     public func available_backend_simulators(access_token: String? = nil,
                                              user_id: String? = nil,
-                                             responseHandler: @escaping ((_:[[String:Any]], _:IBMQuantumExperienceError?) -> Void)) {
-        self.available_backends(access_token: access_token,
+                                             responseHandler: @escaping ((_:[[String:Any]], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.available_backends(access_token: access_token,
                                 user_id: user_id) { (backends,error) -> Void in
             if error != nil {
                 responseHandler([], error)
@@ -970,15 +1061,19 @@ public final class IBMQuantumExperience {
             }
             responseHandler(ret, nil)
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     /**
      Get the the credits by user to use in the QX Platform
      */
+    @discardableResult
     public func get_my_credits(access_token: String? = nil,
                                user_id: String? = nil,
-                               responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
-        self.getRequest() { (req,error) -> Void in
+                               responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
                 responseHandler([:], error)
                 return
@@ -993,8 +1088,7 @@ public final class IBMQuantumExperience {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
                 return
             }
-
-            req!.get(path: "users/\(req!.credential.get_user_id()!)") { (out, error) -> Void in
+            let r = req!.get(path: "users/\(req!.credential.get_user_id()!)") { (out, error) -> Void in
                 if error != nil {
                     responseHandler([:], error)
                     return
@@ -1015,19 +1109,24 @@ public final class IBMQuantumExperience {
                 }
                 responseHandler([:], nil)
             }
+            reqTask.add(r)
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     /**
      Get the API Version of the QX Platform
      */
-    public func api_version(responseHandler: @escaping ((_:String, _:IBMQuantumExperienceError?) -> Void)) {
-        self.getRequest() { (req,error) -> Void in
+    @discardableResult
+    public func api_version(responseHandler: @escaping ((_:String, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
                 responseHandler("", error)
                 return
             }
-            req!.get(path: "version") { (out, error) -> Void in
+            let r = req!.get(path: "version") { (out, error) -> Void in
                 if error != nil {
                     responseHandler("", error)
                     return
@@ -1038,6 +1137,9 @@ public final class IBMQuantumExperience {
                 }
                 responseHandler(version, nil)
             }
+            reqTask.add(r)
         }
+        reqTask.add(r)
+        return reqTask
     }
 }

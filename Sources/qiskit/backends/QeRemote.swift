@@ -45,15 +45,16 @@ final class QeRemote: BaseBackend {
      Returns:
          Result object.
      */
-    override public func run(_ q_job: QuantumJob, response: @escaping ((_:Result) -> Void)) {
-        self.runInternal(q_job) {  (result) -> Void in
+    override public func run(_ q_job: QuantumJob, response: @escaping ((_:Result) -> Void)) -> RequestTask {
+        return self.runInternal(q_job) {  (result) -> Void in
             DispatchQueue.main.async {
                 response(result)
             }
         }
     }
     
-    private func runInternal(_ q_job: QuantumJob, response: @escaping ((_:Result) -> Void)) {
+    private func runInternal(_ q_job: QuantumJob, response: @escaping ((_:Result) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
         do {
             var qobj = q_job.qobj
             let wait = q_job.wait
@@ -107,7 +108,7 @@ final class QeRemote: BaseBackend {
                     max_credits = m
                 }
             }
-            self.api!.run_job(qasms: api_jobs, backend: backend, shots: shots, maxCredits: max_credits, seed: seed0) { (output, error) -> Void in
+            let r = self.api!.run_job(qasms: api_jobs, backend: backend, shots: shots, maxCredits: max_credits, seed: seed0) { (output, error) -> Void in
                 if error != nil {
                     response(Result(["job_id": "0","status": "ERROR","result": QISKitError.internalError(error: error!).localizedDescription],q_job.qobj))
                     return
@@ -120,7 +121,7 @@ final class QeRemote: BaseBackend {
                     response(Result(["job_id": "0","status": "ERROR","result": QISKitError.missingJobId.localizedDescription],q_job.qobj))
                     return
                 }
-                QeRemote.wait_for_job(jobId, self.api!, wait: wait, timeout: timeout) { (json, error) -> Void in
+                let r = QeRemote.wait_for_job(jobId, self.api!, wait: wait, timeout: timeout) { (json, error) -> Void in
                     if error != nil {
                         response(Result(["job_id": jobId, "status": "ERROR","result": QISKitError.internalError(error: error!).localizedDescription],q_job.qobj))
                         return
@@ -132,22 +133,26 @@ final class QeRemote: BaseBackend {
                     job_result["backend"] = backend
                     response(Result(job_result, qobj))
                 }
+                reqTask.add(r)
             }
+            reqTask.add(r)
         } catch {
             if let err = error as? QISKitError {
                 response(Result(["job_id": "0","status": "ERROR","result": err.localizedDescription],q_job.qobj))
-                return
             }
-            response(Result(["job_id": "0","status": "ERROR","result": QISKitError.internalError(error: error).localizedDescription],q_job.qobj))
-            return
+            else {
+                response(Result(["job_id": "0","status": "ERROR","result": QISKitError.internalError(error: error).localizedDescription],q_job.qobj))
+            }
         }
+        return reqTask
     }
 
     private static func run_remote_backend(_ q: [String: Any],
                                            _ api: IBMQuantumExperience,
                                            _ wait: Int = 5,
                                            _ timeout: Int = 60,
-                                           _ responseHandler: @escaping ((_:Result,_:QISKitError?) -> Void)) {
+                                           _ responseHandler: @escaping ((_:Result,_:QISKitError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
         do {
             var qobj = q
             var api_jobs: [[String:Any]] = []
@@ -199,7 +204,7 @@ final class QeRemote: BaseBackend {
                     max_credits = m
                 }
             }
-            api.run_job(qasms: api_jobs, backend: backend, shots: shots, maxCredits: max_credits, seed: seed0) { (output, error) -> Void in
+            let r = api.run_job(qasms: api_jobs, backend: backend, shots: shots, maxCredits: max_credits, seed: seed0) { (output, error) -> Void in
                 if error != nil {
                     responseHandler(Result(),QISKitError.internalError(error: error!))
                     return
@@ -212,7 +217,7 @@ final class QeRemote: BaseBackend {
                     responseHandler(Result(),QISKitError.missingJobId)
                     return
                 }
-                wait_for_job(jobId, api, wait: wait, timeout: timeout) { (json, error) -> Void in
+                let r = wait_for_job(jobId, api, wait: wait, timeout: timeout) { (json, error) -> Void in
                     if error != nil {
                         responseHandler(Result(),QISKitError.internalError(error: error!))
                         return
@@ -224,25 +229,29 @@ final class QeRemote: BaseBackend {
                     job_result["backend"] = backend
                     responseHandler(Result(job_result, qobj),nil)
                 }
+                reqTask.add(r)
             }
+            reqTask.add(r)
         } catch {
             if let err = error as? QISKitError {
                 responseHandler(Result(),err)
-                return
             }
-            responseHandler(Result(),QISKitError.internalError(error: error))
-            return
+            else {
+                responseHandler(Result(),QISKitError.internalError(error: error))
+            }
         }
+        return reqTask
     }
 
     private static func wait_for_job(_ jobId: String, _ api: IBMQuantumExperience, wait: Int = 5, timeout: Int = 60,
-                                     _ responseHandler: @escaping ((_:[String:Any], _:QISKitError?) -> Void)) {
-        wait_for_job(api, jobId, wait, timeout, 0, responseHandler)
+                                     _ responseHandler: @escaping ((_:[String:Any], _:QISKitError?) -> Void)) -> RequestTask {
+        return wait_for_job(api, jobId, wait, timeout, 0, responseHandler)
     }
 
     private static func wait_for_job(_ api: IBMQuantumExperience, _ jobid: String, _ wait: Int, _ timeout: Int, _ elapsed: Int,
-                                     _ responseHandler: @escaping ((_:[String:Any], _:QISKitError?) -> Void)) {
-        api.get_job(jobId: jobid) { (jobResult, error) -> Void in
+                                     _ responseHandler: @escaping ((_:[String:Any], _:QISKitError?) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
+        let r =  api.get_job(jobId: jobid) { (jobResult, error) -> Void in
             if error != nil {
                 responseHandler([:], QISKitError.internalError(error: error!))
                 return
@@ -275,9 +284,12 @@ final class QeRemote: BaseBackend {
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(wait)) {
                 SDKLogger.logInfo("status = \(status) (\(elapsed+wait) seconds)")
-                wait_for_job(api,jobid, wait, timeout, elapsed + wait, responseHandler)
+                let r = wait_for_job(api,jobid, wait, timeout, elapsed + wait, responseHandler)
+                reqTask.add(r)
             }
         }
+        reqTask.add(r)
+        return reqTask
     }
 
     /**
@@ -287,8 +299,8 @@ final class QeRemote: BaseBackend {
      List of online backends if the online api has been set or an empty
      list of it has not been set.
      */
-    private static func remote_backends(_ api: IBMQuantumExperience, responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) {
-        api.available_backends() { (backends,error) in
+    private static func remote_backends(_ api: IBMQuantumExperience, responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return api.available_backends() { (backends,error) in
             if error != nil {
                 responseHandler([],error)
                 return

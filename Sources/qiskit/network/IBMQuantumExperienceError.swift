@@ -40,6 +40,7 @@ public enum IBMQuantumExperienceError: LocalizedError, CustomStringConvertible {
     case retriesPositive
     case invalidCredentials
     case userGroupError(user_group: String)
+    case requestCancelled(error: Error)
     case internalError(error: Error)
 
     public var errorDescription: String? {
@@ -87,6 +88,8 @@ public enum IBMQuantumExperienceError: LocalizedError, CustomStringConvertible {
             return "Not credentials valid"
         case .userGroupError(let user_group):
             return "User group doesnt exist \(user_group)"
+        case .requestCancelled(let error):
+            return "Request was cancelled: \(error.localizedDescription)"
         case .internalError(let error):
             return error.localizedDescription
         }

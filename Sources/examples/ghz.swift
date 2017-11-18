@@ -49,8 +49,9 @@ public final class GHZ {
     //##############################################################
     // Make a quantum program for the GHZ state.
     //##############################################################
-
-    public class func ghz(_ apiToken: String, _ responseHandler: (() -> Void)? = nil) {
+    @discardableResult
+    public class func ghz(_ apiToken: String, _ responseHandler: (() -> Void)? = nil) -> RequestTask {
+        var reqTask = RequestTask()
         do {
             print()
             print("#################################################################")
@@ -80,7 +81,7 @@ public final class GHZ {
 
             print("First version: not compiled")
             print("no mapping, simulator")
-            qp.execute(["ghz"], backend: "ibmqx_qasm_simulator", coupling_map: nil,shots: 1024) { (result) in
+            let r = qp.execute(["ghz"], backend: "ibmqx_qasm_simulator", coupling_map: nil,shots: 1024) { (result) in
                 do {
                     if result.is_error() {
                         print(result.get_error())
@@ -92,7 +93,7 @@ public final class GHZ {
 
                     print("Second version: map to qx2 coupling graph and simulate")
                     print("map to \(backend), simulator")
-                    qp.execute(["ghz"], backend: "ibmqx_qasm_simulator", coupling_map: coupling_map,shots: 1024) { (result) in
+                    let r = qp.execute(["ghz"], backend: "ibmqx_qasm_simulator", coupling_map: coupling_map,shots: 1024) { (result) in
                         do {
                             if result.is_error() {
                                 print(result.get_error())
@@ -104,7 +105,7 @@ public final class GHZ {
 
                             print("Third version: map to qx2 coupling graph and simulate locally")
                             print("map to \(backend), local qasm simulator")
-                            qp.execute(["ghz"], backend: "local_qasm_simulator",coupling_map: coupling_map,shots: 1024) { (result) in
+                            let r = qp.execute(["ghz"], backend: "local_qasm_simulator",coupling_map: coupling_map,shots: 1024) { (result) in
                                 do {
                                     if result.is_error() {
                                         print(result.get_error())
@@ -116,7 +117,7 @@ public final class GHZ {
 
                                     print("Fourth version: map to qx2 coupling graph and run on qx2")
                                     print("map to \(backend), backend")
-                                    qp.execute(["ghz"], backend: backend,timeout:120, coupling_map: coupling_map,shots: 1024) { (result) in
+                                    let r = qp.execute(["ghz"], backend: backend,timeout:120, coupling_map: coupling_map,shots: 1024) { (result) in
                                         do {
                                             if result.is_error() {
                                                 print(result.get_error())
@@ -131,24 +132,29 @@ public final class GHZ {
                                         }
                                         responseHandler?()
                                     }
+                                    reqTask += r
                                 } catch {
                                     print(error.localizedDescription)
                                     responseHandler?()
                                 }
                             }
+                            reqTask += r
                         } catch {
                             print(error.localizedDescription)
                             responseHandler?()
                         }
                     }
+                    reqTask += r
                 } catch {
                     print(error.localizedDescription)
                     responseHandler?()
                 }
             }
+            reqTask += r
         } catch {
             print(error.localizedDescription)
             responseHandler?()
         }
+        return reqTask
     }
 }

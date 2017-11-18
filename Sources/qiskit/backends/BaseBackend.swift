@@ -33,7 +33,8 @@ public class BaseBackend {
         }
     }
 
-    public func run(_ q_job: QuantumJob, response: @escaping ((_:Result) -> Void)) {
+    @discardableResult
+    public func run(_ q_job: QuantumJob, response: @escaping ((_:Result) -> Void)) -> RequestTask {
         preconditionFailure("run not implemented")
     }
 }

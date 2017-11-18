@@ -55,13 +55,17 @@ final class JobProcessor {
         }
     }
 
-    func submit() {
+    func submit() -> RequestTask {
+        let reqTask = RequestTask()
         for q_job in self.q_jobs {
-            self.run_backend(q_job, self._job_done_callback)
+            let r = self.run_backend(q_job, self._job_done_callback)
+            reqTask.add(r)
         }
+        return reqTask
     }
 
-    private func run_backend(_ q_job: QuantumJob, _ response: @escaping ((_:Result) -> Void)) {
+    private func run_backend(_ q_job: QuantumJob, _ response: @escaping ((_:Result) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
         do {
             let backend_name = q_job.backend
             var qobj = q_job.qobj
@@ -79,17 +83,20 @@ final class JobProcessor {
                 }
                 q_job._qobj = qobj
             }
-            self.backendUtils.get_backend_instance(backend_name) { (backend,error) in
+            let r = self.backendUtils.get_backend_instance(backend_name) { (backend,error) in
                 if error != nil {
                     response(Result(["job_id": "0", "status": "ERROR","result": error!.localizedDescription],q_job.qobj))
                     return
                 }
-                backend!.run(q_job,response: response)
+                let r = backend!.run(q_job,response: response)
+                reqTask.add(r)
             }
+            reqTask.add(r)
         } catch {
             DispatchQueue.main.async {
                 response(Result(["job_id": "0", "status": "ERROR","result": error.localizedDescription],q_job.qobj))
             }
         }
+        return reqTask
     }
 }

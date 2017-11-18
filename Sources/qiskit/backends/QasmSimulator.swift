@@ -301,7 +301,9 @@ final class QasmSimulator: BaseBackend {
     /**
      Run circuits in qobj
      */
-    override public func run(_ q_job: QuantumJob, response: @escaping ((_:Result) -> Void)) {
+    @discardableResult
+    override public func run(_ q_job: QuantumJob, response: @escaping ((_:Result) -> Void)) -> RequestTask {
+        let reqTask = RequestTask()
         DispatchQueue.global().async {
             var result = Result()
             let job_id = UUID().uuidString
@@ -327,6 +329,7 @@ final class QasmSimulator: BaseBackend {
                  response(result)
             }
         }
+        return reqTask
     }
 
     /**

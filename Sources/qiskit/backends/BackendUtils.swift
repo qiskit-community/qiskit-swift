@@ -93,8 +93,8 @@ final class BackendUtils {
         return backend_name_list
     }
 
-    private func discover_remote_backends(_ api: IBMQuantumExperience, responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) {
-        api.available_backends() { (configuration_list,error) in
+    private func discover_remote_backends(_ api: IBMQuantumExperience, responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return api.available_backends() { (configuration_list,error) in
             if error != nil {
                 responseHandler([],error)
                 return
@@ -108,12 +108,12 @@ final class BackendUtils {
         }
     }
 
-    private func update_backends(responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) {
+    private func update_backends(responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         if !self.needsUpdate {
             var backends = self.local_backends()
             backends = backends.union(self.remote_backends())
             responseHandler(backends,nil)
-            return
+            return RequestTask()
         }
         self.lock.lock()
         self._registered_backends = [:]
@@ -124,9 +124,9 @@ final class BackendUtils {
             DispatchQueue.main.async {
                 responseHandler(backend_name_list,nil)
             }
-            return
+            return RequestTask()
         }
-        self.discover_remote_backends(self.api!) { (backends,error) in
+        return self.discover_remote_backends(self.api!) { (backends,error) in
             if error == nil {
                 self.needsUpdate = false
             }
@@ -161,8 +161,8 @@ final class BackendUtils {
         return ""
     }
 
-    func get_backend_instance(_ backend_name: String,_ responseHandler: @escaping ((_:BaseBackend?, _:IBMQuantumExperienceError?) -> Void)) {
-        self.update_backends() { (backends,error) in
+    func get_backend_instance(_ backend_name: String,_ responseHandler: @escaping ((_:BaseBackend?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.update_backends() { (backends,error) in
             if error != nil {
                 responseHandler(nil,error)
                 return
@@ -179,8 +179,8 @@ final class BackendUtils {
         }
     }
 
-    func get_backend_configuration(_ backend_name: String,_ responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) {
-        self.update_backends() { (backends,error) in
+    func get_backend_configuration(_ backend_name: String,_ responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.update_backends() { (backends,error) in
             if error != nil {
                 responseHandler([:],error)
                 return

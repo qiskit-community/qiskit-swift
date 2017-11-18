@@ -55,8 +55,9 @@ public final class Teleport {
     //##############################################################
     // Make a quantum program for the GHZ and Bell states.
     //##############################################################
-   
-    public class func teleport(_ apiToken: String, _ responseHandler: (() -> Void)? = nil) {
+    @discardableResult
+    public class func teleport(_ apiToken: String, _ responseHandler: (() -> Void)? = nil) -> RequestTask {
+        var reqTask = RequestTask()
         do {
             print()
             print("#################################################################")
@@ -98,7 +99,7 @@ public final class Teleport {
             print("Experiment does not support feedback, so we use the simulator")
 
             print("First version: not mapped")
-            qp.execute(["teleport"], backend: backend,coupling_map: nil,shots: 1024) { (result) in
+            let r = qp.execute(["teleport"], backend: backend,coupling_map: nil,shots: 1024) { (result) in
                 do {
                     if result.is_error() {
                         print(result.get_error())
@@ -109,7 +110,7 @@ public final class Teleport {
                     print(try result.get_counts("teleport"))
 
                     print("Second version: mapped to qx2 coupling graph")
-                    qp.execute(["teleport"], backend: backend,coupling_map: coupling_map,shots: 1024) { (result) in
+                    let r = qp.execute(["teleport"], backend: backend,coupling_map: coupling_map,shots: 1024) { (result) in
                         do {
                             if result.is_error() {
                                 print(result.get_error())
@@ -125,14 +126,17 @@ public final class Teleport {
                         }
                         responseHandler?()
                     }
+                    reqTask += r
                 } catch {
                     print(error.localizedDescription)
                     responseHandler?()
                 }
             }
+            reqTask += r
         } catch {
             print(error.localizedDescription)
             responseHandler?()
         }
+        return reqTask
     }
 }
