@@ -28,6 +28,7 @@ class DataStructureTests: XCTestCase {
         ("testDescendants",testDescendants),
         ("testWeaklyConnetectedComponents",testWeaklyConnetectedComponents),
         ("testLongestPath",testLongestPath),
+        ("testDotInt",testDotInt),
     ]
     #endif
 
@@ -211,6 +212,13 @@ class DataStructureTests: XCTestCase {
         } catch let error {
             XCTFail("\(error)")
         }
+    }
+
+    func testDotInt() {
+        let a = [[1,2],[3,4]]
+        let b = [[11,12],[13,14]]
+        let expected = [[37, 40], [85, 92]]
+        XCTAssertEqual(NumUtilities.dotInt(a,b).description, expected.description)
     }
 
     private class func formatList(_ list: [GraphVertex<EmptyGraphData>]) -> String {

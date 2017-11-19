@@ -13,18 +13,28 @@
 // limitations under the License.
 // =============================================================================
 
-#ifndef CRandom_h
-#define CRandom_h
+import Foundation
 
-extern const int N;
+/**
+ Tools Exceptions
+ */
+public enum ToolsError: LocalizedError, CustomStringConvertible {
 
-struct CRandomState {
-    unsigned long *mt; /* the array for the state vector  */
-    int mti;           /* mti==N+1 means mt[N] is not initialized */
-};
+    case invalidPauliMultiplication
+    case pauliToMatrixZ
+    case pauliToMatrixX
 
-extern void init_by_array(struct CRandomState *pState,unsigned long init_key[], int key_length);
-extern unsigned long genrand_int32(struct CRandomState *pState);
-extern double genrand_res53(struct CRandomState *pState);
-
-#endif
+    public var errorDescription: String? {
+        return self.description
+    }
+    public var description: String {
+        switch self {
+        case .invalidPauliMultiplication:
+            return "Paulis cannot be multiplied - different number of qubits"
+        case .pauliToMatrixZ:
+            return "The z string is not of the form 0 and 1"
+        case .pauliToMatrixX:
+            return "The x string is not of the form 0 and 1"
+        }
+    }
+}

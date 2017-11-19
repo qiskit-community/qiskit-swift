@@ -15,7 +15,7 @@
 
 import Foundation
 
-struct Complex: Equatable, Hashable, CustomStringConvertible, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral {
+public struct Complex: Equatable, Hashable, CustomStringConvertible, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral {
 
     public var real: Double {
         get { return _real }
@@ -174,7 +174,7 @@ struct Complex: Equatable, Hashable, CustomStringConvertible, ExpressibleByInteg
     }
 }
 
-func ==(left: Complex, right: Complex) -> Bool {
+public func ==(left: Complex, right: Complex) -> Bool {
     return left.real == right.real && left.imag == right.imag
 }
 
@@ -196,73 +196,74 @@ infix operator *= : AssignmentPrecedence
 infix operator /= : AssignmentPrecedence
 
 
-func + (left: Complex, right: Complex) -> Complex {
+public func + (left: Complex, right: Complex) -> Complex {
     return left.add(right)
 }
-func + (left: Double,  right: Complex) -> Complex {
+public func + (left: Double,  right: Complex) -> Complex {
     return Complex(real: left).add(right)
 }
-func + (left: Complex, right: Double ) -> Complex {
+public func + (left: Complex, right: Double ) -> Complex {
     return left.add(Complex(real: right))
 }
 
-func - (left: Complex, right: Complex) -> Complex {
+public func - (left: Complex, right: Complex) -> Complex {
     return left.subtract(right)
 }
-func - (left: Double,  right: Complex) -> Complex {
+public func - (left: Double,  right: Complex) -> Complex {
     return Complex(real: left).subtract(right)
 }
-func - (left: Complex, right: Double ) -> Complex {
+public func - (left: Complex, right: Double ) -> Complex {
     return left.subtract(Complex(real: right))
 }
 
-func * (left: Complex, right: Complex) -> Complex {
+public func * (left: Complex, right: Complex) -> Complex {
     return left.multiply(right)
 }
-func * (left: Double,  right: Complex) -> Complex {
+public func * (left: Double,  right: Complex) -> Complex {
     return right.multiply(left)
 }
-func * (left: Complex, right: Double ) -> Complex {
+public func * (left: Complex, right: Double ) -> Complex {
     return left.multiply(right)
 }
 
-func / (left: Complex, right: Complex) -> Complex {
+public func / (left: Complex, right: Complex) -> Complex {
     return left.divide(right)
 }
-func / (left: Double,  right: Complex) -> Complex {
+public func / (left: Double,  right: Complex) -> Complex {
     return Complex(real: left).divide(right)
 }
-func / (left: Complex, right: Double ) -> Complex {
+public func / (left: Complex, right: Double ) -> Complex {
     return left.divide(right)
 }
 
-func ^ (left: Complex, right: Double) -> Complex {
+public func ^ (left: Complex, right: Double) -> Complex {
     return left.power(right)
 }
-func ^ (left: Complex, right: Int) -> Complex {
+public func ^ (left: Complex, right: Int) -> Complex {
     return left.power(right)
 }
 
-func += (left: inout Complex, right: Complex) {
+public func += (left: inout Complex, right: Complex) {
     left.addInPlace(right)
 }
-func += (left: inout Complex, right: Double) {
+public func += (left: inout Complex, right: Double) {
     left.addInPlace(Complex(real: right))
 }
-func -= (left: inout Complex, right: Complex) {
+public func -= (left: inout Complex, right: Complex) {
     left.subtractInPlace(right)
 }
-func -= (left: inout Complex, right: Double) {
-    left.subtractInPlace(Complex(real: right)) }
-func *= (left: inout Complex, right: Complex) {
+public func -= (left: inout Complex, right: Double) {
+    left.subtractInPlace(Complex(real: right))
+}
+public func *= (left: inout Complex, right: Complex) {
     left.multiplyInPlace(right)
 }
-func *= (left: inout Complex, right: Double) {
+public func *= (left: inout Complex, right: Double) {
     left.multiplyInPlace(right)
 }
-func /= (left: inout Complex, right: Complex) {
+public func /= (left: inout Complex, right: Complex) {
     left.divideInPlace(right)
 }
-func /= (left: inout Complex, right: Double) {
+public func /= (left: inout Complex, right: Double) {
     left.divideInPlace(right)
 }

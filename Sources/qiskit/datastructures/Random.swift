@@ -67,4 +67,38 @@ final class Random {
         self.mti = randomState.mti
         return result
     }
+
+    func getrandbits(_ bits: UInt) -> UInt32 {
+        var k = bits
+        var randomState = CRandomState(mt:&self.mt, mti:  self.mti)
+        var r: UInt32 = UInt32(genrand_int32(&randomState))
+        self.mti = randomState.mti
+        if k < 32 {
+            return r >> (32 - k)
+        }
+        let words = Int((k - 1) / 32 + 1)
+        var wordarray: [UInt8] = []
+        for _ in 0..<words {
+            randomState = CRandomState(mt:&self.mt, mti:  self.mti)
+            r = UInt32(genrand_int32(&randomState))
+            self.mti = randomState.mti
+            if k < 32 {
+                r >>= (32 - k)  /* Drop least significant bits */
+            }
+            wordarray.append(contentsOf: Random.toBytes(r))
+            k -= 32
+        }
+        let data = Data(bytes: wordarray)
+        return UInt32(bigEndian: data.withUnsafeBytes { $0.pointee })
+    }
+
+    private static func toBytes(_ number: UInt32) -> [UInt8] {
+        let capacity = MemoryLayout<UInt32>.size
+        var mutableValue = number
+        return withUnsafePointer(to: &mutableValue) {
+            return $0.withMemoryRebound(to: UInt8.self, capacity: capacity) {
+                return Array(UnsafeBufferPointer(start: $0, count: capacity))
+            }
+        }
+    }
 }

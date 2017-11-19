@@ -13,18 +13,14 @@
 // limitations under the License.
 // =============================================================================
 
-#ifndef CRandom_h
-#define CRandom_h
+import Foundation
 
-extern const int N;
+extension String {
+    func leftPadding(length: UInt, pad: String = " ") -> String {
 
-struct CRandomState {
-    unsigned long *mt; /* the array for the state vector  */
-    int mti;           /* mti==N+1 means mt[N] is not initialized */
-};
+        guard length > self.count else { return self }
 
-extern void init_by_array(struct CRandomState *pState,unsigned long init_key[], int key_length);
-extern unsigned long genrand_int32(struct CRandomState *pState);
-extern double genrand_res53(struct CRandomState *pState);
-
-#endif
+        let padding = String(repeating: pad, count: Int(length) - self.count)
+        return padding + self
+    }
+}
