@@ -15,7 +15,7 @@
 
 import Foundation
 
-public struct Complex: Equatable, Hashable, CustomStringConvertible, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral {
+public struct Complex: Equatable, Hashable, CustomStringConvertible, NumericType, ExpressibleByFloatLiteral {
 
     public var real: Double {
         get { return _real }
@@ -194,7 +194,6 @@ infix operator += : AssignmentPrecedence
 infix operator -= : AssignmentPrecedence
 infix operator *= : AssignmentPrecedence
 infix operator /= : AssignmentPrecedence
-
 
 public func + (left: Complex, right: Complex) -> Complex {
     return left.add(right)

@@ -28,7 +28,8 @@ class DataStructureTests: XCTestCase {
         ("testDescendants",testDescendants),
         ("testWeaklyConnetectedComponents",testWeaklyConnetectedComponents),
         ("testLongestPath",testLongestPath),
-        ("testDotInt",testDotInt),
+        ("testVector",testVector),
+        ("testMatrix",testMatrix),
     ]
     #endif
 
@@ -214,11 +215,19 @@ class DataStructureTests: XCTestCase {
         }
     }
 
-    func testDotInt() {
-        let a = [[1,2],[3,4]]
-        let b = [[11,12],[13,14]]
-        let expected = [[37, 40], [85, 92]]
-        XCTAssertEqual(NumUtilities.dotInt(a,b).description, expected.description)
+    func testVector() {
+        let a: Vector<Complex> = [Complex(imag:2), Complex(imag:3)]
+        let b: Vector<Complex> = [Complex(imag:2), Complex(imag:3)]
+        XCTAssertEqual(a.dot(b).description, Complex(-13,0).description)
+    }
+
+    func testMatrix() {
+        var a: Matrix = [[1, 0], [0, 1]]
+        var b: Matrix = [[4, 1], [2, 2]]
+        XCTAssertEqual(a.dot(b).description, [[4, 1], [2, 2]].description)
+        a = [[1,2],[3,4]]
+        b = [[11,12],[13,14]]
+        XCTAssertEqual(a.dot(b).description, [[37, 40], [85, 92]].description)
     }
 
     private class func formatList(_ list: [GraphVertex<EmptyGraphData>]) -> String {

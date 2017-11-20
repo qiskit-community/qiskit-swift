@@ -32,14 +32,6 @@ final class NumUtilities {
     static func zeroComplex(_ rows: Int,_ cols: Int) -> [[Complex]] {
         return (0..<rows).map {_ in
             return (0..<cols).map {_ in
-                return Complex()
-            }
-        }
-    }
-
-    static func zeroInt(_ rows: Int,_ cols: Int) -> [[Int]] {
-        return (0..<rows).map {_ in
-            return (0..<cols).map {_ in
                 return 0
             }
         }
@@ -80,42 +72,5 @@ final class NumUtilities {
             }
         }
         return ab
-    }
-
-    static func dotInt(_ a: [[Int]], _ b: [[Int]]) -> [[Int]] {
-        let m = a.count
-        let n = a.isEmpty ? 0 : a[0].count
-        let q = b.isEmpty ? 0 : b[0].count
-
-        var ab = NumUtilities.zeroInt(m,q)
-        for i in 0..<m {
-            for j in 0..<q {
-                for k in 0..<n {
-                    ab[i][j] += a[i][k] * b[k][j]
-                }
-            }
-        }
-        return ab
-    }
-
-    static func dotInt(_ a: [Int], _ b: [Int]) -> Int {
-        let m = a.count <= b.count ? a.count : b.count
-        var ab: Int = 0
-        for i in 0..<m {
-            ab += a[i] * b[i]
-        }
-        return ab
-    }
-
-    static func multiplyScalarToMatrixComplex(_ a : Complex, _ matrix: [[Complex]]) -> [[Complex]] {
-        var ret: [[Complex]] = []
-        for i in 0..<matrix.count {
-            var vector: [Complex] = []
-            for j in 0..<matrix[i].count {
-                vector.append(a * matrix[i][j])
-            }
-            ret.append(vector)
-        }
-        return ret
     }
 }

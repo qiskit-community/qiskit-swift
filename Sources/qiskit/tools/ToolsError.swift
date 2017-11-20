@@ -23,6 +23,8 @@ public enum ToolsError: LocalizedError, CustomStringConvertible {
     case invalidPauliMultiplication
     case pauliToMatrixZ
     case pauliToMatrixX
+    case invalidPauliString(label: String)
+    case errorPauliGroup
 
     public var errorDescription: String? {
         return self.description
@@ -35,6 +37,10 @@ public enum ToolsError: LocalizedError, CustomStringConvertible {
             return "The z string is not of the form 0 and 1"
         case .pauliToMatrixX:
             return "The x string is not of the form 0 and 1"
+        case .invalidPauliString(let label):
+            return "Invalid Pauli string: '\(label)'"
+        case .errorPauliGroup:
+            return "Please set the number of qubits to less than 5"
         }
     }
 }

@@ -37,14 +37,18 @@ import Foundation
  */
 public final class Pauli: CustomStringConvertible {
 
-    private var v: [Int] = []
-    private var w: [Int] = []
+    private var v: Vector<Int> = []
+    private var w: Vector<Int> = []
     private let numberofqubits: Int
 
     /**
      Make the Pauli class.
     */
-    public init(_ v: [Int], _ w: [Int]) {
+    public convenience init(_ v: [Int], _ w: [Int]) {
+        self.init(Vector<Int>(value:v),Vector<Int>(value:w))
+    }
+
+    public init(_ v: Vector<Int>, _ w: Vector<Int>) {
         self.numberofqubits = v.count
         self.v = v
         self.w = w
@@ -72,12 +76,8 @@ public final class Pauli: CustomStringConvertible {
         if left.numberofqubits != right.numberofqubits {
             throw ToolsError.invalidPauliMultiplication
         }
-        var vnew = left.v
-        vnew.append(contentsOf: right.v)
-        vnew = vnew.map { $0 % 2 }
-        var wnew = left.w
-        wnew.append(contentsOf: right.w)
-        wnew = wnew.map { $0 % 2 }
+        let vnew = left.v.add(right.v).remainder(2)
+        let wnew = left.w.add(right.w).remainder(2)
         return Pauli(vnew, wnew)
     }
 
@@ -108,13 +108,13 @@ public final class Pauli: CustomStringConvertible {
 
      Order is q_n x q_{n-1} .... q_0
      */
-    public func to_matrix() throws -> [[Complex]] {
-        let X: [[Complex]] = [[0, 1], [1, 0]]
-        let Z: [[Complex]] = [[1, 0], [0, -1]]
-        let Id: [[Complex]] = [[1, 0], [0, 1]]
-        var Xtemp: [[Complex]] = [[Complex(real: 1)]]
+    public func to_matrix() throws -> Matrix<Complex> {
+        let X: Matrix<Complex> = [[0, 1], [1, 0]]
+        let Z: Matrix<Complex> = [[1, 0], [0, -1]]
+        let Id: Matrix<Complex> = [[1, 0], [0, 1]]
+        var Xtemp: Matrix<Complex> = [[1]]
         for k in 0..<self.numberofqubits {
-            var tempz: [[Complex]] = []
+            var tempz: Matrix<Complex> = []
             if self.v[k] == 0 {
                 tempz = Id
             }
@@ -124,7 +124,7 @@ public final class Pauli: CustomStringConvertible {
             else {
                 throw ToolsError.pauliToMatrixZ
             }
-            var tempx: [[Complex]] = []
+            var tempx: Matrix<Complex> = []
             if self.w[k] == 0 {
                 tempx = Id
             }
@@ -134,10 +134,10 @@ public final class Pauli: CustomStringConvertible {
             else {
                 throw ToolsError.pauliToMatrixX
             }
-            let ope = NumUtilities.dotComplex(tempz, tempx)
-            Xtemp = NumUtilities.kronComplex(ope, Xtemp)
+            let ope = tempz.dot(tempx)
+            Xtemp = ope.kron(Xtemp)
         }
-        return NumUtilities.multiplyScalarToMatrixComplex(Complex(imag: -1).power(NumUtilities.dotInt(self.v, self.w)) , Xtemp)
+        return Xtemp.mult(Complex(imag: -1).power(self.v.dot(self.w)))
     }
 
     /**
@@ -147,5 +147,175 @@ public final class Pauli: CustomStringConvertible {
         let random = Random(time(nil))
         return Pauli(Array(String(random.getrandbits(numberofqubits), radix:2).leftPadding(length: numberofqubits, pad: "0")).map { Int(String($0))! },
                      Array(String(random.getrandbits(numberofqubits), radix:2).leftPadding(length: numberofqubits, pad: "0")).map { Int(String($0))! })
+    }
+
+    /**
+     Multiply two Paulis P1*P2 and track the sign.
+
+     P3 = P1*P2: X*Y
+     */
+    public static func sgn_prod(P1: Pauli, P2: Pauli) throws -> (Pauli,Complex) {
+        if P1.numberofqubits != P2.numberofqubits {
+            throw ToolsError.invalidPauliMultiplication
+        }
+        let vnew = P1.v.add(P2.v).remainder(2)
+        let wnew = P1.w.add(P2.w).remainder(2)
+        let paulinew = Pauli(vnew, wnew)
+        var phase = Complex(real: 1)
+        for i in 0..<P1.v.count {
+            if P1.v[i] == 1 && P1.w[i] == 0 && P2.v[i] == 0 && P2.w[i] == 1 {  // Z*X
+                phase = Complex(imag: 1) * phase
+            }
+            else if P1.v[i] == 0 && P1.w[i] == 1 && P2.v[i] == 1 && P2.w[i] == 0 {  // X*Z
+                phase = Complex(imag: -1) * phase
+            }
+            else if P1.v[i] == 0 && P1.w[i] == 1 && P2.v[i] == 1 && P2.w[i] == 1 { // X*Y
+                phase = Complex(imag: 1) * phase
+            }
+            else if P1.v[i] == 1 && P1.w[i] == 1 && P2.v[i] ==  0 && P2.w[i] == 1 {  // Y*X
+                phase = Complex(imag: -1) * phase
+            }
+            else if P1.v[i] == 1 && P1.w[i] == 1 && P2.v[i] == 1 && P2.w[i] == 0 {  // Y*Z
+                phase = Complex(imag: 1) * phase
+            }
+            else if P1.v[i] == 1 && P1.w[i] == 0 && P2.v[i] == 1 && P2.w[i] == 1 { // Z*Y
+                phase = Complex(imag: -1) * phase
+            }
+        }
+        return (paulinew, phase)
+    }
+
+    /**
+     Return the inverse of a Pauli.
+     */
+    public static func inverse_pauli(other: Pauli) -> Pauli {
+        return Pauli(other.v, other.w)
+    }
+
+    /**
+     Return the pauli of a string .
+     */
+    public static func label_to_pauli(label: String) throws -> Pauli {
+        var v = Vector<Int>(count: label.count, repeating:0)
+        var w = Vector<Int>(count: label.count, repeating:0)
+        let characters = Array(label)
+        for j in 0..<characters.count {
+            if characters[j] == "I" {
+                v[j] = 0
+                w[j] = 0
+            }
+            else if characters[j] == "Z" {
+                v[j] = 1
+                w[j] = 0
+            }
+            else if characters[j] == "Y" {
+                v[j] = 1
+                w[j] = 1
+            }
+            else if characters[j] == "X" {
+                v[j] = 0
+                w[j] = 1
+            }
+            else {
+                throw ToolsError.invalidPauliString(label: label)
+            }
+        }
+        return Pauli(v, w)
+    }
+
+    /**
+     Return the Pauli group with 4^n elements.
+
+     The phases have been removed.
+     groupCase 0 is ordered by Pauli weights and
+     groupCase 1 is ordered by I,X,Y,Z counting last qubit fastest.
+     @param numberofqubits is number of qubits
+     @param case determines ordering of group elements (0=weight, 1=tensor)
+     @return list of Pauli objects
+     WARNING THIS IS EXPONENTIAL
+     */
+    public static func pauli_group(_ numberofqubits: Int, groupCase: UInt = 0) throws -> [Pauli] {
+        if numberofqubits < 5 {
+            var tempset: [Pauli] = []
+            if groupCase == 0 {
+                let tmp = try Pauli.pauli_group(numberofqubits, groupCase: 1)
+                // sort on the weight of the Pauli operator
+                return tmp.sorted(by: { p1, p2 in
+                    let p1Array = Array(p1.to_label())
+                    var p1Count = 0
+                    for x in p1Array {
+                        if x == "I" {
+                            p1Count += 1
+                        }
+                    }
+                    let p2Array = Array(p2.to_label())
+                    var p2Count = 0
+                    for x in p2Array {
+                        if x == "I" {
+                            p2Count += 1
+                        }
+                    }
+                    return (p1Count > p2Count)
+                })
+            }
+            else if groupCase == 1 {
+                // the Pauli set is in tensor order II IX IY IZ XI ...
+                for kindex in 0..<Int(pow(4.0,Double(numberofqubits))) {
+                    var v = Vector<Int>(count: numberofqubits, repeating:0)
+                    var w = Vector<Int>(count: numberofqubits, repeating:0)
+                    // looping over all the qubits
+                    for jindex in 0..<numberofqubits {
+                        // making the Pauli for each kindex i fill it in from the
+                        // end first
+                        let element = Int(kindex / Int(pow(4.0,Double(jindex)))) % 4
+                        if element == 0 {
+                            v[jindex] = 0
+                            w[jindex] = 0
+                        }
+                        else if element == 1 {
+                            v[jindex] = 0
+                            w[jindex] = 1
+                        }
+                        else if element == 2 {
+                            v[jindex] = 1
+                            w[jindex] = 1
+                        }
+                        else if element == 3 {
+                            v[jindex] = 1
+                            w[jindex] = 0
+                        }
+                    }
+                    tempset.append(Pauli(v, w))
+                }
+            }
+            return tempset
+        }
+        else {
+            throw ToolsError.errorPauliGroup
+        }
+    }
+
+    /**
+     Return the single qubit pauli in numberofqubits.
+     */
+    static public func pauli_singles(_ jindex: Int, _ numberofqubits: Int) -> [Pauli] {
+        // looping over all the qubits
+        var tempset: [Pauli] = []
+        var v = Vector<Int>(count: numberofqubits, repeating:0)
+        var w = Vector<Int>(count: numberofqubits, repeating:0)
+        v[jindex] = 0
+        w[jindex] = 1
+        tempset.append(Pauli(v, w))
+        v = Vector<Int>(count: numberofqubits, repeating:0)
+        w = Vector<Int>(count: numberofqubits, repeating:0)
+        v[jindex] = 1
+        w[jindex] = 1
+        tempset.append(Pauli(v, w))
+        v = Vector<Int>(count: numberofqubits, repeating:0)
+        w = Vector<Int>(count: numberofqubits, repeating:0)
+        v[jindex] = 1
+        w[jindex] = 0
+        tempset.append(Pauli(v, w))
+        return tempset
     }
 }
