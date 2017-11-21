@@ -17,9 +17,9 @@ import Foundation
 
 public struct Matrix<T: NumericType> : CustomStringConvertible, ExpressibleByArrayLiteral {
 
-    private var value: [[T]]
+    public private(set) var value: [[T]]
 
-    public init(rows: Int, cols: Int, repeating: T) {
+    public init(repeating: T, rows: Int, cols: Int) {
         self.init(value: [[T]](repeating: [T](repeating: repeating, count: cols), count: rows))
     }
 
@@ -38,7 +38,7 @@ public struct Matrix<T: NumericType> : CustomStringConvertible, ExpressibleByArr
     }
 
     public static func identity(_ n: Int) -> Matrix<T> {
-        var m = Matrix<T>(rows: n, cols: 0, repeating: 0)
+        var m = Matrix<T>(repeating: 0, rows: n, cols: 0)
         for row in 0..<m.rowCount {
             for col in 0..<m.colCount {
                 m[row,col] = row == col ? 1 : 0
@@ -87,7 +87,7 @@ public struct Matrix<T: NumericType> : CustomStringConvertible, ExpressibleByArr
         let n = self.colCount
         let q = other.colCount
 
-        var ab = Matrix<T>(rows:m, cols:q, repeating: 0)
+        var ab = Matrix<T>(repeating: 0, rows:m, cols:q)
         for i in 0..<m {
             for j in 0..<q {
                 for k in 0..<n {
@@ -104,7 +104,7 @@ public struct Matrix<T: NumericType> : CustomStringConvertible, ExpressibleByArr
         let p = other.rowCount
         let q = other.colCount
 
-        var ab = Matrix<T>(rows:m * p, cols:n * q, repeating: 0)
+        var ab = Matrix<T>(repeating: 0, rows:m * p, cols:n * q)
         for i in 0..<m {
             for j in 0..<n {
                 let da = self[i,j]

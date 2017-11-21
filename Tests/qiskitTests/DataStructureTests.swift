@@ -219,6 +219,8 @@ class DataStructureTests: XCTestCase {
         let a: Vector<Complex> = [Complex(imag:2), Complex(imag:3)]
         let b: Vector<Complex> = [Complex(imag:2), Complex(imag:3)]
         XCTAssertEqual(a.dot(b).description, Complex(-13,0).description)
+        let c: Vector<Int> = [5, 4, 1, 0]
+        XCTAssertEqual(c.remainder(2).description, [1, 0, 1, 0].description)
     }
 
     func testMatrix() {

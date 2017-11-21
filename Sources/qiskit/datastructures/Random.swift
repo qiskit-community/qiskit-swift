@@ -92,6 +92,25 @@ final class Random {
         return UInt32(bigEndian: data.withUnsafeBytes { $0.pointee })
     }
 
+    /**
+     Return a random integer N such that a <= N <= b
+     */
+    func randint(_ start: UInt32, _ stop: UInt32) -> UInt32 {
+        return start + self.randbelow(stop - start + 1)
+    }
+
+    /**
+     Return a random int in the range [0,n).
+     */
+    private func randbelow(_ n: UInt32) -> UInt32 {
+        let k = UInt(String(n, radix:2).count)
+        var r = self.getrandbits(k)
+        while r >= n {
+            r = getrandbits(k)
+        }
+        return r
+    }
+
     private static func toBytes(_ number: UInt32) -> [UInt8] {
         let capacity = MemoryLayout<UInt32>.size
         var mutableValue = number

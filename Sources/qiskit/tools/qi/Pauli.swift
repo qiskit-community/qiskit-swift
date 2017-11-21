@@ -37,9 +37,9 @@ import Foundation
  */
 public final class Pauli: CustomStringConvertible {
 
-    private var v: Vector<Int> = []
-    private var w: Vector<Int> = []
-    private let numberofqubits: Int
+    public private(set) var v: Vector<Int> = []
+    public private(set) var w: Vector<Int> = []
+    public let numberofqubits: Int
 
     /**
      Make the Pauli class.
@@ -196,8 +196,8 @@ public final class Pauli: CustomStringConvertible {
      Return the pauli of a string .
      */
     public static func label_to_pauli(label: String) throws -> Pauli {
-        var v = Vector<Int>(count: label.count, repeating:0)
-        var w = Vector<Int>(count: label.count, repeating:0)
+        var v = Vector<Int>(repeating: 0,count: label.count)
+        var w = Vector<Int>(repeating: 0,count: label.count)
         let characters = Array(label)
         for j in 0..<characters.count {
             if characters[j] == "I" {
@@ -261,8 +261,8 @@ public final class Pauli: CustomStringConvertible {
             else if groupCase == 1 {
                 // the Pauli set is in tensor order II IX IY IZ XI ...
                 for kindex in 0..<Int(pow(4.0,Double(numberofqubits))) {
-                    var v = Vector<Int>(count: numberofqubits, repeating:0)
-                    var w = Vector<Int>(count: numberofqubits, repeating:0)
+                    var v = Vector<Int>(repeating: 0, count: numberofqubits)
+                    var w = Vector<Int>(repeating: 0, count: numberofqubits)
                     // looping over all the qubits
                     for jindex in 0..<numberofqubits {
                         // making the Pauli for each kindex i fill it in from the
@@ -301,18 +301,18 @@ public final class Pauli: CustomStringConvertible {
     static public func pauli_singles(_ jindex: Int, _ numberofqubits: Int) -> [Pauli] {
         // looping over all the qubits
         var tempset: [Pauli] = []
-        var v = Vector<Int>(count: numberofqubits, repeating:0)
-        var w = Vector<Int>(count: numberofqubits, repeating:0)
+        var v = Vector<Int>(repeating: 0, count: numberofqubits)
+        var w = Vector<Int>(repeating: 0, count: numberofqubits)
         v[jindex] = 0
         w[jindex] = 1
         tempset.append(Pauli(v, w))
-        v = Vector<Int>(count: numberofqubits, repeating:0)
-        w = Vector<Int>(count: numberofqubits, repeating:0)
+        v = Vector<Int>(repeating: 0, count: numberofqubits)
+        w = Vector<Int>(repeating: 0, count: numberofqubits)
         v[jindex] = 1
         w[jindex] = 1
         tempset.append(Pauli(v, w))
-        v = Vector<Int>(count: numberofqubits, repeating:0)
-        w = Vector<Int>(count: numberofqubits, repeating:0)
+        v = Vector<Int>(repeating: 0, count: numberofqubits)
+        w = Vector<Int>(repeating: 0, count: numberofqubits)
         v[jindex] = 1
         w[jindex] = 0
         tempset.append(Pauli(v, w))

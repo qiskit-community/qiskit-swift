@@ -18,9 +18,9 @@ import Foundation
 
 public struct Vector<T: NumericType> : Sequence, CustomStringConvertible, ExpressibleByArrayLiteral {
 
-    private var value: [T]
+    public private(set) var value: [T]
 
-    public init(count: Int, repeating: T) {
+    public init(repeating: T, count: Int) {
         self.init(value: [T](repeating: repeating, count: count))
     }
 
@@ -65,11 +65,44 @@ public struct Vector<T: NumericType> : Sequence, CustomStringConvertible, Expres
 
     public func add(_ other: Vector<T>) -> Vector<T> {
         let m = self.count <= other.count ? self.count : other.count
-        var sum: Vector<T> = Vector<T>(count:m, repeating: 0)
+        var sum: Vector<T> = Vector<T>(repeating: 0, count:m)
         for i in 0..<m {
             sum[i] = self[i] + other[i]
         }
         return sum
+    }
+
+    public func subtract(_ other: Vector<T>) -> Vector<T> {
+        let m = self.count <= other.count ? self.count : other.count
+        var sum: Vector<T> = Vector<T>(repeating: 0, count:m)
+        for i in 0..<m {
+            sum[i] = self[i] - other[i]
+        }
+        return sum
+    }
+
+    public func add(_ scalar: T) -> Vector<T> {
+        return Vector<T>(value: self.map {
+            return $0 + scalar
+        })
+    }
+
+    public func subtract(_ scalar: T) -> Vector<T> {
+        return Vector<T>(value: self.map {
+            return $0 - scalar
+        })
+    }
+
+    public func mult(_ scalar: T) -> Vector<T> {
+        return Vector<T>(value: self.map {
+            return $0 * scalar
+        })
+    }
+
+    public func div(_ scalar: T) -> Vector<T> {
+        return Vector<T>(value: self.map {
+            return $0 / scalar
+        })
     }
 
     public func remainder(_ scalar: T) -> Vector<T> {

@@ -107,7 +107,7 @@ final class SimulatorTools {
      number_of_qubits is the number of qubits in the system.
      */
     static func enlarge_two_opt(_ opt: Matrix<Complex>, _ q0: Int, _ q1: Int, _ num: Int) -> Matrix<Complex> {
-        var enlarge_opt = Matrix<Complex>(rows: 1 << (num), cols: 1 << (num), repeating: 0)
+        var enlarge_opt = Matrix<Complex>(repeating: 0, rows: 1 << (num), cols: 1 << (num))
         for i in 0..<(1 << (num-2)) {
             for j in 0..<2 {
                 for k in 0..<2 {
