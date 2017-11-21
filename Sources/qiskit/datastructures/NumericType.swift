@@ -45,4 +45,3 @@ extension UInt32 : NumericType { }
 extension UInt64 : NumericType { }
 extension Float32 : FloatingPointType { }
 extension Float64 : FloatingPointType { }
-extension Float80 : FloatingPointType { }
