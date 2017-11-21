@@ -90,10 +90,10 @@ final class SimulatorTools {
             is q_{n-1} ... otimes q_1 otimes q_0.
         number_of_qubits: the number of qubits in the system.
      */
-    static func enlarge_single_opt(_ opt: [[Complex]], _ qubit: Int, _ number_of_qubits: Int) -> [[Complex]] {
-        let temp_1 = NumUtilities.identityComplex(Int(pow(2.0,Double(number_of_qubits-qubit-1))))
-        let temp_2 = NumUtilities.identityComplex(Int(pow(2.0,Double(qubit))))
-        return NumUtilities.kronComplex(temp_1, NumUtilities.kronComplex(opt, temp_2))
+    static func enlarge_single_opt(_ opt: Matrix<Complex>, _ qubit: Int, _ number_of_qubits: Int) -> Matrix<Complex> {
+        let temp_1 = Matrix<Complex>.identity(Int(pow(2.0,Double(number_of_qubits-qubit-1))))
+        let temp_2 = Matrix<Complex>.identity(Int(pow(2.0,Double(qubit))))
+        return temp_1.kron(opt.kron(temp_2))
     }
 
     /**
@@ -106,14 +106,14 @@ final class SimulatorTools {
      returns a complex numpy array
      number_of_qubits is the number of qubits in the system.
      */
-    static func enlarge_two_opt(_ opt: [[Complex]], _ q0: Int, _ q1: Int, _ num: Int) -> [[Complex]] {
-        var enlarge_opt = NumUtilities.zeroComplex(1 << (num), 1 << (num))
+    static func enlarge_two_opt(_ opt: Matrix<Complex>, _ q0: Int, _ q1: Int, _ num: Int) -> Matrix<Complex> {
+        var enlarge_opt = Matrix<Complex>(rows: 1 << (num), cols: 1 << (num), repeating: 0)
         for i in 0..<(1 << (num-2)) {
             for j in 0..<2 {
                 for k in 0..<2 {
                     for jj in 0..<2 {
                         for kk in 0..<2 {
-                            enlarge_opt[index2(j, q0, k, q1, i)][index2(jj, q0, kk, q1, i)] = opt[j+2*k][jj+2*kk]
+                            enlarge_opt[index2(j, q0, k, q1, i),index2(jj, q0, kk, q1, i)] = opt[j+2*k,jj+2*kk]
                         }
                     }
                 }
@@ -158,7 +158,7 @@ final class SimulatorTools {
      Returns:
         A numpy array representing the matrix
      */
-    static func single_gate_matrix(_ gate: String, _ params: [Double]? = nil) -> [[Complex]] {
+    static func single_gate_matrix(_ gate: String, _ params: [Double]? = nil) -> Matrix<Complex> {
         let (theta, phi, lam) = SimulatorTools.single_gate_params(gate, params)
         return [[
                     Complex(real:cos(theta/2.0)),

@@ -100,7 +100,7 @@ result =
 final class UnitarySimulator: BaseBackend {
 
     private var _number_of_qubits: Int = 0
-    private var _unitary_state: [[Complex]] = []
+    private var _unitary_state: Matrix<Complex> = []
 
     public required init(_ configuration: [String:Any]? = nil) {
         super.init(configuration)
@@ -128,9 +128,9 @@ final class UnitarySimulator: BaseBackend {
      is q_{n-1} ... otimes q_1 otimes q_0.
      number_of_qubits is the number of qubits in the system.
      */
-    private func _add_unitary_single(_ gate: [[Complex]], _ qubit: Int) {
+    private func _add_unitary_single(_ gate: Matrix<Complex>, _ qubit: Int) {
         let unitaty_add = SimulatorTools.enlarge_single_opt(gate, qubit, self._number_of_qubits)
-        self._unitary_state = NumUtilities.dotComplex(unitaty_add, self._unitary_state)
+        self._unitary_state = unitaty_add.dot(self._unitary_state)
     }
 
     /**
@@ -141,9 +141,9 @@ final class UnitarySimulator: BaseBackend {
      q1 is the second qubit (target)
      returns a complex numpy array
      */
-    private func _add_unitary_two(_ gate: [[Complex]], _ q0: Int, _ q1: Int) {
+    private func _add_unitary_two(_ gate: Matrix<Complex>, _ q0: Int, _ q1: Int) {
         let unitaty_add = SimulatorTools.enlarge_two_opt(gate, q0, q1, self._number_of_qubits)
-        self._unitary_state = NumUtilities.dotComplex(unitaty_add, self._unitary_state)
+        self._unitary_state = unitaty_add.dot(self._unitary_state)
     }
 
     /**
@@ -188,7 +188,7 @@ final class UnitarySimulator: BaseBackend {
                 self._number_of_qubits = number_of_qubits
             }
         }
-        self._unitary_state = NumUtilities.identityComplex(Int(pow(2.0,Double(self._number_of_qubits))))
+        self._unitary_state = Matrix<Complex>.identity(Int(pow(2.0,Double(self._number_of_qubits))))
         guard let operations = ccircuit["operations"] as? [[String:Any]] else {
             result["status"] = "ERROR"
             return result
@@ -212,7 +212,7 @@ final class UnitarySimulator: BaseBackend {
             }
             else if ["CX", "cx"].contains(name) {
                 if let qubits = operation["qubits"] as? [Int] {
-                    let gate: [[Complex]] = [[1, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0]]
+                    let gate: Matrix<Complex> = [[1, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0]]
                     self._add_unitary_two(gate, qubits[0], qubits[1])
                 }
             }

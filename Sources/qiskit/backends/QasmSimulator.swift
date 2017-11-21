@@ -179,7 +179,7 @@ final class QasmSimulator: BaseBackend {
      Gate is the single qubit applied.
      qubit is the qubit the gate is applied to.
      */
-    private func _add_qasm_single(_ gate: [[Complex]], _ qubit: Int) {
+    private func _add_qasm_single(_ gate: Matrix<Complex>, _ qubit: Int) {
         var psi = self._quantum_state
         let bit: Int = 1 << qubit
         for k1 in stride(from: 0, to: 1 << self._number_of_qubits, by: 1 << (qubit+1)) {
@@ -187,8 +187,8 @@ final class QasmSimulator: BaseBackend {
                 let k: Int = k1 | k2
                 let cache0 = psi[k]
                 let cache1 = psi[k | bit]
-                psi[k] = gate[0][0] * cache0 + gate[0][1] * cache1
-                psi[k | bit] = gate[1][0] * cache0 + gate[1][1] * cache1
+                psi[k] = gate[0,0] * cache0 + gate[0,1] * cache1
+                psi[k | bit] = gate[1,0] * cache0 + gate[1,1] * cache1
             }
         }
         self._quantum_state = psi

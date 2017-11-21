@@ -19,8 +19,8 @@ public struct Matrix<T: NumericType> : CustomStringConvertible, ExpressibleByArr
 
     private var value: [[T]]
 
-    public init(rows: Int, columns: Int, repeating: T) {
-        self.init(value: [[T]](repeating: [T](repeating: repeating, count: columns), count: rows))
+    public init(rows: Int, cols: Int, repeating: T) {
+        self.init(value: [[T]](repeating: [T](repeating: repeating, count: cols), count: rows))
     }
 
     public init(arrayLiteral elements: [T]...) {
@@ -29,12 +29,22 @@ public struct Matrix<T: NumericType> : CustomStringConvertible, ExpressibleByArr
 
     private init(value: [[T]]) {
         let cols = value.isEmpty ? 0 : value[0].count
-        for i in 1..<value.count {
+        for i in 0..<value.count {
             if cols != value[i].count {
                 fatalError("Matrix must have same number of columns")
             }
         }
         self.value = value
+    }
+
+    public static func identity(_ n: Int) -> Matrix<T> {
+        var m = Matrix<T>(rows: n, cols: 0, repeating: 0)
+        for row in 0..<m.rowCount {
+            for col in 0..<m.colCount {
+                m[row,col] = row == col ? 1 : 0
+            }
+        }
+        return m
     }
 
     public var description: String {
@@ -77,7 +87,7 @@ public struct Matrix<T: NumericType> : CustomStringConvertible, ExpressibleByArr
         let n = self.colCount
         let q = other.colCount
 
-        var ab = Matrix<T>(rows:m, columns:q, repeating: 0)
+        var ab = Matrix<T>(rows:m, cols:q, repeating: 0)
         for i in 0..<m {
             for j in 0..<q {
                 for k in 0..<n {
@@ -94,7 +104,7 @@ public struct Matrix<T: NumericType> : CustomStringConvertible, ExpressibleByArr
         let p = other.rowCount
         let q = other.colCount
 
-        var ab = Matrix<T>(rows:m * p, columns:n * q, repeating: 0)
+        var ab = Matrix<T>(rows:m * p, cols:n * q, repeating: 0)
         for i in 0..<m {
             for j in 0..<n {
                 let da = self[i,j]
