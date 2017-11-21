@@ -35,7 +35,7 @@ import Foundation
  Clifford group, stabilizer states, and linear and quadratic operations over GF(2)
  Phys. Rev. A 68, 042318 – Published 20 October 2003
  */
-public final class Pauli: CustomStringConvertible {
+public final class Pauli: CustomStringConvertible, Hashable {
 
     public private(set) var v: Vector<Int> = []
     public private(set) var w: Vector<Int> = []
@@ -52,6 +52,35 @@ public final class Pauli: CustomStringConvertible {
         self.numberofqubits = v.count
         self.v = v
         self.w = w
+    }
+
+    public func copy() -> Pauli {
+        return Pauli(self.v,self.w)
+    }
+
+    public var hashValue : Int {
+        get {
+            return self.v.value.count &* 31 &+ self.w.value.count
+        }
+    }
+    public static func ==(lhs: Pauli, rhs:Pauli) -> Bool {
+        return lhs.v.value == rhs.v.value && lhs.w.value == rhs.w.value
+    }
+
+    public func getV(_ index: Int) -> Int {
+        return self.v[index]
+    }
+
+    public func setV(_ index: Int, _ value: Int) {
+        self.v[index] = value
+    }
+
+    public func getW(_ index: Int) -> Int {
+        return self.w[index]
+    }
+
+    public func setW(_ index: Int, _ value: Int) {
+        self.w[index] = value
     }
 
     /**

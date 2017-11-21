@@ -217,4 +217,77 @@ public final class Optimization {
         }
         return ret
     }
+
+    /**
+     Groups a list of (coeff,Pauli) tuples into tensor product basis (tpb) sets
+
+     Args:
+        pauli_list : a list of (coeff, Pauli object) tuples.
+     Returns:
+        A list of tpb sets, each one being a list of (coeff, Pauli object)
+        tuples.
+     */
+    public static func group_paulis(_ pauli_list: [(Int,Pauli)]) -> [ [(Int,Pauli)] ] {
+        let n = pauli_list[0].1.v.count
+        var pauli_list_grouped: [ [(Int,Pauli)] ] = []
+        var pauli_list_sorted = Set< HashableTuple<Int,Pauli> >()
+        for p_1 in pauli_list {
+            if !pauli_list_sorted.contains(HashableTuple<Int,Pauli>(p_1.0,p_1.1)) {
+                var pauli_list_temp: [(Int,Pauli)] = []
+                // pauli_list_temp.extend(p_1) # this is going to signal the total
+                // post-rotations of the set (set master)
+                pauli_list_temp.append(p_1)
+                pauli_list_temp.append((p_1.0,p_1.1.copy()))
+                pauli_list_temp[0].0 = 0
+                for p_2 in pauli_list {
+                    if !pauli_list_sorted.contains(HashableTuple<Int,Pauli>(p_2.0,p_2.1)) && p_1.1 != p_2.1 {
+                        var j = 0
+                        for i in 0..<n {
+                            if !((p_2.1.v[i] == 0 && p_2.1.w[i] == 0) || (p_1.1.v[i] == 0 && p_1.1.w[i] == 0) ||
+                                 (p_2.1.v[i] == p_1.1.v[i] && p_2.1.w[i] == p_1.1.w[i])) {
+                                break
+                            }
+                            else {
+                                // update master
+                                if p_2.1.v[i] == 1 || p_2.1.w[i] == 1 {
+                                    pauli_list_temp[0].1.setV(i,p_2.1.v[i])
+                                    pauli_list_temp[0].1.setW(i,p_2.1.w[i])
+                                }
+                            }
+                            j += 1
+                        }
+                        if j == n {
+                            pauli_list_temp.append(p_2)
+                            pauli_list_sorted.insert(HashableTuple<Int,Pauli>(p_2.0,p_2.1))
+                        }
+                    }
+                }
+                pauli_list_grouped.append(pauli_list_temp)
+            }
+        }
+        return pauli_list_grouped
+    }
+
+    /**
+     Print a list of Pauli operators which has been grouped into tensor
+     product basis (tpb) sets.
+
+     Args:
+        pauli_list_grouped (list of lists of (coeff, pauli) tuples): the
+        list of Pauli operators grouped into tpb sets
+     Returns:
+        None
+     */
+    public static func print_pauli_list_grouped(_ pauli_list_grouped: [ [(Int,Pauli)] ]) {
+        for (i,pauli_list) in pauli_list_grouped.enumerated() {
+            print("Post Rotations of TPB set \(i):")
+            print(pauli_list[0].1.to_label())
+            print("\(pauli_list[0].0)\n")
+            for j in 0..<(pauli_list.count - 1) {
+                print(pauli_list[j + 1].1.to_label())
+                print("\(pauli_list[j + 1].0)")
+            }
+            print("\n")
+        }
+    }
 }
