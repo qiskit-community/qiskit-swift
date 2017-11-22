@@ -16,7 +16,7 @@
 
 import Foundation
 
-public struct Vector<T: NumericType> : Sequence, CustomStringConvertible, ExpressibleByArrayLiteral {
+public struct Vector<T: NumericType> : Hashable, Sequence, CustomStringConvertible, ExpressibleByArrayLiteral {
 
     public private(set) var value: [T]
 
@@ -34,6 +34,25 @@ public struct Vector<T: NumericType> : Sequence, CustomStringConvertible, Expres
 
     public var description: String {
         return self.value.description
+    }
+
+    public var hashValue : Int {
+        // Modified DJB hash function using abs
+        return self.value.reduce(5381) {
+            ($0 << 5) &+ $0 &+ Int($1.absolute())
+        }
+    }
+    public static func ==(lhs: Vector<T>, rhs: Vector<T>) -> Bool {
+        if lhs.count != rhs.count {
+            return false
+        }
+        for i in 0..<lhs.count {
+            if lhs[i] == rhs[i] {
+                continue
+            }
+            return false
+        }
+        return true
     }
 
     public subscript(index: Int) -> T {

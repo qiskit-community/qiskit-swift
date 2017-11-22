@@ -59,12 +59,10 @@ public final class Pauli: CustomStringConvertible, Hashable {
     }
 
     public var hashValue : Int {
-        get {
-            return self.v.value.count &* 31 &+ self.w.value.count
-        }
+        return self.v.hashValue &* 31 &+ self.w.hashValue
     }
     public static func ==(lhs: Pauli, rhs:Pauli) -> Bool {
-        return lhs.v.value == rhs.v.value && lhs.w.value == rhs.w.value
+        return lhs.v == rhs.v && lhs.w == rhs.w
     }
 
     public func getV(_ index: Int) -> Int {

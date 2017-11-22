@@ -24,6 +24,7 @@ public protocol NumericType: ExpressibleByIntegerLiteral {
     static func -=(lhs: inout Self, rhs: Self)
     static func *=(lhs: inout Self, rhs: Self)
     static func /=(lhs: inout Self, rhs: Self)
+    static func ==(lhs: Self, rhs: Self) -> Bool
     func absolute() -> Double
 }
 

@@ -19,7 +19,7 @@ import Foundation
 /**
  Methods to assist with compiling tasks.
  */
-final class Compiling {
+public final class Compiling {
 
     private init() {
     }
@@ -92,6 +92,73 @@ final class Compiling {
         if V.subtract(U).norm() > small {
             throw MappingError.eulerAngles1qResult
         }
-        return (theta, phi, lamb, "U(\(theta.format(15)),\(phi.format(15)),\(lamb.format(15))")
+        return (theta, phi, lamb, "U(\(theta.format(15)),\(phi.format(15)),\(lamb.format(15)))")
+    }
+
+    /**
+     Return the gate u1, u2, or u3 implementing U with the fewest pulses.
+
+     U(theta, phi, lam) is the input gate.
+
+     The returned gate implements U exactly, not up to a global phase.
+
+     Return (gate_string, params, "OpenQASM string") where gate_string is one of
+     "u1", "u2", "u3", "id" and params is a 3-tuple of parameter values. The
+     OpenQASM string is the name of the gate with parameters substituted.
+     */
+    public static func simplify_U(_ theta: Double, _ phi: Double, _ lam: Double) -> (String, (Double,Double,Double), String) {
+        let epsilon: Double = pow(1.0, -13.0)
+        var name = "u3"
+        var params = (theta, phi, lam)
+        var qasm = "u3(\(params.0.format(15)),\(params.1.format(15)),\(params.2.format(15)))"
+        // Y rotation is 0 mod 2*pi, so the gate is a u1
+        if abs(params.0.truncatingRemainder(dividingBy: 2.0 * Double.pi)) < epsilon {
+            name = "u1"
+            params = (0.0, 0.0, params.1 + params.2 + params.0)
+            qasm = "u1(\(params.2.format(15)))"
+        }
+        // Y rotation is pi/2 or -pi/2 mod 2*pi, so the gate is a u2
+        if name == "u3" {
+            // theta = pi/2 + 2*k*pi
+            if abs((params.0 - Double.pi / 2).truncatingRemainder(dividingBy: 2.0 * Double.pi)) < epsilon {
+                name = "u2"
+                params = (Double.pi / 2, params.1, params.2 + (params.0 - Double.pi / 2))
+                qasm = "u2(\(params.1.format(15)),\(params.2.format(15)))"
+            }
+            // theta = -pi/2 + 2*k*pi
+            if abs((params.0 + Double.pi / 2).truncatingRemainder(dividingBy: 2.0 * Double.pi)) < epsilon {
+                name = "u2"
+                params = (Double.pi / 2, params.1 + Double.pi, params.2 - Double.pi + (params.0 + Double.pi / 2))
+                qasm = "u2(\(params.1.format(15)),\(params.2.format(15)))"
+            }
+        }
+        // u1 and lambda is 0 mod 4*pi so gate is nop
+        if name == "u1" && abs(params.2.truncatingRemainder(dividingBy: 4.0 * Double.pi)) < epsilon {
+            name = "id"
+            params = (0.0, 0.0, 0.0)
+            qasm = "id"
+        }
+        return (name, params, qasm)
+    }
+
+    /**
+     Return numpy array for Rz(theta).
+
+     Rz(theta) = diag(exp(-i*theta/2),exp(i*theta/2))
+     */
+    public static func rz_array(_ theta: Double) -> Matrix<Complex> {
+        let c1 = Complex(imag:-1) * theta / 2.0
+        let c2 = Complex(imag: 1) * theta / 2.0
+        return [[c1.exp(), 0],[0, c2.exp()]]
+    }
+
+    /**
+     Return numpy array for Ry(theta).
+
+     Ry(theta) = [[cos(theta/2), -sin(theta/2)], [sin(theta/2),  cos(theta/2)]])
+     */
+    public static func ry_array(_ theta: Double) -> Matrix<Complex> {
+        return  [[Complex(real:cos(theta/2.0)), Complex(real:-sin(theta/2.0))],
+                 [Complex(real:sin(theta/2.0)), Complex(real:cos(theta/2.0))]]
     }
 }

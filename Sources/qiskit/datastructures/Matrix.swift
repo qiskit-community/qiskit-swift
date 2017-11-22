@@ -15,7 +15,7 @@
 
 import Foundation
 
-public struct Matrix<T: NumericType> : CustomStringConvertible, ExpressibleByArrayLiteral {
+public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, ExpressibleByArrayLiteral {
 
     public private(set) var value: [[T]]
 
@@ -57,6 +57,33 @@ public struct Matrix<T: NumericType> : CustomStringConvertible, ExpressibleByArr
 
     public var description: String {
         return self.value.description
+    }
+
+    public var hashValue : Int {
+        // Modified DJB hash function using abs
+        var hash = 23
+        for row in self.value {
+            let h =  row.reduce(5381) {
+                ($0 << 5) &+ $0 &+ Int($1.absolute())
+            }
+            hash = hash &* 31 &+ h
+        }
+        return hash
+    }
+
+    public static func ==(lhs: Matrix<T>, rhs: Matrix<T>) -> Bool {
+        if lhs.shape != rhs.shape {
+            return false
+        }
+        for row in 0..<lhs.rowCount {
+            for col in 0..<lhs.colCount {
+                if lhs[row,col] == rhs[row,col] {
+                    continue
+                }
+                return false
+            }
+        }
+        return true
     }
 
     public subscript(row: Int, column: Int) -> T {

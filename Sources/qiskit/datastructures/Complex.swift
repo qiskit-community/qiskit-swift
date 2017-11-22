@@ -15,7 +15,7 @@
 
 import Foundation
 
-public struct Complex: Equatable, Hashable, CustomStringConvertible, NumericType, ExpressibleByFloatLiteral {
+public struct Complex: Hashable, CustomStringConvertible, NumericType, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral {
 
     public var real: Double {
         get { return _real }
