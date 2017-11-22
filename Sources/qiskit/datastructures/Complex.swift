@@ -84,6 +84,10 @@ public struct Complex: Equatable, Hashable, CustomStringConvertible, NumericType
         return self.radius
     }
 
+    public func absolute() -> Double {
+        return self.abs()
+    }
+
     // e ** x+iy = e**x * (cos(y) + i sin(y))
     public func exp() -> Complex {
         let first: Double = pow(M_E,self.real)

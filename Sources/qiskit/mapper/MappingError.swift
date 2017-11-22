@@ -27,6 +27,8 @@ public enum MappingError: LocalizedError, CustomStringConvertible {
     case errorQubitInputCircuit(regBit: RegBit)
     case errorQubitInCouplingGraph(regBit: RegBit)
     case swapMapperFailed(i: Int, j: Int, qasm: String)
+    case eulerAngles1q2_2
+    case eulerAngles1qResult
 
     public var errorDescription: String? {
         return self.description
@@ -47,6 +49,10 @@ public enum MappingError: LocalizedError, CustomStringConvertible {
             return "initial_layout qubit \(regBit.description) not in input CouplingGraph"
         case .swapMapperFailed(let i, let j, let qasm):
             return "swap_mapper failed: layer \(i), sublayer \(j), \"\(qasm)\""
+        case .eulerAngles1q2_2:
+            return "compiling.euler_angles_1q expected 2x2 matrix"
+        case .eulerAngles1qResult:
+            return "compiling.euler_angles_1q incorrect result"
         }
     }
 }

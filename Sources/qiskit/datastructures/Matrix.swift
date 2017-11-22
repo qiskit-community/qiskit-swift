@@ -47,6 +47,14 @@ public struct Matrix<T: NumericType> : CustomStringConvertible, ExpressibleByArr
         return m
     }
 
+    public var isEmpty: Bool {
+        return self.count == 0
+    }
+
+    public var isSquare: Bool {
+        return self.rowCount == self.colCount
+    }
+
     public var description: String {
         return self.value.description
     }
@@ -60,16 +68,54 @@ public struct Matrix<T: NumericType> : CustomStringConvertible, ExpressibleByArr
         }
     }
 
+    public var count: Int {
+        return self.rowCount * self.colCount
+    }
+
+    public var shape: (Int,Int) {
+        return (self.rowCount,self.colCount)
+    }
+
     public var rowCount: Int {
-        get {
-            return self.value.count
-        }
+        return self.value.count
     }
 
     public var colCount: Int {
-        get {
-            return self.value.first?.count ?? 0
+        return self.value.first?.count ?? 0
+    }
+
+    public mutating func removeRow(at index: Int){
+        self.value.remove(at: index)
+    }
+
+    public mutating func removeCol(at index: Int){
+        for i in 0..<self.rowCount {
+            self.value[i].remove(at: index)
         }
+    }
+
+    public func add(_ other: Matrix<T>) -> Matrix<T> {
+        let rows = self.rowCount <= other.rowCount ? self.rowCount : other.rowCount
+        let cols = self.colCount <= other.colCount ? self.colCount : other.colCount
+        var sum = Matrix<T>(repeating: 0, rows:rows, cols:cols)
+        for row in 0..<rows {
+            for col in 0..<cols {
+                sum[row,col] = self[row,col] + other[row,col]
+            }
+        }
+        return sum
+    }
+
+    public func subtract(_ other: Matrix<T>) -> Matrix<T> {
+        let rows = self.rowCount <= other.rowCount ? self.rowCount : other.rowCount
+        let cols = self.colCount <= other.colCount ? self.colCount : other.colCount
+        var sub = Matrix<T>(repeating: 0, rows:rows, cols:cols)
+        for row in 0..<rows {
+            for col in 0..<cols {
+                sub[row,col] = self[row,col] - other[row,col]
+            }
+        }
+        return sub
     }
 
     public func mult(_ scalar: T) -> Matrix<T> {
@@ -117,5 +163,66 @@ public struct Matrix<T: NumericType> : CustomStringConvertible, ExpressibleByArr
             }
         }
         return ab
+    }
+
+    public func oneNorm() -> Double {
+        var largest = 0.0
+        for i in 0..<self.colCount {
+            var sum = 0.0
+            for j in 0..<self.rowCount {
+                sum += self[j,i].absolute() // compute the column sum
+            }
+            if sum > largest {
+                largest = sum // found a new largest column sum
+            }
+        }
+        return largest
+    }
+
+    public func pnorm(_ p: Double) -> Double {
+        if p == 1 {
+            return oneNorm()
+        }
+        var sum = 0.0
+        for i in 0..<self.rowCount {
+            for j in 0..<self.colCount {
+                sum += pow(self[i,j].absolute(),p)
+            }
+        }
+        return pow(sum, 1.0/Double(p))
+    }
+
+    public func norm() -> Double {
+        return self.frobeniusNorm()
+    }
+
+    public func frobeniusNorm() -> Double {
+        return self.pnorm(2)
+    }
+
+    public func det() -> T {
+        return Matrix.det(self)
+    }
+
+    private static func det(_ matrix: Matrix<T>) -> T {
+        assert(matrix.isSquare, "Determinant of a non-square matrix")
+        assert(!matrix.isEmpty, "Determinant of an empty matrix")
+        if matrix.count == 1 {
+            return matrix[0,0]
+        }
+        if matrix.count == 4 {
+            return matrix[0,0] * matrix[1,1] - matrix[0,1] * matrix[1,0]
+        }
+        var determinant: T = 0
+        var multiplier: T = 1
+        let topRow = matrix.value[0]
+        for (col, num) in topRow.enumerated() {
+            var subMatrix = matrix
+            subMatrix.removeRow(at: 0)
+            subMatrix.removeCol(at: col)
+            determinant += num * multiplier * Matrix.det(subMatrix)
+            multiplier = -1
+        }
+        return determinant
     }
 }

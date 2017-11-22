@@ -24,6 +24,7 @@ public protocol NumericType: ExpressibleByIntegerLiteral {
     static func -=(lhs: inout Self, rhs: Self)
     static func *=(lhs: inout Self, rhs: Self)
     static func /=(lhs: inout Self, rhs: Self)
+    func absolute() -> Double
 }
 
 public protocol SignedNumericType: NumericType {
@@ -33,15 +34,63 @@ public protocol SignedNumericType: NumericType {
 public protocol FloatingPointType: SignedNumericType {
 }
 
-extension Int    : SignedNumericType { }
-extension Int8   : SignedNumericType { }
-extension Int16  : SignedNumericType { }
-extension Int32  : SignedNumericType { }
-extension Int64  : SignedNumericType { }
-extension UInt   : NumericType { }
-extension UInt8  : NumericType { }
-extension UInt16 : NumericType { }
-extension UInt32 : NumericType { }
-extension UInt64 : NumericType { }
-extension Float32 : FloatingPointType { }
-extension Float64 : FloatingPointType { }
+extension Int    : SignedNumericType {
+    public func absolute() -> Double {
+        return Double(abs(self))
+    }
+}
+extension Int8   : SignedNumericType {
+    public func absolute() -> Double {
+        return Double(abs(self))
+    }
+}
+extension Int16  : SignedNumericType {
+    public func absolute() -> Double {
+        return Double(abs(self))
+    }
+}
+extension Int32  : SignedNumericType {
+    public func absolute() -> Double {
+        return Double(abs(self))
+    }
+}
+extension Int64  : SignedNumericType {
+    public func absolute() -> Double {
+        return Double(abs(self))
+    }
+}
+extension UInt   : NumericType {
+    public func absolute() -> Double {
+        return Double(self)
+    }
+}
+extension UInt8  : NumericType {
+    public func absolute() -> Double {
+        return Double(self)
+    }
+}
+extension UInt16 : NumericType {
+    public func absolute() -> Double {
+        return Double(self)
+    }
+}
+extension UInt32 : NumericType {
+    public func absolute() -> Double {
+        return Double(self)
+    }
+}
+extension UInt64 : NumericType {
+    public func absolute() -> Double {
+        return Double(self)
+    }
+}
+extension Float32 : FloatingPointType {
+    public func absolute() -> Double {
+        return Double(abs(self))
+    }
+}
+extension Float64 : FloatingPointType {
+    public func absolute() -> Double {
+        return Double(abs(self))
+    }
+}

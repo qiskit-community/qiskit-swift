@@ -310,6 +310,7 @@
 		69F198F21FC1DEFD00CE05DC /* Pauli.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F198F01FC1DEFD00CE05DC /* Pauli.swift */; };
 		69F198FA1FC2144D00CE05DC /* String+Padding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F198F91FC2144C00CE05DC /* String+Padding.swift */; };
 		69F198FB1FC2144D00CE05DC /* String+Padding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F198F91FC2144C00CE05DC /* String+Padding.swift */; };
+		69F42EA91FC555B700228A90 /* ToolsError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 699CAF661FC489A200402C05 /* ToolsError.swift */; };
 		DFBC4F6C1EC7384200027640 /* qiskit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFBC4F621EC7384100027640 /* qiskit.framework */; };
 /* End PBXBuildFile section */
 
@@ -1071,6 +1072,7 @@
 				6932AB091FB9F88B00382CF7 /* Credentials.swift in Sources */,
 				6932AB4E1FB9F8FB00382CF7 /* NodeExpressionList.swift in Sources */,
 				6932AAEA1FB9F7D400382CF7 /* CompositeGate.swift in Sources */,
+				69F42EA91FC555B700228A90 /* ToolsError.swift in Sources */,
 				6932AB521FB9F90700382CF7 /* NodeGopList.swift in Sources */,
 				69F198F21FC1DEFD00CE05DC /* Pauli.swift in Sources */,
 				6932AA801FB9F6AA00382CF7 /* CH.swift in Sources */,
