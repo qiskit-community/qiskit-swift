@@ -29,6 +29,11 @@ public enum MappingError: LocalizedError, CustomStringConvertible {
     case swapMapperFailed(i: Int, j: Int, qasm: String)
     case eulerAngles1q2_2
     case eulerAngles1qResult
+    case twoQubitKakMatrix4x4
+    case twoQubitKakDecomposition
+    case twoQubitKakSequence
+    case twoQubitKakSU
+    case twoQubitKakA
 
     public var errorDescription: String? {
         return self.description
@@ -53,6 +58,16 @@ public enum MappingError: LocalizedError, CustomStringConvertible {
             return "compiling.euler_angles_1q expected 2x2 matrix"
         case .eulerAngles1qResult:
             return "compiling.euler_angles_1q incorrect result"
+        case .twoQubitKakMatrix4x4:
+            return "compiling.two_qubit_kak expected 4x4 matrix"
+        case .twoQubitKakDecomposition:
+            return "compiling.two_qubit_kak: unknown error in KAK decomposition"
+        case .twoQubitKakSequence:
+            return "compiling.two_qubit_kak: sequence incorrect, unknown error"
+        case .twoQubitKakSU:
+            return "compiling.two_qubit_kak: error in SU(2) x SU(2) part"
+        case .twoQubitKakA:
+            return "compiling.two_qubit_kak: error in A part"
         }
     }
 }

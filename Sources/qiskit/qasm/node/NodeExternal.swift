@@ -66,7 +66,7 @@ final class NodeExternal: Node, NodeRealValueProtocol {
                 return log(arg)
             }
             if self.operation == "sqrt" {
-                return sqrt(arg)
+                return arg.squareRoot()
             }
         }
         throw QasmException.errorExternal(qasm: self.qasm(15))

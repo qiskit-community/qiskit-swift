@@ -39,7 +39,7 @@ final class Random {
                 v2 = 2 * self.random() - 1 // between -1.0 and 1.0
                 s = v1 * v1 + v2 * v2
             } while s >= 1 || s == 0
-            let multiplier: Double = sqrt(-2 * log(s)/s)
+            let multiplier: Double = (-2 * log(s)/s).squareRoot()
             self.nextNextGaussian = v2 * multiplier
             return v1 * multiplier
         }

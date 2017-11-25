@@ -55,7 +55,7 @@ public struct Complex: Hashable, CustomStringConvertible, NumericType, Expressib
     }
 
     public var radiusSquare: Double { return self.real * self.real + self.imag * self.imag }
-    public var radius: Double { return sqrt(self.radiusSquare) }
+    public var radius: Double { return self.radiusSquare.squareRoot() }
     public var arg: Double { return atan2(self.imag, self.real) }
 
     public var hashValue: Int {
@@ -99,36 +99,75 @@ public struct Complex: Hashable, CustomStringConvertible, NumericType, Expressib
         return Complex(self.real, -self.imag)
     }
 
+    public func sqrt() -> Complex {
+        let a = ((self.radiusSquare + self.real) / 2.0).squareRoot()
+        let b = (self.imag / self.imag.absolute()) * ((self.radiusSquare - self.real) / 2.0).squareRoot()
+        return Complex(a, b)
+    }
+
+    public static func conjugateMatrix(_ matrix: Matrix<Complex>) -> Matrix<Complex> {
+        var m = matrix
+        for row in 0..<m.rowCount {
+            for col in 0..<m.colCount {
+                m[row,col] = m[row,col].conjugate()
+            }
+        }
+        return m
+    }
+
+    public static func sqrtMatrix(_ matrix: Matrix<Complex>) -> Matrix<Complex> {
+        var m = matrix
+        for row in 0..<m.rowCount {
+            for col in 0..<m.colCount {
+                m[row,col] = m[row,col].sqrt()
+            }
+        }
+        return m
+    }
+
+    public static func realMatrix(_ matrix: Matrix<Complex>) -> Matrix<Double> {
+        var m = Matrix<Double>(repeating:0, rows: matrix.rowCount, cols: matrix.colCount)
+        for row in 0..<m.rowCount {
+            for col in 0..<m.colCount {
+                m[row,col] = matrix[row,col].real
+            }
+        }
+        return m
+    }
+
+    public static func imagMatrix(_ matrix: Matrix<Complex>) -> Matrix<Double> {
+        var m = Matrix<Double>(repeating:0, rows: matrix.rowCount, cols: matrix.colCount)
+        for row in 0..<m.rowCount {
+            for col in 0..<m.colCount {
+                m[row,col] = matrix[row,col].imag
+            }
+        }
+        return m
+    }
 
     public func add(_ n: Complex) -> Complex {
         return Complex(self.real + n.self.real, self.imag + n.imag)
     }
 
-
     public func subtract(_ n: Complex) -> Complex {
         return Complex(self.real - n.self.real, self.imag - n.imag)
     }
-
 
     public func multiply(_ n: Double) -> Complex {
         return Complex(self.real * n, self.imag * n)
     }
 
-
     public func multiply(_ n: Complex) -> Complex {
         return Complex(self.real * n.real - self.imag * n.imag, self.real * n.imag + self.imag * n.real)
     }
-
 
     public func divide(_ n: Complex) -> Complex {
         return self.multiply((n.conjugate().divide(n.radiusSquare)))
     }
 
-
     public func divide(_ n: Double) -> Complex {
         return Complex(self.real / n, self.imag / n)
     }
-
 
     public func power(_ n: Double) -> Complex {
         return pow(radiusSquare, n / 2) *  Complex(cos(n * arg), sin(n * arg))

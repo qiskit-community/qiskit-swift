@@ -71,6 +71,24 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
         return hash
     }
 
+    public var rows: [[T]] {
+        return self.value
+    }
+
+    public var cols: [[T]] {
+        return self.value.reduce([[T]](repeating: [T](), count: self.colCount)) { (arr, row) in
+            var ret = arr
+            for (i,x) in row.enumerated() {
+                ret[i].append(x)
+            }
+            return ret
+        }
+    }
+
+    public func transpose() -> Matrix {
+        return Matrix(value: self.cols)
+    }
+
     public static func ==(lhs: Matrix<T>, rhs: Matrix<T>) -> Bool {
         if lhs.shape != rhs.shape {
             return false
@@ -121,6 +139,68 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
         }
     }
 
+    public func slice(_ rowRange: (Int,Int), _ colRange: (Int,Int)) -> Matrix<T> {
+        assert(rowRange.0 >= 0 && rowRange.0 < self.rowCount, "Row start index out of bounds.")
+        assert(rowRange.1 >= 0 && rowRange.1 <= self.rowCount, "Row end index out of bounds.")
+        assert(rowRange.0 < rowRange.1, "Row start,end indexes out of bounds.")
+        assert(colRange.0 >= 0 && colRange.0 < self.colCount, "Col start index out of bounds.")
+        assert(colRange.1 >= 0 && colRange.1 <= self.colCount, "Col end i index out of bounds.")
+        assert(colRange.0 < colRange.1, "Col start,end indexes out of bounds.")
+
+        var m = Matrix<T>(repeating:0, rows: rowRange.1 - rowRange.0, cols: colRange.1 - colRange.0)
+        var i = 0
+        for row in rowRange.0..<rowRange.1 {
+            var j = 0
+            for col in colRange.0..<colRange.1 {
+                m[i,j] = self[row,col]
+                j += 1
+            }
+            i += 1
+        }
+        return m
+    }
+
+    public func diag() -> Matrix<T> {
+        if self.rowCount == 0 {
+            return []
+        }
+        var arr: [T] = []
+        for row in 0..<self.rowCount {
+            for col in 0..<self.colCount {
+                if row  == col || self.rowCount == 1 {
+                   arr.append(self[row,col])
+                }
+            }
+        }
+        if self.rowCount > 1 {
+            return [arr]
+        }
+        var index = 0
+        var m = Matrix<T>(repeating: 0, rows: arr.count, cols:arr.count)
+        for row in 0..<m.rowCount {
+            for col in 0..<m.colCount {
+                if row  == col {
+                    m[row,col] = arr[index]
+                    index += 1
+                }
+            }
+        }
+        return m
+    }
+
+    public func trace() -> T {
+        let m = self.diag()
+        var sum: T = 0
+        for row in 0..<m.rowCount {
+            for col in 0..<m.colCount {
+                if row  == col {
+                    sum += m[row,col]
+                }
+            }
+        }
+        return sum
+    }
+
     public func add(_ other: Matrix<T>) -> Matrix<T> {
         let rows = self.rowCount <= other.rowCount ? self.rowCount : other.rowCount
         let cols = self.colCount <= other.colCount ? self.colCount : other.colCount
@@ -150,6 +230,16 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
         for i in 0..<ab.rowCount {
             for j in 0..<ab.colCount {
                 ab[i,j] += self[i,j] * scalar
+            }
+        }
+        return ab
+    }
+
+    public func div(_ scalar: T) -> Matrix<T> {
+        var ab = self
+        for i in 0..<ab.rowCount {
+            for j in 0..<ab.colCount {
+                ab[i,j] += self[i,j] / scalar
             }
         }
         return ab
@@ -219,8 +309,8 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
         return pow(sum, 1.0/Double(p))
     }
 
-    public func norm() -> Double {
-        return self.frobeniusNorm()
+    public func norm(_ p: Double = 2) -> Double {
+        return self.pnorm(p)
     }
 
     public func frobeniusNorm() -> Double {
@@ -251,5 +341,17 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
             multiplier = -1
         }
         return determinant
+    }
+    
+    public func eig() -> (Matrix<Complex>, Matrix<Complex>) {
+        fatalError("Matrix eig not implemented")
+    }
+
+    public func inv() -> Matrix<T> {
+        fatalError("Matrix inv not implemented")
+    }
+
+    public func expm() -> Matrix<T> {
+        fatalError("Matrix expm not implemented")
     }
 }

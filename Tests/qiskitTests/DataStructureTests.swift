@@ -235,6 +235,13 @@ class DataStructureTests: XCTestCase {
         a = [[2,-2,1], [-1,3,-1], [2,-4,1]]
         let dif = a.norm() - 6.4
         XCTAssertLessThan(dif, 0.004)
+        a = [[0, 1, 2],[3, 4, 5],[6, 7, 8]]
+        XCTAssertEqual(a.diag().description, [[0, 4, 8]].description)
+        a = [[0, 4, 8]]
+        XCTAssertEqual(a.diag().description, [[0, 0, 0],[0, 4, 0],[0, 0, 8]].description)
+        a = [[10,0,3, 6], [-2,-4,1, 9], [3,0,2, 11], [7,8,9, 24]]
+        XCTAssertEqual(a.slice((0,2),(0,2)).description, [[10, 0],[-2, -4]].description)
+        XCTAssertEqual(a.slice((2,4),(2,4)).description, [[2, 11], [9, 24]].description)
     }
 
     private class func formatList(_ list: [GraphVertex<EmptyGraphData>]) -> String {
