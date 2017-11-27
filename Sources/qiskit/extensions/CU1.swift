@@ -24,6 +24,14 @@ public final class Cu1Gate: Gate {
         super.init("cu1", [theta], [ctl,tgt], circuit)
     }
 
+    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
+        super.init(name, params, args, circuit)
+    }
+
+    override public func copy() -> Instruction {
+        return Cu1Gate(self.name, self.params, self.args, self.circuit)
+    }
+
     public override var description: String {
         let theta = self.params[0].format(15)
         return self._qasmif("\(name)(\(theta)) \(self.args[0].identifier),\(self.args[1].identifier)")

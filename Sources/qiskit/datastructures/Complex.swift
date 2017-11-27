@@ -65,9 +65,9 @@ public struct Complex: Hashable, CustomStringConvertible, NumericType, Expressib
     public var description: String {
         if self.real != 0 {
             if self.imag > 0 {
-                return "\(self.real)+\(self.imag)𝒊"
+                return "\(self.real)+\(self.imag)j"
             } else if self.imag < 0 {
-                return "\(self.real)-\(-self.imag)𝒊"
+                return "\(self.real)-\(-self.imag)j"
             } else {
                 return "\(self.real)"
             }
@@ -75,7 +75,7 @@ public struct Complex: Hashable, CustomStringConvertible, NumericType, Expressib
             if self.imag == 0 {
                 return "0"
             } else {
-                return "\(self.imag)𝒊"
+                return "\(self.imag)j"
             }
         }
     }

@@ -33,11 +33,19 @@ final class JobProcessor {
 
     init(_ backendUtils: BackendUtils,
          _ q_jobs: [QuantumJob],
-         _ callback: ((_:String, _:[Result]) -> Void)?) throws {
+         _ callback: ((_:String, _:[Result]) -> Void)?) {
         self.identifier = UUID().uuidString
         self.backendUtils = backendUtils
         self.q_jobs = q_jobs
         self.callback = callback
+        self.num_jobs = self.q_jobs.count
+    }
+
+    init() {
+        self.identifier = UUID().uuidString
+        self.backendUtils = BackendUtils()
+        self.q_jobs = []
+        self.callback = nil
         self.num_jobs = self.q_jobs.count
     }
 
@@ -64,7 +72,8 @@ final class JobProcessor {
         return reqTask
     }
 
-    private func run_backend(_ q_job: QuantumJob, _ response: @escaping ((_:Result) -> Void)) -> RequestTask {
+    @discardableResult
+    func run_backend(_ q_job: QuantumJob, _ response: @escaping ((_:Result) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         do {
             let backend_name = q_job.backend

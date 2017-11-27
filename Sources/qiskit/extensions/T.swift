@@ -26,6 +26,14 @@ public final class TGate: CompositeGate {
         try self.u1(Double.pi/4.0,qubit)
     }
 
+    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
+        super.init(name, params, args, circuit)
+    }
+
+    override public func copy() -> Instruction {
+        return TGate(self.name, self.params, self.args, self.circuit)
+    }
+
     public override var description: String {
         let u1Gate: U1Gate = self.data[0] as! U1Gate
         let qubit = u1Gate.args[0] as! QuantumRegisterTuple

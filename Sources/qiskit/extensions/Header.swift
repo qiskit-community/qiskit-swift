@@ -20,6 +20,10 @@ public final class Header: QuantumCircuitHeader {
     override public var value: String {
         return "\(super.value)\ninclude \"qelib1.inc\";"
     }
+
+    override public func copy() -> QuantumCircuitHeader {
+        return Header()
+    }
 }
 
 extension QuantumCircuit {

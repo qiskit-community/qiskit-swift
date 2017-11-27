@@ -25,6 +25,14 @@ public final class U2Gate: Gate {
         super.init("u2", [phi,lam], [qubit], circuit)
     }
 
+    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
+        super.init(name, params, args, circuit)
+    }
+
+    override public func copy() -> Instruction {
+        return U2Gate(self.name, self.params, self.args, self.circuit)
+    }
+
     public override var description: String {
         let phi = self.params[0].format(15)
         let lam = self.params[1].format(15)

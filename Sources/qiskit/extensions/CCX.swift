@@ -25,6 +25,14 @@ public final class ToffoliGate: Gate {
         super.init("ccx", [], [ctl1, ctl2, tgt], circuit)
     }
 
+    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
+        super.init(name, params, args, circuit)
+    }
+
+    override public func copy() -> Instruction {
+        return ToffoliGate(self.name, self.params, self.args, self.circuit)
+    }
+
     public override var description: String {
         return self._qasmif("\(self.name) \(self.args[0].identifier),\(self.args[1].identifier),\(self.args[2].identifier)")
     }

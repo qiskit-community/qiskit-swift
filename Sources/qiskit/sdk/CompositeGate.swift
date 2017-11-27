@@ -37,6 +37,10 @@ public class CompositeGate: Gate {
         super.init(name, params, qargs, circuit)
     }
 
+    override init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
+        super.init(name, params, args, circuit)
+    }
+
     public override var description: String {
         var text = ""
         for statement in self.data {

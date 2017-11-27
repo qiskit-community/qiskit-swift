@@ -25,6 +25,14 @@ public final class RXGate: Gate {
         super.init("rx", [theta], [qubit], circuit)
     }
 
+    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
+        super.init(name, params, args, circuit)
+    }
+
+    override public func copy() -> Instruction {
+        return RXGate(self.name, self.params, self.args, self.circuit)
+    }
+
     public override var description: String {
         let theta = self.params[0].format(15)
         return self._qasmif("\(name)(\(theta)) \(self.args[0].identifier)")

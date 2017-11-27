@@ -36,6 +36,14 @@ public final class Barrier: Instruction {
         super.init("barrier", [], qargs, gate.circuit)
     }
 
+    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
+        super.init(name, params, args, circuit)
+    }
+
+    override public func copy() -> Instruction {
+        return Barrier(self.name, self.params, self.args, self.circuit)
+    }
+
     public override var description: String {
         var text = "barrier "
         let array = self.args.map {$0.identifier}

@@ -25,6 +25,14 @@ public final class U3Gate: Gate {
         super.init("u3", [theta,phi,lam], [qubit], circuit)
     }
 
+    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
+        super.init(name, params, args, circuit)
+    }
+
+    override public func copy() -> Instruction {
+        return U3Gate(self.name, self.params, self.args, self.circuit)
+    }
+
     public override var description: String {
         let theta = self.params[0].format(15)
         let phi = self.params[1].format(15)

@@ -20,18 +20,22 @@ import Foundation
  */
 public class Gate: Instruction {
 
-    public init(_ name: String, _ params: [Double], _ qargs: [QuantumRegister], _ circuit: QuantumCircuit?) {
+    init(_ name: String, _ params: [Double], _ args: [QuantumRegister], _ circuit: QuantumCircuit?) {
+        if type(of: self) == Gate.self {
+            fatalError("Abstract class instantiation.")
+        }
+        super.init(name, params, args, circuit)
+    }
+
+    init(_ name: String, _ params: [Double], _ qargs: [QuantumRegisterTuple], _ circuit: QuantumCircuit?) {
         if type(of: self) == Gate.self {
             fatalError("Abstract class instantiation.")
         }
         super.init(name, params, qargs, circuit)
     }
-    
-    public init(_ name: String, _ params: [Double], _ qargs: [QuantumRegisterTuple], _ circuit: QuantumCircuit?) {
-        if type(of: self) == Gate.self {
-            fatalError("Abstract class instantiation.")
-        }
-        super.init(name, params, qargs, circuit)
+
+    override init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
+        super.init(name, params, args, circuit)
     }
 
     /**

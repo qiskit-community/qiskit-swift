@@ -27,7 +27,7 @@ public class Instruction: CustomStringConvertible {
     private var control: (ClassicalRegister, Int)? = nil
 
     public var description: String {
-        preconditionFailure("description not implemented")
+        preconditionFailure("Instruction description not implemented")
     }
 
     public var qasm: String {
@@ -41,7 +41,7 @@ public class Instruction: CustomStringConvertible {
      - parameter param: list of real parameters
      - parameter arg: list InstructionArgument
      */
-    public init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
+    init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
         if type(of: self) == Instruction.self {
             fatalError("Abstract class instantiation.")
         }
@@ -49,6 +49,10 @@ public class Instruction: CustomStringConvertible {
         self.params = params
         self.args = args
         self.circuit = circuit
+    }
+
+    public func copy() -> Instruction {
+        preconditionFailure("Instruction copy not implemented")
     }
 
     /**

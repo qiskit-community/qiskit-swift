@@ -28,6 +28,14 @@ public final class Reset: Instruction {
         super.init("reset", [], [qubit], circuit)
     }
 
+    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
+        super.init(name, params, args, circuit)
+    }
+
+    override public func copy() -> Instruction {
+        return Reset(self.name, self.params, self.args, self.circuit)
+    }
+
     public override var description: String {
         return "\(name) \(self.args[0].identifier)"
     }

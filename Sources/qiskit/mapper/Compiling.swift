@@ -39,7 +39,7 @@ public final class Compiling {
         if unitary_matrix.shape != (2, 2) {
             throw MappingError.eulerAngles1q2_2
         }
-        let phase: Complex = unitary_matrix.det().power(-1.0/2.0)
+        let phase: Complex = try unitary_matrix.det().power(-1.0/2.0)
         let U = unitary_matrix.mult(phase)  // U in SU(2)
         // OpenQASM SU(2) parameterization:
         // U[0, 0] = exp(-i(phi+lambda)/2) * cos(theta/2)
@@ -174,11 +174,11 @@ public final class Compiling {
 
      unitary_matrix = numpy 4x4 unitary matrix
      */
-    public static func two_qubit_kak(_ unitary_matrix: Matrix<Complex>) throws -> [[String:Any]] {
+    private static func two_qubit_kak(_ unitary_matrix: Matrix<Complex>) throws -> [[String:Any]] {
         if unitary_matrix.shape != (4, 4) {
             throw MappingError.twoQubitKakMatrix4x4
         }
-        let phase = unitary_matrix.det().power(-1.0/4.0)
+        let phase = try unitary_matrix.det().power(-1.0/4.0)
         // Make it in SU(4), correct phase at the end
         let U = unitary_matrix.mult(phase)
         // B changes to the Bell basis
@@ -196,7 +196,7 @@ public final class Compiling {
         // when M2 is real.
         var (D, P) = M2.eig()
         // If det(P) == -1, apply a swap to make P in SO(4)
-        if (P.det() + 1).abs() < pow(1.0, -5.0) {
+        if (try P.det() + 1).abs() < pow(1.0, -5.0) {
             let swapM: Matrix<Complex> = [[1, 0, 0, 0],
                                           [0, 0, 1, 0],
                                           [0, 1, 0, 0],
@@ -206,7 +206,7 @@ public final class Compiling {
         }
         var Q = Complex.sqrtMatrix(D).diag()  // array from elementwise sqrt
         // Want to take square root so that Q has determinant 1
-        if (Q.det() + 1).abs() < pow(1.0, -5.0) {
+        if (try Q.det() + 1).abs() < pow(1.0, -5.0) {
             Q[0, 0] = -1.0 * Q[0, 0]
         }
         let Kprime = Uprime.dot(P.dot(Q.inv().dot(P.transpose())))
@@ -233,11 +233,11 @@ public final class Compiling {
         let gamma = atan( Complex.imagMatrix(A.dot(zz)).trace() / Complex.realMatrix(A).trace() )
         // K1 = kron(U1, U2) and K2 = kron(V1, V2)
         // Find the matrices U1, U2, V1, V2
-        var L = K1.slice((0,2),(0,2))
+        var L = try K1.slice((0,2),(0,2))
         if L.norm() < pow(1.0, -9.0) {
-            L = K1.slice((0,2), (2,4))
+            L = try K1.slice((0,2), (2,4))
             if L.norm() < pow(1.0, -9.0) {
-                L = K1.slice((2,4),(2,4))
+                L = try K1.slice((2,4),(2,4))
             }
         }
         Q = (L.dot(Complex.conjugateMatrix(L).transpose()))
@@ -248,11 +248,11 @@ public final class Compiling {
         U1[0, 1] = R[0, 2]
         U1[1, 0] = R[2, 0]
         U1[1, 1] = R[2, 2]
-        L = K2.slice((0,2),(0,2))
+        L = try K2.slice((0,2),(0,2))
         if L.norm() < pow(1.0, -9.0) {
-            L = K2.slice((0,2), (2,4))
+            L = try K2.slice((0,2), (2,4))
             if L.norm() < pow(1.0, -9.0) {
-                L = K2.slice((2,4), (2,4))
+                L = try K2.slice((2,4), (2,4))
             }
         }
         Q = L.dot(Complex.conjugateMatrix(L).transpose())
@@ -429,7 +429,7 @@ public final class Compiling {
             }
         }
         // Put V in SU(4) and test up to global phase
-        V = V.mult(V.det().power((-1.0/4.0)))
+        V = V.mult(try V.det().power((-1.0/4.0)))
         if V.subtract(U).norm()                         > pow(1.0, -6.0) &&
             V.mult(Complex(imag:1)).subtract(U).norm()  > pow(1.0, -6.0) &&
             V.mult(-1).subtract(U).norm()               > pow(1.0, -6.0) &&

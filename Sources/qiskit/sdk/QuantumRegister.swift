@@ -20,13 +20,16 @@ import Foundation
  */
 public final class QuantumRegister: Register {
 
-    public let name:String
-    public let size:Int
+    public private(set) var name:String = ""
+    public private(set) var size:Int = 0
 
     public init(_ name: String, _ size: Int) throws {
         self.name = name
         self.size = size
         try self.checkProperties()
+    }
+
+    private init() {
     }
 
     public subscript(index: Int) -> QuantumRegisterTuple {
@@ -36,6 +39,13 @@ public final class QuantumRegister: Register {
             }
             return QuantumRegisterTuple(self, index)
         }
+    }
+
+    public func copy() -> Register {
+        let r = QuantumRegister()
+        r.name = self.name
+        r.size = self.size
+        return r
     }
 
     public var description: String {

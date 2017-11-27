@@ -290,4 +290,169 @@ public final class Optimization {
             print("\n")
         }
     }
+
+    /**
+     Calculates the average value of a Hamiltonian on a state created by the input circuit
+
+     Args:
+        Q_program : QuantumProgram object used to run the imput circuit.
+        hamiltonian (array, matrix or list of Pauli operators grouped into
+            tpb sets) :
+            a representation of the Hamiltonian or observables to be measured.
+        shots (int) : number of shots considered in the averaging. If 1 the
+            averaging is exact.
+        device : the backend used to run the simulation.
+     Returns:
+        Average value of the Hamiltonian or observable.
+     */
+    /*
+    public static func eval_hamiltonian(_ Q_program: QuantumProgram,
+                                        _ hamiltonian: Any,
+                                        _ input_circuit: QuantumCircuit,
+                                        _ shots: Int,
+                                        _ device: String,
+                                        _ callback: @escaping ((_:Double, _:String?) -> Void)) throws -> RequestTask {
+        var energy: Double = 0.0
+        var requestTask = RequestTask()
+        do {
+            if shots == 1 {
+                // Hamiltonian represented by a Pauli list
+                if let hamiltonianList = hamiltonian as? [[Pauli]]  { // Hamiltonian represented by a Pauli list
+                    var circuits: [QuantumCircuit] = []
+                    var circuits_labels: [String] = []
+                    circuits.append(input_circuit)
+                    // Trial circuit w/o the final rotations
+                    circuits_labels.append("circuit_label0")
+                    try Q_program.add_circuit(circuits_labels[0], circuits[0])
+                    // Execute trial circuit with final rotations for each Pauli in
+                    // hamiltonian and store from circuits[1] on
+                    let q = try QuantumRegister("q", Int(log2(Double(hamiltonianList.count))))
+                    var i: Int = 1
+                    for p in hamiltonianList {
+                        circuits.append(input_circuit.copy())
+                        for j in 0..<(Int(log2(Double(hamiltonianList.count)))) {
+                            if p[1].v[j] == 1 && p[1].w[j] == 0 {
+                                try circuits[i].x(q[j])
+                            }
+                            else if p[1].v[j] == 0 && p[1].w[j] == 1 {
+                                try circuits[i].z(q[j])
+                            }
+                            else if p[1].v[j] == 1 && p[1].w[j] == 1 {
+                                try circuits[i].y(q[j])
+                            }
+                        }
+                        circuits_labels.append("circuit_label\(i)")
+                        try Q_program.add_circuit(circuits_labels[i], circuits[i])
+                        i += 1
+                    }
+                    requestTask = Q_program.execute(circuits_labels, backend: device, shots: shots) { (result) in
+                        if result.is_error() {
+                            callback(energy,result.get_error())
+                            return
+                        }
+                        do {
+                            // no Pauli final rotations
+                            if let quantum_state_0 = try result.get_data(circuits_labels[0])["quantum_state"] as? Matrix<Complex> {
+                                i = 1
+                                for p in hamiltonianList {
+                                    if let quantum_state_i = try result.get_data(circuits_labels[i])["quantum_state"] as? Matrix<Complex> {
+                                        // inner product with final rotations of (i-1)-th Pauli
+                                        energy += p[0] * np.inner(Complex.conjugateMatrix(quantum_state_0), quantum_state_i)
+                                    }
+                                    i += 1
+                                }
+                            }
+                            callback(energy,nil)
+                        } catch {
+                            callback(energy,error.localizedDescription)
+                        }
+                    }
+                }
+                else if let hamiltonianMatrix = hamiltonian as? Matrix<Complex> {
+                    // Hamiltonian is not a pauli_list grouped into tpb sets
+                    var circuit = ["c"]
+                    try Q_program.add_circuit(circuit[0], input_circuit)
+                    requestTask = Q_program.execute(circuit, backend: device, config: ["data": ["quantum_state"]], shots: shots) { (result) in
+                        if result.is_error() {
+                            callback(energy,result.get_error())
+                            return
+                        }
+                        do {
+                            var quantum_state = Matrix<Complex>()
+                            if let q = try result.get_data(circuit[0])["quantum_state"] as? Matrix<Complex> {
+                                quantum_state = q
+                            }
+                            else {
+                                if let q = try result.get_data(circuit[0])["quantum_states"] as? [Matrix<Complex>] {
+                                    if q.count > 0 {
+                                        quantum_state = q[0]
+                                    }
+                                }
+                            }
+
+                            // Diagonal Hamiltonian represented by 1D array
+                            if hamiltonianMatrix.shape.0 == 1 || np.shape(np.shape(np.array(hamiltonianMatrix))) == (1,) {
+                                energy = np.sum(hamiltonianMatrix * quantum_state.absolute() ** 2)
+                            }
+                            // Hamiltonian represented by square matrix
+                            else if hamiltonianMatrix.shape.0 == hamiltonianMatrix.shape.1 {
+                                energy = np.inner(np.conjugate(quantum_state), np.dot(hamiltonianMatrix, quantum_state))
+                            }
+                            callback(energy,nil)
+                        } catch {
+                            callback(energy,error.localizedDescription)
+                        }
+                    }
+                }
+                else {
+                    DispatchQueue.main.async {
+                        callback(energy,"Unknown hamiltonian.")
+                    }
+                }
+            }
+            else { // finite number of shots and hamiltonian grouped in tpb sets
+                var circuits: [QuantumCircuit] = []
+                var circuits_labels: [String] = []
+                let n = hamiltonian[0][0][1].v.count
+                let q = QuantumRegister("q", n)
+                let c = ClassicalRegister("c", n)
+                var i: Int = 0
+                for tpb_set in hamiltonian {
+                    circuits.append(copy.deepcopy(input_circuit))
+                    circuits_labels.append("tpb_circuit_\(i)")
+                    for j in 0..<n {
+                        // Measure X
+                        if tpb_set[0][1].v[j] == 0 && tpb_set[0][1].w[j] == 1 {
+                            circuits[i].h(q[j])
+                        }
+                        // Measure Y
+                        else if tpb_set[0][1].v[j] == 1 && tpb_set[0][1].w[j] == 1 {
+                            circuits[i].s(q[j]).inverse()
+                            circuits[i].h(q[j])
+                        }
+                        circuits[i].measure(q[j], c[j])
+                    }
+                    Q_program.add_circuit(circuits_labels[i], circuits[i])
+                    i += 1
+                }
+                requestTask = Q_program.execute(circuits_labels, backend: device, shots: shots) { (result) in
+                    if result.is_error() {
+                        callback(energy,result.get_error())
+                        return
+                    }
+                    for j in 0..<hamiltonian.count {
+                        for k in 0..<hamiltonian[j].count {
+                            energy += hamiltonian[j][k][0] * measure_pauli_z(result.get_counts(circuits_labels[j]), hamiltonian[j][k][1])
+                        }
+                    }
+                    callback(energy,nil)
+                }
+            }
+        } catch {
+            DispatchQueue.main.async {
+                callback(energy,error.localizedDescription)
+            }
+        }
+        return requestTask
+    }*/
 }

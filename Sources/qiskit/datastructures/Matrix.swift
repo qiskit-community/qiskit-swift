@@ -19,6 +19,10 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
 
     public private(set) var value: [[T]]
 
+    public init() {
+        self.init(value: [])
+    }
+
     public init(repeating: T, rows: Int, cols: Int) {
         self.init(value: [[T]](repeating: [T](repeating: repeating, count: cols), count: rows))
     }
@@ -27,7 +31,7 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
         self.init(value: elements)
     }
 
-    private init(value: [[T]]) {
+    public init(value: [[T]]) {
         let cols = value.isEmpty ? 0 : value[0].count
         for i in 0..<value.count {
             if cols != value[i].count {
@@ -38,7 +42,7 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
     }
 
     public static func identity(_ n: Int) -> Matrix<T> {
-        var m = Matrix<T>(repeating: 0, rows: n, cols: 0)
+        var m = Matrix<T>(repeating: 0, rows: n, cols: n)
         for row in 0..<m.rowCount {
             for col in 0..<m.colCount {
                 m[row,col] = row == col ? 1 : 0
@@ -85,7 +89,7 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
         }
     }
 
-    public func transpose() -> Matrix {
+    public func transpose() -> Matrix<T> {
         return Matrix(value: self.cols)
     }
 
@@ -139,13 +143,25 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
         }
     }
 
-    public func slice(_ rowRange: (Int,Int), _ colRange: (Int,Int)) -> Matrix<T> {
-        assert(rowRange.0 >= 0 && rowRange.0 < self.rowCount, "Row start index out of bounds.")
-        assert(rowRange.1 >= 0 && rowRange.1 <= self.rowCount, "Row end index out of bounds.")
-        assert(rowRange.0 < rowRange.1, "Row start,end indexes out of bounds.")
-        assert(colRange.0 >= 0 && colRange.0 < self.colCount, "Col start index out of bounds.")
-        assert(colRange.1 >= 0 && colRange.1 <= self.colCount, "Col end i index out of bounds.")
-        assert(colRange.0 < colRange.1, "Col start,end indexes out of bounds.")
+    public func slice(_ rowRange: (Int,Int), _ colRange: (Int,Int)) throws -> Matrix<T> {
+        if rowRange.0 < 0 || rowRange.0 >= self.rowCount {
+            throw MatrixError.rowStartOutOfBounds(row: rowRange.0)
+        }
+        if rowRange.1 < 0 || rowRange.1 > self.rowCount {
+            throw MatrixError.rowEndOutOfBounds(row: rowRange.1)
+        }
+        if rowRange.0 >= rowRange.1 {
+            throw MatrixError.rowsOutOfBounds(rowStart: rowRange.0, rowEnd: rowRange.1)
+        }
+        if colRange.0 < 0 || colRange.0 >= self.colCount {
+            throw MatrixError.colStartOutOfBounds(col: colRange.0)
+        }
+        if colRange.1 < 0 || colRange.1 > self.colCount {
+            throw MatrixError.colEndOutOfBounds(col: colRange.1)
+        }
+        if colRange.0 >= colRange.1 {
+            throw MatrixError.colsOutOfBounds(colStart: colRange.0, colEnd: colRange.1)
+        }
 
         var m = Matrix<T>(repeating:0, rows: rowRange.1 - rowRange.0, cols: colRange.1 - colRange.0)
         var i = 0
@@ -226,20 +242,30 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
     }
 
     public func mult(_ scalar: T) -> Matrix<T> {
-        var ab = self
+        var ab = Matrix<T>(repeating: 0, rows: self.rowCount, cols: self.colCount)
         for i in 0..<ab.rowCount {
             for j in 0..<ab.colCount {
-                ab[i,j] += self[i,j] * scalar
+                ab[i,j] = self[i,j] * scalar
             }
         }
         return ab
     }
 
     public func div(_ scalar: T) -> Matrix<T> {
-        var ab = self
+        var ab = Matrix<T>(repeating: 0, rows: self.rowCount, cols: self.colCount)
         for i in 0..<ab.rowCount {
             for j in 0..<ab.colCount {
-                ab[i,j] += self[i,j] / scalar
+                ab[i,j] = self[i,j] / scalar
+            }
+        }
+        return ab
+    }
+
+    public func absolute() -> Matrix<Double> {
+        var ab = Matrix<Double>(repeating: 0, rows: self.rowCount, cols: self.colCount)
+        for i in 0..<ab.rowCount {
+            for j in 0..<ab.colCount {
+                ab[i,j] = self[i,j].absolute()
             }
         }
         return ab
@@ -317,13 +343,17 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
         return self.pnorm(2)
     }
 
-    public func det() -> T {
-        return Matrix.det(self)
+    public func det() throws -> T {
+        return try Matrix.det(self)
     }
 
-    private static func det(_ matrix: Matrix<T>) -> T {
-        assert(matrix.isSquare, "Determinant of a non-square matrix")
-        assert(!matrix.isEmpty, "Determinant of an empty matrix")
+    private static func det(_ matrix: Matrix<T>) throws -> T {
+        if !matrix.isSquare {
+            throw MatrixError.detSquare
+        }
+        if matrix.isEmpty {
+            throw MatrixError.detEmpty
+        }
         if matrix.count == 1 {
             return matrix[0,0]
         }
@@ -337,7 +367,7 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
             var subMatrix = matrix
             subMatrix.removeRow(at: 0)
             subMatrix.removeCol(at: col)
-            determinant += num * multiplier * Matrix.det(subMatrix)
+            determinant += try num * multiplier * Matrix.det(subMatrix)
             multiplier = -1
         }
         return determinant

@@ -271,6 +271,9 @@ public final class Result: CustomStringConvertible {
      A dictionary of data for the different backends
      */
     public func get_data(_ name: String) throws -> [String:Any] {
+        if self.is_error() {
+            throw QISKitError.errorStatus(status: self.get_error())
+        }
         let qobj = self.__qobj
         if let circuits = qobj["circuits"] as? [[String:Any]], 
             let results = self.__result["result"] as? [[String:Any]] {

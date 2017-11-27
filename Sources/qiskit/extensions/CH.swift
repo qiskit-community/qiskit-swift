@@ -24,6 +24,14 @@ public final class CHGate: Gate {
         super.init("ch", [], [ctl,tgt], circuit)
     }
 
+    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
+        super.init(name, params, args, circuit)
+    }
+
+    override public func copy() -> Instruction {
+        return CHGate(self.name, self.params, self.args, self.circuit)
+    }
+
     public override var description: String {
         return self._qasmif("\(name) \(self.args[0].identifier),\(self.args[1].identifier)")
     }

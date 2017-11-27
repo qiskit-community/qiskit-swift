@@ -1247,34 +1247,18 @@ public final class QuantumProgram {
                                timeout: Int,
                                callbackSingle: ((_:Result) -> Void)? = nil,
                                callbackMultiple: ((_:[Result]) -> Void)? = nil) -> RequestTask {
-        do {
-            var q_job_list: [QuantumJob] = []
-            for qobj in qobj_list {
-                q_job_list.append(QuantumJob(qobj))
-            }
-            let job_processor = try JobProcessor(self.backendUtils,q_job_list,self._jobs_done_callback)
-            let data = JobProcessorData(job_processor,
-                                        callbackSingle,
-                                        callbackMultiple)
-            self.lock.lock()
-            self.jobProcessors[data.jobProcessor.identifier] = data
-            self.lock.unlock()
-            return job_processor.submit()
-        } catch {
-            var results: [Result] = []
-            for qobj in qobj_list {
-                results.append(Result(["job_id": "0","status": "ERROR","result": error.localizedDescription],qobj))
-            }
-            DispatchQueue.main.async {
-                if callbackSingle != nil {
-                    callbackSingle?(results[0])
-                }
-                else {
-                    callbackMultiple?(results)
-                }
-            }
+        var q_job_list: [QuantumJob] = []
+        for qobj in qobj_list {
+            q_job_list.append(QuantumJob(qobj))
         }
-        return RequestTask()
+        let job_processor = JobProcessor(self.backendUtils,q_job_list,self._jobs_done_callback)
+        let data = JobProcessorData(job_processor,
+                                    callbackSingle,
+                                    callbackMultiple)
+        self.lock.lock()
+        self.jobProcessors[data.jobProcessor.identifier] = data
+        self.lock.unlock()
+        return job_processor.submit()
     }
 
     /**

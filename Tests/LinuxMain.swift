@@ -23,6 +23,7 @@ SDKLogger.type = .typeError
 XCTMain([
     testCase(DataStructureTests.allTests),
     testCase(LocalQasmSimulatorTests.allTests),
+    testCase(LocalUnitarySimulatorTests.allTests),
     testCase(QiskitParserTests.allTests),
     testCase(QiskitProgramTests.allTests),
     testCase(QiskitTests.allTests),
