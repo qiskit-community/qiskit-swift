@@ -274,6 +274,7 @@
 		6932AB921FB9FDC800382CF7 /* ParseTree.c in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB8B1FB9FDB800382CF7 /* ParseTree.c */; };
 		6932AB931FB9FDCB00382CF7 /* tokenizer.l in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB8A1FB9FDB800382CF7 /* tokenizer.l */; };
 		6932AB941FB9FDDA00382CF7 /* ParseTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 6932AB851FB9FDA300382CF7 /* ParseTree.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		6941A18B1FCDA17F0016C298 /* example_unitary_matrix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6941A1891FCDA1740016C298 /* example_unitary_matrix.swift */; };
 		698248241FBCC7390097E8E5 /* CRandom.h in Headers */ = {isa = PBXBuildFile; fileRef = 698248221FBCC7390097E8E5 /* CRandom.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		698248281FBCC7580097E8E5 /* CRandom.c in Sources */ = {isa = PBXBuildFile; fileRef = 698248271FBCC7580097E8E5 /* CRandom.c */; };
 		698248291FBCCA900097E8E5 /* CRandom.h in Headers */ = {isa = PBXBuildFile; fileRef = 698248221FBCC7390097E8E5 /* CRandom.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -466,6 +467,7 @@
 		6932AB891FB9FDB800382CF7 /* parser.y */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; name = parser.y; path = Sources/cqasmparser/parser.y; sourceTree = "<group>"; };
 		6932AB8A1FB9FDB800382CF7 /* tokenizer.l */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; name = tokenizer.l; path = Sources/cqasmparser/tokenizer.l; sourceTree = "<group>"; };
 		6932AB8B1FB9FDB800382CF7 /* ParseTree.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ParseTree.c; path = Sources/cqasmparser/ParseTree.c; sourceTree = "<group>"; };
+		6941A1891FCDA1740016C298 /* example_unitary_matrix.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = example_unitary_matrix.swift; path = Tests/qiskitTests/example_unitary_matrix.swift; sourceTree = "<group>"; };
 		698248221FBCC7390097E8E5 /* CRandom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CRandom.h; path = Sources/crandom/include/CRandom.h; sourceTree = "<group>"; };
 		698248231FBCC7390097E8E5 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; name = module.modulemap; path = Sources/crandom/include/module.modulemap; sourceTree = "<group>"; };
 		698248271FBCC7580097E8E5 /* CRandom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = CRandom.c; path = Sources/crandom/CRandom.c; sourceTree = "<group>"; };
@@ -692,6 +694,7 @@
 		69CB0D201FB7B08900A1D546 /* qiskitTests */ = {
 			isa = PBXGroup;
 			children = (
+				6941A1891FCDA1740016C298 /* example_unitary_matrix.swift */,
 				69CB0D261FB7B0E300A1D546 /* DataStructureTests.swift */,
 				69CB0D251FB7B0E300A1D546 /* Info.plist */,
 				69CB0D241FB7B0E300A1D546 /* LocalQasmSimulatorTests.swift */,
@@ -1385,6 +1388,7 @@
 				69CB0D651FB7B23700A1D546 /* qpt.swift in Sources */,
 				69CB0D661FB7B23700A1D546 /* rb.swift in Sources */,
 				69CB0D671FB7B23700A1D546 /* teleport.swift in Sources */,
+				6941A18B1FCDA17F0016C298 /* example_unitary_matrix.swift in Sources */,
 				69CB0D681FB7B23700A1D546 /* W-state.swift in Sources */,
 				69CB0D5A1FB7B21700A1D546 /* DataStructureTests.swift in Sources */,
 				69CB0D5B1FB7B21700A1D546 /* LocalQasmSimulatorTests.swift in Sources */,

@@ -205,12 +205,11 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
     }
 
     public func trace() -> T {
-        let m = self.diag()
         var sum: T = 0
-        for row in 0..<m.rowCount {
-            for col in 0..<m.colCount {
+        for row in 0..<self.rowCount {
+            for col in 0..<self.colCount {
                 if row  == col {
-                    sum += m[row,col]
+                    sum += self[row,col]
                 }
             }
         }

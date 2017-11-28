@@ -53,6 +53,14 @@ class LocalUnitarySimulatorTests: XCTestCase {
      */
     func test_unitary_simulator() {
         do {
+            let lines = ExampleUnitaryMatrix.UNITARY_MATRIX.components(separatedBy:"\n")
+            var complexMatrix = Matrix<Complex>(repeating: 0, rows: lines.count, cols: lines.count)
+            for (i,line) in lines.enumerated() {
+                let complexStrArray = line.components(separatedBy:",")
+                for (j,complexStr) in complexStrArray.enumerated() {
+                    complexMatrix[i,j] = try Complex(complexStr)
+                }
+            }
             try self.qp!.load_qasm_text(qasm_string: Example.QASM, name: "example")
             let basis_gates: [String] = []  // unroll to base gates
             let unroller = Unroller(try Qasm(data: try self.qp!.get_qasm("example")).parse(),JsonBackend(basis_gates))
@@ -101,11 +109,30 @@ class LocalUnitarySimulatorTests: XCTestCase {
             UnitarySimulator().run(q_job) { (result) in
                 XCTAssertEqual(result.get_status(), "COMPLETED")
                 do {
-                    guard let unitary = try result.get_data("test")["unitary"] else {
+                    guard let unitary = try result.get_data("test")["unitary"] as? Matrix<Complex> else {
                         XCTFail("LocalUnitarySimulatorTests missing unitary result.")
                         return
                     }
-                    print(unitary)
+                    XCTAssertEqual(unitary.shape.0,complexMatrix.shape.0)
+                    XCTAssertEqual(unitary.shape.1,complexMatrix.shape.1)
+                    let cmp = 1e-3
+                    var fail = false
+                    for row in 0..<unitary.rowCount {
+                        for col in 0..<unitary.colCount {
+                            var diff = abs(unitary[row,col].real - complexMatrix[row,col].real)
+                            if diff <= cmp {
+                                diff = abs(unitary[row,col].imag - complexMatrix[row,col].imag)
+                            }
+                            if diff > cmp {
+                                XCTFail("test_unitary_simulator: (\(row),\(col)): \(unitary[row,col]) \(unitary[row,col])")
+                                fail = true
+                                break
+                            }
+                        }
+                        if fail {
+                            break
+                        }
+                    }
                 } catch {
                     XCTFail("LocalUnitarySimulatorTests: \(error)")
                 }
@@ -188,8 +215,6 @@ class LocalUnitarySimulatorTests: XCTestCase {
                     XCTFail("LocalUnitarySimulatorTests missing unitary result.")
                     return
                 }
-                print(unitary1)
-                print(unitary2)
                 let unitaryreal1: Matrix<Complex> = [[0.5, 0.5, 0.5, 0.5],
                                                      [0.5, -0.5, 0.5, -0.5],
                                                      [0.5, 0.5, -0.5, -0.5],
@@ -200,9 +225,8 @@ class LocalUnitarySimulatorTests: XCTestCase {
                                                      [0,  1,  0, 0]]
                 let norm1 = unitaryreal1.conjugate().transpose().dot(unitary1).trace()
                 let norm2 = unitaryreal2.conjugate().transpose().dot(unitary2).trace()
-                print("\(norm1) \(norm2)")
-                //self.assertAlmostEqual(norm1, 4)
-                //self.assertAlmostEqual(norm2, 4)
+                XCTAssertEqual(norm1.real, 4.0)
+                XCTAssertEqual(norm2.real, 4.0)
                 asyncExpectation.fulfill()
             }
             self.waitForExpectations(timeout: 180, handler: { (error) in

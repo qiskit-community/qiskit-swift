@@ -33,6 +33,42 @@ public struct Complex: Hashable, CustomStringConvertible, NumericType, Expressib
         self.init(0, 0)
     }
 
+    public init(_ str: String) throws {
+        var complexStr = str.trimmingCharacters(in: .whitespacesAndNewlines)
+        if complexStr.hasSuffix("j") {
+            var r = complexStr.index(complexStr.endIndex, offsetBy: -1)..<complexStr.endIndex
+            complexStr.removeSubrange(r)
+            r = complexStr.startIndex..<complexStr.endIndex
+            repeat {
+                var rangeFound: Range<String.Index>? = nil
+                if let range = complexStr.range(of: "+", options:.backwards, range: r) {
+                    rangeFound = range
+                }
+                else if let range = complexStr.range(of: "-", options:.backwards, range: r) {
+                    rangeFound = range
+                }
+                if let range = rangeFound {
+                    r = complexStr.index(range.lowerBound, offsetBy: -1)..<complexStr.index(range.upperBound, offsetBy: -1)
+                    if complexStr[r] != "e" {
+                        if let v = Double(String(complexStr[range.lowerBound..<complexStr.endIndex])) {
+                            self._imag = v
+                        }
+                        complexStr.removeSubrange(range.lowerBound..<complexStr.endIndex)
+                        break
+                    }
+                    r = complexStr.startIndex..<complexStr.index(range.lowerBound, offsetBy: -1)
+                }
+                else {
+                    break
+                }
+            }
+            while true
+        }
+        if let v = Double(complexStr) {
+            self._real = v
+        }
+    }
+
     public init(_ real: Double, _ imag: Double) {
         self._real = real
         self._imag = imag
