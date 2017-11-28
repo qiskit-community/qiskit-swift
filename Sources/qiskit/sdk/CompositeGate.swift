@@ -119,6 +119,7 @@ public class CompositeGate: Gate {
     /**
      Invert this gate.
      */
+    @discardableResult
     public override func inverse() -> Gate {
         var array:[Instruction] = []
         for gate in self.data.reversed() {

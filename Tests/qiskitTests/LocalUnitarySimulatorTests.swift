@@ -198,8 +198,8 @@ class LocalUnitarySimulatorTests: XCTestCase {
                                                      [0,  0,  0, 1],
                                                      [0,  0,  1, 0],
                                                      [0,  1,  0, 0]]
-                let norm1 = Complex.conjugateMatrix(unitaryreal1).transpose().dot(unitary1).trace()
-                let norm2 = Complex.conjugateMatrix(unitaryreal2).transpose().dot(unitary2).trace()
+                let norm1 = unitaryreal1.conjugate().transpose().dot(unitary1).trace()
+                let norm2 = unitaryreal2.conjugate().transpose().dot(unitary2).trace()
                 print("\(norm1) \(norm2)")
                 //self.assertAlmostEqual(norm1, 4)
                 //self.assertAlmostEqual(norm2, 4)

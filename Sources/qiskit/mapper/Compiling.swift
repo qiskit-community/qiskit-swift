@@ -188,7 +188,7 @@ public final class Compiling {
                                   [1, Complex(imag:-1),                0,  0]]
         B = B.mult(1.0/2.0.squareRoot())
         // U' = Bdag . U . B
-        let Uprime = Complex.conjugateMatrix(B).transpose().dot(U.dot(B))
+        let Uprime = B.conjugate().transpose().dot(U.dot(B))
         // M^2 = trans(U') . U'
         let M2 = Uprime.transpose().dot(Uprime)
         // Diagonalize M2
@@ -204,15 +204,15 @@ public final class Compiling {
             P = P.dot(swapM)
             D = swapM.dot(D.diag().dot(swapM)).diag()
         }
-        var Q = Complex.sqrtMatrix(D).diag()  // array from elementwise sqrt
+        var Q = D.sqrt().diag()  // array from elementwise sqrt
         // Want to take square root so that Q has determinant 1
         if (try Q.det() + 1).abs() < pow(1.0, -5.0) {
             Q[0, 0] = -1.0 * Q[0, 0]
         }
         let Kprime = Uprime.dot(P.dot(Q.inv().dot(P.transpose())))
-        let K1 = B.dot(Kprime.dot(P.dot(Complex.conjugateMatrix(B).transpose())))
-        let A = B.dot(Q.dot(Complex.conjugateMatrix(B).transpose()))
-        let K2 = B.dot(P.transpose().dot(Complex.conjugateMatrix(B).transpose()))
+        let K1 = B.dot(Kprime.dot(P.dot(B.conjugate().transpose())))
+        let A = B.dot(Q.dot(B.conjugate().transpose()))
+        let K2 = B.dot(P.transpose().dot(B.conjugate().transpose()))
         let KAK = K1.dot(A.dot(K2))
         if (KAK.subtract(U)).norm(2) > 1e-6 {
             throw MappingError.twoQubitKakDecomposition
@@ -228,9 +228,9 @@ public final class Compiling {
         let xx = x.kron(x)
         let yy = y.kron(y)
         let zz = z.kron(z)
-        let alpha = atan( Complex.imagMatrix(A.dot(xx)).trace() / Complex.realMatrix(A).trace() )
-        let beta  = atan( Complex.imagMatrix(A.dot(yy)).trace() / Complex.realMatrix(A).trace() )
-        let gamma = atan( Complex.imagMatrix(A.dot(zz)).trace() / Complex.realMatrix(A).trace() )
+        let alpha = atan( A.dot(xx).imag().trace() / A.real().trace() )
+        let beta  = atan( A.dot(yy).imag().trace() / A.real().trace() )
+        let gamma = atan( A.dot(zz).imag().trace() / A.real().trace() )
         // K1 = kron(U1, U2) and K2 = kron(V1, V2)
         // Find the matrices U1, U2, V1, V2
         var L = try K1.slice((0,2),(0,2))
@@ -240,9 +240,9 @@ public final class Compiling {
                 L = try K1.slice((2,4),(2,4))
             }
         }
-        Q = (L.dot(Complex.conjugateMatrix(L).transpose()))
+        Q = (L.dot(L.conjugate().transpose()))
         let U2 = L.div(Q[0, 0].sqrt())
-        var R = K1.dot(Matrix<Complex>.identity(2).kron(Complex.conjugateMatrix(U2).transpose()))
+        var R = K1.dot(Matrix<Complex>.identity(2).kron(U2.conjugate().transpose()))
         var U1 : Matrix<Complex> = [[0, 0], [0, 0]]
         U1[0, 0] = R[0, 0]
         U1[0, 1] = R[0, 2]
@@ -255,9 +255,9 @@ public final class Compiling {
                 L = try K2.slice((2,4), (2,4))
             }
         }
-        Q = L.dot(Complex.conjugateMatrix(L).transpose())
+        Q = L.dot(L.conjugate().transpose())
         var V2 = L.div(Q[0, 0].sqrt())
-        R = K2.dot(Matrix<Complex>.identity(2).kron(Complex.conjugateMatrix(V2).transpose()))
+        R = K2.dot(Matrix<Complex>.identity(2).kron(V2.conjugate().transpose()))
         var V1 : Matrix<Complex> = [[0, 0], [0, 0]]
         V1[0, 0] = R[0, 0]
         V1[0, 1] = R[0, 2]

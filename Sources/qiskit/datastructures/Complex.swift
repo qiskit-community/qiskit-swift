@@ -104,47 +104,7 @@ public struct Complex: Hashable, CustomStringConvertible, NumericType, Expressib
         let b = (self.imag / self.imag.absolute()) * ((self.radiusSquare - self.real) / 2.0).squareRoot()
         return Complex(a, b)
     }
-
-    public static func conjugateMatrix(_ matrix: Matrix<Complex>) -> Matrix<Complex> {
-        var m = matrix
-        for row in 0..<m.rowCount {
-            for col in 0..<m.colCount {
-                m[row,col] = m[row,col].conjugate()
-            }
-        }
-        return m
-    }
-
-    public static func sqrtMatrix(_ matrix: Matrix<Complex>) -> Matrix<Complex> {
-        var m = matrix
-        for row in 0..<m.rowCount {
-            for col in 0..<m.colCount {
-                m[row,col] = m[row,col].sqrt()
-            }
-        }
-        return m
-    }
-
-    public static func realMatrix(_ matrix: Matrix<Complex>) -> Matrix<Double> {
-        var m = Matrix<Double>(repeating:0, rows: matrix.rowCount, cols: matrix.colCount)
-        for row in 0..<m.rowCount {
-            for col in 0..<m.colCount {
-                m[row,col] = matrix[row,col].real
-            }
-        }
-        return m
-    }
-
-    public static func imagMatrix(_ matrix: Matrix<Complex>) -> Matrix<Double> {
-        var m = Matrix<Double>(repeating:0, rows: matrix.rowCount, cols: matrix.colCount)
-        for row in 0..<m.rowCount {
-            for col in 0..<m.colCount {
-                m[row,col] = matrix[row,col].imag
-            }
-        }
-        return m
-    }
-
+    
     public func add(_ n: Complex) -> Complex {
         return Complex(self.real + n.self.real, self.imag + n.imag)
     }

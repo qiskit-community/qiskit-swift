@@ -279,6 +279,8 @@
 		698248291FBCCA900097E8E5 /* CRandom.h in Headers */ = {isa = PBXBuildFile; fileRef = 698248221FBCC7390097E8E5 /* CRandom.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		6982482A1FBCCAA60097E8E5 /* CRandom.c in Sources */ = {isa = PBXBuildFile; fileRef = 698248271FBCC7580097E8E5 /* CRandom.c */; };
 		699CAF671FC489A200402C05 /* ToolsError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 699CAF661FC489A200402C05 /* ToolsError.swift */; };
+		69BB5A4B1FCD2169005AAE32 /* VectorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69BB5A4A1FCD2168005AAE32 /* VectorError.swift */; };
+		69BB5A4C1FCD2178005AAE32 /* VectorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69BB5A4A1FCD2168005AAE32 /* VectorError.swift */; };
 		69CB0D5A1FB7B21700A1D546 /* DataStructureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69CB0D261FB7B0E300A1D546 /* DataStructureTests.swift */; };
 		69CB0D5B1FB7B21700A1D546 /* LocalQasmSimulatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69CB0D241FB7B0E300A1D546 /* LocalQasmSimulatorTests.swift */; };
 		69CB0D5C1FB7B21700A1D546 /* example.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69CB0D321FB7B11D00A1D546 /* example.swift */; };
@@ -468,6 +470,7 @@
 		698248231FBCC7390097E8E5 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; name = module.modulemap; path = Sources/crandom/include/module.modulemap; sourceTree = "<group>"; };
 		698248271FBCC7580097E8E5 /* CRandom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = CRandom.c; path = Sources/crandom/CRandom.c; sourceTree = "<group>"; };
 		699CAF661FC489A200402C05 /* ToolsError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ToolsError.swift; path = Sources/qiskit/tools/ToolsError.swift; sourceTree = SOURCE_ROOT; };
+		69BB5A4A1FCD2168005AAE32 /* VectorError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = VectorError.swift; path = Sources/qiskit/datastructures/VectorError.swift; sourceTree = SOURCE_ROOT; };
 		69CB0D241FB7B0E300A1D546 /* LocalQasmSimulatorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LocalQasmSimulatorTests.swift; path = Tests/qiskitTests/LocalQasmSimulatorTests.swift; sourceTree = "<group>"; };
 		69CB0D251FB7B0E300A1D546 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Tests/qiskitTests/Info.plist; sourceTree = "<group>"; };
 		69CB0D261FB7B0E300A1D546 /* DataStructureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DataStructureTests.swift; path = Tests/qiskitTests/DataStructureTests.swift; sourceTree = "<group>"; };
@@ -619,6 +622,7 @@
 				69F198F91FC2144C00CE05DC /* String+Padding.swift */,
 				6932AA191FB9F5B200382CF7 /* String+Random.swift */,
 				6903E0AC1FC340B7007C1C60 /* Vector.swift */,
+				69BB5A4A1FCD2168005AAE32 /* VectorError.swift */,
 			);
 			name = "Data Structures";
 			sourceTree = "<group>";
@@ -1098,6 +1102,7 @@
 				6932AA3F1FB9F63100382CF7 /* CircuitVertexData.swift in Sources */,
 				6932AA2D1FB9F5D900382CF7 /* RegBit.swift in Sources */,
 				6932AB5F1FB9F92C00382CF7 /* NodeQreg.swift in Sources */,
+				69BB5A4C1FCD2178005AAE32 /* VectorError.swift in Sources */,
 				6932AA3E1FB9F62E00382CF7 /* CircuitEdgeData.swift in Sources */,
 				6932AB5C1FB9F92400382CF7 /* NodeOpaque.swift in Sources */,
 				6932AB6D1FB9F98500382CF7 /* qelib1.swift in Sources */,
@@ -1242,6 +1247,7 @@
 				6932A9F31FB9F50500382CF7 /* QeRemote.swift in Sources */,
 				6932AA071FB9F56F00382CF7 /* GraphError.swift in Sources */,
 				6932AA6D1FB9F69300382CF7 /* CU3.swift in Sources */,
+				69BB5A4B1FCD2169005AAE32 /* VectorError.swift in Sources */,
 				6932AB3B1FB9F8CB00382CF7 /* NodeInclude.swift in Sources */,
 				6932AB8D1FB9FDB800382CF7 /* parser.y in Sources */,
 				6932AB331FB9F8CB00382CF7 /* NodeUniversalUnitary.swift in Sources */,

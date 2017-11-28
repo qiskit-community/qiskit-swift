@@ -305,14 +305,14 @@ public final class Optimization {
      Returns:
         Average value of the Hamiltonian or observable.
      */
-    /*
+/*
     public static func eval_hamiltonian(_ Q_program: QuantumProgram,
                                         _ hamiltonian: Any,
                                         _ input_circuit: QuantumCircuit,
                                         _ shots: Int,
                                         _ device: String,
-                                        _ callback: @escaping ((_:Double, _:String?) -> Void)) throws -> RequestTask {
-        var energy: Double = 0.0
+                                        _ callback: @escaping ((_:Complex, _:String?) -> Void)) throws -> RequestTask {
+        var energy: Complex = 0.0
         var requestTask = RequestTask()
         do {
             if shots == 1 {
@@ -352,12 +352,14 @@ public final class Optimization {
                         }
                         do {
                             // no Pauli final rotations
-                            if let quantum_state_0 = try result.get_data(circuits_labels[0])["quantum_state"] as? Matrix<Complex> {
+                            if let q_0 = try result.get_data(circuits_labels[0])["quantum_state"] as? [Complex] {
+                                let quantum_state_0 = Vector<Complex>(value:q_0)
                                 i = 1
                                 for p in hamiltonianList {
-                                    if let quantum_state_i = try result.get_data(circuits_labels[i])["quantum_state"] as? Matrix<Complex> {
+                                    if let q_i = try result.get_data(circuits_labels[i])["quantum_state"] as? [Complex] {
+                                        let quantum_state_i = Vector<Complex>(value:q_i)
                                         // inner product with final rotations of (i-1)-th Pauli
-                                        energy += p[0] * np.inner(Complex.conjugateMatrix(quantum_state_0), quantum_state_i)
+                                        energy += p[0] * try quantum_state_0.conjugate().inner(quantum_state_i)
                                     }
                                     i += 1
                                 }
@@ -378,25 +380,26 @@ public final class Optimization {
                             return
                         }
                         do {
-                            var quantum_state = Matrix<Complex>()
-                            if let q = try result.get_data(circuit[0])["quantum_state"] as? Matrix<Complex> {
-                                quantum_state = q
+                            var quantum_state: Vector<Complex> = []
+                            if let q = try result.get_data(circuit[0])["quantum_state"] as? [Complex] {
+                                quantum_state = Vector<Complex>(value:q)
                             }
                             else {
-                                if let q = try result.get_data(circuit[0])["quantum_states"] as? [Matrix<Complex>] {
+                                if let q = try result.get_data(circuit[0])["quantum_states"] as? [[Complex]] {
                                     if q.count > 0 {
-                                        quantum_state = q[0]
+                                        quantum_state = Vector<Complex>(value:q[0])
                                     }
                                 }
                             }
 
                             // Diagonal Hamiltonian represented by 1D array
-                            if hamiltonianMatrix.shape.0 == 1 || np.shape(np.shape(np.array(hamiltonianMatrix))) == (1,) {
-                                energy = np.sum(hamiltonianMatrix * quantum_state.absolute() ** 2)
+                            if hamiltonianMatrix.shape.0 == 1 && hamiltonianMatrix.shape.1 > 1 {
+                                let hamiltonianVector = Vector<Complex>(value:hamiltonianMatrix.rows[0])
+                                energy = try hamiltonianVector.mult(Vector<Complex>(value:quantum_state.absolute()).power(2)).sum()
                             }
                             // Hamiltonian represented by square matrix
                             else if hamiltonianMatrix.shape.0 == hamiltonianMatrix.shape.1 {
-                                energy = np.inner(np.conjugate(quantum_state), np.dot(hamiltonianMatrix, quantum_state))
+                                energy = quantum_state.conjugate().inner(hamiltonianMatrix.dot(quantum_state))
                             }
                             callback(energy,nil)
                         } catch {
@@ -410,29 +413,29 @@ public final class Optimization {
                     }
                 }
             }
-            else { // finite number of shots and hamiltonian grouped in tpb sets
+            else if let hamiltonianMatrix = hamiltonian as? [[[Pauli]]] { // finite number of shots and hamiltonian grouped in tpb sets
                 var circuits: [QuantumCircuit] = []
                 var circuits_labels: [String] = []
-                let n = hamiltonian[0][0][1].v.count
-                let q = QuantumRegister("q", n)
-                let c = ClassicalRegister("c", n)
+                let n = hamiltonianMatrix[0][0][1].v.count
+                let q = try QuantumRegister("q", n)
+                let c = try ClassicalRegister("c", n)
                 var i: Int = 0
-                for tpb_set in hamiltonian {
-                    circuits.append(copy.deepcopy(input_circuit))
+                for tpb_set in hamiltonianMatrix {
+                    circuits.append(input_circuit.copy())
                     circuits_labels.append("tpb_circuit_\(i)")
                     for j in 0..<n {
                         // Measure X
                         if tpb_set[0][1].v[j] == 0 && tpb_set[0][1].w[j] == 1 {
-                            circuits[i].h(q[j])
+                            try circuits[i].h(q[j])
                         }
                         // Measure Y
                         else if tpb_set[0][1].v[j] == 1 && tpb_set[0][1].w[j] == 1 {
-                            circuits[i].s(q[j]).inverse()
-                            circuits[i].h(q[j])
+                            try circuits[i].s(q[j]).inverse()
+                            try circuits[i].h(q[j])
                         }
-                        circuits[i].measure(q[j], c[j])
+                        try circuits[i].measure(q[j], c[j])
                     }
-                    Q_program.add_circuit(circuits_labels[i], circuits[i])
+                    try Q_program.add_circuit(circuits_labels[i], circuits[i])
                     i += 1
                 }
                 requestTask = Q_program.execute(circuits_labels, backend: device, shots: shots) { (result) in
@@ -440,12 +443,18 @@ public final class Optimization {
                         callback(energy,result.get_error())
                         return
                     }
-                    for j in 0..<hamiltonian.count {
-                        for k in 0..<hamiltonian[j].count {
-                            energy += hamiltonian[j][k][0] * measure_pauli_z(result.get_counts(circuits_labels[j]), hamiltonian[j][k][1])
+                    for j in 0..<hamiltonianMatrix.count {
+                        for k in 0..<hamiltonianMatrix[j].count {
+                            energy +=
+                                hamiltonianMatrix[j][k][0] * measure_pauli_z(result.get_counts(circuits_labels[j]), hamiltonianMatrix[j][k][1])
                         }
                     }
                     callback(energy,nil)
+                }
+            }
+            else {
+                DispatchQueue.main.async {
+                    callback(energy,"Unknown hamiltonian.")
                 }
             }
         } catch {

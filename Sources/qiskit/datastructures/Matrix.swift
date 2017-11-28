@@ -271,6 +271,16 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
         return ab
     }
 
+    public func sum() -> T {
+        var sum: T = 0
+        for i in 0..<self.rowCount {
+            for j in 0..<self.colCount {
+                sum += self[i,j]
+            }
+        }
+        return sum
+    }
+
     public func dot(_ other: Matrix<T>) -> Matrix<T> {
         let m = self.rowCount
         let n = self.colCount
@@ -383,5 +393,48 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
 
     public func expm() -> Matrix<T> {
         fatalError("Matrix expm not implemented")
+    }
+}
+
+extension Matrix where T == Complex {
+
+    public func conjugate() -> Matrix {
+        var m = Matrix<T>(repeating: 0, rows: self.rowCount, cols: self.colCount)
+        for row in 0..<m.rowCount {
+            for col in 0..<m.colCount {
+                m[row,col] = self[row,col].conjugate()
+            }
+        }
+        return m
+    }
+
+    public func sqrt() -> Matrix {
+        var m = Matrix<T>(repeating: 0, rows: self.rowCount, cols: self.colCount)
+        for row in 0..<m.rowCount {
+            for col in 0..<m.colCount {
+                m[row,col] = m[row,col].sqrt()
+            }
+        }
+        return m
+    }
+
+    public func real() -> Matrix<Double> {
+        var m = Matrix<Double>(repeating:0, rows: self.rowCount, cols: self.colCount)
+        for row in 0..<m.rowCount {
+            for col in 0..<m.colCount {
+                m[row,col] = self[row,col].real
+            }
+        }
+        return m
+    }
+
+    public func imag() -> Matrix<Double> {
+        var m = Matrix<Double>(repeating:0, rows: self.rowCount, cols: self.colCount)
+        for row in 0..<m.rowCount {
+            for col in 0..<m.colCount {
+                m[row,col] = self[row,col].imag
+            }
+        }
+        return m
     }
 }

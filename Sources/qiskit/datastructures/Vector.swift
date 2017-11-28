@@ -118,6 +118,28 @@ public struct Vector<T: NumericType> : Hashable, Sequence, CustomStringConvertib
         })
     }
 
+    public func mult(_ other: Vector<T>) throws -> Vector<T> {
+        if self.count != other.count {
+            throw VectorError.differentSizes(count1: self.count, count2: other.count)
+        }
+        var ab = self
+        for i in 0..<ab.count {
+            ab[i] *= other[i]
+        }
+        return ab
+    }
+
+    public func inner(_ other: Vector<T>) throws -> T {
+        if self.count != other.count {
+            throw VectorError.differentSizes(count1: self.count, count2: other.count)
+        }
+        var sum: T = 0
+        for i in 0..<self.count {
+            sum += self[i] * other[i]
+        }
+        return sum
+    }
+
     public func div(_ scalar: T) -> Vector<T> {
         return Vector<T>(value: self.map {
             return $0 / scalar
@@ -131,6 +153,20 @@ public struct Vector<T: NumericType> : Hashable, Sequence, CustomStringConvertib
         })
     }
 
+    public func absolute() -> Vector<Double> {
+        return Vector<Double>(value: self.map {
+            return $0.absolute()
+        })
+    }
+
+    public func sum() -> T {
+        var sum: T = 0
+        for i in 0..<self.count {
+            sum += self[i]
+        }
+        return sum
+    }
+
     public func dot(_ other: Vector<T>) -> T {
         let m = self.count <= other.count ? self.count : other.count
         var ret: T = 0
@@ -138,5 +174,26 @@ public struct Vector<T: NumericType> : Hashable, Sequence, CustomStringConvertib
             ret += self[i] * other[i]
         }
         return ret
+    }
+}
+
+extension Vector where T == Complex {
+
+    public init(value: Vector<Double>) {
+        self.value = value.value.map {
+            return Complex(real: $0)
+        }
+    }
+
+    public func power(_ n: Double) -> Vector {
+        return Vector<T>(value: self.map {
+            return $0.power(n)
+        })
+    }
+
+    public func conjugate() -> Vector {
+        return Vector<T>(value: self.map {
+            return $0.conjugate()
+        })
     }
 }
