@@ -17,14 +17,14 @@ import Foundation
 
 final class ProcessNodesReturn {
 
-    let nodes: [NodeRealValueProtocol]
+    let nodes: [NodeRealValue]
     let regBits: [[RegBit]]
 
     init() {
         self.nodes = []
         self.regBits = []
     }
-    init(_ nodes: [NodeRealValueProtocol]) {
+    init(_ nodes: [NodeRealValue]) {
         self.nodes = nodes
         self.regBits = []
     }
@@ -74,7 +74,7 @@ final class Unroller {
     /**
      List of dictionaries mapping local parameter ids to expression Nodes
      */
-    private var arg_stack: Stack<[String:NodeRealValueProtocol]> = Stack<[String:NodeRealValueProtocol]>()
+    private var arg_stack: Stack<[String:NodeRealValue]> = Stack<[String:NodeRealValue]>()
     /**
      List of dictionaries mapping local bit ids to global ids (name,idx)
      */
@@ -138,7 +138,7 @@ final class Unroller {
      */
     private func _process_custom_unitary(_ node: NodeCustomUnitary) throws {
         let name = node.name
-        var args: [NodeRealValueProtocol] = []
+        var args: [NodeRealValue] = []
         if let list = node.arguments {
             args = try self._process_node(list).nodes
         }
@@ -158,7 +158,7 @@ final class Unroller {
             let gbody = gate.body
             // Loop over register arguments, if any.
             for idx in 0..<maxidx {
-                var map: [String:NodeRealValueProtocol] = [:]
+                var map: [String:NodeRealValue] = [:]
                 for (j, garg) in gargs.enumerated() {
                     map[garg] = args[j]
                 }
@@ -174,7 +174,7 @@ final class Unroller {
                     regBitMap[gbit] = bits[j][element[j]]
                 }
                 self.bit_stack.push(regBitMap)
-                var args: [NodeRealValueProtocol] = []
+                var args: [NodeRealValue] = []
                 if let map = self.arg_stack.peek() {
                     for s in gargs {
                         if let value = map[s] {
@@ -392,9 +392,9 @@ final class Unroller {
         case .N_CNOT:
             try self._process_cnot(node as! NodeCnot)
         case .N_EXPRESSIONLIST:
-            var nodes: [NodeRealValueProtocol] = []
+            var nodes: [NodeRealValue] = []
             for child in node.children {
-                if let value = child as? NodeRealValueProtocol {
+                if let value = child as? NodeRealValue {
                     nodes.append(value)
                 }
             }

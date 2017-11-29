@@ -22,7 +22,7 @@ import Foundation
  children[1] is the left expression.
  children[2] is the right expression.
  */
-final class NodeBinaryOp: Node, NodeRealValueProtocol {
+final class NodeBinaryOp: NodeRealValue {
 
     let op: String
     let _children: [Node]
@@ -54,12 +54,12 @@ final class NodeBinaryOp: Node, NodeRealValueProtocol {
         return "\(lhsqasm) \(op) \(rhs.qasm(prec))"
     }
 
-    func real(_ nested_scope: [[String:NodeRealValueProtocol]]? = nil) throws -> Double {
+    func real(_ nested_scope: [[String:NodeRealValue]]? = nil) throws -> Double {
         let operation = self.op
-        guard let lexpr = self._children[0] as? NodeRealValueProtocol else {
+        guard let lexpr = self._children[0] as? NodeRealValue else {
             throw QasmException.errorBinop(qasm: self.qasm(15))
         }
-        guard let rexpr = self._children[1] as? NodeRealValueProtocol else {
+        guard let rexpr = self._children[1] as? NodeRealValue else {
             throw QasmException.errorBinop(qasm: self.qasm(15))
         }
         let lhs = try lexpr.real(nested_scope)

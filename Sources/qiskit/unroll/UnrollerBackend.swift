@@ -61,7 +61,7 @@ protocol UnrollerBackend {
      nested_scope is a list of dictionaries mapping expression variables
      to Node expression objects in order of increasing nesting depth.
      */
-    func u(_ arg: (NodeRealValueProtocol, NodeRealValueProtocol, NodeRealValueProtocol), _ qubit: RegBit, _ nested_scope:[[String:NodeRealValueProtocol]]?) throws
+    func u(_ arg: (NodeRealValue, NodeRealValue, NodeRealValue), _ qubit: RegBit, _ nested_scope:[[String:NodeRealValue]]?) throws
 
     /**
      Fundamental two qubit gate.
@@ -110,7 +110,7 @@ protocol UnrollerBackend {
      nested_scope is a list of dictionaries mapping expression variables
      to Node expression objects in order of increasing nesting depth.
      */
-    func start_gate(_ name: String, _ args: [NodeRealValueProtocol], _ qubits: [RegBit], _ nested_scope:[[String:NodeRealValueProtocol]]?) throws
+    func start_gate(_ name: String, _ args: [NodeRealValue], _ qubits: [RegBit], _ nested_scope:[[String:NodeRealValue]]?) throws
 
     /**
      End a custom gate.
@@ -121,7 +121,7 @@ protocol UnrollerBackend {
      nested_scope is a list of dictionaries mapping expression variables
      to Node expression objects in order of increasing nesting depth..
      */
-    func end_gate(_ name: String, _ args: [NodeRealValueProtocol], _ qubits: [RegBit], _ nested_scope:[[String:NodeRealValueProtocol]]?) throws
+    func end_gate(_ name: String, _ args: [NodeRealValue], _ qubits: [RegBit], _ nested_scope:[[String:NodeRealValue]]?) throws
 
     /**
      Returns the generated circuit.

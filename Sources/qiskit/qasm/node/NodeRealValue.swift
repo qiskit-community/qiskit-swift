@@ -16,6 +16,6 @@
 
 import Foundation
 
-protocol NodeRealValueProtocol {
-    func real(_ nested_scope: [[String:NodeRealValueProtocol]]?) throws -> Double
+protocol NodeRealValue: Node {
+    func real(_ nested_scope: [[String:NodeRealValue]]?) throws -> Double
 }

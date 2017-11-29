@@ -223,7 +223,7 @@
 		6932AB3F1FB9F8CB00382CF7 /* NodeId.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB221FB9F8C900382CF7 /* NodeId.swift */; };
 		6932AB401FB9F8CB00382CF7 /* NodeMagic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB231FB9F8C900382CF7 /* NodeMagic.swift */; };
 		6932AB411FB9F8CB00382CF7 /* NodeExternal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB241FB9F8C900382CF7 /* NodeExternal.swift */; };
-		6932AB421FB9F8CB00382CF7 /* NodeRealValueProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB251FB9F8CA00382CF7 /* NodeRealValueProtocol.swift */; };
+		6932AB421FB9F8CB00382CF7 /* NodeRealValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB251FB9F8CA00382CF7 /* NodeRealValue.swift */; };
 		6932AB431FB9F8CB00382CF7 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB261FB9F8CA00382CF7 /* Node.swift */; };
 		6932AB441FB9F8CB00382CF7 /* NodeIf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB271FB9F8CA00382CF7 /* NodeIf.swift */; };
 		6932AB451FB9F8CB00382CF7 /* NodeReal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB281FB9F8CA00382CF7 /* NodeReal.swift */; };
@@ -255,7 +255,7 @@
 		6932AB5F1FB9F92C00382CF7 /* NodeQreg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB1D1FB9F8C800382CF7 /* NodeQreg.swift */; };
 		6932AB601FB9F92F00382CF7 /* NodeProgram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB151FB9F8C700382CF7 /* NodeProgram.swift */; };
 		6932AB611FB9F93500382CF7 /* NodeReal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB281FB9F8CA00382CF7 /* NodeReal.swift */; };
-		6932AB621FB9F93700382CF7 /* NodeRealValueProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB251FB9F8CA00382CF7 /* NodeRealValueProtocol.swift */; };
+		6932AB621FB9F93700382CF7 /* NodeRealValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB251FB9F8CA00382CF7 /* NodeRealValue.swift */; };
 		6932AB631FB9F93A00382CF7 /* NodeReset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB1A1FB9F8C800382CF7 /* NodeReset.swift */; };
 		6932AB641FB9F93E00382CF7 /* NodeUniversalUnitary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB161FB9F8C700382CF7 /* NodeUniversalUnitary.swift */; };
 		6932AB681FB9F97200382CF7 /* qelib1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB651FB9F97200382CF7 /* qelib1.swift */; };
@@ -451,7 +451,7 @@
 		6932AB221FB9F8C900382CF7 /* NodeId.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeId.swift; path = Sources/qiskit/qasm/node/NodeId.swift; sourceTree = SOURCE_ROOT; };
 		6932AB231FB9F8C900382CF7 /* NodeMagic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeMagic.swift; path = Sources/qiskit/qasm/node/NodeMagic.swift; sourceTree = SOURCE_ROOT; };
 		6932AB241FB9F8C900382CF7 /* NodeExternal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeExternal.swift; path = Sources/qiskit/qasm/node/NodeExternal.swift; sourceTree = SOURCE_ROOT; };
-		6932AB251FB9F8CA00382CF7 /* NodeRealValueProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeRealValueProtocol.swift; path = Sources/qiskit/qasm/node/NodeRealValueProtocol.swift; sourceTree = SOURCE_ROOT; };
+		6932AB251FB9F8CA00382CF7 /* NodeRealValue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeRealValue.swift; path = Sources/qiskit/qasm/node/NodeRealValue.swift; sourceTree = SOURCE_ROOT; };
 		6932AB261FB9F8CA00382CF7 /* Node.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Node.swift; path = Sources/qiskit/qasm/node/Node.swift; sourceTree = SOURCE_ROOT; };
 		6932AB271FB9F8CA00382CF7 /* NodeIf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeIf.swift; path = Sources/qiskit/qasm/node/NodeIf.swift; sourceTree = SOURCE_ROOT; };
 		6932AB281FB9F8CA00382CF7 /* NodeReal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeReal.swift; path = Sources/qiskit/qasm/node/NodeReal.swift; sourceTree = SOURCE_ROOT; };
@@ -676,7 +676,7 @@
 				6932AB151FB9F8C700382CF7 /* NodeProgram.swift */,
 				6932AB1D1FB9F8C800382CF7 /* NodeQreg.swift */,
 				6932AB281FB9F8CA00382CF7 /* NodeReal.swift */,
-				6932AB251FB9F8CA00382CF7 /* NodeRealValueProtocol.swift */,
+				6932AB251FB9F8CA00382CF7 /* NodeRealValue.swift */,
 				6932AB1A1FB9F8C800382CF7 /* NodeReset.swift */,
 				6932AB161FB9F8C700382CF7 /* NodeUniversalUnitary.swift */,
 			);
@@ -1178,7 +1178,7 @@
 				6932AA0B1FB9F57E00382CF7 /* GraphEdge.swift in Sources */,
 				6932AB491FB9F8EE00382CF7 /* NodeBarrier.swift in Sources */,
 				6932AA2F1FB9F5DF00382CF7 /* Stack.swift in Sources */,
-				6932AB621FB9F93700382CF7 /* NodeRealValueProtocol.swift in Sources */,
+				6932AB621FB9F93700382CF7 /* NodeRealValue.swift in Sources */,
 				6932AB4A1FB9F8F100382CF7 /* NodeBinaryOp.swift in Sources */,
 				6932AA421FB9F63C00382CF7 /* GateData.swift in Sources */,
 				6932AA0C1FB9F58100382CF7 /* GraphError.swift in Sources */,
@@ -1278,7 +1278,7 @@
 				6932AA6A1FB9F69300382CF7 /* U3.swift in Sources */,
 				6932AA231FB9F5B200382CF7 /* Random.swift in Sources */,
 				6932AAA41FB9F71700382CF7 /* CouplingVertexData.swift in Sources */,
-				6932AB421FB9F8CB00382CF7 /* NodeRealValueProtocol.swift in Sources */,
+				6932AB421FB9F8CB00382CF7 /* NodeRealValue.swift in Sources */,
 				6932AB8F1FB9FDB800382CF7 /* ParseTree.c in Sources */,
 				6932AB2D1FB9F8CB00382CF7 /* NodePrimaryList.swift in Sources */,
 				6932AB381FB9F8CB00382CF7 /* NodeOpaque.swift in Sources */,

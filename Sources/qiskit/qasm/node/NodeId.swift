@@ -21,7 +21,7 @@ import Foundation
  The node has no children but has fields name, line, and file.
  There is a flag is_bit that is set when XXXXX to help with scoping.
  */
-final class NodeId: Node, NodeRealValueProtocol {
+final class NodeId: NodeRealValue {
 
     private(set) var _name: String = ""
     private(set) var line: Int = 0
@@ -53,7 +53,7 @@ final class NodeId: Node, NodeRealValueProtocol {
         return qasm
     }
 
-    func real(_ nested_scope: [[String:NodeRealValueProtocol]]?) throws -> Double {
+    func real(_ nested_scope: [[String:NodeRealValue]]?) throws -> Double {
         guard let scope = nested_scope else {
             throw QasmException.errorLocalParameter(qasm: self.qasm(15))
         }

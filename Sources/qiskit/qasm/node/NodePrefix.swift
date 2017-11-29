@@ -20,7 +20,7 @@ Node for an OPENQASM prefix expression.
 children[0] is a prefix string such as '-'.
 children[1] is an expression node.
 */
-final class NodePrefix: Node, NodeRealValueProtocol {
+final class NodePrefix: NodeRealValue {
 
     let op: String
     let _children: [Node]
@@ -46,9 +46,9 @@ final class NodePrefix: Node, NodeRealValueProtocol {
         return "\(op)\(operand.qasm(prec))"
     }
 
-    func real(_ nested_scope: [[String:NodeRealValueProtocol]]?) throws -> Double {
+    func real(_ nested_scope: [[String:NodeRealValue]]?) throws -> Double {
         let operation = self.op
-        guard let operand = self._children[0] as? NodeRealValueProtocol else {
+        guard let operand = self._children[0] as? NodeRealValue else {
             throw QasmException.errorPrefix(qasm: self.qasm(15))
         }
         let expr = try operand.real(nested_scope)

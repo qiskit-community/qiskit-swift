@@ -21,7 +21,7 @@ import Foundation
  children[0] is an id node with the name of the function.
  children[1] is an expression node.
  */
-final class NodeExternal: Node, NodeRealValueProtocol {
+final class NodeExternal: NodeRealValue {
 
     private static let externalFunctions = ["sin", "cos", "tan", "exp", "ln", "sqrt"]
 
@@ -47,8 +47,8 @@ final class NodeExternal: Node, NodeRealValueProtocol {
         return qasm
     }
 
-    func real(_ nested_scope: [[String:NodeRealValueProtocol]]?) throws -> Double {
-        if let expr = self.expression as? NodeRealValueProtocol {
+    func real(_ nested_scope: [[String:NodeRealValue]]?) throws -> Double {
+        if let expr = self.expression as? NodeRealValue {
             let arg = try expr.real(nested_scope)
             if self.operation == "sin" {
                 return sin(arg)

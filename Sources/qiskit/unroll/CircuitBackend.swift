@@ -121,7 +121,7 @@ final class CircuitBackend: UnrollerBackend {
      nested_scope is a list of dictionaries mapping expression variables
      to Node expression objects in order of increasing nesting depth.
      */
-    func u(_ arg: (NodeRealValueProtocol, NodeRealValueProtocol, NodeRealValueProtocol), _ qubit: RegBit, _ nested_scope:[[String:NodeRealValueProtocol]]?) throws {
+    func u(_ arg: (NodeRealValue, NodeRealValue, NodeRealValue), _ qubit: RegBit, _ nested_scope:[[String:NodeRealValue]]?) throws {
         if self.listen {
             if !self.basis.contains("U") {
                 self.basis.append("U")
@@ -232,7 +232,7 @@ final class CircuitBackend: UnrollerBackend {
      nested_scope is a list of dictionaries mapping expression variables
      to Node expression objects in order of increasing nesting depth.
      */
-    func start_gate(_ name: String, _ args: [NodeRealValueProtocol], _ qubits: [RegBit], _ nested_scope:[[String:NodeRealValueProtocol]]?) throws {
+    func start_gate(_ name: String, _ args: [NodeRealValue], _ qubits: [RegBit], _ nested_scope:[[String:NodeRealValue]]?) throws {
         if self.listen && !self.basis.contains(name) {
             if let gate = self.gates[name] {
                 if gate.opaque {
@@ -416,7 +416,7 @@ final class CircuitBackend: UnrollerBackend {
      nested_scope is a list of dictionaries mapping expression variables
      to Node expression objects in order of increasing nesting depth..
      */
-    func end_gate(_ name: String, _ args: [NodeRealValueProtocol], _ qubits: [RegBit], _ nested_scope:[[String:NodeRealValueProtocol]]?) throws {
+    func end_gate(_ name: String, _ args: [NodeRealValue], _ qubits: [RegBit], _ nested_scope:[[String:NodeRealValue]]?) throws {
         if name == self.in_gate {
             self.in_gate = ""
             self.listen = true
