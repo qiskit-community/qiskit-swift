@@ -21,33 +21,35 @@ import Foundation
  */
 public final class IdGate: Gate {
 
-    fileprivate init(_ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) {
-        super.init("id", [], [qubit], circuit)
+    public var instructionComponent: InstructionComponent
+
+    fileprivate init(_ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit) {
+        self.instructionComponent = InstructionComponent("id", [], [qubit], circuit)
     }
 
-    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
-        super.init(name, params, args, circuit)
+    private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit) {
+        self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    override public func copy() -> Instruction {
+    public func copy() -> Instruction {
         return IdGate(self.name, self.params, self.args, self.circuit)
     }
 
-    public override var description: String {
+    public var description: String {
         return self._qasmif("\(name) \(self.args[0].identifier)")
     }
 
     /**
      Invert this gate.
      */
-    public override func inverse() -> Gate {
+    public func inverse() -> Instruction {
         return self
     }
 
     /**
      Reapply this gate to corresponding qubits in circ.
      */
-    public override func reapply(_ circ: QuantumCircuit) throws {
+    public func reapply(_ circ: QuantumCircuit) throws {
         try self._modifiers(circ.iden(self.args[0] as! QuantumRegisterTuple))
     }
 }

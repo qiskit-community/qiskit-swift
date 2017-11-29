@@ -20,14 +20,14 @@ import Foundation
  */
 public final class FredkinGate: CompositeGate {
 
-    fileprivate init(_ ctl: QuantumRegisterTuple,_ tgt1: QuantumRegisterTuple, _ tgt2: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) throws {
+    fileprivate init(_ ctl: QuantumRegisterTuple,_ tgt1: QuantumRegisterTuple, _ tgt2: QuantumRegisterTuple, _ circuit: QuantumCircuit) throws {
         super.init("fredkin", [], [ctl,tgt1, tgt2], circuit)
         try self.cx(tgt2,tgt1)
         try self.ccx(ctl,tgt1,tgt2)
         try self.cx(tgt2,tgt1)
     }
 
-    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
+    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit) {
         super.init(name, params, args, circuit)
     }
 

@@ -20,31 +20,33 @@ import Foundation
  */
 public final class Barrier: Instruction {
 
+    public var instructionComponent: InstructionComponent
+
     fileprivate init(_ qregs: [QuantumRegister], _ circuit: QuantumCircuit) {
-        super.init("barrier", [], qregs, circuit)
+        self.instructionComponent = InstructionComponent("barrier", [], qregs, circuit)
     }
 
     fileprivate init(_ qargs: [QuantumRegisterTuple], _ circuit: QuantumCircuit) {
-        super.init("barrier", [], qargs, circuit)
+        self.instructionComponent = InstructionComponent("barrier", [], qargs, circuit)
     }
 
     fileprivate init(_ qregs: [QuantumRegister], _ gate: CompositeGate) {
-        super.init("barrier", [], qregs, gate.circuit)
+        self.instructionComponent = InstructionComponent("barrier", [], qregs, gate.circuit)
     }
 
     fileprivate init(_ qargs: [QuantumRegisterTuple], _ gate: CompositeGate) {
-        super.init("barrier", [], qargs, gate.circuit)
+        self.instructionComponent = InstructionComponent("barrier", [], qargs, gate.circuit)
     }
 
-    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
-        super.init(name, params, args, circuit)
+    private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit) {
+        self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    override public func copy() -> Instruction {
+    public func copy() -> Instruction {
         return Barrier(self.name, self.params, self.args, self.circuit)
     }
 
-    public override var description: String {
+    public var description: String {
         var text = "barrier "
         let array = self.args.map {$0.identifier}
         text.append(array.joined(separator: ","))
@@ -54,14 +56,14 @@ public final class Barrier: Instruction {
     /**
      Special case. Return self.
      */
-    public override func inverse() -> Instruction {
+    public func inverse() -> Instruction {
         return self
     }
 
     /**
     Reapply this instruction to corresponding qubits in circ.
      */
-    public override func reapply(_ circ: QuantumCircuit) throws {
+    public func reapply(_ circ: QuantumCircuit) throws {
         var registers: [QuantumRegister] = []
         var tuples: [QuantumRegisterTuple] = []
         for arg in self.args {

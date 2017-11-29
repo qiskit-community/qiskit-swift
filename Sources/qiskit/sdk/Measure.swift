@@ -20,26 +20,32 @@ import Foundation
  */
 public final class Measure: Instruction {
 
-    init(_ qubit: QuantumRegisterTuple, _ bit: ClassicalRegisterTuple, _ circuit: QuantumCircuit?) {
-        super.init("measure", [], [qubit,bit], circuit)
+    public var instructionComponent: InstructionComponent
+
+    init(_ qubit: QuantumRegisterTuple, _ bit: ClassicalRegisterTuple, _ circuit: QuantumCircuit) {
+        self.instructionComponent = InstructionComponent("measure", [], [qubit,bit], circuit)
     }
 
-    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
-        super.init(name, params, args, circuit)
+    private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit) {
+        self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    override public func copy() -> Instruction {
+    public func copy() -> Instruction {
         return Measure(self.name, self.params, self.args, self.circuit)
     }
 
-    public override var description: String {
+    public var description: String {
         return "\(name) \(self.args[0].identifier) -> \(self.args[1].identifier)"
+    }
+
+    public func inverse() -> Instruction {
+        preconditionFailure("inverse not implemented")
     }
 
     /**
      Reapply this instruction to corresponding qubits in circ.
      */
-    public override func reapply(_ circ: QuantumCircuit) throws {
+    public func reapply(_ circ: QuantumCircuit) throws {
         try self._modifiers(circ.measure(self.args[0] as! QuantumRegisterTuple,
                                      self.args[1] as! ClassicalRegisterTuple))
     }

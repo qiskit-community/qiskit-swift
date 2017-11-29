@@ -16,40 +16,7 @@
 import Foundation
 
 /**
- User Defined Gate class
+ User Defined Gate
  */
-public class Gate: Instruction {
-
-    init(_ name: String, _ params: [Double], _ args: [QuantumRegister], _ circuit: QuantumCircuit?) {
-        if type(of: self) == Gate.self {
-            fatalError("Abstract class instantiation.")
-        }
-        super.init(name, params, args, circuit)
-    }
-
-    init(_ name: String, _ params: [Double], _ qargs: [QuantumRegisterTuple], _ circuit: QuantumCircuit?) {
-        if type(of: self) == Gate.self {
-            fatalError("Abstract class instantiation.")
-        }
-        super.init(name, params, qargs, circuit)
-    }
-
-    override init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
-        super.init(name, params, args, circuit)
-    }
-
-    /**
-     Invert this gate.
-     */
-    @discardableResult
-    public override func inverse() -> Gate {
-        preconditionFailure("inverse not implemented")
-    }
-
-    /**
-     Add controls to this gate.
-     */
-    public override func q_if(_ qregs:[QuantumRegister]) -> Gate {
-        preconditionFailure("q_if not implemented")
-    }
+public protocol Gate: Instruction {
 }

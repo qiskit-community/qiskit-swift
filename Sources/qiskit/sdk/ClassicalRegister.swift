@@ -16,9 +16,9 @@
 import Foundation
 
 /**
- Bits Register class
+ Bits Register
  */
-public final class ClassicalRegister: Register {
+public struct ClassicalRegister: Register {
 
     public private(set) var name:String = ""
     public private(set) var size:Int = 0
@@ -40,20 +40,17 @@ public final class ClassicalRegister: Register {
             return ClassicalRegisterTuple(self, index)
         }
     }
-
-    public func copy() -> Register {
-        let r = ClassicalRegister()
-        r.name = self.name
-        r.size = self.size
-        return r
-    }
     
     public var description: String {
         return "creg \(self.name)[\(self.size)]"
     }
+
+    public static func ==(lhs: ClassicalRegister, rhs: ClassicalRegister) -> Bool {
+        return lhs.name == rhs.name && lhs.size == rhs.size
+    }
 }
 
-public final class ClassicalRegisterTuple: RegisterArgument {
+public struct ClassicalRegisterTuple: RegisterArgument {
     public let register: ClassicalRegister
     public let index: Int
 
@@ -64,5 +61,9 @@ public final class ClassicalRegisterTuple: RegisterArgument {
 
     public var identifier: String {
         return "\(self.register.name)[\(self.index)]"
+    }
+
+    public static func ==(lhs: ClassicalRegisterTuple, rhs: ClassicalRegisterTuple) -> Bool {
+        return lhs.register == rhs.register && lhs.index == rhs.index
     }
 }

@@ -21,19 +21,21 @@ import Foundation
  */
 public final class RZGate: Gate {
 
-    fileprivate init(_ theta: Double, _ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) {
-        super.init("rz", [theta], [qubit], circuit)
+    public var instructionComponent: InstructionComponent
+
+    fileprivate init(_ theta: Double, _ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit) {
+        self.instructionComponent = InstructionComponent("rz", [theta], [qubit], circuit)
     }
 
-    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
-        super.init(name, params, args, circuit)
+    private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit) {
+        self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    override public func copy() -> Instruction {
+    public func copy() -> Instruction {
         return RZGate(self.name, self.params, self.args, self.circuit)
     }
 
-    public override var description: String {
+    public var description: String {
         let theta = self.params[0].format(15)
         return self._qasmif("\(name)(\(theta)) \(self.args[0].identifier)")
     }
@@ -42,15 +44,15 @@ public final class RZGate: Gate {
      Invert this gate.
      ry(theta)^dagger = ry(-theta)
      */
-    public override func inverse() -> Gate {
-        self.params[0] = -self.params[0]
+    public func inverse() -> Instruction {
+        self.instructionComponent.params[0] = -self.instructionComponent.params[0]
         return self
     }
 
     /**
      Reapply this gate to corresponding qubits in circ.
      */
-    public override func reapply(_ circ: QuantumCircuit) throws {
+    public func reapply(_ circ: QuantumCircuit) throws {
         try self._modifiers(circ.rz(self.params[0], self.args[0] as! QuantumRegisterTuple))
     }
 }

@@ -20,28 +20,30 @@ import Foundation
  */
 public class CompositeGate: Gate {
 
+    public var instructionComponent: InstructionComponent
+    
     private(set) var data: [Instruction] = []  // gate sequence defining the composite unitary
     private var inverse_flag = false
 
-    public override init(_ name: String, _ params: [Double], _ qargs: [QuantumRegister], _ circuit: QuantumCircuit?) {
+    public init(_ name: String, _ params: [Double], _ qargs: [QuantumRegister], _ circuit: QuantumCircuit) {
         if type(of: self) == CompositeGate.self {
             fatalError("Abstract class instantiation.")
         }
-        super.init(name, params, qargs, circuit)
+        self.instructionComponent = InstructionComponent(name, params, qargs, circuit)
     }
 
-    public override init(_ name: String, _ params: [Double], _ qargs: [QuantumRegisterTuple], _ circuit: QuantumCircuit?) {
+    public init(_ name: String, _ params: [Double], _ qargs: [QuantumRegisterTuple], _ circuit: QuantumCircuit) {
         if type(of: self) == CompositeGate.self {
             fatalError("Abstract class instantiation.")
         }
-        super.init(name, params, qargs, circuit)
+        self.instructionComponent = InstructionComponent(name, params, qargs, circuit)
     }
 
-    override init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
-        super.init(name, params, args, circuit)
+    init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit) {
+        self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public override var description: String {
+    public var description: String {
         var text = ""
         for statement in self.data {
             text.append("\n\(statement.description);")
@@ -53,8 +55,7 @@ public class CompositeGate: Gate {
      Test if this gate's circuit has the register.
      */
     public func has_register(_ register: Register) throws -> Bool {
-        try self.check_circuit()
-        return self.circuit!.has_register(register)
+        return self.circuit.has_register(register)
     }
 
     /**
@@ -64,7 +65,7 @@ public class CompositeGate: Gate {
         if self.inverse_flag {
             gate.inverse()
         }
-        try super._modifiers(gate)
+        try self.instructionComponent._modifiers(gate)
     }
 
     /**
@@ -87,8 +88,7 @@ public class CompositeGate: Gate {
      Raise exception if q is not an argument or not qreg in circuit.
      */
     public func _check_qubit(_ qubit: QuantumRegisterTuple) throws {
-        try self.check_circuit()
-        try self.circuit!._check_qubit(qubit)
+        try self.circuit._check_qubit(qubit)
         for arg in self.args {
             if let tuple = arg as? QuantumRegisterTuple {
                 if tuple.register.name == qubit.register.name &&
@@ -104,23 +104,20 @@ public class CompositeGate: Gate {
      Raise exception if quantum register is not in this gate's circuit.
      */
     public func _check_qreg(_ register: QuantumRegister) throws {
-        try self.check_circuit()
-        try self.circuit!._check_qreg(register)
+        try self.circuit._check_qreg(register)
     }
 
     /**
      Raise exception if classical register is not in this gate's circuit.
      */
     public func _check_creg(_ register: ClassicalRegister) throws {
-        try self.check_circuit()
-        try self.circuit!._check_creg(register)
+        try self.circuit._check_creg(register)
     }
 
     /**
      Invert this gate.
      */
-    @discardableResult
-    public override func inverse() -> Gate {
+    public func inverse() -> Instruction {
         var array:[Instruction] = []
         for gate in self.data.reversed() {
             array.append(gate.inverse())
@@ -131,32 +128,45 @@ public class CompositeGate: Gate {
     }
 
     /**
-     Add controls to this gate.
+     Add classical control register.
      */
-    public override func q_if(_ qregs:[QuantumRegister]) -> CompositeGate {
+    public func c_if(_ c: ClassicalRegister, _ val: Int) throws -> Instruction {
         var array:[Instruction] = []
         for gate in self.data {
-            array.append(gate.q_if(qregs))
+            array.append(try gate.c_if(c, val))
         }
         self.data = array
         return self
     }
 
     /**
-     Add classical control register.
+     Add controls to this gate.
      */
-    public override func c_if(_ c: ClassicalRegister, _ val: Int) throws -> CompositeGate {
-        var array:[Gate] = []
-        for gate in self.data {
-            array.append(try gate.c_if(c, val) as! Gate)
+    public func q_if(_ qregs:[QuantumRegister]) -> Instruction {
+        var array:[Instruction] = []
+        for instruction in self.data {
+            array.append(instruction.q_if(qregs))
         }
         self.data = array
         return self
     }
+    
+    public func copy() -> Instruction {
+        let c = CompositeGate(self.name, self.params, self.args, self.circuit)
+        c.inverse_flag = self.inverse_flag
+        for instruction in self.data {
+            c.data.append(instruction.copy())
+        }
+        return c
+    }
+
+    public func reapply(_ circ: QuantumCircuit) throws {
+        fatalError("reapply not implemented")
+    }
 
     private func append(_ gate: Gate) -> CompositeGate {
         self.data.append(gate)
-        gate.circuit = self.circuit
+        gate.instructionComponent.circuit = self.instructionComponent.circuit
         return self
     }
 }

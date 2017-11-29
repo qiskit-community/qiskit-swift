@@ -279,6 +279,7 @@
 		698248281FBCC7580097E8E5 /* CRandom.c in Sources */ = {isa = PBXBuildFile; fileRef = 698248271FBCC7580097E8E5 /* CRandom.c */; };
 		698248291FBCCA900097E8E5 /* CRandom.h in Headers */ = {isa = PBXBuildFile; fileRef = 698248221FBCC7390097E8E5 /* CRandom.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		6982482A1FBCCAA60097E8E5 /* CRandom.c in Sources */ = {isa = PBXBuildFile; fileRef = 698248271FBCC7580097E8E5 /* CRandom.c */; };
+		698445211FCF0C5300F600A9 /* InstructionComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698445201FCF0C5300F600A9 /* InstructionComponent.swift */; };
 		699CAF671FC489A200402C05 /* ToolsError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 699CAF661FC489A200402C05 /* ToolsError.swift */; };
 		69BB5A4B1FCD2169005AAE32 /* VectorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69BB5A4A1FCD2168005AAE32 /* VectorError.swift */; };
 		69BB5A4C1FCD2178005AAE32 /* VectorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69BB5A4A1FCD2168005AAE32 /* VectorError.swift */; };
@@ -471,6 +472,7 @@
 		698248221FBCC7390097E8E5 /* CRandom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CRandom.h; path = Sources/crandom/include/CRandom.h; sourceTree = "<group>"; };
 		698248231FBCC7390097E8E5 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; name = module.modulemap; path = Sources/crandom/include/module.modulemap; sourceTree = "<group>"; };
 		698248271FBCC7580097E8E5 /* CRandom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = CRandom.c; path = Sources/crandom/CRandom.c; sourceTree = "<group>"; };
+		698445201FCF0C5300F600A9 /* InstructionComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = InstructionComponent.swift; path = Sources/qiskit/sdk/InstructionComponent.swift; sourceTree = SOURCE_ROOT; };
 		699CAF661FC489A200402C05 /* ToolsError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ToolsError.swift; path = Sources/qiskit/tools/ToolsError.swift; sourceTree = SOURCE_ROOT; };
 		69BB5A4A1FCD2168005AAE32 /* VectorError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = VectorError.swift; path = Sources/qiskit/datastructures/VectorError.swift; sourceTree = SOURCE_ROOT; };
 		69CB0D241FB7B0E300A1D546 /* LocalQasmSimulatorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LocalQasmSimulatorTests.swift; path = Tests/qiskitTests/LocalQasmSimulatorTests.swift; sourceTree = "<group>"; };
@@ -833,6 +835,7 @@
 				6932AAD31FB9F7C100382CF7 /* CompositeGate.swift */,
 				6932AAC61FB9F7BF00382CF7 /* Gate.swift */,
 				6932AACF1FB9F7C000382CF7 /* Instruction.swift */,
+				698445201FCF0C5300F600A9 /* InstructionComponent.swift */,
 				6932AAC71FB9F7BF00382CF7 /* InstructionSet.swift */,
 				6932AAC81FB9F7BF00382CF7 /* JobProcessor.swift */,
 				6932AAC51FB9F7BF00382CF7 /* Measure.swift */,
@@ -1244,6 +1247,7 @@
 				6932AA6E1FB9F69300382CF7 /* CX.swift in Sources */,
 				6932AB341FB9F8CB00382CF7 /* NodePrefix.swift in Sources */,
 				69F198FA1FC2144D00CE05DC /* String+Padding.swift in Sources */,
+				698445211FCF0C5300F600A9 /* InstructionComponent.swift in Sources */,
 				6903E0A71FC317B3007C1C60 /* Matrix.swift in Sources */,
 				6932AADC1FB9F7C200382CF7 /* OpenQuantumCompiler.swift in Sources */,
 				6932AAB51FB9F77300382CF7 /* CircuitBackend.swift in Sources */,

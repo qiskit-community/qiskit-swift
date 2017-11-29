@@ -18,16 +18,31 @@ import Foundation
 /**
  Generic quantum computer instruction.
  */
-public class Instruction: CustomStringConvertible {
+public protocol Instruction: CustomStringConvertible {
 
-    let name: String
-    var params: [Double]
-    let args: [RegisterArgument]
-    weak var circuit: QuantumCircuit? = nil
-    private var control: (ClassicalRegister, Int)? = nil
+    var instructionComponent: InstructionComponent { get }
+    func copy() -> Instruction
+    @discardableResult
+    func inverse() -> Instruction
+    func reapply(_ circ: QuantumCircuit) throws
+}
 
-    public var description: String {
-        preconditionFailure("Instruction description not implemented")
+extension Instruction {
+
+    var name: String {
+        return instructionComponent.name
+    }
+
+    var params: [Double] {
+        return instructionComponent.params
+    }
+
+    var args: [RegisterArgument] {
+        return instructionComponent.args
+    }
+
+    var circuit: QuantumCircuit {
+        return instructionComponent.circuit
     }
 
     public var qasm: String {
@@ -35,81 +50,27 @@ public class Instruction: CustomStringConvertible {
     }
 
     /**
-     Create a new instruction.
-     
-     - parameter name: instruction name string
-     - parameter param: list of real parameters
-     - parameter arg: list InstructionArgument
-     */
-    init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
-        if type(of: self) == Instruction.self {
-            fatalError("Abstract class instantiation.")
-        }
-        self.name = name
-        self.params = params
-        self.args = args
-        self.circuit = circuit
-    }
-
-    public func copy() -> Instruction {
-        preconditionFailure("Instruction copy not implemented")
-    }
-
-    /**
-     Raise exception if self.circuit is nil.
-     */
-    public func check_circuit() throws {
-        if self.circuit == nil {
-            throw QISKitError.intructionCircuitNil
-        }
-    }
-
-    /**
-     Add classical control on register classical and value val.
-     */
-    @discardableResult
-    public func c_if(_ classical: ClassicalRegister, _ val: Int) throws -> Instruction {
-        if val < 0 {
-            throw QISKitError.controlValueNegative
-        }
-        self.control = (classical, val)
-        return self
-    }
-
-    @discardableResult
-    public func q_if(_ qregs:[QuantumRegister]) -> Instruction {
-        preconditionFailure("q_if not implemented")
-    }
-
-    /**
      Apply any modifiers of this instruction to another one.
      */
     public func _modifiers(_ instruction: Instruction) throws {
-        if self.control != nil {
-            try self.check_circuit()
-            if !instruction.circuit!.has_register(self.control!.0) {
-                throw QISKitError.controlRegNotFound(name: self.control!.0.name)
-            }
-            try instruction.c_if(self.control!.0, self.control!.1)
-        }
+        try self.instructionComponent._modifiers(instruction)
     }
 
     /**
      Print an if statement if needed.
      */
     public func _qasmif(_ string: String) -> String {
-        if self.control == nil {
-            return string
-        }
-        return "if(\(self.control!.0.name)==\(self.control!.1)) \(string)"
+        return self.instructionComponent._qasmif(string)
     }
 
     @discardableResult
-    public func inverse() -> Instruction {
-        preconditionFailure("inverse not implemented")
+    public func c_if(_ classical: ClassicalRegister, _ val: Int) throws -> Instruction {
+        try self.instructionComponent.c_if(classical,val)
+        return self
     }
 
-    public func reapply(_ circ: QuantumCircuit) throws {
-        preconditionFailure("reapply not implemented")
+    @discardableResult
+    public func q_if(_ qregs:[QuantumRegister]) -> Instruction {
+        preconditionFailure("q_if not implemented")
     }
 }

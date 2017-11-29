@@ -21,12 +21,12 @@ import Foundation
  */
 public final class TGate: CompositeGate {
 
-    fileprivate init(_ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) throws {
+    fileprivate init(_ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit) throws {
         super.init("t", [], [qubit], circuit)
         try self.u1(Double.pi/4.0,qubit)
     }
 
-    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
+    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit) {
         super.init(name, params, args, circuit)
     }
 

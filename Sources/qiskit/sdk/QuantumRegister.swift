@@ -16,9 +16,9 @@
 import Foundation
 
 /**
- Qubits Register class
+ Qubits Register
  */
-public final class QuantumRegister: Register {
+public struct QuantumRegister: Register {
 
     public private(set) var name:String = ""
     public private(set) var size:Int = 0
@@ -41,19 +41,16 @@ public final class QuantumRegister: Register {
         }
     }
 
-    public func copy() -> Register {
-        let r = QuantumRegister()
-        r.name = self.name
-        r.size = self.size
-        return r
-    }
-
     public var description: String {
         return "qreg \(self.name)[\(self.size)]"
     }
+
+    public static func ==(lhs: QuantumRegister, rhs: QuantumRegister) -> Bool {
+        return lhs.name == rhs.name && lhs.size == rhs.size
+    }
 }
 
-public final class QuantumRegisterTuple: RegisterArgument {
+public struct QuantumRegisterTuple: RegisterArgument {
     public let register: QuantumRegister
     public let index: Int
 
@@ -64,5 +61,9 @@ public final class QuantumRegisterTuple: RegisterArgument {
 
     public var identifier: String {
         return "\(self.register.name)[\(self.index)]"
+    }
+
+    public static func ==(lhs: QuantumRegisterTuple, rhs: QuantumRegisterTuple) -> Bool {
+        return lhs.register == rhs.register && lhs.index == rhs.index
     }
 }

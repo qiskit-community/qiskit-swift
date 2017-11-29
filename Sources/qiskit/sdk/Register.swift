@@ -20,10 +20,8 @@ public protocol RegisterArgument {
 }
 
 public protocol Register: RegisterArgument, CustomStringConvertible {
-
     var name:String { get }
     var size:Int { get }
-    func copy() -> Register 
 }
 
 extension Register {

@@ -21,19 +21,21 @@ import Foundation
  */
 public final class U3Gate: Gate {
 
-    fileprivate init(_ theta: Double, _ phi: Double, _ lam: Double, _ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) {
-        super.init("u3", [theta,phi,lam], [qubit], circuit)
+    public var instructionComponent: InstructionComponent
+
+    fileprivate init(_ theta: Double, _ phi: Double, _ lam: Double, _ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit) {
+        self.instructionComponent = InstructionComponent("u3", [theta,phi,lam], [qubit], circuit)
     }
 
-    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
-        super.init(name, params, args, circuit)
+    private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit) {
+        self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    override public func copy() -> Instruction {
+    public func copy() -> Instruction {
         return U3Gate(self.name, self.params, self.args, self.circuit)
     }
 
-    public override var description: String {
+    public var description: String {
         let theta = self.params[0].format(15)
         let phi = self.params[1].format(15)
         let lam = self.params[2].format(15)
@@ -44,18 +46,18 @@ public final class U3Gate: Gate {
      Invert this gate.
      u3(theta, phi, lamb)^dagger = u3(-theta, -lam, -phi)
      */
-    public override func inverse() -> Gate {
-        self.params[0] = -self.params[0]
+    public func inverse() -> Instruction {
+        self.instructionComponent.params[0] = -self.instructionComponent.params[0]
         let phi = self.params[1]
-        self.params[1] = -self.params[2]
-        self.params[2] = -phi
+        self.instructionComponent.params[1] = -self.instructionComponent.params[2]
+        self.instructionComponent.params[2] = -phi
         return self
     }
 
     /**
      Reapply this gate to corresponding qubits in circ.
      */
-    public override func reapply(_ circ: QuantumCircuit) throws {
+    public func reapply(_ circ: QuantumCircuit) throws {
         try self._modifiers(circ.u3(self.params[0], self.params[1],self.params[2], self.args[0] as! QuantumRegisterTuple))
     }
 }

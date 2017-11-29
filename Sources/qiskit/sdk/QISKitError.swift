@@ -20,7 +20,6 @@ import Foundation
  */
 public enum QISKitError: LocalizedError, CustomStringConvertible {
 
-    case intructionCircuitNil
     case regExists(name: String)
     case regNotExists(name: String)
     case controlValueNegative
@@ -63,8 +62,6 @@ public enum QISKitError: LocalizedError, CustomStringConvertible {
     }
     public var description: String {
         switch self {
-        case .intructionCircuitNil:
-            return "Instruction's circuit not assigned"
         case .regExists(let name):
             return "register '\(name)'already exists"
         case .regNotExists(let name):

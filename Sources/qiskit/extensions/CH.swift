@@ -20,33 +20,35 @@ import Foundation
  */
 public final class CHGate: Gate {
 
-    fileprivate init(_ ctl: QuantumRegisterTuple,_ tgt: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) {
-        super.init("ch", [], [ctl,tgt], circuit)
+    public var instructionComponent: InstructionComponent
+
+    fileprivate init(_ ctl: QuantumRegisterTuple,_ tgt: QuantumRegisterTuple, _ circuit: QuantumCircuit) {
+        self.instructionComponent = InstructionComponent("ch", [], [ctl,tgt], circuit)
     }
 
-    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
-        super.init(name, params, args, circuit)
+    private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit) {
+        self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    override public func copy() -> Instruction {
+    public func copy() -> Instruction {
         return CHGate(self.name, self.params, self.args, self.circuit)
     }
 
-    public override var description: String {
+    public var description: String {
         return self._qasmif("\(name) \(self.args[0].identifier),\(self.args[1].identifier)")
     }
 
     /**
      Invert this gate.
      */
-    public override func inverse() -> Gate {
+    public func inverse() -> Instruction {
         return self
     }
 
     /**
      Reapply this gate to corresponding qubits in circ.
      */
-    public override func reapply(_ circ: QuantumCircuit) throws {
+    public func reapply(_ circ: QuantumCircuit) throws {
         try self._modifiers(circ.ch(self.args[0] as! QuantumRegisterTuple, self.args[1] as! QuantumRegisterTuple))
     }
 }

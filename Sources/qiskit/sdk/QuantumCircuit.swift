@@ -78,11 +78,7 @@ public final class QuantumCircuit: CustomStringConvertible {
         for instruction in self.data {
             copyData.append(instruction.copy())
         }
-        var copyRegs: OrderedDictionary<String,Register> = OrderedDictionary<String,Register>()
-        for (key,value) in self.regs {
-            copyRegs[key] = value.copy()
-        }
-        return QuantumCircuit(self.header.copy(), copyData, copyRegs)
+        return QuantumCircuit(self.header.copy(), copyData, self.regs)
     }
 
     /**
@@ -254,7 +250,7 @@ public final class QuantumCircuit: CustomStringConvertible {
     public static func _check_dups(_ qubits: [QuantumRegisterTuple]) throws {
         for qubit1 in qubits {
             for qubit2 in qubits {
-                if qubit1 === qubit2 {
+                if qubit1 == qubit2 {
                     continue
                 }
                 if qubit1.register.name == qubit2.register.name &&

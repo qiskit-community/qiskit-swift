@@ -20,30 +20,32 @@ import Foundation
  */
 public final class Reset: Instruction {
 
-    public init(_ qreg: QuantumRegister, _ circuit: QuantumCircuit? = nil) {
-        super.init("reset", [], [qreg], circuit)
+    public var instructionComponent: InstructionComponent
+    
+    public init(_ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit) {
+        self.instructionComponent = InstructionComponent("reset", [], [qubit], circuit)
     }
 
-    public init(_ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit? = nil) {
-        super.init("reset", [], [qubit], circuit)
+    private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit) {
+        self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit?) {
-        super.init(name, params, args, circuit)
-    }
-
-    override public func copy() -> Instruction {
+    public func copy() -> Instruction {
         return Reset(self.name, self.params, self.args, self.circuit)
     }
 
-    public override var description: String {
+    public var description: String {
         return "\(name) \(self.args[0].identifier)"
+    }
+
+    public func inverse() -> Instruction {
+        preconditionFailure("inverse not implemented")
     }
 
     /**
      Reapply this gate to corresponding qubits in circ.
      */
-    public func reapply(circ: QuantumCircuit) {
-       // self._modifiers(circ.reset(self.arg[0]))
+    public func reapply(_ circ: QuantumCircuit) throws {
+        try self._modifiers(try circ.reset(self.args[0] as! QuantumRegisterTuple))
     }
 }
