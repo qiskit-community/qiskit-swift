@@ -21,7 +21,7 @@ import Foundation
  */
 public final class UBase: Gate {
 
-    public var instructionComponent: InstructionComponent
+    public let instructionComponent: InstructionComponent
     
     fileprivate init(_ params: [Double], _ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit) throws {
         if params.count != 3 {
@@ -34,7 +34,7 @@ public final class UBase: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> Instruction {
+    public func copy() -> UBase {
         return UBase(self.name, self.params, self.args, self.circuit)
     }
 
@@ -49,7 +49,8 @@ public final class UBase: Gate {
      Invert this gate.
      U(theta,phi,lambda)^dagger = U(-theta,-lambda,-phi)
      */
-    public func inverse() -> Instruction {
+    @discardableResult
+    public func inverse() -> UBase {
         self.instructionComponent.params[0] = -self.instructionComponent.params[0]
         let phi = self.params[1]
         self.instructionComponent.params[1] = -self.instructionComponent.params[2]

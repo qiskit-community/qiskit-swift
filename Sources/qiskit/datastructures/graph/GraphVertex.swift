@@ -15,7 +15,7 @@
 
 import Foundation
 
-final class GraphVertex<VertexDataType: GraphDataCopying> : Hashable, Equatable {
+final class GraphVertex<VertexDataType: GraphDataCopying> : Hashable {
 
     public let key: Int
     public var data: VertexDataType? = nil

@@ -20,29 +20,34 @@ import Foundation
  */
 public final class FredkinGate: CompositeGate {
 
+    public let instructionComponent: InstructionComponent
+    public let compositeGateComponent: CompositeGateComponent
+
     fileprivate init(_ ctl: QuantumRegisterTuple,_ tgt1: QuantumRegisterTuple, _ tgt2: QuantumRegisterTuple, _ circuit: QuantumCircuit) throws {
-        super.init("fredkin", [], [ctl,tgt1, tgt2], circuit)
+        self.instructionComponent = InstructionComponent("fredkin", [], [ctl,tgt1, tgt2], circuit)
+        self.compositeGateComponent = CompositeGateComponent()
         try self.cx(tgt2,tgt1)
         try self.ccx(ctl,tgt1,tgt2)
         try self.cx(tgt2,tgt1)
     }
 
-    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit) {
-        super.init(name, params, args, circuit)
+    private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit, _ compositeGateComponent: CompositeGateComponent) {
+        self.instructionComponent = InstructionComponent(name, params, args, circuit)
+        self.compositeGateComponent = compositeGateComponent
     }
 
-    override public func copy() -> Instruction {
-        return FredkinGate(self.name, self.params, self.args, self.circuit)
+    public func copy() -> FredkinGate {
+        return FredkinGate(self.name, self.params, self.args, self.circuit,self.compositeGateComponent.copy())
     }
 
-    public override var description: String {
+    public var description: String {
         return self._qasmif("\(name) \(self.args[0].identifier),\(self.args[1].identifier)")
     }
 
     /**
      Reapply this gate to corresponding qubits in circ.
      */
-    public override func reapply(_ circ: QuantumCircuit) throws {
+    public func reapply(_ circ: QuantumCircuit) throws {
         try self._modifiers(circ.cswap(self.args[0] as! QuantumRegisterTuple,
                                      self.args[1] as! QuantumRegisterTuple,
                                      self.args[2] as! QuantumRegisterTuple))

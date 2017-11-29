@@ -20,9 +20,9 @@ import Foundation
  */
 public final class Reset: Instruction {
 
-    public var instructionComponent: InstructionComponent
+    public let instructionComponent: InstructionComponent
     
-    public init(_ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit) {
+    init(_ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit) {
         self.instructionComponent = InstructionComponent("reset", [], [qubit], circuit)
     }
 
@@ -30,7 +30,7 @@ public final class Reset: Instruction {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> Instruction {
+    public func copy() -> Reset {
         return Reset(self.name, self.params, self.args, self.circuit)
     }
 
@@ -38,7 +38,8 @@ public final class Reset: Instruction {
         return "\(name) \(self.args[0].identifier)"
     }
 
-    public func inverse() -> Instruction {
+    @discardableResult
+    public func inverse() -> Reset {
         preconditionFailure("inverse not implemented")
     }
 

@@ -18,7 +18,7 @@ import Foundation
 /**
  Qubits Register
  */
-public struct QuantumRegister: Register {
+public struct QuantumRegister: Register, Equatable {
 
     public private(set) var name:String = ""
     public private(set) var size:Int = 0
@@ -50,7 +50,7 @@ public struct QuantumRegister: Register {
     }
 }
 
-public struct QuantumRegisterTuple: RegisterArgument {
+public struct QuantumRegisterTuple: RegisterArgument, Equatable {
     public let register: QuantumRegister
     public let index: Int
 

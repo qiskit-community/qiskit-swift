@@ -280,6 +280,9 @@
 		698248291FBCCA900097E8E5 /* CRandom.h in Headers */ = {isa = PBXBuildFile; fileRef = 698248221FBCC7390097E8E5 /* CRandom.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		6982482A1FBCCAA60097E8E5 /* CRandom.c in Sources */ = {isa = PBXBuildFile; fileRef = 698248271FBCC7580097E8E5 /* CRandom.c */; };
 		698445211FCF0C5300F600A9 /* InstructionComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698445201FCF0C5300F600A9 /* InstructionComponent.swift */; };
+		698445231FCF59B100F600A9 /* CompositeGateComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698445221FCF59B100F600A9 /* CompositeGateComponent.swift */; };
+		698445241FCF59BD00F600A9 /* CompositeGateComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698445221FCF59B100F600A9 /* CompositeGateComponent.swift */; };
+		698445251FCF59C300F600A9 /* InstructionComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698445201FCF0C5300F600A9 /* InstructionComponent.swift */; };
 		699CAF671FC489A200402C05 /* ToolsError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 699CAF661FC489A200402C05 /* ToolsError.swift */; };
 		69BB5A4B1FCD2169005AAE32 /* VectorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69BB5A4A1FCD2168005AAE32 /* VectorError.swift */; };
 		69BB5A4C1FCD2178005AAE32 /* VectorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69BB5A4A1FCD2168005AAE32 /* VectorError.swift */; };
@@ -473,6 +476,7 @@
 		698248231FBCC7390097E8E5 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; name = module.modulemap; path = Sources/crandom/include/module.modulemap; sourceTree = "<group>"; };
 		698248271FBCC7580097E8E5 /* CRandom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = CRandom.c; path = Sources/crandom/CRandom.c; sourceTree = "<group>"; };
 		698445201FCF0C5300F600A9 /* InstructionComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = InstructionComponent.swift; path = Sources/qiskit/sdk/InstructionComponent.swift; sourceTree = SOURCE_ROOT; };
+		698445221FCF59B100F600A9 /* CompositeGateComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CompositeGateComponent.swift; path = Sources/qiskit/sdk/CompositeGateComponent.swift; sourceTree = SOURCE_ROOT; };
 		699CAF661FC489A200402C05 /* ToolsError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ToolsError.swift; path = Sources/qiskit/tools/ToolsError.swift; sourceTree = SOURCE_ROOT; };
 		69BB5A4A1FCD2168005AAE32 /* VectorError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = VectorError.swift; path = Sources/qiskit/datastructures/VectorError.swift; sourceTree = SOURCE_ROOT; };
 		69CB0D241FB7B0E300A1D546 /* LocalQasmSimulatorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LocalQasmSimulatorTests.swift; path = Tests/qiskitTests/LocalQasmSimulatorTests.swift; sourceTree = "<group>"; };
@@ -833,6 +837,7 @@
 			children = (
 				6932AAC91FB9F7BF00382CF7 /* ClassicalRegister.swift */,
 				6932AAD31FB9F7C100382CF7 /* CompositeGate.swift */,
+				698445221FCF59B100F600A9 /* CompositeGateComponent.swift */,
 				6932AAC61FB9F7BF00382CF7 /* Gate.swift */,
 				6932AACF1FB9F7C000382CF7 /* Instruction.swift */,
 				698445201FCF0C5300F600A9 /* InstructionComponent.swift */,
@@ -1137,6 +1142,7 @@
 				6932AAA71FB9F72600382CF7 /* CouplingError.swift in Sources */,
 				6932AA2B1FB9F5D300382CF7 /* Queue.swift in Sources */,
 				6932AA831FB9F6B300382CF7 /* CU1.swift in Sources */,
+				698445251FCF59C300F600A9 /* InstructionComponent.swift in Sources */,
 				6932AA431FB9F63E00382CF7 /* Layer.swift in Sources */,
 				6932AB511FB9F90400382CF7 /* NodeGateBody.swift in Sources */,
 				6932AAEB1FB9F7D700382CF7 /* Gate.swift in Sources */,
@@ -1173,6 +1179,7 @@
 				6903E0AB1FC3213E007C1C60 /* NumericType.swift in Sources */,
 				6932AA8D1FB9F6D100382CF7 /* RY.swift in Sources */,
 				6932AB581FB9F91800382CF7 /* NodeInt.swift in Sources */,
+				698445241FCF59BD00F600A9 /* CompositeGateComponent.swift in Sources */,
 				6932AABF1FB9F78300382CF7 /* DAGBackend.swift in Sources */,
 				6932AAC41FB9F79500382CF7 /* UnrollerError.swift in Sources */,
 				6932AA941FB9F6E500382CF7 /* U3.swift in Sources */,
@@ -1334,6 +1341,7 @@
 				6932AA081FB9F56F00382CF7 /* GraphVertex.swift in Sources */,
 				6932AAB91FB9F77300382CF7 /* Unroller.swift in Sources */,
 				6932AAE21FB9F7C200382CF7 /* QuantumCircuit.swift in Sources */,
+				698445231FCF59B100F600A9 /* CompositeGateComponent.swift in Sources */,
 				6932AAB61FB9F77300382CF7 /* PrinterBackend.swift in Sources */,
 				6932AB3A1FB9F8CB00382CF7 /* NodeQreg.swift in Sources */,
 				6932AA391FB9F61900382CF7 /* CircuitEdgeData.swift in Sources */,

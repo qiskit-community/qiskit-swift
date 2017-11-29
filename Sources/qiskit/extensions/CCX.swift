@@ -21,7 +21,7 @@ import Foundation
  */
 public final class ToffoliGate: Gate {
 
-    public var instructionComponent: InstructionComponent
+    public let instructionComponent: InstructionComponent
 
     fileprivate init(_ ctl1:QuantumRegisterTuple, _ ctl2:QuantumRegisterTuple, _ tgt:QuantumRegisterTuple, _ circuit: QuantumCircuit) {
         self.instructionComponent = InstructionComponent("ccx", [], [ctl1, ctl2, tgt], circuit)
@@ -31,7 +31,7 @@ public final class ToffoliGate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> Instruction {
+    public func copy() -> ToffoliGate {
         return ToffoliGate(self.name, self.params, self.args, self.circuit)
     }
 
@@ -42,7 +42,8 @@ public final class ToffoliGate: Gate {
     /**
      Invert this gate.
      */
-    public func inverse() -> Instruction {
+    @discardableResult
+    public func inverse() -> ToffoliGate {
         return self
     }
 

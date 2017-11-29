@@ -21,7 +21,7 @@ import Foundation
  */
 public final class U2Gate: Gate {
 
-    public var instructionComponent: InstructionComponent
+    public let instructionComponent: InstructionComponent
 
     fileprivate init(_ phi: Double, _ lam: Double, _ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit) {
         self.instructionComponent = InstructionComponent("u2", [phi,lam], [qubit], circuit)
@@ -31,7 +31,7 @@ public final class U2Gate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> Instruction {
+    public func copy() -> U2Gate {
         return U2Gate(self.name, self.params, self.args, self.circuit)
     }
 
@@ -45,7 +45,7 @@ public final class U2Gate: Gate {
      Invert this gate.
      u2(phi,lamb)^dagger = u2(-lamb-pi,-phi+pi)
      */
-    public func inverse() -> Instruction {
+    public func inverse() -> U2Gate {
         let phi = self.instructionComponent.params[0]
         self.instructionComponent.params[0] = -self.instructionComponent.params[1] - Double.pi
         self.instructionComponent.params[1] = -phi + Double.pi

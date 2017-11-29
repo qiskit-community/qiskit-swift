@@ -20,7 +20,7 @@ import Foundation
  */
 public final class CnotGate: Gate {
 
-    public var instructionComponent: InstructionComponent
+    public let instructionComponent: InstructionComponent
 
     fileprivate init(_ ctl: QuantumRegisterTuple,_ tgt: QuantumRegisterTuple, _ circuit: QuantumCircuit) {
         self.instructionComponent = InstructionComponent("cx", [], [ctl,tgt], circuit)
@@ -30,7 +30,7 @@ public final class CnotGate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> Instruction {
+    public func copy() -> CnotGate {
         return CnotGate(self.name, self.params, self.args, self.circuit)
     }
 
@@ -41,7 +41,8 @@ public final class CnotGate: Gate {
     /**
      Invert this gate.
      */
-    public func inverse() -> Instruction {
+    @discardableResult
+    public func inverse() -> CnotGate {
         return self
     }
 

@@ -18,7 +18,7 @@ import Foundation
 /**
  Bits Register
  */
-public struct ClassicalRegister: Register {
+public struct ClassicalRegister: Register, Equatable {
 
     public private(set) var name:String = ""
     public private(set) var size:Int = 0
@@ -50,7 +50,7 @@ public struct ClassicalRegister: Register {
     }
 }
 
-public struct ClassicalRegisterTuple: RegisterArgument {
+public struct ClassicalRegisterTuple: RegisterArgument, Equatable {
     public let register: ClassicalRegister
     public let index: Int
 

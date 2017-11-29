@@ -20,7 +20,7 @@ import Foundation
  */
 public final class Measure: Instruction {
 
-    public var instructionComponent: InstructionComponent
+    public let instructionComponent: InstructionComponent
 
     init(_ qubit: QuantumRegisterTuple, _ bit: ClassicalRegisterTuple, _ circuit: QuantumCircuit) {
         self.instructionComponent = InstructionComponent("measure", [], [qubit,bit], circuit)
@@ -30,7 +30,7 @@ public final class Measure: Instruction {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> Instruction {
+    public func copy() -> Measure {
         return Measure(self.name, self.params, self.args, self.circuit)
     }
 
@@ -38,7 +38,8 @@ public final class Measure: Instruction {
         return "\(name) \(self.args[0].identifier) -> \(self.args[1].identifier)"
     }
 
-    public func inverse() -> Instruction {
+    @discardableResult
+    public func inverse() -> Measure {
         preconditionFailure("inverse not implemented")
     }
 

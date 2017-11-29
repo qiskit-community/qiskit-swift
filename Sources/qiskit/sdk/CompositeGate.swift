@@ -18,34 +18,16 @@ import Foundation
 /**
  Composite gate, a sequence of unitary gates.
  */
-public class CompositeGate: Gate {
+public protocol CompositeGate: Gate {
 
-    public var instructionComponent: InstructionComponent
-    
-    private(set) var data: [Instruction] = []  // gate sequence defining the composite unitary
-    private var inverse_flag = false
+    var compositeGateComponent: CompositeGateComponent { get }
+}
 
-    public init(_ name: String, _ params: [Double], _ qargs: [QuantumRegister], _ circuit: QuantumCircuit) {
-        if type(of: self) == CompositeGate.self {
-            fatalError("Abstract class instantiation.")
-        }
-        self.instructionComponent = InstructionComponent(name, params, qargs, circuit)
-    }
-
-    public init(_ name: String, _ params: [Double], _ qargs: [QuantumRegisterTuple], _ circuit: QuantumCircuit) {
-        if type(of: self) == CompositeGate.self {
-            fatalError("Abstract class instantiation.")
-        }
-        self.instructionComponent = InstructionComponent(name, params, qargs, circuit)
-    }
-
-    init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit) {
-        self.instructionComponent = InstructionComponent(name, params, args, circuit)
-    }
+extension CompositeGate {
 
     public var description: String {
         var text = ""
-        for statement in self.data {
+        for statement in self.compositeGateComponent.data {
             text.append("\n\(statement.description);")
         }
         return text
@@ -62,7 +44,7 @@ public class CompositeGate: Gate {
      Apply any modifiers of this gate to another composite.
      */
     public func _modifiers(_ gate: Gate) throws {
-        if self.inverse_flag {
+        if self.compositeGateComponent.inverse_flag {
             gate.inverse()
         }
         try self.instructionComponent._modifiers(gate)
@@ -72,7 +54,7 @@ public class CompositeGate: Gate {
      Attach gate.
      */
     public func _attach(_ gate: Gate) -> Gate {
-        self.data.append(gate)
+        self.compositeGateComponent.data.append(gate)
         return gate
     }
 
@@ -80,7 +62,7 @@ public class CompositeGate: Gate {
      Attach barrier.
      */
     public func _attach(_ barrier: Barrier) -> Barrier {
-        self.data.append(barrier)
+        self.compositeGateComponent.data.append(barrier)
         return barrier
     }
 
@@ -117,13 +99,14 @@ public class CompositeGate: Gate {
     /**
      Invert this gate.
      */
-    public func inverse() -> Instruction {
+    @discardableResult
+    public func inverse() -> Self {
         var array:[Instruction] = []
-        for gate in self.data.reversed() {
+        for gate in self.compositeGateComponent.data.reversed() {
             array.append(gate.inverse())
         }
-        self.data = array
-        self.inverse_flag = !self.inverse_flag
+        self.compositeGateComponent.data = array
+        self.compositeGateComponent.inverse_flag = !self.compositeGateComponent.inverse_flag
         return self
     }
 
@@ -132,10 +115,10 @@ public class CompositeGate: Gate {
      */
     public func c_if(_ c: ClassicalRegister, _ val: Int) throws -> Instruction {
         var array:[Instruction] = []
-        for gate in self.data {
+        for gate in self.compositeGateComponent.data {
             array.append(try gate.c_if(c, val))
         }
-        self.data = array
+        self.compositeGateComponent.data = array
         return self
     }
 
@@ -144,20 +127,11 @@ public class CompositeGate: Gate {
      */
     public func q_if(_ qregs:[QuantumRegister]) -> Instruction {
         var array:[Instruction] = []
-        for instruction in self.data {
+        for instruction in self.compositeGateComponent.data {
             array.append(instruction.q_if(qregs))
         }
-        self.data = array
+        self.compositeGateComponent.data = array
         return self
-    }
-    
-    public func copy() -> Instruction {
-        let c = CompositeGate(self.name, self.params, self.args, self.circuit)
-        c.inverse_flag = self.inverse_flag
-        for instruction in self.data {
-            c.data.append(instruction.copy())
-        }
-        return c
     }
 
     public func reapply(_ circ: QuantumCircuit) throws {
@@ -165,7 +139,7 @@ public class CompositeGate: Gate {
     }
 
     private func append(_ gate: Gate) -> CompositeGate {
-        self.data.append(gate)
+        self.compositeGateComponent.data.append(gate)
         gate.instructionComponent.circuit = self.instructionComponent.circuit
         return self
     }

@@ -21,7 +21,7 @@ import Foundation
  */
 public final class XGate: Gate {
 
-    public var instructionComponent: InstructionComponent
+    public let instructionComponent: InstructionComponent
 
     fileprivate init(_ qreg: QuantumRegisterTuple, _ circuit: QuantumCircuit) {
         self.instructionComponent = InstructionComponent("x", [], [qreg], circuit)
@@ -31,7 +31,7 @@ public final class XGate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> Instruction {
+    public func copy() -> XGate {
         return XGate(self.name, self.params, self.args, self.circuit)
     }
 
@@ -42,7 +42,8 @@ public final class XGate: Gate {
     /**
      Invert this gate.
      */
-    public func inverse() -> Instruction {
+    @discardableResult
+    public func inverse() -> XGate {
         return self
     }
 

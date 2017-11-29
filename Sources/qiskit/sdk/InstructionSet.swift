@@ -31,7 +31,7 @@ public final class InstructionSet {
      */
     public func inverse() -> InstructionSet {
         for instruction in self.instructions {
-            instruction.inverse()
+            _ = instruction.inverse()
         }
         return self
     }

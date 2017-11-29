@@ -17,7 +17,7 @@ import Foundation
 
 public typealias TupleRegBit = HashableTuple<RegBit,RegBit>
 
-public struct RegBit: Hashable, Equatable, CustomStringConvertible {
+public struct RegBit: Hashable, CustomStringConvertible {
 
     private let tuple: HashableTuple<String,Int>
 

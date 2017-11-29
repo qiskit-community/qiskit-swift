@@ -15,27 +15,20 @@
 
 import Foundation
 
-public typealias TupleInt = HashableTuple<Int,Int>
+/**
+ Composite gate component
+ */
+public final class CompositeGateComponent {
+    
+    var data: [Instruction] = []  // gate sequence defining the composite unitary
+    var inverse_flag = false
 
-public struct HashableTuple<A:Hashable,B:Hashable> : Hashable, CustomStringConvertible {
-    public let one: A
-    public let two: B
-
-    public init(_ one: A, _ two: B) {
-        self.one = one
-        self.two = two
-    }
-    public var hashValue : Int {
-        get {
-            return self.one.hashValue &* 31 &+ self.two.hashValue
+    public func copy() -> CompositeGateComponent {
+        let c = CompositeGateComponent()
+        c.inverse_flag = self.inverse_flag
+        for instruction in self.data {
+            c.data.append(instruction.copy())
         }
-    }
-
-    public var description: String {
-        return "(\(self.one), \(self.two))"
-    }
-
-    public static func ==(lhs: HashableTuple<A,B>, rhs: HashableTuple<A,B>) -> Bool {
-        return lhs.one == rhs.one && lhs.two == rhs.two
+        return c
     }
 }

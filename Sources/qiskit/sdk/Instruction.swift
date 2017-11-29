@@ -21,9 +21,9 @@ import Foundation
 public protocol Instruction: CustomStringConvertible {
 
     var instructionComponent: InstructionComponent { get }
-    func copy() -> Instruction
+    func copy() -> Self
     @discardableResult
-    func inverse() -> Instruction
+    func inverse() -> Self
     func reapply(_ circ: QuantumCircuit) throws
 }
 

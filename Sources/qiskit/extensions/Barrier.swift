@@ -20,7 +20,7 @@ import Foundation
  */
 public final class Barrier: Instruction {
 
-    public var instructionComponent: InstructionComponent
+    public let instructionComponent: InstructionComponent
 
     fileprivate init(_ qregs: [QuantumRegister], _ circuit: QuantumCircuit) {
         self.instructionComponent = InstructionComponent("barrier", [], qregs, circuit)
@@ -42,7 +42,7 @@ public final class Barrier: Instruction {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> Instruction {
+    public func copy() -> Barrier {
         return Barrier(self.name, self.params, self.args, self.circuit)
     }
 
@@ -56,7 +56,8 @@ public final class Barrier: Instruction {
     /**
      Special case. Return self.
      */
-    public func inverse() -> Instruction {
+    @discardableResult
+    public func inverse() -> Barrier {
         return self
     }
 

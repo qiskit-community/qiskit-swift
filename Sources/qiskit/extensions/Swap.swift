@@ -20,7 +20,7 @@ import Foundation
  */
 public final class SwapGate: Gate {
 
-    public var instructionComponent: InstructionComponent
+    public let instructionComponent: InstructionComponent
 
     fileprivate init(_ ctl: QuantumRegisterTuple,_ tgt: QuantumRegisterTuple, _ circuit: QuantumCircuit) throws {
         self.instructionComponent = InstructionComponent("swap", [], [ctl,tgt], circuit)
@@ -30,7 +30,7 @@ public final class SwapGate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> Instruction {
+    public func copy() -> SwapGate {
         return SwapGate(self.name, self.params, self.args, self.circuit)
     }
 
@@ -41,7 +41,8 @@ public final class SwapGate: Gate {
     /**
      Invert this gate.
      */
-    public func inverse() -> Instruction {
+    @discardableResult
+    public func inverse() -> SwapGate {
         return self
     }
 

@@ -20,7 +20,7 @@ import Foundation
  */
 public final class CXBase: Gate {
 
-    public var instructionComponent: InstructionComponent
+    public let instructionComponent: InstructionComponent
 
     fileprivate init(_ ctl: QuantumRegisterTuple,_ tgt: QuantumRegisterTuple, _ circuit: QuantumCircuit) {
         self.instructionComponent = InstructionComponent("CX", [], [ctl,tgt], circuit)
@@ -30,7 +30,7 @@ public final class CXBase: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> Instruction {
+    public func copy() -> CXBase {
         return CXBase(self.name, self.params, self.args, self.circuit)
     }
 
@@ -41,7 +41,8 @@ public final class CXBase: Gate {
     /**
      Invert this gate.
      */
-    public func inverse() -> Instruction {
+    @discardableResult
+    public func inverse() -> CXBase {
         return self
     }
 

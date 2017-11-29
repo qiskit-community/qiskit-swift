@@ -21,7 +21,7 @@ import Foundation
  */
 public final class RYGate: Gate {
 
-    public var instructionComponent: InstructionComponent
+    public let instructionComponent: InstructionComponent
 
     fileprivate init(_ theta: Double, _ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit) {
         self.instructionComponent = InstructionComponent("ry", [theta], [qubit], circuit)
@@ -31,7 +31,7 @@ public final class RYGate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> Instruction {
+    public func copy() -> RYGate {
         return RYGate(self.name, self.params, self.args, self.circuit)
     }
 
@@ -44,7 +44,8 @@ public final class RYGate: Gate {
      Invert this gate.
      ry(theta)^dagger = ry(-theta)
      */
-    public func inverse() -> Instruction {
+    @discardableResult
+    public func inverse() -> RYGate {
         self.instructionComponent.params[0] = -self.instructionComponent.params[0]
         return self
     }

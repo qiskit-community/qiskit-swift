@@ -21,7 +21,7 @@ import Foundation
  */
 public final class U3Gate: Gate {
 
-    public var instructionComponent: InstructionComponent
+    public let instructionComponent: InstructionComponent
 
     fileprivate init(_ theta: Double, _ phi: Double, _ lam: Double, _ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit) {
         self.instructionComponent = InstructionComponent("u3", [theta,phi,lam], [qubit], circuit)
@@ -31,7 +31,7 @@ public final class U3Gate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> Instruction {
+    public func copy() -> U3Gate {
         return U3Gate(self.name, self.params, self.args, self.circuit)
     }
 
@@ -46,7 +46,8 @@ public final class U3Gate: Gate {
      Invert this gate.
      u3(theta, phi, lamb)^dagger = u3(-theta, -lam, -phi)
      */
-    public func inverse() -> Instruction {
+    @discardableResult
+    public func inverse() -> U3Gate {
         self.instructionComponent.params[0] = -self.instructionComponent.params[0]
         let phi = self.params[1]
         self.instructionComponent.params[1] = -self.instructionComponent.params[2]

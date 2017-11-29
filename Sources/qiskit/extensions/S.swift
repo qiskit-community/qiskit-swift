@@ -21,34 +21,38 @@ import Foundation
  */
 public final class SGate: CompositeGate {
 
+    public let instructionComponent: InstructionComponent
+    public let compositeGateComponent: CompositeGateComponent
+
     fileprivate init(_ qubit: QuantumRegisterTuple, _ circuit: QuantumCircuit) throws {
-        super.init("s", [], [qubit], circuit)
+        self.instructionComponent = InstructionComponent("s", [], [qubit], circuit)
+        self.compositeGateComponent = CompositeGateComponent()
         try self.u1(Double.pi/2.0,qubit)
     }
 
-    override private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit) {
-        super.init(name, params, args, circuit)
+    private init(_ name: String, _ params: [Double], _ args: [RegisterArgument], _ circuit: QuantumCircuit, _ compositeGateComponent: CompositeGateComponent) {
+        self.instructionComponent = InstructionComponent(name, params, args, circuit)
+        self.compositeGateComponent = compositeGateComponent
     }
 
-    override public func copy() -> Instruction {
-        return SGate(self.name, self.params, self.args, self.circuit)
+    public func copy() -> SGate {
+        return SGate(self.name, self.params, self.args, self.circuit,self.compositeGateComponent.copy())
     }
 
-    public override var description: String {
-        let u1Gate: U1Gate = self.data[0] as! U1Gate
+    public var description: String {
+        let u1Gate: U1Gate = self.compositeGateComponent.data[0] as! U1Gate
         let qubit = u1Gate.args[0] as! QuantumRegisterTuple
         let phi: Double = u1Gate.params[0]
         if phi > 0 {
-            return self.data[0]._qasmif("\(self.name) \(qubit.identifier)")
+            return self.compositeGateComponent.data[0]._qasmif("\(self.name) \(qubit.identifier)")
         }
-        return self.data[0]._qasmif("sdg \(qubit.identifier)")
+        return self.compositeGateComponent.data[0]._qasmif("sdg \(qubit.identifier)")
     }
-
 
     /**
      Reapply this gate to corresponding qubits in circ.
      */
-    public override func reapply(_ circ: QuantumCircuit) throws {
+    public func reapply(_ circ: QuantumCircuit) throws {
         try self._modifiers(circ.s(self.args[0] as! QuantumRegisterTuple))
     }
 }
@@ -79,7 +83,7 @@ extension QuantumCircuit {
      Apply Sdg to q.
      */
     public func sdg(_ q: QuantumRegisterTuple) throws -> SGate {
-        return try self.s(q).inverse() as! SGate
+        return try self.s(q).inverse()
     }
 
 }
@@ -110,6 +114,6 @@ extension CompositeGate {
      Apply Sdg to q.
      */
     public func sdg(_ q: QuantumRegisterTuple) throws -> SGate {
-        return try self.s(q).inverse() as! SGate
+        return try self.s(q).inverse()
     }
 }
