@@ -181,7 +181,7 @@ public final class Pauli: CustomStringConvertible, Hashable {
 
      P3 = P1*P2: X*Y
      */
-    public static func sgn_prod(P1: Pauli, P2: Pauli) throws -> (Pauli,Complex) {
+    public static func sgn_prod(_ P1: Pauli, _ P2: Pauli) throws -> (Pauli,Complex) {
         if P1.numberofqubits != P2.numberofqubits {
             throw ToolsError.invalidPauliMultiplication
         }
@@ -215,14 +215,14 @@ public final class Pauli: CustomStringConvertible, Hashable {
     /**
      Return the inverse of a Pauli.
      */
-    public static func inverse_pauli(other: Pauli) -> Pauli {
+    public static func inverse_pauli(_ other: Pauli) -> Pauli {
         return Pauli(other.v, other.w)
     }
 
     /**
      Return the pauli of a string .
      */
-    public static func label_to_pauli(label: String) throws -> Pauli {
+    public static func label_to_pauli(_ label: String) throws -> Pauli {
         var v = Vector<Int>(repeating: 0,count: label.count)
         var w = Vector<Int>(repeating: 0,count: label.count)
         let characters = Array(label)
@@ -261,11 +261,11 @@ public final class Pauli: CustomStringConvertible, Hashable {
      @return list of Pauli objects
      WARNING THIS IS EXPONENTIAL
      */
-    public static func pauli_group(_ numberofqubits: Int, groupCase: UInt = 0) throws -> [Pauli] {
+    public static func pauli_group(_ numberofqubits: Int, _ groupCase: UInt = 0) throws -> [Pauli] {
         if numberofqubits < 5 {
             var tempset: [Pauli] = []
             if groupCase == 0 {
-                let tmp = try Pauli.pauli_group(numberofqubits, groupCase: 1)
+                let tmp = try Pauli.pauli_group(numberofqubits, 1)
                 // sort on the weight of the Pauli operator
                 return tmp.sorted(by: { p1, p2 in
                     let p1Array = Array(p1.to_label())

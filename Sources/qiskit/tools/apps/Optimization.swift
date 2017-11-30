@@ -164,18 +164,18 @@ public final class Optimization {
      Returns:
         Expected value of pauli given data
      */
-    public static func measure_pauli_z(_ data: [String: Int], _ pauli: Pauli) -> Int {
-        var observable: Int = 0
-        let tot = data.values.reduce(0, +)
+    public static func measure_pauli_z(_ data: [String: Int], _ pauli: Pauli) -> Double {
+        var observable: Double = 0.0
+        let tot = Double(data.values.reduce(0, {$0 + $1}))
         for (key,dataValue) in data {
-            var value = 1
+            var value: Double = 1.0
             let keyChars = Array(key)
             for j in 0..<pauli.numberofqubits {
                 if ((pauli.v[j] == 1 || pauli.w[j] == 1) && keyChars[pauli.numberofqubits - j - 1] == "1") {
                     value = -value
                 }
             }
-            observable = observable + value * dataValue / tot
+            observable = observable + value * Double(dataValue) / tot
         }
         return observable
     }
@@ -191,8 +191,8 @@ public final class Optimization {
      Returns:
         The expectation value
      */
-    public static func Energy_Estimate(_ data: [String: Int], _ pauli_list: [(Int,Pauli)]) -> Int {
-        var energy: Int = 0
+    public static func Energy_Estimate(_ data: [String: Int], _ pauli_list: [(Double,Pauli)]) -> Double {
+        var energy: Double = 0
         for p in pauli_list {
             energy += p.0 * measure_pauli_z(data, p.1)
         }
@@ -305,7 +305,6 @@ public final class Optimization {
      Returns:
         Average value of the Hamiltonian or observable.
      */
-/*
     public static func eval_hamiltonian(_ Q_program: QuantumProgram,
                                         _ hamiltonian: Any,
                                         _ input_circuit: QuantumCircuit,
@@ -317,7 +316,7 @@ public final class Optimization {
         do {
             if shots == 1 {
                 // Hamiltonian represented by a Pauli list
-                if let hamiltonianList = hamiltonian as? [[Pauli]]  { // Hamiltonian represented by a Pauli list
+                if let hamiltonianList = hamiltonian as? [(Double,Pauli)]  { // Hamiltonian represented by a Pauli list
                     var circuits: [QuantumCircuit] = []
                     var circuits_labels: [String] = []
                     circuits.append(input_circuit)
@@ -331,13 +330,13 @@ public final class Optimization {
                     for p in hamiltonianList {
                         circuits.append(input_circuit.copy())
                         for j in 0..<(Int(log2(Double(hamiltonianList.count)))) {
-                            if p[1].v[j] == 1 && p[1].w[j] == 0 {
+                            if p.1.v[j] == 1 && p.1.w[j] == 0 {
                                 try circuits[i].x(q[j])
                             }
-                            else if p[1].v[j] == 0 && p[1].w[j] == 1 {
+                            else if p.1.v[j] == 0 && p.1.w[j] == 1 {
                                 try circuits[i].z(q[j])
                             }
-                            else if p[1].v[j] == 1 && p[1].w[j] == 1 {
+                            else if p.1.v[j] == 1 && p.1.w[j] == 1 {
                                 try circuits[i].y(q[j])
                             }
                         }
@@ -359,7 +358,7 @@ public final class Optimization {
                                     if let q_i = try result.get_data(circuits_labels[i])["quantum_state"] as? [Complex] {
                                         let quantum_state_i = Vector<Complex>(value:q_i)
                                         // inner product with final rotations of (i-1)-th Pauli
-                                        energy += p[0] * try quantum_state_0.conjugate().inner(quantum_state_i)
+                                        energy += try quantum_state_0.conjugate().inner(quantum_state_i) * p.0
                                     }
                                     i += 1
                                 }
@@ -370,7 +369,7 @@ public final class Optimization {
                         }
                     }
                 }
-                else if let hamiltonianMatrix = hamiltonian as? Matrix<Complex> {
+                else {
                     // Hamiltonian is not a pauli_list grouped into tpb sets
                     var circuit = ["c"]
                     try Q_program.add_circuit(circuit[0], input_circuit)
@@ -393,13 +392,20 @@ public final class Optimization {
                             }
 
                             // Diagonal Hamiltonian represented by 1D array
-                            if hamiltonianMatrix.shape.0 == 1 && hamiltonianMatrix.shape.1 > 1 {
-                                let hamiltonianVector = Vector<Complex>(value:hamiltonianMatrix.rows[0])
+                            if let h = hamiltonian as? [Complex] {
+                                let hamiltonianVector = Vector<Complex>(value:h)
                                 energy = try hamiltonianVector.mult(Vector<Complex>(value:quantum_state.absolute()).power(2)).sum()
                             }
                             // Hamiltonian represented by square matrix
-                            else if hamiltonianMatrix.shape.0 == hamiltonianMatrix.shape.1 {
-                                energy = quantum_state.conjugate().inner(hamiltonianMatrix.dot(quantum_state))
+                            else if let h = hamiltonian as? [[Complex]] {
+                                //TODO fix this hamiltonian calculation
+                                let hamiltonianMatrix = Matrix<Complex>(value:h)
+                                let m = Matrix<Complex>(value: [quantum_state.value])
+                                energy = try quantum_state.conjugate().inner(Vector<Complex>(value:hamiltonianMatrix.dot(m).value[0]))
+                            }
+                            else {
+                                callback(energy,"Unknown hamiltonian: \(hamiltonian)")
+                                return
                             }
                             callback(energy,nil)
                         } catch {
@@ -407,16 +413,11 @@ public final class Optimization {
                         }
                     }
                 }
-                else {
-                    DispatchQueue.main.async {
-                        callback(energy,"Unknown hamiltonian.")
-                    }
-                }
             }
-            else if let hamiltonianMatrix = hamiltonian as? [[[Pauli]]] { // finite number of shots and hamiltonian grouped in tpb sets
+            else if let hamiltonianMatrix = hamiltonian as? [[(Double,Pauli)]] { // finite number of shots and hamiltonian grouped in tpb sets
                 var circuits: [QuantumCircuit] = []
                 var circuits_labels: [String] = []
-                let n = hamiltonianMatrix[0][0][1].v.count
+                let n = hamiltonianMatrix[0][0].1.v.count
                 let q = try QuantumRegister("q", n)
                 let c = try ClassicalRegister("c", n)
                 var i: Int = 0
@@ -425,11 +426,11 @@ public final class Optimization {
                     circuits_labels.append("tpb_circuit_\(i)")
                     for j in 0..<n {
                         // Measure X
-                        if tpb_set[0][1].v[j] == 0 && tpb_set[0][1].w[j] == 1 {
+                        if tpb_set[0].1.v[j] == 0 && tpb_set[0].1.w[j] == 1 {
                             try circuits[i].h(q[j])
                         }
                         // Measure Y
-                        else if tpb_set[0][1].v[j] == 1 && tpb_set[0][1].w[j] == 1 {
+                        else if tpb_set[0].1.v[j] == 1 && tpb_set[0].1.w[j] == 1 {
                             try circuits[i].s(q[j]).inverse()
                             try circuits[i].h(q[j])
                         }
@@ -443,13 +444,17 @@ public final class Optimization {
                         callback(energy,result.get_error())
                         return
                     }
-                    for j in 0..<hamiltonianMatrix.count {
-                        for k in 0..<hamiltonianMatrix[j].count {
-                            energy +=
-                                hamiltonianMatrix[j][k][0] * measure_pauli_z(result.get_counts(circuits_labels[j]), hamiltonianMatrix[j][k][1])
+                    do {
+                        for j in 0..<hamiltonianMatrix.count {
+                            for k in 0..<hamiltonianMatrix[j].count {
+                                energy +=
+                                    hamiltonianMatrix[j][k].0 * measure_pauli_z(try result.get_counts(circuits_labels[j]), hamiltonianMatrix[j][k].1)
+                            }
                         }
+                        callback(energy,nil)
+                    } catch {
+                        callback(energy,error.localizedDescription)
                     }
-                    callback(energy,nil)
                 }
             }
             else {
@@ -463,5 +468,161 @@ public final class Optimization {
             }
         }
         return requestTask
-    }*/
+    }
+
+    /**
+     Creates a QuantumCircuit object consisting in layers of
+     parametrized single-qubit Y rotations and CZ two-qubit gates
+
+     Args:
+         n (int) : number of qubits
+         m (int) : depth of the circuit
+         theta array[float] : angles that parametrize the Y rotations
+         entangler_map : CZ connectivity, e.g. {0: [1], 1: [2]}
+         meas_string (str) : measure a given Pauli operator at the end of the
+         circuit
+         measurement (bool) : whether to measure the qubit (register "q")
+         on classical bits (register "c")
+     Returns:
+        A QuantumCircuit object
+     */
+    public static func trial_circuit_ry(_ n: Int,
+                                        _ m: Int,
+                                        _ theta: [Double],
+                                        _ entangler_map: [Int:[Int]],
+                                        _ meas_string: String? = nil,
+                                        _ measurement: Bool = true) throws -> QuantumCircuit {
+        let q = try QuantumRegister("q", n)
+        let c = try ClassicalRegister("c", n)
+        let trial_circuit = try QuantumCircuit([q, c])
+        try trial_circuit.h(q)
+        let meas = Array(meas_string != nil ? meas_string! : String(repeating: " ", count: n))
+        for i in 0..<m {
+            try trial_circuit.barrier(q)
+            for (node,value) in entangler_map {
+                for j in value {
+                    try trial_circuit.cz(q[node], q[j])
+                }
+            }
+            for j in 0..<n {
+                try trial_circuit.ry(theta[n * i + j], q[j])
+            }
+        }
+        try trial_circuit.barrier(q)
+        for j in 0..<n {
+            if meas[j] == "X" {
+                try trial_circuit.h(q[j])
+            }
+            else if meas[j] == "Y" {
+                try trial_circuit.s(q[j]).inverse()
+                try trial_circuit.h(q[j])
+            }
+        }
+        if measurement {
+            for j in 0..<n {
+                try trial_circuit.measure(q[j], c[j])
+            }
+        }
+        return trial_circuit
+    }
+
+    /**
+     Creates a QuantumCircuit object consisting in layers of
+     parametrized single-qubit Y and Z rotations and CZ two-qubit gates
+
+     Args:
+         n (int) : number of qubits
+         m (int) : depth of the circuit
+         theta array[float] : angles that parametrize the Y and Z rotations
+         entangler_map : CZ connectivity, e.g. {0: [1], 1: [2]}
+         meas_string (str) : measure a given Pauli operator at the end of the
+         circuit
+         measurement (bool) : whether to measure the qubit (register "q")
+         on classical bits (register "c")
+     Returns:
+        A QuantumCircuit object
+     */
+    public static func trial_circuit_ryrz(_ n: Int,
+                                          _ m: Int,
+                                          _ theta: [Double],
+                                          _ entangler_map: [Int:[Int]],
+                                          _ meas_string: String? = nil,
+                                          _ measurement: Bool = true) throws -> QuantumCircuit {
+        let q = try QuantumRegister("q", n)
+        let c = try ClassicalRegister("c", n)
+        let trial_circuit = try QuantumCircuit([q, c])
+        try trial_circuit.h(q)
+        let meas = Array(meas_string != nil ? meas_string! : String(repeating: " ", count:n))
+        for i in 0..<m {
+            try trial_circuit.barrier(q)
+            for (node,value) in entangler_map {
+                for j in value {
+                    try trial_circuit.cz(q[node], q[j])
+                }
+            }
+            for j in 0..<n {
+                try trial_circuit.ry(theta[n * i * 2 + 2 * j], q[j])
+                try trial_circuit.rz(theta[n * i * 2 + 2 * j + 1], q[j])
+            }
+        }
+        try trial_circuit.barrier(q)
+        for j in 0..<n {
+            if meas[j] == "X" {
+                try trial_circuit.h(q[j])
+            }
+            else if meas[j] == "Y" {
+                try trial_circuit.s(q[j]).inverse()
+                try trial_circuit.h(q[j])
+            }
+        }
+        if measurement {
+            for j in 0..<n {
+                try trial_circuit.measure(q[j], c[j])
+            }
+        }
+        return trial_circuit
+    }
+
+    /**
+     Creates a matrix operator out of a list of Paulis.
+
+     Args:
+        pauli_list : list of list [coeff,Pauli]
+     Returns:
+        A matrix representing pauli_list
+     */
+    public static func make_Hamiltonian(_ pauli_list: [(Double,Pauli)]) throws -> Matrix<Complex> {
+        var Hamiltonian = Matrix<Complex>()
+        for p in pauli_list {
+            let m = try p.1.to_matrix().mult(Complex(real:p.0))
+            Hamiltonian = Hamiltonian.shape != (0,0) ? Hamiltonian.add(m) : m
+        }
+        return Hamiltonian
+    }
+
+    /**
+     Creates a matrix operator out of a file with a list
+     of Paulis.
+
+     Args:
+        file_name : a text file containing a list of Paulis and
+        coefficients.
+     Returns:
+        A matrix representing pauli_list
+     */
+    public static func Hamiltonian_from_file(_ file_name: String) throws -> [(Double,Pauli)] {
+        let fileContent = try String(contentsOfFile: file_name, encoding: .utf8)
+        var ham_array = fileContent.components(separatedBy: "\n")
+        ham_array = ham_array.map {
+            $0.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        var pauli_list: [(Double,Pauli)] = []
+        for i in 0..<(ham_array.count / 2) {
+            let pauli = try Pauli.label_to_pauli(ham_array[2 * i])
+            if let Numb = Double(ham_array[2 * i + 1]) {
+                pauli_list.append((Numb, pauli))
+            }
+        }
+        return pauli_list
+    }
 }

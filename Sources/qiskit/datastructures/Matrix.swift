@@ -281,14 +281,10 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
     }
 
     public func dot(_ other: Matrix<T>) -> Matrix<T> {
-        let m = self.rowCount
-        let n = self.colCount
-        let q = other.colCount
-
-        var ab = Matrix<T>(repeating: 0, rows:m, cols:q)
-        for i in 0..<m {
-            for j in 0..<q {
-                for k in 0..<n {
+        var ab = Matrix<T>(repeating: 0, rows:self.rowCount, cols:other.colCount)
+        for i in 0..<self.rowCount {
+            for j in 0..<other.colCount {
+                for k in 0..<self.colCount {
                     ab[i,j] += self[i,k] * other[k,j]
                 }
             }
