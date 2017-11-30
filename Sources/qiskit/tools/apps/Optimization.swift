@@ -14,6 +14,9 @@
 // =============================================================================
 
 import Foundation
+#if os(Linux)
+import Dispatch
+#endif
 
 /**
  These are tools that are used in the classical optimization and chemistry
