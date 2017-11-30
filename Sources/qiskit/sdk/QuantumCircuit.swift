@@ -67,18 +67,17 @@ public final class QuantumCircuit: CustomStringConvertible {
         self.header = header
     }
 
-    private init(_ header: QuantumCircuitHeader = QuantumCircuitHeader(), _ data: [Instruction], _ regs: OrderedDictionary<String,Register>) {
+    private init(_ header: QuantumCircuitHeader, _ regs: OrderedDictionary<String,Register>) {
         self.header = header
-        self.data = data
         self.regs = regs
     }
 
     public func copy() -> QuantumCircuit {
-        var copyData: [Instruction] = []
+        let qc = QuantumCircuit(self.header.copy(),self.regs)
         for instruction in self.data {
-            copyData.append((instruction as! CopyableInstruction).copy(self))
+            qc.data.append((instruction as! CopyableInstruction).copy(qc))
         }
-        return QuantumCircuit(self.header.copy(), copyData, self.regs)
+        return qc
     }
 
     /**
