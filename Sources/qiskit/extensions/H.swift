@@ -18,7 +18,7 @@ import Foundation
 /**
  Hadamard gate.
  */
-public final class HGate: Gate {
+public final class HGate: Gate, CopyableInstruction {
 
     public let instructionComponent: InstructionComponent
 
@@ -30,8 +30,8 @@ public final class HGate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> HGate {
-        return HGate(self.name, self.params, self.args, self.circuit)
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return HGate(self.name, self.params, self.args, c)
     }
 
     public var description: String {

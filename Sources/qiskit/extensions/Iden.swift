@@ -19,7 +19,7 @@ import Foundation
 /**
  Identity gate.
  */
-public final class IdGate: Gate {
+public final class IdGate: Gate, CopyableInstruction {
 
     public let instructionComponent: InstructionComponent
 
@@ -31,8 +31,8 @@ public final class IdGate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> IdGate {
-        return IdGate(self.name, self.params, self.args, self.circuit)
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return IdGate(self.name, self.params, self.args, c)
     }
 
     public var description: String {

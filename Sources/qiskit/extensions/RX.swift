@@ -19,7 +19,7 @@ import Foundation
 /**
  rotation around the x-axis
  */
-public final class RXGate: Gate {
+public final class RXGate: Gate, CopyableInstruction {
 
     public let instructionComponent: InstructionComponent
 
@@ -31,8 +31,8 @@ public final class RXGate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> RXGate {
-        return RXGate(self.name, self.params, self.args, self.circuit)
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return RXGate(self.name, self.params, self.args, c)
     }
 
     public var description: String {

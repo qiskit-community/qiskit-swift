@@ -18,7 +18,7 @@ import Foundation
 /**
  controlled-NOT gate.
  */
-public final class CnotGate: Gate {
+public final class CnotGate: Gate, CopyableInstruction {
 
     public let instructionComponent: InstructionComponent
 
@@ -30,8 +30,8 @@ public final class CnotGate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> CnotGate {
-        return CnotGate(self.name, self.params, self.args, self.circuit)
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return CnotGate(self.name, self.params, self.args, c)
     }
 
     public var description: String {

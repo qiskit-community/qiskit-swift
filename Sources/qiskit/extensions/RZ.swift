@@ -19,7 +19,7 @@ import Foundation
 /**
  rotation around the z-axis
  */
-public final class RZGate: Gate {
+public final class RZGate: Gate, CopyableInstruction {
 
     public let instructionComponent: InstructionComponent
 
@@ -31,8 +31,8 @@ public final class RZGate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> RZGate {
-        return RZGate(self.name, self.params, self.args, self.circuit)
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return RZGate(self.name, self.params, self.args, c)
     }
 
     public var description: String {

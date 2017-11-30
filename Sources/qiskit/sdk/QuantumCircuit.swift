@@ -76,7 +76,7 @@ public final class QuantumCircuit: CustomStringConvertible {
     public func copy() -> QuantumCircuit {
         var copyData: [Instruction] = []
         for instruction in self.data {
-            copyData.append(instruction.copy())
+            copyData.append((instruction as! CopyableInstruction).copy(self))
         }
         return QuantumCircuit(self.header.copy(), copyData, self.regs)
     }
@@ -183,7 +183,7 @@ public final class QuantumCircuit: CustomStringConvertible {
     /**
      Attach a instruction.
      */
-    public func _attach(_ instruction: Instruction) -> Instruction {
+    func _attach(_ instruction: Instruction) -> Instruction {
         self.data.append(instruction)
         return instruction
     }
@@ -221,7 +221,7 @@ public final class QuantumCircuit: CustomStringConvertible {
     /**
      Raise exception if r is not in this circuit or not qreg.
      */
-    public func _check_qreg(_ register: QuantumRegister) throws {
+    func _check_qreg(_ register: QuantumRegister) throws {
         if !self.has_register(register) {
             throw QISKitError.regNotInCircuit(name: register.name)
         }
@@ -230,7 +230,7 @@ public final class QuantumCircuit: CustomStringConvertible {
     /**
      Raise exception if q is not in this circuit or invalid format.
      */
-    public func _check_qubit(_ qubit: QuantumRegisterTuple) throws {
+    func _check_qubit(_ qubit: QuantumRegisterTuple) throws {
         try self._check_qreg(qubit.register)
         try qubit.register.check_range(qubit.index)
     }
@@ -238,7 +238,7 @@ public final class QuantumCircuit: CustomStringConvertible {
     /**
      Raise exception if r is not in this circuit or not creg.
      */
-    public func _check_creg(_ register: ClassicalRegister) throws {
+    func _check_creg(_ register: ClassicalRegister) throws {
         if !self.has_register(register) {
             throw QISKitError.regNotInCircuit(name: register.name)
         }
@@ -247,7 +247,7 @@ public final class QuantumCircuit: CustomStringConvertible {
     /**
      Raise exception if list of qubits contains duplicates.
      */
-    public static func _check_dups(_ qubits: [QuantumRegisterTuple]) throws {
+    static func _check_dups(_ qubits: [QuantumRegisterTuple]) throws {
         for qubit1 in qubits {
             for qubit2 in qubits {
                 if qubit1 == qubit2 {

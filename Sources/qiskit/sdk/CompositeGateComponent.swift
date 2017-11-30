@@ -23,12 +23,15 @@ public final class CompositeGateComponent {
     var data: [Instruction] = []  // gate sequence defining the composite unitary
     var inverse_flag = false
 
-    public func copy() -> CompositeGateComponent {
-        let c = CompositeGateComponent()
-        c.inverse_flag = self.inverse_flag
+    init() {
+    }
+
+    func copy(_ c: QuantumCircuit) -> CompositeGateComponent {
+        let cg = CompositeGateComponent()
+        cg.inverse_flag = self.inverse_flag
         for instruction in self.data {
-            c.data.append(instruction.copy())
+            cg.data.append((instruction as! CopyableInstruction).copy(c))
         }
-        return c
+        return cg
     }
 }

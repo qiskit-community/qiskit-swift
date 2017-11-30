@@ -18,7 +18,7 @@ import Foundation
 /**
  controlled-Phase gate.
  */
-public final class CzGate: Gate {
+public final class CzGate: Gate, CopyableInstruction {
 
     public let instructionComponent: InstructionComponent
 
@@ -30,8 +30,8 @@ public final class CzGate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> CzGate {
-        return CzGate(self.name, self.params, self.args, self.circuit)
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return CzGate(self.name, self.params, self.args, c)
     }
 
     public var description: String {

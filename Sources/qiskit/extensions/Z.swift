@@ -19,7 +19,7 @@ import Foundation
 /**
  Pauli Z (phase-flip) gate.
  */
-public final class ZGate: Gate {
+public final class ZGate: Gate, CopyableInstruction {
 
     public let instructionComponent: InstructionComponent
 
@@ -31,8 +31,8 @@ public final class ZGate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> ZGate {
-        return ZGate(self.name, self.params, self.args, self.circuit)
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return ZGate(self.name, self.params, self.args, c)
     }
 
     public var description: String {

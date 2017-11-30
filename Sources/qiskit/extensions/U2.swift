@@ -19,7 +19,7 @@ import Foundation
 /**
  One-pulse single qubit gate
  */
-public final class U2Gate: Gate {
+public final class U2Gate: Gate, CopyableInstruction {
 
     public let instructionComponent: InstructionComponent
 
@@ -31,8 +31,8 @@ public final class U2Gate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> U2Gate {
-        return U2Gate(self.name, self.params, self.args, self.circuit)
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return U2Gate(self.name, self.params, self.args, c)
     }
 
     public var description: String {

@@ -19,7 +19,7 @@ import Foundation
 /**
  S=diag(1,i) Clifford phase gate.
  */
-public final class SGate: CompositeGate {
+public final class SGate: CompositeGate, CopyableInstruction {
 
     public let instructionComponent: InstructionComponent
     public let compositeGateComponent: CompositeGateComponent
@@ -35,8 +35,8 @@ public final class SGate: CompositeGate {
         self.compositeGateComponent = compositeGateComponent
     }
 
-    public func copy() -> SGate {
-        return SGate(self.name, self.params, self.args, self.circuit,self.compositeGateComponent.copy())
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return SGate(self.name, self.params, self.args, c, self.compositeGateComponent.copy(c))
     }
 
     public var description: String {

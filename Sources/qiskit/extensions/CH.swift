@@ -18,7 +18,7 @@ import Foundation
 /**
  controlled-H gate.
  */
-public final class CHGate: Gate {
+public final class CHGate: Gate, CopyableInstruction {
 
     public let instructionComponent: InstructionComponent
 
@@ -30,8 +30,8 @@ public final class CHGate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> CHGate {
-        return CHGate(self.name, self.params, self.args, self.circuit)
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return CHGate(self.name, self.params, self.args, c)
     }
 
     public var description: String {

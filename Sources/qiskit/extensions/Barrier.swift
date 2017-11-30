@@ -18,7 +18,7 @@ import Foundation
 /**
  Quantum Barrier class
  */
-public final class Barrier: Instruction {
+public final class Barrier: Instruction, CopyableInstruction {
 
     public let instructionComponent: InstructionComponent
 
@@ -42,8 +42,8 @@ public final class Barrier: Instruction {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> Barrier {
-        return Barrier(self.name, self.params, self.args, self.circuit)
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return Barrier(self.name, self.params, self.args, c)
     }
 
     public var description: String {

@@ -18,7 +18,7 @@ import Foundation
 /**
  controlled-U3 gate.
  */
-public final class Cu3Gate: Gate {
+public final class Cu3Gate: Gate, CopyableInstruction {
 
     public let instructionComponent: InstructionComponent
 
@@ -30,8 +30,8 @@ public final class Cu3Gate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> Cu3Gate {
-        return Cu3Gate(self.name, self.params, self.args, self.circuit)
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return Cu3Gate(self.name, self.params, self.args, c)
     }
 
     public var description: String {

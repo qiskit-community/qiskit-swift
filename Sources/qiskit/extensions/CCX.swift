@@ -19,7 +19,7 @@ import Foundation
 /**
  Toffoli gate.
  */
-public final class ToffoliGate: Gate {
+public final class ToffoliGate: Gate, CopyableInstruction {
 
     public let instructionComponent: InstructionComponent
 
@@ -31,8 +31,8 @@ public final class ToffoliGate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> ToffoliGate {
-        return ToffoliGate(self.name, self.params, self.args, self.circuit)
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return ToffoliGate(self.name, self.params, self.args, c)
     }
 
     public var description: String {

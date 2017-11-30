@@ -18,7 +18,7 @@ import Foundation
 /**
  Qubit reset
  */
-public final class Reset: Instruction {
+public final class Reset: Instruction, CopyableInstruction {
 
     public let instructionComponent: InstructionComponent
     
@@ -30,8 +30,8 @@ public final class Reset: Instruction {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> Reset {
-        return Reset(self.name, self.params, self.args, self.circuit)
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return Reset(self.name, self.params, self.args, c)
     }
 
     public var description: String {

@@ -18,7 +18,7 @@ import Foundation
 /**
  Quantum measurement in the computational basis.
  */
-public final class Measure: Instruction {
+public final class Measure: Instruction, CopyableInstruction {
 
     public let instructionComponent: InstructionComponent
 
@@ -30,8 +30,8 @@ public final class Measure: Instruction {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> Measure {
-        return Measure(self.name, self.params, self.args, self.circuit)
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return Measure(self.name, self.params, self.args, c)
     }
 
     public var description: String {

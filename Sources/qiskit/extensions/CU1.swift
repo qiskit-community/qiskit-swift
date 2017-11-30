@@ -18,7 +18,7 @@ import Foundation
 /**
  controlled-U1 gate.
  */
-public final class Cu1Gate: Gate {
+public final class Cu1Gate: Gate, CopyableInstruction  {
 
     public let instructionComponent: InstructionComponent
 
@@ -30,8 +30,8 @@ public final class Cu1Gate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> Cu1Gate {
-        return Cu1Gate(self.name, self.params, self.args, self.circuit)
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return Cu1Gate(self.name, self.params, self.args, c)
     }
 
     public var description: String {

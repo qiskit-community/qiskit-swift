@@ -19,7 +19,7 @@ import Foundation
 /**
  Pauli Y (bit-phase-flip) gate.
  */
-public final class YGate: Gate {
+public final class YGate: Gate, CopyableInstruction {
 
     public let instructionComponent: InstructionComponent
 
@@ -31,8 +31,8 @@ public final class YGate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> YGate {
-        return YGate(self.name, self.params, self.args, self.circuit)
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return YGate(self.name, self.params, self.args, c)
     }
 
     public var description: String {

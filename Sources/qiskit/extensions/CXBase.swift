@@ -18,7 +18,7 @@ import Foundation
 /**
  Fundamental controlled-NOT gate.
  */
-public final class CXBase: Gate {
+public final class CXBase: Gate, CopyableInstruction {
 
     public let instructionComponent: InstructionComponent
 
@@ -30,8 +30,8 @@ public final class CXBase: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> CXBase {
-        return CXBase(self.name, self.params, self.args, self.circuit)
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return CXBase(self.name, self.params, self.args, c)
     }
 
     public var description: String {

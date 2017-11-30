@@ -19,7 +19,7 @@ import Foundation
 /**
  Pauli X (bit-flip) gate.
  */
-public final class XGate: Gate {
+public final class XGate: Gate, CopyableInstruction {
 
     public let instructionComponent: InstructionComponent
 
@@ -31,8 +31,8 @@ public final class XGate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> XGate {
-        return XGate(self.name, self.params, self.args, self.circuit)
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return XGate(self.name, self.params, self.args, c)
     }
 
     public var description: String {

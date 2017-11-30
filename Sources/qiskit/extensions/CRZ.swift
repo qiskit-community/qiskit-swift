@@ -18,7 +18,7 @@ import Foundation
 /**
  controlled-RZ gate.
  */
-public final class CrzGate: Gate {
+public final class CrzGate: Gate, CopyableInstruction {
 
     public let instructionComponent: InstructionComponent
 
@@ -30,8 +30,8 @@ public final class CrzGate: Gate {
         self.instructionComponent = InstructionComponent(name, params, args, circuit)
     }
 
-    public func copy() -> CrzGate {
-        return CrzGate(self.name, self.params, self.args, self.circuit)
+    func copy(_ c: QuantumCircuit) -> Instruction {
+        return CrzGate(self.name, self.params, self.args, c)
     }
 
     public var description: String {

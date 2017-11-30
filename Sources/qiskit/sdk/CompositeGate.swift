@@ -43,7 +43,7 @@ extension CompositeGate {
     /**
      Apply any modifiers of this gate to another composite.
      */
-    public func _modifiers(_ gate: Gate) throws {
+    func _modifiers(_ gate: Gate) throws {
         if self.compositeGateComponent.inverse_flag {
             gate.inverse()
         }
@@ -53,7 +53,7 @@ extension CompositeGate {
     /**
      Attach gate.
      */
-    public func _attach(_ gate: Gate) -> Gate {
+    func _attach(_ gate: Gate) -> Gate {
         self.compositeGateComponent.data.append(gate)
         return gate
     }
@@ -61,7 +61,7 @@ extension CompositeGate {
     /**
      Attach barrier.
      */
-    public func _attach(_ barrier: Barrier) -> Barrier {
+    func _attach(_ barrier: Barrier) -> Barrier {
         self.compositeGateComponent.data.append(barrier)
         return barrier
     }
@@ -69,7 +69,7 @@ extension CompositeGate {
     /**
      Raise exception if q is not an argument or not qreg in circuit.
      */
-    public func _check_qubit(_ qubit: QuantumRegisterTuple) throws {
+    func _check_qubit(_ qubit: QuantumRegisterTuple) throws {
         try self.circuit._check_qubit(qubit)
         for arg in self.args {
             if let tuple = arg as? QuantumRegisterTuple {
@@ -85,14 +85,14 @@ extension CompositeGate {
     /**
      Raise exception if quantum register is not in this gate's circuit.
      */
-    public func _check_qreg(_ register: QuantumRegister) throws {
+    func _check_qreg(_ register: QuantumRegister) throws {
         try self.circuit._check_qreg(register)
     }
 
     /**
      Raise exception if classical register is not in this gate's circuit.
      */
-    public func _check_creg(_ register: ClassicalRegister) throws {
+    func _check_creg(_ register: ClassicalRegister) throws {
         try self.circuit._check_creg(register)
     }
 

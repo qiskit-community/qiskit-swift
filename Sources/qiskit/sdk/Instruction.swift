@@ -21,23 +21,26 @@ import Foundation
 public protocol Instruction: CustomStringConvertible {
 
     var instructionComponent: InstructionComponent { get }
-    func copy() -> Self
     @discardableResult
     func inverse() -> Self
     func reapply(_ circ: QuantumCircuit) throws
 }
 
+protocol CopyableInstruction {
+    func copy(_ c: QuantumCircuit) -> Instruction
+}
+
 extension Instruction {
 
-    var name: String {
+    public var name: String {
         return instructionComponent.name
     }
 
-    var params: [Double] {
+    public var params: [Double] {
         return instructionComponent.params
     }
 
-    var args: [RegisterArgument] {
+    public var args: [RegisterArgument] {
         return instructionComponent.args
     }
 
@@ -52,14 +55,14 @@ extension Instruction {
     /**
      Apply any modifiers of this instruction to another one.
      */
-    public func _modifiers(_ instruction: Instruction) throws {
+    func _modifiers(_ instruction: Instruction) throws {
         try self.instructionComponent._modifiers(instruction)
     }
 
     /**
      Print an if statement if needed.
      */
-    public func _qasmif(_ string: String) -> String {
+    func _qasmif(_ string: String) -> String {
         return self.instructionComponent._qasmif(string)
     }
 
