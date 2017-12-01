@@ -25,6 +25,7 @@ public enum ToolsError: LocalizedError, CustomStringConvertible {
     case pauliToMatrixX
     case invalidPauliString(label: String)
     case errorPauliGroup
+    case errorPartialTrace
 
     public var errorDescription: String? {
         return self.description
@@ -41,6 +42,8 @@ public enum ToolsError: LocalizedError, CustomStringConvertible {
             return "Invalid Pauli string: '\(label)'"
         case .errorPauliGroup:
             return "Please set the number of qubits to less than 5"
+        case .errorPartialTrace:
+            return "Input is not a multi-qubit state, specifify input state dims"
         }
     }
 }

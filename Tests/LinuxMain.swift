@@ -24,9 +24,11 @@ XCTMain([
     testCase(DataStructureTests.allTests),
     testCase(LocalQasmSimulatorTests.allTests),
     testCase(LocalUnitarySimulatorTests.allTests),
+    testCase(PauliTests.allTests),
     testCase(QiskitParserTests.allTests),
     testCase(QiskitProgramTests.allTests),
     testCase(QiskitTests.allTests),
+    testCase(QuantumProgramTests.allTests),
     testCase(UnrollerTests.allTests)
 ])
 

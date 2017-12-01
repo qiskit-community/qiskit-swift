@@ -274,6 +274,7 @@
 		6932AB921FB9FDC800382CF7 /* ParseTree.c in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB8B1FB9FDB800382CF7 /* ParseTree.c */; };
 		6932AB931FB9FDCB00382CF7 /* tokenizer.l in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB8A1FB9FDB800382CF7 /* tokenizer.l */; };
 		6932AB941FB9FDDA00382CF7 /* ParseTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 6932AB851FB9FDA300382CF7 /* ParseTree.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		694001E11FD0BC9900299E1A /* QI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694001E01FD0BC9900299E1A /* QI.swift */; };
 		6941A18B1FCDA17F0016C298 /* example_unitary_matrix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6941A1891FCDA1740016C298 /* example_unitary_matrix.swift */; };
 		698248241FBCC7390097E8E5 /* CRandom.h in Headers */ = {isa = PBXBuildFile; fileRef = 698248221FBCC7390097E8E5 /* CRandom.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		698248281FBCC7580097E8E5 /* CRandom.c in Sources */ = {isa = PBXBuildFile; fileRef = 698248271FBCC7580097E8E5 /* CRandom.c */; };
@@ -284,6 +285,7 @@
 		698445241FCF59BD00F600A9 /* CompositeGateComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698445221FCF59B100F600A9 /* CompositeGateComponent.swift */; };
 		698445251FCF59C300F600A9 /* InstructionComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698445201FCF0C5300F600A9 /* InstructionComponent.swift */; };
 		699CAF671FC489A200402C05 /* ToolsError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 699CAF661FC489A200402C05 /* ToolsError.swift */; };
+		69B5722D1FD0FF2A00B8C649 /* QI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694001E01FD0BC9900299E1A /* QI.swift */; };
 		69BB5A4B1FCD2169005AAE32 /* VectorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69BB5A4A1FCD2168005AAE32 /* VectorError.swift */; };
 		69BB5A4C1FCD2178005AAE32 /* VectorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69BB5A4A1FCD2168005AAE32 /* VectorError.swift */; };
 		69CB0D5A1FB7B21700A1D546 /* DataStructureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69CB0D261FB7B0E300A1D546 /* DataStructureTests.swift */; };
@@ -314,6 +316,8 @@
 		69CB0D731FB7B24400A1D546 /* UnrollerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69CB0D2B1FB7B0F600A1D546 /* UnrollerTests.swift */; };
 		69CE4C501FC0816D0089A425 /* RequestTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69CE4C4F1FC0816D0089A425 /* RequestTask.swift */; };
 		69CE4C511FC0816D0089A425 /* RequestTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69CE4C4F1FC0816D0089A425 /* RequestTask.swift */; };
+		69DC78D31FD1AD3A00EB60A3 /* PauliTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DC78D11FD1AD3300EB60A3 /* PauliTests.swift */; };
+		69DC78D61FD1B49400EB60A3 /* QuantumProgramTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DC78D41FD1B47600EB60A3 /* QuantumProgramTests.swift */; };
 		69F1791F1FC45ED300810FC9 /* Optimization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F1791E1FC45ED300810FC9 /* Optimization.swift */; };
 		69F179201FC45ED700810FC9 /* Optimization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F1791E1FC45ED300810FC9 /* Optimization.swift */; };
 		69F198F11FC1DEFD00CE05DC /* Pauli.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F198F01FC1DEFD00CE05DC /* Pauli.swift */; };
@@ -471,6 +475,7 @@
 		6932AB891FB9FDB800382CF7 /* parser.y */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; name = parser.y; path = Sources/cqasmparser/parser.y; sourceTree = "<group>"; };
 		6932AB8A1FB9FDB800382CF7 /* tokenizer.l */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; name = tokenizer.l; path = Sources/cqasmparser/tokenizer.l; sourceTree = "<group>"; };
 		6932AB8B1FB9FDB800382CF7 /* ParseTree.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ParseTree.c; path = Sources/cqasmparser/ParseTree.c; sourceTree = "<group>"; };
+		694001E01FD0BC9900299E1A /* QI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QI.swift; path = Sources/qiskit/tools/qi/QI.swift; sourceTree = SOURCE_ROOT; };
 		6941A1891FCDA1740016C298 /* example_unitary_matrix.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = example_unitary_matrix.swift; path = Tests/qiskitTests/example_unitary_matrix.swift; sourceTree = "<group>"; };
 		698248221FBCC7390097E8E5 /* CRandom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CRandom.h; path = Sources/crandom/include/CRandom.h; sourceTree = "<group>"; };
 		698248231FBCC7390097E8E5 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; name = module.modulemap; path = Sources/crandom/include/module.modulemap; sourceTree = "<group>"; };
@@ -508,6 +513,8 @@
 		69CB0D521FB7B14400A1D546 /* W3test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = W3test.swift; path = Tests/qiskitTests/qasm/ibmqx2/W3test.swift; sourceTree = "<group>"; };
 		69CE4C4F1FC0816D0089A425 /* RequestTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RequestTask.swift; path = Sources/qiskit/network/RequestTask.swift; sourceTree = SOURCE_ROOT; };
 		69DAB4DF1FAB60480093C27B /* qiskit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = qiskit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		69DC78D11FD1AD3300EB60A3 /* PauliTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PauliTests.swift; path = Tests/qiskitTests/PauliTests.swift; sourceTree = "<group>"; };
+		69DC78D41FD1B47600EB60A3 /* QuantumProgramTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QuantumProgramTests.swift; path = Tests/qiskitTests/QuantumProgramTests.swift; sourceTree = "<group>"; };
 		69F1791E1FC45ED300810FC9 /* Optimization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Optimization.swift; path = Sources/qiskit/tools/apps/Optimization.swift; sourceTree = SOURCE_ROOT; };
 		69F198F01FC1DEFD00CE05DC /* Pauli.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Pauli.swift; path = Sources/qiskit/tools/qi/Pauli.swift; sourceTree = SOURCE_ROOT; };
 		69F198F91FC2144C00CE05DC /* String+Padding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "String+Padding.swift"; path = "Sources/qiskit/datastructures/String+Padding.swift"; sourceTree = SOURCE_ROOT; };
@@ -707,8 +714,10 @@
 				6901D8291FCC8D1300B39538 /* LocalUnitarySimulatorTests.swift */,
 				69CB0D211FB7B0AD00A1D546 /* qasm */,
 				69CB0D2D1FB7B0F600A1D546 /* QiskitParserTests.swift */,
+				69DC78D11FD1AD3300EB60A3 /* PauliTests.swift */,
 				69CB0D2A1FB7B0F500A1D546 /* QiskitProgramTests.swift */,
 				69CB0D2C1FB7B0F600A1D546 /* QiskitTests.swift */,
+				69DC78D41FD1B47600EB60A3 /* QuantumProgramTests.swift */,
 				69CB0D2B1FB7B0F600A1D546 /* UnrollerTests.swift */,
 			);
 			name = qiskitTests;
@@ -880,6 +889,7 @@
 		69F198EF1FC1DEA600CE05DC /* qi */ = {
 			isa = PBXGroup;
 			children = (
+				694001E01FD0BC9900299E1A /* QI.swift */,
 				69F198F01FC1DEFD00CE05DC /* Pauli.swift */,
 			);
 			name = qi;
@@ -1204,6 +1214,7 @@
 				6932AB571FB9F91600382CF7 /* NodeIndexedId.swift in Sources */,
 				6932AAF71FB9F7FC00382CF7 /* Register.swift in Sources */,
 				6932A9FD1FB9F52500382CF7 /* SimulatorError.swift in Sources */,
+				69B5722D1FD0FF2A00B8C649 /* QI.swift in Sources */,
 				6932AAC31FB9F79000382CF7 /* UnrollerBackend.swift in Sources */,
 				6932AB4F1FB9F8FE00382CF7 /* NodeGate.swift in Sources */,
 				6932AB541FB9F90D00382CF7 /* NodeIdList.swift in Sources */,
@@ -1351,6 +1362,7 @@
 				699CAF671FC489A200402C05 /* ToolsError.swift in Sources */,
 				6932AA791FB9F69300382CF7 /* Iden.swift in Sources */,
 				6932A9F51FB9F50500382CF7 /* UnitarySimulator.swift in Sources */,
+				694001E11FD0BC9900299E1A /* QI.swift in Sources */,
 				6932AA641FB9F69300382CF7 /* CCX.swift in Sources */,
 				6932AB3E1FB9F8CB00382CF7 /* NodeMeasure.swift in Sources */,
 				6932AA9F1FB9F71700382CF7 /* Compiling.swift in Sources */,
@@ -1405,6 +1417,8 @@
 				69CB0D5A1FB7B21700A1D546 /* DataStructureTests.swift in Sources */,
 				69CB0D5B1FB7B21700A1D546 /* LocalQasmSimulatorTests.swift in Sources */,
 				69CB0D5C1FB7B21700A1D546 /* example.swift in Sources */,
+				69DC78D31FD1AD3A00EB60A3 /* PauliTests.swift in Sources */,
+				69DC78D61FD1B49400EB60A3 /* QuantumProgramTests.swift in Sources */,
 				69CB0D5D1FB7B21700A1D546 /* adder.swift in Sources */,
 				6901D82B1FCC8D2900B39538 /* LocalUnitarySimulatorTests.swift in Sources */,
 				69CB0D5E1FB7B21700A1D546 /* bigadder.swift in Sources */,
