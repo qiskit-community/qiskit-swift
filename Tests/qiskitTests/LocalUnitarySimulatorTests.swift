@@ -61,7 +61,7 @@ class LocalUnitarySimulatorTests: XCTestCase {
                     complexMatrix[i,j] = try Complex(complexStr)
                 }
             }
-            try self.qp!.load_qasm_text(qasm_string: Example.QASM, name: "example")
+            try self.qp!.load_qasm_text(Example.QASM, name: "example")
             let basis_gates: [String] = []  // unroll to base gates
             let unroller = Unroller(try Qasm(data: try self.qp!.get_qasm("example")).parse(),JsonBackend(basis_gates))
             guard var circuit = try unroller.execute() as? [String: Any] else {

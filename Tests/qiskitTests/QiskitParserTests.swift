@@ -99,7 +99,7 @@ class QiskitParserTests: XCTestCase {
             let c1 = s1[s1.index(s1.startIndex, offsetBy: i)]
             let c2 = s2[s2.index(s2.startIndex, offsetBy: i)]
             if  c1 !=  c2 {
-                print("\(c1) \(c2)")
+                SDKLogger.logInfo("\(c1) \(c2)")
                 return i
             }
         }
@@ -160,9 +160,9 @@ class QiskitParserTests: XCTestCase {
         }
         if !differences.isEmpty {
             for (qasm,difference) in differences {
-                print("Qasm: \(qasm) doesn't match:")
-                print("Emmited: \(difference.0)")
-                print("Original: \(difference.1)")
+                SDKLogger.logInfo("Qasm: \(qasm) doesn't match:")
+                SDKLogger.logInfo("Emmited: \(difference.0)")
+                SDKLogger.logInfo("Original: \(difference.1)")
             }
             XCTFail("Error not equal.")
         }

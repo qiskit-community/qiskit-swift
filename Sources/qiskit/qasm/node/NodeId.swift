@@ -55,13 +55,13 @@ final class NodeId: NodeRealValue {
 
     func real(_ nested_scope: [[String:NodeRealValue]]?) throws -> Double {
         guard let scope = nested_scope else {
-            throw QasmException.errorLocalParameter(qasm: self.qasm(15))
+            throw QasmError.errorLocalParameter(qasm: self.qasm(15))
         }
         guard let last = scope.last else {
-            throw QasmException.errorLocalParameter(qasm: self.qasm(15))
+            throw QasmError.errorLocalParameter(qasm: self.qasm(15))
         }
         guard let arg = last[self.name] else {
-            throw QasmException.errorLocalParameter(qasm: self.qasm(15))
+            throw QasmError.errorLocalParameter(qasm: self.qasm(15))
         }
         let endIndex: Int = scope.count - 1
         return try arg.real(Array(scope[0..<endIndex]))

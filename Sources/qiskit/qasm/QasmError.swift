@@ -15,13 +15,14 @@
 
 import Foundation
 
-public enum QasmException: LocalizedError, CustomStringConvertible {
+public enum QasmError: LocalizedError, CustomStringConvertible {
 
     case errorBinop(qasm: String)
     case errorPrefix(qasm: String)
     case errorExternal(qasm: String)
     case errorLocalParameter(qasm: String)
     case error(msg: String)
+    case internalError(error: Error)
     
     public var errorDescription: String? {
         return self.description
@@ -39,6 +40,8 @@ public enum QasmException: LocalizedError, CustomStringConvertible {
             return "expected local parameter name: qasm='\(qasm)'"
         case .error(let msg):
             return msg
+        case .internalError(let error):
+            return error.localizedDescription
         }
     }
 }

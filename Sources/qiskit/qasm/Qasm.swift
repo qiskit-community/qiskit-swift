@@ -33,7 +33,11 @@ final class Qasm {
     static private let lock = NSRecursiveLock()
     
     init(filename: String) throws {
-        self.data  = try String(contentsOfFile: filename, encoding: String.Encoding.utf8)
+        do {
+            self.data  = try String(contentsOfFile: filename, encoding: String.Encoding.utf8)
+        } catch {
+            throw QasmError.internalError(error: error)
+        }
     }
     
     init(data: String) {

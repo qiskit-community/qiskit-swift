@@ -57,10 +57,10 @@ final class NodeBinaryOp: NodeRealValue {
     func real(_ nested_scope: [[String:NodeRealValue]]? = nil) throws -> Double {
         let operation = self.op
         guard let lexpr = self._children[0] as? NodeRealValue else {
-            throw QasmException.errorBinop(qasm: self.qasm(15))
+            throw QasmError.errorBinop(qasm: self.qasm(15))
         }
         guard let rexpr = self._children[1] as? NodeRealValue else {
-            throw QasmException.errorBinop(qasm: self.qasm(15))
+            throw QasmError.errorBinop(qasm: self.qasm(15))
         }
         let lhs = try lexpr.real(nested_scope)
         let rhs = try rexpr.real(nested_scope)
@@ -79,6 +79,6 @@ final class NodeBinaryOp: NodeRealValue {
         if operation == "^" {
             return pow(lhs,rhs)
         }
-        throw QasmException.errorBinop(qasm: self.qasm(15))
+        throw QasmError.errorBinop(qasm: self.qasm(15))
     }
 }

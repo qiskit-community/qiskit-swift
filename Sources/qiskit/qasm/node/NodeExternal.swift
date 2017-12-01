@@ -69,6 +69,6 @@ final class NodeExternal: NodeRealValue {
                 return arg.squareRoot()
             }
         }
-        throw QasmException.errorExternal(qasm: self.qasm(15))
+        throw QasmError.errorExternal(qasm: self.qasm(15))
     }
 }

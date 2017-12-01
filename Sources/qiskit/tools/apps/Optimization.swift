@@ -88,10 +88,10 @@ public final class Optimization {
             theta = theta.subtract(g_spsa.mult(a_spsa))
             // saving
             if k % save_steps == 0 {
-                print("objective function at theta+ for step # \(k)")
-                print("\(cost_plus)")
-                print("objective function at theta- for step # \(k)")
-                print("\(cost_minus)")
+                SDKLogger.logInfo("objective function at theta+ for step # \(k)")
+                SDKLogger.logInfo("\(cost_plus)")
+                SDKLogger.logInfo("objective function at theta- for step # \(k)")
+                SDKLogger.logInfo("\(cost_minus)")
                 theta_plus_save.append(theta_plus.value)
                 theta_minus_save.append(theta_minus.value)
                 cost_plus_save.append(cost_plus)
@@ -103,7 +103,7 @@ public final class Optimization {
         }
         // final cost update
         let cost_final = obj_fun(theta_best.value)
-        print("Final objective function is: \(cost_final)")
+        SDKLogger.logInfo("Final objective function is: \(cost_final)")
         return (cost_final, theta_best.value, cost_plus_save, cost_minus_save,
                 theta_plus_save, theta_minus_save)
     }
@@ -137,7 +137,7 @@ public final class Optimization {
         var delta_obj: Double = 0
         for i in 0..<stat {
             if i % 5 == 0 {
-                print("calibration step # \(i) of \(stat)")
+                SDKLogger.logInfo("calibration step # \(i) of \(stat)")
             }
             var arr = Vector<Double>(repeating: 0, count: initial_theta.count)
             for i in 0..<arr.count {
@@ -150,7 +150,7 @@ public final class Optimization {
         }
         SPSA_parameters[0] = target_update * 2 / delta_obj * SPSA_parameters[1] * (SPSA_parameters[4] + 1)
 
-        print("calibrated SPSA_parameters[0] is \(SPSA_parameters[0])")
+        SDKLogger.logInfo("calibrated SPSA_parameters[0] is \(SPSA_parameters[0])")
 
         return SPSA_parameters
     }
@@ -283,14 +283,14 @@ public final class Optimization {
      */
     public static func print_pauli_list_grouped(_ pauli_list_grouped: [ [(Int,Pauli)] ]) {
         for (i,pauli_list) in pauli_list_grouped.enumerated() {
-            print("Post Rotations of TPB set \(i):")
-            print(pauli_list[0].1.to_label())
-            print("\(pauli_list[0].0)\n")
+            SDKLogger.logInfo("Post Rotations of TPB set \(i):")
+            SDKLogger.logInfo(pauli_list[0].1.to_label())
+            SDKLogger.logInfo("\(pauli_list[0].0)\n")
             for j in 0..<(pauli_list.count - 1) {
-                print(pauli_list[j + 1].1.to_label())
-                print("\(pauli_list[j + 1].0)")
+                SDKLogger.logInfo(pauli_list[j + 1].1.to_label())
+                SDKLogger.logInfo("\(pauli_list[j + 1].0)")
             }
-            print("\n")
+            SDKLogger.logInfo("\n")
         }
     }
 

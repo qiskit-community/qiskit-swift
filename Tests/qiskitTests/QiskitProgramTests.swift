@@ -158,7 +158,7 @@ class QiskitProgramTests: XCTestCase {
 
             try qc.h(qr[1])
             let result = qc.qasm()
-            XCTAssertEqual(result, "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nh qname[1];")
+            XCTAssertEqual(result, "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nh qname[1];\n")
             
         } catch {
             XCTFail("\(error)")
@@ -173,7 +173,7 @@ class QiskitProgramTests: XCTestCase {
             try qprogram.get_classical_register("cname")
             try qc.h(qr[1])
             let result = try qprogram.get_qasm("circuitName")
-            XCTAssertEqual(result, "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nh qname[1];")
+            XCTAssertEqual(result, "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nh qname[1];\n")
             
         } catch {
             XCTFail("\(error)")
@@ -196,7 +196,7 @@ class QiskitProgramTests: XCTestCase {
             "if(cname==1) z qname[2];\n" +
             "if(cname==1) x qname[2];\n" +
             "measure qname[0] -> cname[0];\n" +
-            "measure qname[1] -> cname[1];"
+            "measure qname[1] -> cname[1];\n"
             
             let qprogram = try QuantumProgram(specs: QiskitProgramTests.QPS_SPECS)
             let qc = try qprogram.get_circuit("circuitName")
@@ -235,7 +235,7 @@ class QiskitProgramTests: XCTestCase {
                                                  [qname, qr],
                                                  [cname, cr])
             
-            XCTAssertEqual(result.qasm(), "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\nqreg qr[3];\ncreg cname[3];\ncreg cr[3];")
+            XCTAssertEqual(result.qasm(), "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\nqreg qr[3];\ncreg cname[3];\ncreg cr[3];\n")
         } catch {
             XCTFail("\(error)")
         }
@@ -258,7 +258,7 @@ class QiskitProgramTests: XCTestCase {
             try qc3.measure(qname[0], cname[0])
             let qc_result = try qc2 + qc3
 
-            XCTAssertEqual(qc_result.qasm(), "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nh qname[0];\nmeasure qname[0] -> cname[0];\nh qname[0];\nmeasure qname[0] -> cname[0];")
+            XCTAssertEqual(qc_result.qasm(), "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nh qname[0];\nmeasure qname[0] -> cname[0];\nh qname[0];\nmeasure qname[0] -> cname[0];\n")
         } catch {
             XCTFail("\(error)")
         }
@@ -279,7 +279,7 @@ class QiskitProgramTests: XCTestCase {
             
             try qprogram.compile(["circuitName"])
             let to_test = try qprogram.get_circuit("circuitName")
-            XCTAssertEqual(to_test.qasm(), "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nh qname[0];\nh qname[0];\nmeasure qname[0] -> cname[0];")
+            XCTAssertEqual(to_test.qasm(), "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nh qname[0];\nh qname[0];\nmeasure qname[0] -> cname[0];\n")
         } catch {
             XCTFail("\(error)")
         }

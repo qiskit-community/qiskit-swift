@@ -44,7 +44,7 @@ class LocalQasmSimulatorTests: XCTestCase {
         do {
             self.seed = 88
             self.qp = try QuantumProgram()
-            try self.qp!.load_qasm_text(qasm_string: Example.QASM, name: "example")
+            try self.qp!.load_qasm_text(Example.QASM, name: "example")
             let basis_gates: [String] = []  // unroll to base gates
             let unroller = Unroller(try Qasm(data: try self.qp!.get_qasm("example")).parse(),JsonBackend(basis_gates))
             let circuit = try unroller.execute()

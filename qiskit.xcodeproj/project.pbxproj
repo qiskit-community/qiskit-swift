@@ -260,9 +260,9 @@
 		6932AB641FB9F93E00382CF7 /* NodeUniversalUnitary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB161FB9F8C700382CF7 /* NodeUniversalUnitary.swift */; };
 		6932AB681FB9F97200382CF7 /* qelib1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB651FB9F97200382CF7 /* qelib1.swift */; };
 		6932AB691FB9F97200382CF7 /* Qasm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB661FB9F97200382CF7 /* Qasm.swift */; };
-		6932AB6A1FB9F97200382CF7 /* QasmException.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB671FB9F97200382CF7 /* QasmException.swift */; };
+		6932AB6A1FB9F97200382CF7 /* QasmError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB671FB9F97200382CF7 /* QasmError.swift */; };
 		6932AB6B1FB9F98000382CF7 /* Qasm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB661FB9F97200382CF7 /* Qasm.swift */; };
-		6932AB6C1FB9F98300382CF7 /* QasmException.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB671FB9F97200382CF7 /* QasmException.swift */; };
+		6932AB6C1FB9F98300382CF7 /* QasmError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB671FB9F97200382CF7 /* QasmError.swift */; };
 		6932AB6D1FB9F98500382CF7 /* qelib1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932AB651FB9F97200382CF7 /* qelib1.swift */; };
 		6932AB711FB9F9A900382CF7 /* qiskit.h in Headers */ = {isa = PBXBuildFile; fileRef = 6932AB6F1FB9F9A900382CF7 /* qiskit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6932AB721FB9F9B400382CF7 /* qiskit.h in Headers */ = {isa = PBXBuildFile; fileRef = 6932AB6F1FB9F9A900382CF7 /* qiskit.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -467,7 +467,7 @@
 		6932AB2A1FB9F8CA00382CF7 /* NodeCnot.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NodeCnot.swift; path = Sources/qiskit/qasm/node/NodeCnot.swift; sourceTree = SOURCE_ROOT; };
 		6932AB651FB9F97200382CF7 /* qelib1.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = qelib1.swift; path = Sources/qiskit/qasm/qelib1.swift; sourceTree = SOURCE_ROOT; };
 		6932AB661FB9F97200382CF7 /* Qasm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Qasm.swift; path = Sources/qiskit/qasm/Qasm.swift; sourceTree = SOURCE_ROOT; };
-		6932AB671FB9F97200382CF7 /* QasmException.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QasmException.swift; path = Sources/qiskit/qasm/QasmException.swift; sourceTree = SOURCE_ROOT; };
+		6932AB671FB9F97200382CF7 /* QasmError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QasmError.swift; path = Sources/qiskit/qasm/QasmError.swift; sourceTree = SOURCE_ROOT; };
 		6932AB6E1FB9F9A900382CF7 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Sources/qiskit/Info.plist; sourceTree = SOURCE_ROOT; };
 		6932AB6F1FB9F9A900382CF7 /* qiskit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = qiskit.h; path = Sources/qiskit/qiskit.h; sourceTree = SOURCE_ROOT; };
 		6932AB851FB9FDA300382CF7 /* ParseTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ParseTree.h; path = Sources/cqasmparser/include/ParseTree.h; sourceTree = "<group>"; };
@@ -938,7 +938,7 @@
 			children = (
 				699AAB521EE47FDB0015DB83 /* node */,
 				6932AB661FB9F97200382CF7 /* Qasm.swift */,
-				6932AB671FB9F97200382CF7 /* QasmException.swift */,
+				6932AB671FB9F97200382CF7 /* QasmError.swift */,
 				6932AB651FB9F97200382CF7 /* qelib1.swift */,
 			);
 			path = qasm;
@@ -1231,7 +1231,7 @@
 				6932AB501FB9F90000382CF7 /* NodeExternal.swift in Sources */,
 				6932AA861FB9F6BF00382CF7 /* CXBase.swift in Sources */,
 				6932AAF01FB9F7E500382CF7 /* OpenQuantumCompiler.swift in Sources */,
-				6932AB6C1FB9F98300382CF7 /* QasmException.swift in Sources */,
+				6932AB6C1FB9F98300382CF7 /* QasmError.swift in Sources */,
 				6932A9FB1FB9F51F00382CF7 /* QasmSimulator.swift in Sources */,
 				6932AA8B1FB9F6CC00382CF7 /* Iden.swift in Sources */,
 				6932AA271FB9F5C800382CF7 /* Double+Format.swift in Sources */,
@@ -1316,7 +1316,7 @@
 				6932AB081FB9F88800382CF7 /* Credentials.swift in Sources */,
 				6932AA7C1FB9F69300382CF7 /* H.swift in Sources */,
 				6932AAA01FB9F71700382CF7 /* Coupling.swift in Sources */,
-				6932AB6A1FB9F97200382CF7 /* QasmException.swift in Sources */,
+				6932AB6A1FB9F97200382CF7 /* QasmError.swift in Sources */,
 				6932AAA21FB9F71700382CF7 /* CouplingError.swift in Sources */,
 				69CE4C501FC0816D0089A425 /* RequestTask.swift in Sources */,
 				6932AB2C1FB9F8CB00382CF7 /* NodeCreg.swift in Sources */,

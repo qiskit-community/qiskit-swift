@@ -117,7 +117,7 @@ class UnrollerTests: XCTestCase {
         try qp.set_api(token: UnrollerTests.APItoken, url: qConfig.url.absoluteString)
 
         let QASM_source = try qp.get_qasm("rippleadd")
-        print(QASM_source)
+        SDKLogger.logInfo(QASM_source)
 
         let qobj = try qp.compile(["rippleadd"], backend: UnrollerTests.backend, coupling_map: UnrollerTests.coupling_map, shots: 1024)
         qp.get_execution_list(qobj)
@@ -129,8 +129,8 @@ class UnrollerTests: XCTestCase {
                     asyncExpectation.fulfill()
                     return
                 }
-                print(try result.get_ran_qasm("rippleadd"))
-                print(try result.get_counts("rippleadd"))
+                SDKLogger.logInfo(try result.get_ran_qasm("rippleadd"))
+                SDKLogger.logInfo(try result.get_counts("rippleadd"))
                 // Both versions should give the same distribution
                 asyncExpectation.fulfill()
             } catch {

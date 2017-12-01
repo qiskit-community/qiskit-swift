@@ -49,7 +49,7 @@ final class NodePrefix: NodeRealValue {
     func real(_ nested_scope: [[String:NodeRealValue]]?) throws -> Double {
         let operation = self.op
         guard let operand = self._children[0] as? NodeRealValue else {
-            throw QasmException.errorPrefix(qasm: self.qasm(15))
+            throw QasmError.errorPrefix(qasm: self.qasm(15))
         }
         let expr = try operand.real(nested_scope)
         if operation == "+" {
@@ -58,6 +58,6 @@ final class NodePrefix: NodeRealValue {
         if operation == "-" {
             return -expr
         }
-        throw QasmException.errorPrefix(qasm: self.qasm(15))
+        throw QasmError.errorPrefix(qasm: self.qasm(15))
     }
 }

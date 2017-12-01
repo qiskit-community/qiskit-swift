@@ -70,7 +70,7 @@ public final class QCircuit {
 }
 
 public final class QProgram {
-    public private(set) var circuits: [String: QCircuit] = [:]
+    public private(set) var circuits: OrderedDictionary<String,QCircuit> = OrderedDictionary<String,QCircuit>()
 
     func setCircuit(_ name: String, _ circuit: QCircuit) {
         self.circuits[name] = circuit
@@ -90,7 +90,7 @@ public final class APIConfig {
     }
 }
 
-public final class QuantumProgram {
+public final class QuantumProgram: CustomStringConvertible {
 
     final class JobProcessorData {
         let jobProcessor: JobProcessor
@@ -143,6 +143,15 @@ public final class QuantumProgram {
                                                        withTemplate: "\\1_\\2").lowercased()
         } catch {
             throw QISKitError.internalError(error: error)
+        }
+    }
+
+    public var description: String {
+        do {
+            let (contents,_) = try self.getSaveElements(true)
+            return contents
+        } catch {
+            return error.localizedDescription
         }
     }
 
@@ -400,7 +409,7 @@ public final class QuantumProgram {
         quantum program.
      */
     @discardableResult
-    public func load_qasm_text(qasm_string: String, name: String? = nil,basis_gates: String = "u1,u2,u3,cx,id") throws -> String {
+    public func load_qasm_text(_ qasm_string: String, name: String? = nil,basis_gates: String = "u1,u2,u3,cx,id") throws -> String {
         var n: String = ""
         if name != nil {
             n = name!
@@ -562,6 +571,16 @@ public final class QuantumProgram {
         The dictionary with the result of the operation
      */
     public func save(_ file_name: String, _ beauty: Bool = false) throws -> [String:[String:Any]] {
+        let (contents,elements_saved) = try self.getSaveElements()
+        do {
+            try contents.write(toFile: file_name, atomically: true, encoding: .utf8)
+            return elements_saved
+        } catch {
+            throw QISKitError.internalError(error: error)
+        }
+    }
+
+    private func getSaveElements(_ beauty: Bool = false) throws -> (String, [String:[String:Any]]) {
         do {
             let elements_to_save = self.__quantum_program.circuits
             var elements_saved: [String:[String:Any]] = [:]
@@ -572,11 +591,9 @@ public final class QuantumProgram {
             }
 
             let options = beauty ? JSONSerialization.WritingOptions.prettyPrinted : []
-
             let data = try JSONSerialization.data(withJSONObject: elements_saved, options: options)
             let contents = String(data: data, encoding: .utf8)
-            try contents?.write(toFile: file_name, atomically: true, encoding: .utf8)
-            return elements_saved
+            return (contents!, elements_saved)
         } catch {
             throw QISKitError.internalError(error: error)
         }

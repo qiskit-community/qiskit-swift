@@ -214,6 +214,7 @@ public final class QuantumCircuit: CustomStringConvertible {
         for instruction in self.data {
             text.append("\n\(instruction.description);")
         }
+        text.append("\n")
         return text
     }
 

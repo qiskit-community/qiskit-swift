@@ -63,7 +63,7 @@ class QiskitTests: XCTestCase {
                     "measure q[1] -> c[1];\n" +
                     "measure q[2] -> c[2];\n" +
                     "measure q[3] -> c[3];\n" +
-            "measure q[4] -> c[4];"
+            "measure q[4] -> c[4];\n"
             let q = try QuantumRegister("q", 5)
             let c = try ClassicalRegister("c", 5)
             let circuit = try QuantumCircuit([q,c])
@@ -93,7 +93,7 @@ class QiskitTests: XCTestCase {
                     "h q[0];\n" +
                     "cx q[0],q[2];\n" +
                     "measure q[0] -> c[0];\n" +
-            "measure q[2] -> c[1];"
+            "measure q[2] -> c[1];\n"
 
             let q = try QuantumRegister("q", 3)
             let c = try ClassicalRegister("c", 2)
@@ -171,7 +171,7 @@ class QiskitTests: XCTestCase {
                     "measure b[1] -> ans[1];\n" +
                     "measure b[2] -> ans[2];\n" +
                     "measure b[3] -> ans[3];\n" +
-                    "measure cout[0] -> ans[4];"
+                    "measure cout[0] -> ans[4];\n"
 
             let cin = try QuantumRegister("cin", 1)
             let a = try QuantumRegister("a", 4)
@@ -236,7 +236,7 @@ class QiskitTests: XCTestCase {
                     "if(c1==1) u1(\(piDiv4S)) q[3];\n" +
                     "if(c2==1) u1(\(piDiv2S)) q[3];\n" +
                     "h q[3];\n" +
-                    "measure q[3] -> c3[0];"
+                    "measure q[3] -> c3[0];\n"
 
             let q = try QuantumRegister("q", 4)
             let c0 = try ClassicalRegister("c0", 1)
@@ -287,7 +287,7 @@ class QiskitTests: XCTestCase {
             "s qr[0];\n" +
             "t qr[1];\n" +
             "id qr[1];\n" +
-            "measure qr[0] -> cr[0];"
+            "measure qr[0] -> cr[0];\n"
 
             let Q_program = try QuantumProgram()
             let qr = try Q_program.create_quantum_register("qr", 4)
@@ -364,8 +364,8 @@ class QiskitTests: XCTestCase {
                 return
             }
             do {
-                print(try result.get_ran_qasm("circuit"))
-                print(try result.get_counts("circuit"))
+                SDKLogger.logInfo(try result.get_ran_qasm("circuit"))
+                SDKLogger.logInfo(try result.get_counts("circuit").description)
                 asyncExpectation.fulfill()
             } catch let error {
                 XCTFail("Failure in runJob: \(error)")
