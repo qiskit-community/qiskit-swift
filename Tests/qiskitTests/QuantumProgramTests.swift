@@ -37,6 +37,7 @@ class QuantumProgramTests: XCTestCase {
         ("test_create_several_circuits",test_create_several_circuits),
         ("test_fail_load_qasm_file",test_fail_load_qasm_file),
         ("test_load_qasm_text",test_load_qasm_text),
+	("test_get_register_and_circuit",test_get_register_and_circuit),
         ("test_get_register_and_circuit_names",test_get_register_and_circuit_names),
         ("test_get_qasm",test_get_qasm),
     ]

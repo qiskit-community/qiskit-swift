@@ -113,9 +113,9 @@ public final class QuantumProgram: CustomStringConvertible {
      only exists once you set the api to use the online backends
      */
     private var __api_config: APIConfig
-
-    private var __quantum_registers: [String: QuantumRegister] = [:]
-    private var __classical_registers: [String: ClassicalRegister] = [:]
+ 
+    private var __quantum_registers:   OrderedDictionary<String,QuantumRegister> = OrderedDictionary<String,QuantumRegister>()
+    private var __classical_registers: OrderedDictionary<String,ClassicalRegister> = OrderedDictionary<String,ClassicalRegister>()
     /**
      stores all the quantum programs
      */
