@@ -187,7 +187,7 @@ class QiskitProgramTests: XCTestCase {
             "include \"qelib1.inc\";\n" +
             "qreg qname[3];\n" +
             "creg cname[3];\n" +
-            "u3(0.3000000000000000,0.2000000000000000,0.1000000000000000) qname[0];\n" +
+            "u3(0.300000000000000,0.200000000000000,0.100000000000000) qname[0];\n" +
             "h qname[1];\n" +
             "cx qname[1],qname[2];\n" +
             "barrier qname[0],qname[1],qname[2];\n" +
@@ -276,15 +276,12 @@ class QiskitProgramTests: XCTestCase {
             try qc.h(qname[0])
             try qc.measure(qname[0], cname[0])
 
-            
             try qprogram.compile(["circuitName"])
             let to_test = try qprogram.get_circuit("circuitName")
             XCTAssertEqual(to_test.qasm(), "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nh qname[0];\nh qname[0];\nmeasure qname[0] -> cname[0];\n")
         } catch {
             XCTFail("\(error)")
         }
-        
     }
-    
 }
 

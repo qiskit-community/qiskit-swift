@@ -37,9 +37,10 @@ class QuantumProgramTests: XCTestCase {
         ("test_create_several_circuits",test_create_several_circuits),
         ("test_fail_load_qasm_file",test_fail_load_qasm_file),
         ("test_load_qasm_text",test_load_qasm_text),
-	("test_get_register_and_circuit",test_get_register_and_circuit),
+        ("test_get_register_and_circuit",test_get_register_and_circuit),
         ("test_get_register_and_circuit_names",test_get_register_and_circuit_names),
         ("test_get_qasm",test_get_qasm),
+        ("test_get_qasms",test_get_qasms),
     ]
     //#endif
 
@@ -251,9 +252,8 @@ class QuantumProgramTests: XCTestCase {
             let name = try QP_program.load_qasm_text(QASM_string)
             let result = try QP_program.get_circuit(name)
             let to_check = result.qasm()
-            //print(to_check)
             SDKLogger.logInfo(to_check)
-         //   XCTAssertEqual(to_check.count, 554)
+            XCTAssertEqual(to_check.count, 554)
         } catch {
             XCTFail("test_load_qasm_text: \(error)")
         }
@@ -312,29 +312,33 @@ class QuantumProgramTests: XCTestCase {
             XCTFail("test_get_qasm: \(error)")
         }
     }
-/*
+
     func test_get_qasms() {
-    QP_program = QuantumProgram()
-    qr = QP_program.create_quantum_register("qr", 3)
-    cr = QP_program.create_classical_register("cr", 3)
-    qc1 = QP_program.create_circuit("qc1", [qr], [cr])
-    qc2 = QP_program.create_circuit("qc2", [qr], [cr])
-    qc1.h(qr[0])
-    qc1.cx(qr[0], qr[1])
-    qc1.cx(qr[1], qr[2])
-    qc1.measure(qr[0], cr[0])
-    qc1.measure(qr[1], cr[1])
-    qc1.measure(qr[2], cr[2])
-    qc2.h(qr)
-    qc2.measure(qr[0], cr[0])
-    qc2.measure(qr[1], cr[1])
-    qc2.measure(qr[2], cr[2])
-    result = QP_program.get_qasms(["qc1", "qc2"])
-    XCTAssertEqual(len(result[0]), 173)
-    XCTAssertEqual(len(result[1]), 159)
+         do {
+            let QP_program = try QuantumProgram()
+            let qr = try QP_program.create_quantum_register("qr", 3)
+            let cr = try QP_program.create_classical_register("cr", 3)
+            let qc1 = try QP_program.create_circuit("qc1", [qr], [cr])
+            let qc2 = try QP_program.create_circuit("qc2", [qr], [cr])
+            try qc1.h(qr[0])
+            try qc1.cx(qr[0], qr[1])
+            try qc1.cx(qr[1], qr[2])
+            try qc1.measure(qr[0], cr[0])
+            try qc1.measure(qr[1], cr[1])
+            try qc1.measure(qr[2], cr[2])
+            try qc2.h(qr)
+            try qc2.measure(qr[0], cr[0])
+            try qc2.measure(qr[1], cr[1])
+            try qc2.measure(qr[2], cr[2])
+            let result = try QP_program.get_qasms(["qc1", "qc2"])
+            XCTAssertEqual(result[0].count, 173)
+            XCTAssertEqual(result[1].count, 159)
+        } catch {
+            XCTFail("test_get_qasms: \(error)")
+        }
 
     }
-
+/*
     func test_get_qasm_all_gates() {
     QP_program = QuantumProgram(specs=self.QPS_SPECS)
     qc = QP_program.get_circuit("circuitName")

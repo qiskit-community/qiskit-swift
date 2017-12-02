@@ -24,7 +24,7 @@ creg c1[1];
 creg c2[1];
 // optional post-rotation for state tomography
 gate post q { }
-u3(0.3000000000000000,0.2000000000000000,0.1000000000000000) q[0];
+u3(0.300000000000000,0.200000000000000,0.100000000000000) q[0];
 h q[1];
 cx q[1],q[2];
 barrier q;
