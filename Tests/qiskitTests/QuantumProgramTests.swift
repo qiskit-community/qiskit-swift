@@ -41,13 +41,29 @@ class QuantumProgramTests: XCTestCase {
         ("test_get_register_and_circuit_names",test_get_register_and_circuit_names),
         ("test_get_qasm",test_get_qasm),
         ("test_get_qasms",test_get_qasms),
+        ("test_get_qasm_all_gates",test_get_qasm_all_gates),
+        ("test_get_initial_circuit",test_get_initial_circuit),
+        ("test_setup_api",test_setup_api),
+        ("test_available_backends_exist",test_available_backends_exist),
+        ("test_local_backends_exist",test_local_backends_exist),
+        ("test_online_devices",test_online_devices),
+        ("test_online_simulators",test_online_simulators)
     ]
     //#endif
 
+    private var QE_TOKEN: String? = nil
+    private var QE_URL = Qconfig.BASEURL
     private var QPS_SPECS: [String:Any] = [:]
 
     override func setUp() {
         super.setUp()
+        let environment = ProcessInfo.processInfo.environment
+        if let token = environment["QE_TOKEN"] {
+            self.QE_TOKEN = token
+        }
+        if let url = environment["QE_URL"] {
+            self.QE_URL = url
+        }
         self.QPS_SPECS = [
             "circuits": [[
             "name": "circuitName",
@@ -336,87 +352,48 @@ class QuantumProgramTests: XCTestCase {
         } catch {
             XCTFail("test_get_qasms: \(error)")
         }
-
     }
-/*
-    func test_get_qasm_all_gates() {
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
-    qc = QP_program.get_circuit("circuitName")
-    qr = QP_program.get_quantum_register("qname")
-    cr = QP_program.get_classical_register("cname")
-    qc.u1(0.3, qr[0])
-    qc.u2(0.2, 0.1, qr[1])
-    qc.u3(0.3, 0.2, 0.1, qr[2])
-    qc.s(qr[1])
-    qc.s(qr[2]).inverse()
-    qc.cx(qr[1], qr[2])
-    qc.barrier()
-    qc.cx(qr[0], qr[1])
-    qc.h(qr[0])
-    qc.x(qr[2]).c_if(cr, 0)
-    qc.y(qr[2]).c_if(cr, 1)
-    qc.z(qr[2]).c_if(cr, 2)
-    qc.barrier(qr)
-    qc.measure(qr[0], cr[0])
-    qc.measure(qr[1], cr[1])
-    qc.measure(qr[2], cr[2])
-    result = QP_program.get_qasm("circuitName")
-    XCTAssertEqual(len(result), 535)
 
+    func test_get_qasm_all_gates() {
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            let qc = try QP_program.get_circuit("circuitName")
+            let qr = try QP_program.get_quantum_register("qname")
+            let cr = try QP_program.get_classical_register("cname")
+            try qc.u1(0.3, qr[0])
+            try qc.u2(0.2, 0.1, qr[1])
+            try qc.u3(0.3, 0.2, 0.1, qr[2])
+            try qc.s(qr[1])
+            try qc.s(qr[2]).inverse()
+            try qc.cx(qr[1], qr[2])
+            try qc.barrier()
+            try qc.cx(qr[0], qr[1])
+            try qc.h(qr[0])
+            try qc.x(qr[2]).c_if(cr, 0)
+            try qc.y(qr[2]).c_if(cr, 1)
+            try qc.z(qr[2]).c_if(cr, 2)
+            try qc.barrier(qr)
+            try qc.measure(qr[0], cr[0])
+            try qc.measure(qr[1], cr[1])
+            try qc.measure(qr[2], cr[2])
+            let result = try QP_program.get_qasm("circuitName")
+            XCTAssertEqual(result.count, 535)
+        } catch {
+            XCTFail("test_get_qasm_all_gates: \(error)")
+        }
     }
 
     func test_get_initial_circuit() {
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
-    qc = QP_program.get_initial_circuit()
-    SDKLogger.logInfo(qc)
-
-    }
-
-    func test_save() {
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
-
-    qc = QP_program.get_circuit("circuitName")
-    qr = QP_program.get_quantum_register("qname")
-    cr = QP_program.get_classical_register("cname")
-
-    qc.u3(0.3, 0.2, 0.1, qr[0])
-    qc.h(qr[1])
-    qc.cx(qr[1], qr[2])
-    qc.barrier()
-    qc.cx(qr[0], qr[1])
-    qc.h(qr[0])
-    qc.z(qr[2]).c_if(cr, 1)
-    qc.x(qr[2]).c_if(cr, 1)
-    qc.measure(qr[0], cr[0])
-    qc.measure(qr[1], cr[1])
-
-    result = QP_program.save(self._get_resource_path("test_save.json"),
-    beauty=True)
-
-    XCTAssertEqual(result["status"], "Done")
-
-    }
-
-    func test_save_wrong() {
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
-    self.assertRaises(LookupError, QP_program.load)
-
-    }
-
-    func test_load() {
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
-
-    result = QP_program.load(self._get_resource_path("test_load.json"))
-    XCTAssertEqual(result["status"], "Done")
-
-    check_result = QP_program.get_qasm("circuitName")
-    XCTAssertEqual(len(check_result), 1872)
-
-    }
-
-    func test_load_wrong() {
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
-    self.assertRaises(LookupError, QP_program.load)
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            guard let qc = QP_program.get_initial_circuit() else {
+                XCTFail("test_get_initial_circuit: Missing initial circuit")
+                return
+            }
+            SDKLogger.logInfo(qc.description)
+        } catch {
+            XCTFail("test_get_initial_circuit: \(error)")
+        }
     }
 
     //###############################################################
@@ -424,69 +401,147 @@ class QuantumProgramTests: XCTestCase {
     //###############################################################
 
     func test_setup_api() {
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
-    QP_program.set_api(QE_TOKEN, QE_URL)
-    config = QP_program.get_api_config()
-    self.assertTrue(config)
+        guard let token = self.QE_TOKEN else {
+            return
+        }
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            try QP_program.set_api(token:token, url:QE_URL)
+            let config = QP_program.get_api_config()
+            SDKLogger.logInfo(config.description)
+        } catch {
+            XCTFail("test_setup_api: \(error)")
+        }
     }
 
     func test_available_backends_exist() {
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
-    QP_program.set_api(QE_TOKEN, QE_URL)
-    available_backends = QP_program.available_backends()
-    self.assertTrue(available_backends)
-
+        guard let token = self.QE_TOKEN else {
+            return
+        }
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            try QP_program.set_api(token:token, url:QE_URL)
+            let asyncExpectation = self.expectation(description: "test_available_backends_exist")
+            QP_program.available_backends() { (available_backends,error) in
+                if error != nil {
+                    XCTFail("Failure in test_available_backends_exist: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                SDKLogger.logInfo(available_backends.description)
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_available_backends_exist")
+            })
+        } catch {
+            XCTFail("test_available_backends_exist: \(error)")
+        }
     }
 
     func test_local_backends_exist() {
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
-    local_backends = qiskit.backends.local_backends()
-    self.assertTrue(local_backends)
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            let local_backends = QP_program.local_backends()
+            SDKLogger.logInfo(local_backends.description)
+        } catch {
+            XCTFail("test_local_backends_exist: \(error)")
+        }
     }
 
     func test_online_backends_exist() {
-    // TODO: Jay should we check if we the QX is online before runing.
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
-    QP_program.set_api(QE_TOKEN, QE_URL)
-    online_backends = QP_program.online_backends()
-    SDKLogger.logInfo(online_backends)
-    self.assertTrue(online_backends)
+        guard let token = self.QE_TOKEN else {
+            return
+        }
+        do {
+            // TODO: should we check if we the QX is online before running
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            try QP_program.set_api(token:token, url:QE_URL)
+            let asyncExpectation = self.expectation(description: "test_available_backends_exist")
+            QP_program.online_backends()  { (online_backends,error) in
+                if error != nil {
+                    XCTFail("Failure in test_online_backends_exist: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                SDKLogger.logInfo(online_backends.description)
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_online_backends_exist")
+            })
+        } catch {
+            XCTFail("test_online_backends_exist: \(error)")
+        }
     }
 
     func test_online_devices() {
-    // TODO: Jay should we check if we the QX is online before runing.
-    qp = QuantumProgram(specs=self.QPS_SPECS)
-    qp.set_api(QE_TOKEN, QE_URL)
-    online_devices = qp.online_devices()
-    SDKLogger.logInfo(online_devices)
-    self.assertTrue(isinstance(online_devices, list))
+        guard let token = self.QE_TOKEN else {
+            return
+        }
+        do {
+            // TODO: should we check if we the QX is online before running
+            let qp = try QuantumProgram(specs: self.QPS_SPECS)
+            try qp.set_api(token:token, url:QE_URL)
+            let asyncExpectation = self.expectation(description: "test_online_devices")
+            qp.online_devices()  { (online_devices,error) in
+                if error != nil {
+                    XCTFail("Failure in test_online_devices: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                SDKLogger.logInfo(online_devices.description)
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_online_devices")
+            })
+        } catch {
+            XCTFail("test_online_devices: \(error)")
+        }
     }
 
     func test_online_simulators() {
-    // TODO: Jay should we check if we the QX is online before runing.
-    qp = QuantumProgram(specs=self.QPS_SPECS)
-    qp.set_api(QE_TOKEN, QE_URL)
-    online_simulators = qp.online_simulators()
-    SDKLogger.logInfo(online_simulators)
-    self.assertTrue(isinstance(online_simulators, list))
-
+        guard let token = self.QE_TOKEN else {
+            return
+        }
+        do {
+            // TODO: should we check if we the QX is online before running
+            let qp = try QuantumProgram(specs: self.QPS_SPECS)
+            try qp.set_api(token:token, url:QE_URL)
+            let asyncExpectation = self.expectation(description: "test_online_simulators")
+            qp.online_simulators() { (online_simulators,error) in
+                if error != nil {
+                    XCTFail("Failure in test_online_simulators: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                SDKLogger.logInfo(online_simulators.description)
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_online_devices")
+            })
+        } catch {
+            XCTFail("test_online_devices: \(error)")
+        }
     }
-
+/*
     func test_backend_status() {
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
+    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
     out = QP_program.get_backend_status("local_qasm_simulator")
     self.assertIn(out["available"], [True])
 
     }
 
     func test_backend_status_fail() {
-    qp = QuantumProgram(specs=self.QPS_SPECS)
+    qp = QuantumProgram(specs: self.QPS_SPECS)
     self.assertRaises(ValueError, qp.get_backend_status, "fail")
 
     }
 
     func test_get_backend_configuration() {
-    qp = QuantumProgram(specs=self.QPS_SPECS)
+    qp = QuantumProgram(specs: self.QPS_SPECS)
     config_keys = ["name", "simulator", "local", "description",
                    "coupling_map", "basis_gates"]
     backend_config = qp.get_backend_configuration("local_qasm_simulator")
@@ -495,14 +550,14 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_get_backend_configuration_fail() {
-        qp = QuantumProgram(specs=self.QPS_SPECS)
+        qp = QuantumProgram(specs: self.QPS_SPECS)
         // qp.get_backend_configuration("fail")
         self.assertRaises(LookupError, qp.get_backend_configuration, "fail")
     }
 
     func test_get_backend_calibration() {
-        QP_program = QuantumProgram(specs=self.QPS_SPECS)
-        QP_program.set_api(QE_TOKEN, QE_URL)
+        let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+        QP_program.set_api(token:token, url:QE_URL)
         backend_list = QP_program.online_backends()
         if backend_list {
             backend = backend_list[0]
@@ -513,8 +568,8 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_get_backend_parameters() {
-        QP_program = QuantumProgram(specs=self.QPS_SPECS)
-        QP_program.set_api(QE_TOKEN, QE_URL)
+        let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+        QP_program.set_api(token:token, url:QE_URL)
         backend_list = QP_program.online_backends()
         if backend_list {
             backend = backend_list[0]
@@ -529,7 +584,7 @@ class QuantumProgramTests: XCTestCase {
     //###############################################################
 
     func test_compile_program() {
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
+    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
     qc = QP_program.get_circuit("circuitName")
     qr = QP_program.get_quantum_register("qname")
     cr = QP_program.get_classical_register("cname")
@@ -547,7 +602,7 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_get_compiled_configuration() {
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
+    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
     qc = QP_program.get_circuit("circuitName")
     qr = QP_program.get_quantum_register("qname")
     cr = QP_program.get_classical_register("cname")
@@ -566,7 +621,7 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_get_compiled_qasm() {
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
+    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
     qc = QP_program.get_circuit("circuitName")
     qr = QP_program.get_quantum_register("qname")
     cr = QP_program.get_classical_register("cname")
@@ -585,7 +640,7 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_get_execution_list() {
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
+    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
     qc = QP_program.get_circuit("circuitName")
     qr = QP_program.get_quantum_register("qname")
     cr = QP_program.get_classical_register("cname")
@@ -604,7 +659,7 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_compile_coupling_map() {
-    QP_program = QuantumProgram()
+    let QP_program = try QuantumProgram()
     q = QP_program.create_quantum_register("q", 3)
     c = QP_program.create_classical_register("c", 3)
     qc = QP_program.create_circuit("circuitName", [q], [c])
@@ -630,7 +685,7 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_change_circuit_qobj_after_compile() {
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
+    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
     qr = QP_program.get_quantum_register("qname")
     cr = QP_program.get_classical_register("cname")
     qc2 = QP_program.create_circuit("qc2", [qr], [cr])
@@ -671,7 +726,7 @@ class QuantumProgramTests: XCTestCase {
     //###############################################################
 
     func test_run_program() {
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
+    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
     qr = QP_program.get_quantum_register("qname")
     cr = QP_program.get_classical_register("cname")
     qc2 = QP_program.create_circuit("qc2", [qr], [cr])
@@ -712,7 +767,7 @@ class QuantumProgramTests: XCTestCase {
     finally:
     self.qp_program_finished = True
 
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
+    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
     qr = QP_program.get_quantum_register("qname")
     cr = QP_program.get_classical_register("cname")
     qc2 = QP_program.create_circuit("qc2", [qr], [cr])
@@ -743,7 +798,7 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_run_batch() {
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
+    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
     qr = QP_program.get_quantum_register("qname")
     cr = QP_program.get_classical_register("cname")
     qc2 = QP_program.create_circuit("qc2", [qr], [cr])
@@ -795,7 +850,7 @@ class QuantumProgramTests: XCTestCase {
     finally:
     self.qp_program_finished = True
 
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
+    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
     qr = QP_program.get_quantum_register("qname")
     cr = QP_program.get_classical_register("cname")
     qc2 = QP_program.create_circuit("qc2", [qr], [cr])
@@ -832,7 +887,7 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_combine_results() {
-    QP_program = QuantumProgram()
+    let QP_program = try QuantumProgram()
     qr = QP_program.create_quantum_register("qr", 1)
     cr = QP_program.create_classical_register("cr", 1)
     qc1 = QP_program.create_circuit("qc1", [qr], [cr])
@@ -853,7 +908,7 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_local_qasm_simulator() {
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
+    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
     qr = QP_program.get_quantum_register("qname")
     cr = QP_program.get_classical_register("cname")
     qc2 = QP_program.create_circuit("qc2", [qr], [cr])
@@ -884,7 +939,7 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_local_qasm_simulator_one_shot() {
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
+    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
     qr = QP_program.get_quantum_register("qname")
     cr = QP_program.get_classical_register("cname")
     qc2 = QP_program.create_circuit("qc2", [qr], [cr])
@@ -916,7 +971,7 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_local_unitary_simulator() {
-    QP_program = QuantumProgram()
+    let QP_program = try QuantumProgram()
     q = QP_program.create_quantum_register("q", 2)
     c = QP_program.create_classical_register("c", 2)
     qc1 = QP_program.create_circuit("qc1", [q], [c])
@@ -941,7 +996,7 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_run_program_map() {
-    QP_program = QuantumProgram()
+    let QP_program = try QuantumProgram()
     backend = "local_qasm_simulator"  // the backend to run on
     shots = 100  // the number of shots in the experiment.
     max_credits = 3
@@ -961,7 +1016,7 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_execute_program_map() {
-    QP_program = QuantumProgram()
+    let QP_program = try QuantumProgram()
     backend = "local_qasm_simulator"  // the backend to run on
     shots = 100  // the number of shots in the experiment.
     max_credits = 3
@@ -980,7 +1035,7 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_average_data() {
-    QP_program = QuantumProgram()
+    let QP_program = try QuantumProgram()
     q = QP_program.create_quantum_register("q", 2)
     c = QP_program.create_classical_register("c", 2)
     qc = QP_program.create_circuit("qc", [q], [c])
@@ -1005,14 +1060,14 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_execute_one_circuit_simulator_online() {
-    QP_program = QuantumProgram()
+    let QP_program = try QuantumProgram()
     qr = QP_program.create_quantum_register("q", 1)
     cr = QP_program.create_classical_register("c", 1)
     qc = QP_program.create_circuit("qc", [qr], [cr])
     qc.h(qr[0])
     qc.measure(qr[0], cr[0])
     shots = 1024  // the number of shots in the experiment.
-    QP_program.set_api(QE_TOKEN, QE_URL)
+    QP_program.set_api(token:token, url:QE_URL)
     backend = QP_program.online_simulators()[0]
     # print(backend)
     result = QP_program.execute(["qc"], backend=backend,
@@ -1023,14 +1078,14 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_simulator_online_size() {
-    QP_program = QuantumProgram()
+    let QP_program = try QuantumProgram()
     qr = QP_program.create_quantum_register("q", 25)
     cr = QP_program.create_classical_register("c", 25)
     qc = QP_program.create_circuit("qc", [qr], [cr])
     qc.h(qr)
     qc.measure(qr, cr)
     shots = 1  // the number of shots in the experiment.
-    QP_program.set_api(QE_TOKEN, QE_URL)
+    QP_program.set_api(token:token, url:QE_URL)
     backend = "ibmqx_qasm_simulator"
     result = QP_program.execute(["qc"], backend=backend,
                                 shots=shots, max_credits=3,
@@ -1039,7 +1094,7 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_execute_several_circuits_simulator_online() {
-    QP_program = QuantumProgram()
+    let QP_program = try QuantumProgram()
     qr = QP_program.create_quantum_register("q", 2)
     cr = QP_program.create_classical_register("c", 2)
     qc1 = QP_program.create_circuit("qc1", [qr], [cr])
@@ -1053,7 +1108,7 @@ class QuantumProgramTests: XCTestCase {
     qc2.measure(qr[1], cr[1])
     circuits = ["qc1", "qc2"]
     shots = 1024  // the number of shots in the experiment.
-    QP_program.set_api(QE_TOKEN, QE_URL)
+    QP_program.set_api(token:token, url:QE_URL)
     backend = QP_program.online_simulators()[0]
     result = QP_program.execute(circuits, backend=backend, shots=shots,
     max_credits=3, seed=1287126141)
@@ -1064,13 +1119,13 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_execute_one_circuit_real_online() {
-    QP_program = QuantumProgram()
+    let QP_program = try QuantumProgram()
     qr = QP_program.create_quantum_register("qr", 1)
     cr = QP_program.create_classical_register("cr", 1)
     qc = QP_program.create_circuit("circuitName", [qr], [cr])
     qc.h(qr)
     qc.measure(qr[0], cr[0])
-    QP_program.set_api(QE_TOKEN, QE_URL)
+    QP_program.set_api(token:token, url:QE_URL)
     backend = "ibmqx_qasm_simulator"
     shots = 1  // the number of shots in the experiment.
     status = QP_program.get_backend_status(backend)
@@ -1084,7 +1139,7 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_local_qasm_simulator_two_registers() {
-    QP_program = QuantumProgram()
+    let QP_program = try QuantumProgram()
     q1 = QP_program.create_quantum_register("q1", 2)
     c1 = QP_program.create_classical_register("c1", 2)
     q2 = QP_program.create_quantum_register("q2", 2)
@@ -1115,7 +1170,7 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_online_qasm_simulator_two_registers() {
-    QP_program = QuantumProgram()
+    let QP_program = try QuantumProgram()
     q1 = QP_program.create_quantum_register("q1", 2)
     c1 = QP_program.create_classical_register("c1", 2)
     q2 = QP_program.create_quantum_register("q2", 2)
@@ -1135,7 +1190,7 @@ class QuantumProgramTests: XCTestCase {
     qc2.measure(q2[1], c2[1])
     circuits = ["qc1", "qc2"]
     shots = 1024  # the number of shots in the experiment.
-    QP_program.set_api(QE_TOKEN, QE_URL)
+    QP_program.set_api(token:token, url:QE_URL)
     backend = QP_program.online_simulators()[0]
     result = QP_program.execute(circuits, backend=backend, shots=shots,
     seed=8458)
@@ -1150,7 +1205,7 @@ class QuantumProgramTests: XCTestCase {
     //###############################################################
 
     func test_add_circuit() {
-    QP_program = QuantumProgram()
+    let QP_program = try QuantumProgram()
     qr = QP_program.create_quantum_register("qr", 2)
     cr = QP_program.create_classical_register("cr", 2)
     qc1 = QP_program.create_circuit("qc1", [qr], [cr])
@@ -1172,7 +1227,7 @@ class QuantumProgramTests: XCTestCase {
     }
 
     func test_add_circuit_fail() {
-    QP_program = QuantumProgram()
+    let QP_program = try QuantumProgram()
     qr = QP_program.create_quantum_register("qr", 1)
     cr = QP_program.create_classical_register("cr", 1)
     q = QP_program.create_quantum_register("q", 1)
@@ -1215,7 +1270,7 @@ class QuantumProgramTests: XCTestCase {
     }]}
     ]
     }
-    qp = QuantumProgram(specs=QPS_SPECS)
+    qp = QuantumProgram(specs: QPS_SPECS)
     ghz = qp.get_circuit("ghz")
     bell = qp.get_circuit("bell")
     q = qp.get_quantum_register("q")
@@ -1280,8 +1335,8 @@ class QuantumProgramTests: XCTestCase {
     ]
     }]
     }
-    qp = QuantumProgram(specs=QPS_SPECS)
-    qp.set_api(QE_TOKEN, QE_URL)
+    qp = QuantumProgram(specs: QPS_SPECS)
+    qp.set_api(token:token, url:QE_URL)
     if backend not in qp.online_simulators():
     unittest.skip("backend "{}" not available".format(backend))
     qc = qp.get_circuit("swapping")
@@ -1330,7 +1385,7 @@ class QuantumProgramTests: XCTestCase {
 
     Test for the "local_unitary_simulator" and "local_qasm_simulator"
     """
-    QP_program = QuantumProgram()
+    let QP_program = try QuantumProgram()
     metadata = {"testval":5}
     q = QP_program.create_quantum_register("q", 2)
     c = QP_program.create_classical_register("c", 2)
@@ -1371,7 +1426,7 @@ class QuantumProgramTests: XCTestCase {
     """Test the results of the qubitpol function in Results. Do two 2Q circuits
     in the first do nothing and in the second do X on the first qubit.
     """
-    QP_program = QuantumProgram()
+    let QP_program = try QuantumProgram()
     q = QP_program.create_quantum_register("q", 2)
     c = QP_program.create_classical_register("c", 2)
     qc1 = QP_program.create_circuit("qc1", [q], [c])
@@ -1393,7 +1448,7 @@ class QuantumProgramTests: XCTestCase {
     """Test reconfiguring the qobj from 1024 shots to 2048 using
     reconfig instead of recompile
     """
-    QP_program = QuantumProgram(specs=self.QPS_SPECS)
+    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
     qr = QP_program.get_quantum_register("qname")
     cr = QP_program.get_classical_register("cname")
     qc2 = QP_program.create_circuit("qc2", [qr], [cr])

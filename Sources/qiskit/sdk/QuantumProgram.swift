@@ -77,7 +77,7 @@ public final class QProgram {
     }
 }
 
-public final class APIConfig {
+public final class APIConfig: CustomStringConvertible {
     public let token: String
     public let url: URL
 
@@ -87,6 +87,10 @@ public final class APIConfig {
         }
         self.token = token
         self.url = u
+    }
+
+    public var description: String {
+        return "{\"token\":\"\(self.token)\", \"url\":\"\(self.url.absoluteString)\"}"
     }
 }
 
@@ -647,6 +651,13 @@ public final class QuantumProgram: CustomStringConvertible {
             ret.formUnion(self.backendUtils.local_backends())
             responseHandler(ret,nil)
         }
+    }
+
+    /**
+     Local backends that are seen by QISKIT.
+     */
+    public func local_backends() -> Set<String> {
+        return self.backendUtils.local_backends()
     }
 
     /**
