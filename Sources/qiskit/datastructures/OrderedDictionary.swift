@@ -15,7 +15,11 @@
 
 import Foundation
 
-public struct OrderedDictionary<KeyType: Hashable, ValueType>: Sequence, CustomStringConvertible {
+public struct OrderedDictionary<KeyType: Hashable, ValueType>: Sequence, ExpressibleByDictionaryLiteral, CustomStringConvertible {
+
+    public typealias Key = KeyType
+
+    public typealias Value = ValueType
 
     public private(set) var keys: [KeyType] = []
     private var keyValues: [KeyType:ValueType] = [:]
@@ -51,6 +55,13 @@ public struct OrderedDictionary<KeyType: Hashable, ValueType>: Sequence, CustomS
     }
 
     public init() {
+    }
+
+    public init(dictionaryLiteral elements: (KeyType, ValueType)...) {
+        self.init()
+        for (key, value) in elements {
+            self[key] = value
+        }
     }
 
     public func makeIterator() -> AnyIterator<(KeyType,ValueType)> {

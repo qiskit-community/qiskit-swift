@@ -1170,8 +1170,8 @@ public final class QuantumProgram: CustomStringConvertible {
                 }
             }
         }
-        if let circuits = qobj["circuits"] as? [String:[String:Any]] {
-            for (_,circuit) in circuits {
+        if let circuits = qobj["circuits"] as? [[String:Any]] {
+            for circuit in circuits {
                 if let name = circuit["name"] as? String {
                     execution_list.append(name)
                     SDKLogger.logInfo("  circuit name: \(name)")

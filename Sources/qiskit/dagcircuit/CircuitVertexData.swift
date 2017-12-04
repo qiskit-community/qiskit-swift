@@ -95,14 +95,25 @@ final class CircuitVertexOpData: CircuitVertexData {
     var name: String
     var qargs: [RegBit]
     var cargs: [RegBit]
-    var params: [String]
+    var params: [String] {
+        get {
+            // Just to conform to Python SDK for now
+            return self._params.map() {
+                return ($0 == "0.000000000000000") ? "0.0" : $0
+            }
+        }
+        set {
+            return self._params = newValue
+        }
+    }
     var condition: RegBit?
+    private var _params: [String]
 
     init(_ name: String,_ qargs: [RegBit], _ cargs: [RegBit], _ params: [String], _ condition: RegBit?) {
         self.name = name
         self.qargs = qargs
         self.cargs = cargs
-        self.params = params
+        self._params = params
         self.condition = condition
         super.init("op")
     }
@@ -111,7 +122,7 @@ final class CircuitVertexOpData: CircuitVertexData {
         self.name = instance.name
         self.qargs = instance.qargs
         self.cargs = instance.cargs
-        self.params = instance.params
+        self._params = instance._params
         self.condition = instance.condition
         super.init(instance)
     }

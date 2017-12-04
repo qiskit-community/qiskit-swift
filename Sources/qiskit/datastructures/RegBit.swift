@@ -34,8 +34,12 @@ public struct RegBit: Hashable, CustomStringConvertible {
         return self.qasm
     }
 
-    init(_ name: String, _ index: Int) {
+    public init(_ name: String, _ index: Int) {
         self.tuple = HashableTuple<String,Int>(name,index)
+    }
+
+    public init(_ value: (String,Int)) {
+        self.tuple = HashableTuple<String,Int>(value.0,value.1)
     }
 
     public static func qasm(_ name: String, _ index: Int) -> String {

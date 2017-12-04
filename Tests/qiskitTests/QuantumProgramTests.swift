@@ -52,7 +52,17 @@ class QuantumProgramTests: XCTestCase {
         ("test_local_backends_exist",test_local_backends_exist),
         ("test_online_backends_exist",test_online_backends_exist),
         ("test_online_devices",test_online_devices),
-        ("test_online_simulators",test_online_simulators)
+        ("test_online_simulators",test_online_simulators),
+        ("test_backend_status",test_backend_status),
+        ("test_get_backend_configuration",test_get_backend_configuration),
+        ("test_get_backend_configuration_fail",test_get_backend_configuration_fail),
+        ("test_get_backend_calibration",test_get_backend_calibration),
+        ("test_get_backend_parameters",test_get_backend_parameters),
+        ("test_compile_program",test_compile_program),
+        ("test_get_compiled_configuration",test_get_compiled_configuration),
+        ("test_get_compiled_qasm",test_get_compiled_qasm),
+        ("test_get_execution_list",test_get_execution_list),
+        ("test_compile_coupling_map",test_compile_coupling_map)
     ]
     //#endif
 
@@ -605,60 +615,163 @@ class QuantumProgramTests: XCTestCase {
                 XCTAssertNil(error, "Failure in test_online_devices")
             })
         } catch {
-            XCTFail("test_online_devices: \(error)")
+            XCTFail("test_online_simulators: \(error)")
         }
     }
-/*
+
     func test_backend_status() {
-    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-    out = QP_program.get_backend_status("local_qasm_simulator")
-    self.assertIn(out["available"], [True])
-
-    }
-
-    func test_backend_status_fail() {
-    qp = QuantumProgram(specs: self.QPS_SPECS)
-    self.assertRaises(ValueError, qp.get_backend_status, "fail")
-
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            let asyncExpectation = self.expectation(description: "test_backend_status")
+            QP_program.get_backend_status("local_qasm_simulator") { (status,error) in
+                if error != nil {
+                    XCTFail("Failure in test_backend_status: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                SDKLogger.logInfo(status)
+                guard let available = status["available"] as? Bool else {
+                    XCTFail("test_backend_status: Missing status.")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                XCTAssertEqual(available, true)
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_backend_status")
+            })
+        } catch {
+            XCTFail("test_backend_status: \(error)")
+        }
     }
 
     func test_get_backend_configuration() {
-    qp = QuantumProgram(specs: self.QPS_SPECS)
-    config_keys = ["name", "simulator", "local", "description",
-                   "coupling_map", "basis_gates"]
-    backend_config = qp.get_backend_configuration("local_qasm_simulator")
-    self.assertTrue(config_keys < backend_config.keys())
-
+        do {
+            let qp = try QuantumProgram(specs: self.QPS_SPECS)
+            let config_keys = ["name", "simulator", "local", "description",
+                               "coupling_map", "basis_gates"]
+            let asyncExpectation = self.expectation(description: "test_get_backend_configuration")
+            qp.get_backend_configuration("local_qasm_simulator")  { (backend_config,error) in
+                if error != nil {
+                    XCTFail("Failure in test_get_backend_configuration: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                SDKLogger.logInfo(backend_config)
+                XCTAssert(config_keys.count < backend_config.keys.count)
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_get_backend_configuration")
+            })
+        } catch {
+            XCTFail("test_get_backend_configuration: \(error)")
+        }
     }
 
     func test_get_backend_configuration_fail() {
-        qp = QuantumProgram(specs: self.QPS_SPECS)
-        // qp.get_backend_configuration("fail")
-        self.assertRaises(LookupError, qp.get_backend_configuration, "fail")
+        do {
+            let qp = try QuantumProgram(specs: self.QPS_SPECS)
+            let asyncExpectation = self.expectation(description: "test_get_backend_configuration_fail")
+            qp.get_backend_configuration("fail")  { (backend_config,error) in
+                if error != nil {
+                    switch error! {
+                    case IBMQuantumExperienceError.badBackendError(let backend):
+                        SDKLogger.logInfo(backend)
+                        break
+                    default:
+                        XCTFail("test_get_backend_configuration_fail: \(error!)")
+                    }
+                    asyncExpectation.fulfill()
+                    return
+                }
+                SDKLogger.logInfo(backend_config)
+                XCTFail("test_get_backend_configuration_fail should have failed.")
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_get_backend_configuration_fail")
+            })
+        } catch {
+            XCTFail("test_get_backend_configuration_fail: \(error)")
+        }
     }
 
     func test_get_backend_calibration() {
-        let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-        QP_program.set_api(token:token, url:QE_URL)
-        backend_list = QP_program.online_backends()
-        if backend_list {
-            backend = backend_list[0]
+        guard let token = self.QE_TOKEN else {
+            return
         }
-        result = QP_program.get_backend_calibration(backend)
-        SDKLogger.logInfo(result)
-        XCTAssertEqual(result.count, 4)
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            try QP_program.set_api(token:token, url:QE_URL)
+            let asyncExpectation = self.expectation(description: "test_get_backend_calibration")
+            QP_program.online_backends() { (backend_list,error) in
+                if error != nil {
+                    XCTFail("Failure in test_get_backend_calibration: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                if let backend = backend_list.first {
+                    QP_program.get_backend_calibration(backend)  { (result,error) in
+                        if error != nil {
+                            XCTFail("Failure in test_get_backend_calibration: \(error!.localizedDescription)")
+                            asyncExpectation.fulfill()
+                            return
+                        }
+                        SDKLogger.logInfo(result)
+                        XCTAssertEqual(result.count, 4)
+                        asyncExpectation.fulfill()
+                    }
+                }
+                else {
+                    asyncExpectation.fulfill()
+                }
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_get_backend_calibration")
+            })
+        } catch {
+            XCTFail("test_get_backend_calibration: \(error)")
+        }
     }
 
     func test_get_backend_parameters() {
-        let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-        QP_program.set_api(token:token, url:QE_URL)
-        backend_list = QP_program.online_backends()
-        if backend_list {
-            backend = backend_list[0]
+        guard let token = self.QE_TOKEN else {
+            return
         }
-        result = QP_program.get_backend_parameters(backend)
-        SDKLogger.logInfo(result)
-        XCTAssertEqual(len(result), 4)
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            try QP_program.set_api(token:token, url:QE_URL)
+            let asyncExpectation = self.expectation(description: "test_get_backend_parameters")
+            QP_program.online_backends() { (backend_list,error) in
+                if error != nil {
+                    XCTFail("Failure in test_get_backend_parameters: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                if let backend = backend_list.first {
+                    QP_program.get_backend_parameters(backend)  { (result,error) in
+                        if error != nil {
+                            XCTFail("Failure in test_get_backend_parameters: \(error!.localizedDescription)")
+                            asyncExpectation.fulfill()
+                            return
+                        }
+                        SDKLogger.logInfo(result)
+                        XCTAssertEqual(result.count, 4)
+                        asyncExpectation.fulfill()
+                    }
+                }
+                else {
+                    asyncExpectation.fulfill()
+                }
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_get_backend_parameters")
+            })
+        } catch {
+            XCTFail("test_get_backend_parameters: \(error)")
+        }
     }
 
     //###############################################################
@@ -666,106 +779,139 @@ class QuantumProgramTests: XCTestCase {
     //###############################################################
 
     func test_compile_program() {
-    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-    qc = QP_program.get_circuit("circuitName")
-    qr = QP_program.get_quantum_register("qname")
-    cr = QP_program.get_classical_register("cname")
-    qc.h(qr[0])
-    qc.cx(qr[0], qr[1])
-    qc.measure(qr[0], cr[0])
-    qc.measure(qr[1], cr[1])
-    backend = "test"
-    coupling_map = None
-    out = QP_program.compile(["circuitName"], backend=backend,
-    coupling_map=coupling_map, qobj_id="cooljob")
-    SDKLogger.logInfo(out)
-    XCTAssertEqual(len(out), 3)
-
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            let qc = try QP_program.get_circuit("circuitName")
+            let qr = try QP_program.get_quantum_register("qname")
+            let cr = try QP_program.get_classical_register("cname")
+            try qc.h(qr[0])
+            try qc.cx(qr[0], qr[1])
+            try qc.measure(qr[0], cr[0])
+            try qc.measure(qr[1], cr[1])
+            let backend = "test"
+            let coupling_map: [Int:[Int]]? = nil
+            let out = try QP_program.compile(["circuitName"], backend: backend,
+                                         coupling_map: coupling_map, qobj_id: "cooljob")
+            SDKLogger.logInfo(out)
+            XCTAssertEqual(out.count, 3)
+        } catch {
+            XCTFail("test_compile_program: \(error)")
+        }
     }
 
     func test_get_compiled_configuration() {
-    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-    qc = QP_program.get_circuit("circuitName")
-    qr = QP_program.get_quantum_register("qname")
-    cr = QP_program.get_classical_register("cname")
-    qc.h(qr[0])
-    qc.cx(qr[0], qr[1])
-    qc.measure(qr[0], cr[0])
-    qc.measure(qr[1], cr[1])
-    backend = "local_qasm_simulator"
-    coupling_map = None
-    qobj = QP_program.compile(["circuitName"], backend=backend,
-    coupling_map=coupling_map)
-    result = QP_program.get_compiled_configuration(qobj, "circuitName")
-    SDKLogger.logInfo(result)
-    XCTAssertEqual(len(result), 4)
-
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            let qc = try QP_program.get_circuit("circuitName")
+            let qr = try QP_program.get_quantum_register("qname")
+            let cr = try QP_program.get_classical_register("cname")
+            try qc.h(qr[0])
+            try qc.cx(qr[0], qr[1])
+            try qc.measure(qr[0], cr[0])
+            try qc.measure(qr[1], cr[1])
+            let backend = "local_qasm_simulator"
+            let coupling_map: [Int:[Int]]? = nil
+            let qobj = try QP_program.compile(["circuitName"], backend: backend,
+                                          coupling_map: coupling_map)
+            let result = try QP_program.get_compiled_configuration(qobj, "circuitName")
+            SDKLogger.logInfo(result)
+            XCTAssertEqual(result.count, 4)
+        } catch {
+            XCTFail("test_compile_program: \(error)")
+        }
     }
 
     func test_get_compiled_qasm() {
-    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-    qc = QP_program.get_circuit("circuitName")
-    qr = QP_program.get_quantum_register("qname")
-    cr = QP_program.get_classical_register("cname")
-    qc.h(qr[0])
-    qc.cx(qr[0], qr[1])
-    qc.measure(qr[0], cr[0])
-    qc.measure(qr[1], cr[1])
-    backend = "local_qasm_simulator"
-    coupling_map = None
-    qobj = QP_program.compile(["circuitName"], backend=backend,
-    coupling_map=coupling_map)
-    result = QP_program.get_compiled_qasm(qobj, "circuitName")
-    SDKLogger.logInfo(result)
-    XCTAssertEqual(len(result), 184)
-
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            let qc = try QP_program.get_circuit("circuitName")
+            let qr = try QP_program.get_quantum_register("qname")
+            let cr = try QP_program.get_classical_register("cname")
+            try qc.h(qr[0])
+            try qc.cx(qr[0], qr[1])
+            try qc.measure(qr[0], cr[0])
+            try qc.measure(qr[1], cr[1])
+            let backend = "local_qasm_simulator"
+            let coupling_map: [Int:[Int]]? = nil
+            let qobj = try QP_program.compile(["circuitName"], backend: backend,
+                                              coupling_map: coupling_map)
+            let result = try QP_program.get_compiled_qasm(qobj, "circuitName")
+            SDKLogger.logInfo(result)
+            XCTAssertEqual(result.count, 184)
+        } catch {
+            XCTFail("test_get_compiled_qasm: \(error)")
+        }
     }
 
     func test_get_execution_list() {
-    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-    qc = QP_program.get_circuit("circuitName")
-    qr = QP_program.get_quantum_register("qname")
-    cr = QP_program.get_classical_register("cname")
-    qc.h(qr[0])
-    qc.cx(qr[0], qr[1])
-    qc.measure(qr[0], cr[0])
-    qc.measure(qr[1], cr[1])
-    backend = "local_qasm_simulator"
-    coupling_map = None
-    qobj = QP_program.compile(["circuitName"], backend=backend,
-    coupling_map=coupling_map, qobj_id="cooljob")
-    result = QP_program.get_execution_list(qobj)
-    SDKLogger.logInfo(result)
-    XCTAssertEqual(result, ["circuitName"])
-
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            let qc = try QP_program.get_circuit("circuitName")
+            let qr = try QP_program.get_quantum_register("qname")
+            let cr = try QP_program.get_classical_register("cname")
+            try qc.h(qr[0])
+            try qc.cx(qr[0], qr[1])
+            try qc.measure(qr[0], cr[0])
+            try qc.measure(qr[1], cr[1])
+            let backend = "local_qasm_simulator"
+            let coupling_map: [Int:[Int]]? = nil
+            let qobj = try QP_program.compile(["circuitName"], backend: backend,
+                                          coupling_map: coupling_map, qobj_id: "cooljob")
+            let result = QP_program.get_execution_list(qobj)
+            SDKLogger.logInfo(result)
+            XCTAssertEqual(result, ["circuitName"])
+        } catch {
+            XCTFail("test_get_execution_list: \(error)")
+        }
     }
 
     func test_compile_coupling_map() {
-    let QP_program = try QuantumProgram()
-    q = QP_program.create_quantum_register("q", 3)
-    c = QP_program.create_classical_register("c", 3)
-    qc = QP_program.create_circuit("circuitName", [q], [c])
-    qc.h(q[0])
-    qc.cx(q[0], q[1])
-    qc.cx(q[0], q[2])
-    qc.measure(q[0], c[0])
-    qc.measure(q[1], c[1])
-    qc.measure(q[2], c[2])
-    backend = "local_qasm_simulator"  // the backend to run on
-    shots = 1024  // the number of shots in the experiment.
-    coupling_map = [0: [1], 1: [2]]
-    initial_layout = [("q", 0): ("q", 0), ("q", 1): ("q", 1),
-    ("q", 2): ("q", 2)]
-    circuits = ["circuitName"]
-    qobj = QP_program.compile(circuits, backend=backend, shots=shots,
-    coupling_map=coupling_map,
-    initial_layout=initial_layout, seed=88)
-    result = QP_program.run(qobj)
-    to_check = QP_program.get_qasm("circuitName")
-    XCTAssertEqual(len(to_check), 160)
-    XCTAssertEqual(result.get_counts("circuitName"), ["000": 518, "111": 506])
+        do {
+            let QP_program = try QuantumProgram()
+            let q = try QP_program.create_quantum_register("q", 3)
+            let c = try QP_program.create_classical_register("c", 3)
+            let qc = try QP_program.create_circuit("circuitName", [q], [c])
+            try qc.h(q[0])
+            try qc.cx(q[0], q[1])
+            try qc.cx(q[0], q[2])
+            try qc.measure(q[0], c[0])
+            try qc.measure(q[1], c[1])
+            try qc.measure(q[2], c[2])
+            let backend = "local_qasm_simulator"  // the backend to run on
+            let shots = 1024  // the number of shots in the experiment.
+            let coupling_map = [0: [1], 1: [2]]
+            let initial_layout:OrderedDictionary<RegBit,RegBit> = [RegBit(("q", 0)): RegBit(("q", 0)),
+                                                                   RegBit(("q", 1)): RegBit(("q", 1)),
+                                                                   RegBit(("q", 2)): RegBit(("q", 2))]
+            let circuits = ["circuitName"]
+            let qobj = try QP_program.compile(circuits, backend: backend,
+                                          coupling_map: coupling_map, initial_layout: initial_layout,
+                                          shots: shots, seed: 88)
+            let asyncExpectation = self.expectation(description: "test_compile_coupling_map")
+            QP_program.run_async(qobj) { (result) in
+                do {
+                    if result.is_error() {
+                        XCTFail("Failure in runJob: \(result.get_error())")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    let to_check = try QP_program.get_qasm("circuitName")
+                    XCTAssertEqual(to_check.count, 160)
+                    XCTAssertEqual(try result.get_counts("circuitName"), ["000": 518, "111": 506])
+                    asyncExpectation.fulfill()
+                } catch {
+                    XCTFail("Failure in test_compile_coupling_map: \(error)")
+                    asyncExpectation.fulfill()
+                }
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_compile_coupling_map")
+            })
+        } catch {
+            XCTFail("test_compile_coupling_map: \(error)")
+        }
     }
-
+/*
     func test_change_circuit_qobj_after_compile() {
     let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
     qr = QP_program.get_quantum_register("qname")
