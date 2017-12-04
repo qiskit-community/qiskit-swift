@@ -46,15 +46,15 @@ class PauliTests: XCTestCase {
             w[2] = 1
 
             let p = Pauli(v, w)
-            SDKLogger.logInfo(p.description)
+            SDKLogger.logInfo(p)
             SDKLogger.logInfo("In label form:")
             SDKLogger.logInfo(p.to_label())
             SDKLogger.logInfo("In matrix form:")
-            SDKLogger.logInfo(try p.to_matrix().description)
+            SDKLogger.logInfo(try p.to_matrix())
 
 
             let q = Pauli.random_pauli(2)
-            SDKLogger.logInfo(q.description)
+            SDKLogger.logInfo(q)
 
             let r = Pauli.inverse_pauli(p)
             SDKLogger.logInfo("In label form:")
@@ -79,14 +79,14 @@ class PauliTests: XCTestCase {
             SDKLogger.logInfo(p1.to_label())
             SDKLogger.logInfo(p2.to_label())
             SDKLogger.logInfo(p3.to_label())
-            SDKLogger.logInfo(sgn.description)
+            SDKLogger.logInfo(sgn)
 
             SDKLogger.logInfo("sign product reverse:")
             (p3, sgn) = try Pauli.sgn_prod(p2, p1)
             SDKLogger.logInfo(p2.to_label())
             SDKLogger.logInfo(p1.to_label())
             SDKLogger.logInfo(p3.to_label())
-            SDKLogger.logInfo(sgn.description)
+            SDKLogger.logInfo(sgn)
         } catch {
             XCTFail("test_pauli: \(error)")
         }

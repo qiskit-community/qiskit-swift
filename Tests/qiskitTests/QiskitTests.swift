@@ -365,7 +365,7 @@ class QiskitTests: XCTestCase {
             }
             do {
                 SDKLogger.logInfo(try result.get_ran_qasm("circuit"))
-                SDKLogger.logInfo(try result.get_counts("circuit").description)
+                SDKLogger.logInfo(try result.get_counts("circuit"))
                 asyncExpectation.fulfill()
             } catch let error {
                 XCTFail("Failure in runJob: \(error)")

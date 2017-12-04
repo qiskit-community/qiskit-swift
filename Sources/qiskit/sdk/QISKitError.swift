@@ -55,6 +55,7 @@ public enum QISKitError: LocalizedError, CustomStringConvertible {
     case noData(name: String)
     case noCounts(name: String)
     case invalidResultsCombine
+    case invalidFile(file: String)
     case internalError(error: Error)
 
     public var errorDescription: String? {
@@ -132,6 +133,8 @@ public enum QISKitError: LocalizedError, CustomStringConvertible {
             return "'No counts for circuit \(name)"
         case .invalidResultsCombine:
             return "Result objects have different configs and cannot be combined."
+        case .invalidFile(let file):
+            return "Invalid file '\(file)'."
         case .internalError(let error):
             return error.localizedDescription
         }

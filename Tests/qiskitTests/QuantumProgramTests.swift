@@ -35,6 +35,7 @@ class QuantumProgramTests: XCTestCase {
         ("test_create_quantum_registers",test_create_quantum_registers),
         ("test_create_circuit",test_create_circuit),
         ("test_create_several_circuits",test_create_several_circuits),
+        ("test_load_qasm_file",test_load_qasm_file),
         ("test_fail_load_qasm_file",test_fail_load_qasm_file),
         ("test_load_qasm_text",test_load_qasm_text),
         ("test_get_register_and_circuit",test_get_register_and_circuit),
@@ -43,9 +44,13 @@ class QuantumProgramTests: XCTestCase {
         ("test_get_qasms",test_get_qasms),
         ("test_get_qasm_all_gates",test_get_qasm_all_gates),
         ("test_get_initial_circuit",test_get_initial_circuit),
+        ("test_save",test_save),
+        ("test_save_wrong",test_save_wrong),
+        ("test_load",test_load),
         ("test_setup_api",test_setup_api),
         ("test_available_backends_exist",test_available_backends_exist),
         ("test_local_backends_exist",test_local_backends_exist),
+        ("test_online_backends_exist",test_online_backends_exist),
         ("test_online_devices",test_online_devices),
         ("test_online_simulators",test_online_simulators)
     ]
@@ -54,6 +59,8 @@ class QuantumProgramTests: XCTestCase {
     private var QE_TOKEN: String? = nil
     private var QE_URL = Qconfig.BASEURL
     private var QPS_SPECS: [String:Any] = [:]
+    private var QASM_FILE_PATH: String = ""
+    private var QASM_FILE_PATH_2: String = ""
 
     override func setUp() {
         super.setUp()
@@ -75,11 +82,18 @@ class QuantumProgramTests: XCTestCase {
             "size": 3]]
             ]]
         ]
+        self.QASM_FILE_PATH = self._get_resource_path("entangled_registers.qasm")
+        self.QASM_FILE_PATH_2 = self._get_resource_path("plaquette_check.qasm")
     }
     
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
+    }
+
+    private func _get_resource_path(_ filename: String) -> String {
+        let path = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(filename)
+        return path.path
     }
 
     //###############################################################
@@ -89,7 +103,7 @@ class QuantumProgramTests: XCTestCase {
     func test_create_program_with_specs() {
         do {
             let result = try QuantumProgram(specs: self.QPS_SPECS)
-            SDKLogger.logInfo(result.description)
+            SDKLogger.logInfo(result)
         } catch {
             XCTFail("test_create_program_with_specs: \(error)")
         }
@@ -98,7 +112,7 @@ class QuantumProgramTests: XCTestCase {
     func test_create_program() {
         do {
             let result = try QuantumProgram()
-            SDKLogger.logInfo(result.description)
+            SDKLogger.logInfo(result)
         } catch {
             XCTFail("test_create_program: \(error)")
         }
@@ -108,7 +122,7 @@ class QuantumProgramTests: XCTestCase {
         do {
             let QP_program = try QuantumProgram()
             let cr = try QP_program.create_classical_register("cr", 3)
-            SDKLogger.logInfo(cr.description)
+            SDKLogger.logInfo(cr)
         } catch {
             XCTFail("test_create_classical_register: \(error)")
         }
@@ -118,7 +132,7 @@ class QuantumProgramTests: XCTestCase {
         do {
             let QP_program = try QuantumProgram()
             let qr = try QP_program.create_quantum_register("qr", 3)
-            SDKLogger.logInfo(qr.description)
+            SDKLogger.logInfo(qr)
         } catch {
             XCTFail("test_create_quantum_register: \(error)")
         }
@@ -187,7 +201,7 @@ class QuantumProgramTests: XCTestCase {
                                        ["name": "c2", "size": 2]]
             let crs = try QP_program.create_classical_registers(classical_registers)
             for i in crs {
-                SDKLogger.logInfo(i.description)
+                SDKLogger.logInfo(i)
             }
          } catch {
             XCTFail("test_create_classical_registers: \(error)")
@@ -201,7 +215,7 @@ class QuantumProgramTests: XCTestCase {
                                      ["name": "q2", "size": 2]]
             let qrs = try QP_program.create_quantum_registers(quantum_registers)
             for i in qrs {
-                SDKLogger.logInfo(i.description)
+                SDKLogger.logInfo(i)
             }
         } catch {
             XCTFail("test_create_quantum_registers: \(error)")
@@ -214,7 +228,7 @@ class QuantumProgramTests: XCTestCase {
             let qr = try QP_program.create_quantum_register("qr", 3)
             let cr = try QP_program.create_classical_register("cr", 3)
             let qc = try QP_program.create_circuit("qc", [qr], [cr])
-            SDKLogger.logInfo(qc.description)
+            SDKLogger.logInfo(qc)
         } catch {
             XCTFail("test_create_circuit: \(error)")
         }
@@ -230,18 +244,32 @@ class QuantumProgramTests: XCTestCase {
             let qc1 = try QP_program.create_circuit("qc1", [qr1], [cr1])
             let qc2 = try QP_program.create_circuit("qc2", [qr2], [cr2])
             let qc3 = try QP_program.create_circuit("qc2", [qr1, qr2], [cr1, cr2])
-            SDKLogger.logInfo(qc1.description)
-            SDKLogger.logInfo(qc2.description)
-            SDKLogger.logInfo(qc3.description)
+            SDKLogger.logInfo(qc1)
+            SDKLogger.logInfo(qc2)
+            SDKLogger.logInfo(qc3)
         } catch {
             XCTFail("test_create_several_circuits: \(error)")
+        }
+    }
+
+    func test_load_qasm_file() {
+        do {
+            try EntangledRegisters.QASM.write(toFile: self.QASM_FILE_PATH, atomically: true, encoding: .utf8)
+            let QP_program = try QuantumProgram()
+            let name = try QP_program.load_qasm_file(self.QASM_FILE_PATH, name:"")
+            let result = try QP_program.get_circuit(name)
+            let to_check = result.qasm()
+            SDKLogger.logInfo(to_check)
+            XCTAssertEqual(to_check.count, 554)
+        } catch {
+            XCTFail("test_load_qasm_file: \(error)")
         }
     }
 
     func test_fail_load_qasm_file() {
         do {
             let QP_program = try QuantumProgram()
-            XCTAssertThrowsError(try QP_program.load_qasm(qasm_file: "")) { (error) -> Void in
+            XCTAssertThrowsError(try QP_program.load_qasm_file("")) { (error) -> Void in
                 switch error {
                 case QasmError.internalError(let error):
                     SDKLogger.logInfo(error.localizedDescription)
@@ -281,9 +309,9 @@ class QuantumProgramTests: XCTestCase {
             let qc = try QP_program.get_circuit("circuitName")
             let qr = try QP_program.get_quantum_register("qname")
             let cr = try QP_program.get_classical_register("cname")
-            SDKLogger.logInfo(qc.description)
-            SDKLogger.logInfo(qr.description)
-            SDKLogger.logInfo(cr.description)
+            SDKLogger.logInfo(qc)
+            SDKLogger.logInfo(qr)
+            SDKLogger.logInfo(cr)
         } catch {
             XCTFail("test_get_register_and_circuit: \(error)")
         }
@@ -390,9 +418,63 @@ class QuantumProgramTests: XCTestCase {
                 XCTFail("test_get_initial_circuit: Missing initial circuit")
                 return
             }
-            SDKLogger.logInfo(qc.description)
+            SDKLogger.logInfo(qc)
         } catch {
             XCTFail("test_get_initial_circuit: \(error)")
+        }
+    }
+
+    func test_save() {
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            let qc = try QP_program.get_circuit("circuitName")
+            let qr = try QP_program.get_quantum_register("qname")
+            let cr = try QP_program.get_classical_register("cname")
+            try qc.u3(0.3, 0.2, 0.1, qr[0])
+            try qc.h(qr[1])
+            try qc.cx(qr[1], qr[2])
+            try qc.barrier()
+            try qc.cx(qr[0], qr[1])
+            try qc.h(qr[0])
+            try qc.z(qr[2]).c_if(cr, 1)
+            try qc.x(qr[2]).c_if(cr, 1)
+            try qc.measure(qr[0], cr[0])
+            try qc.measure(qr[1], cr[1])
+            let result = try QP_program.save(self._get_resource_path("test_save.json"),beauty: true)
+            SDKLogger.logInfo(result)
+        } catch {
+            XCTFail("test_save: \(error)")
+        }
+    }
+
+    func test_save_wrong() {
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            XCTAssertThrowsError(try QP_program.save("")) { (error) -> Void in
+                switch error {
+                case QISKitError.internalError(let error):
+                    SDKLogger.logInfo(error.localizedDescription)
+                default:
+                    XCTFail("test_save_wrong: \(error)")
+                }
+            }
+        } catch {
+            XCTFail("test_save_wrong: \(error)")
+        }
+    }
+
+    func test_load() {
+        do {
+            var QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            try QP_program.load_qasm_text(EntangledRegisters.QASM, name: "circuitName")
+            try QP_program.save(self._get_resource_path("test_save.json"),beauty: true)
+            QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            let result = try QP_program.load(self._get_resource_path("test_save.json"))
+            SDKLogger.logInfo(result)
+            let check_result = try QP_program.get_qasm("circuitName")
+            XCTAssertEqual(check_result.count, 554)
+        } catch {
+            XCTFail("test_load: \(error)")
         }
     }
 
@@ -408,7 +490,7 @@ class QuantumProgramTests: XCTestCase {
             let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
             try QP_program.set_api(token:token, url:QE_URL)
             let config = QP_program.get_api_config()
-            SDKLogger.logInfo(config.description)
+            SDKLogger.logInfo(config)
         } catch {
             XCTFail("test_setup_api: \(error)")
         }
@@ -428,7 +510,7 @@ class QuantumProgramTests: XCTestCase {
                     asyncExpectation.fulfill()
                     return
                 }
-                SDKLogger.logInfo(available_backends.description)
+                SDKLogger.logInfo(available_backends)
                 asyncExpectation.fulfill()
             }
             self.waitForExpectations(timeout: 180, handler: { (error) in
@@ -443,7 +525,7 @@ class QuantumProgramTests: XCTestCase {
         do {
             let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
             let local_backends = QP_program.local_backends()
-            SDKLogger.logInfo(local_backends.description)
+            SDKLogger.logInfo(local_backends)
         } catch {
             XCTFail("test_local_backends_exist: \(error)")
         }
@@ -464,7 +546,7 @@ class QuantumProgramTests: XCTestCase {
                     asyncExpectation.fulfill()
                     return
                 }
-                SDKLogger.logInfo(online_backends.description)
+                SDKLogger.logInfo(online_backends)
                 asyncExpectation.fulfill()
             }
             self.waitForExpectations(timeout: 180, handler: { (error) in
@@ -490,7 +572,7 @@ class QuantumProgramTests: XCTestCase {
                     asyncExpectation.fulfill()
                     return
                 }
-                SDKLogger.logInfo(online_devices.description)
+                SDKLogger.logInfo(online_devices)
                 asyncExpectation.fulfill()
             }
             self.waitForExpectations(timeout: 180, handler: { (error) in
@@ -516,7 +598,7 @@ class QuantumProgramTests: XCTestCase {
                     asyncExpectation.fulfill()
                     return
                 }
-                SDKLogger.logInfo(online_simulators.description)
+                SDKLogger.logInfo(online_simulators)
                 asyncExpectation.fulfill()
             }
             self.waitForExpectations(timeout: 180, handler: { (error) in

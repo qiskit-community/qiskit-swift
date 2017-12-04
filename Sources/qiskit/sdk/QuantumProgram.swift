@@ -58,22 +58,32 @@ Class internal properties.
 //# TODO: Jay: coupling_map, basis_gates will move into a config object
 //# only exists once you set the api to use the online backends
 
-public final class QCircuit {
+public final class QCircuit: CustomStringConvertible {
     public let name: String
     public let circuit: QuantumCircuit
     public private(set) var execution: [String:Any] = [:]
 
-    init(_ name: String, _ circuit: QuantumCircuit) {
+    fileprivate init(_ name: String, _ circuit: QuantumCircuit) {
         self.name = name
         self.circuit = circuit
     }
+
+    public var description: String {
+        return ["name"      : self.name,
+                "circuit"   : self.circuit.description,
+                "execution" : self.execution].description
+    }
 }
 
-public final class QProgram {
+public final class QProgram: CustomStringConvertible {
     public private(set) var circuits: OrderedDictionary<String,QCircuit> = OrderedDictionary<String,QCircuit>()
 
     func setCircuit(_ name: String, _ circuit: QCircuit) {
         self.circuits[name] = circuit
+    }
+
+    public var description: String {
+        return self.circuits.description
     }
 }
 
@@ -388,14 +398,15 @@ public final class QuantumProgram: CustomStringConvertible {
         Adds a quantum circuit with the gates given in the qasm file to the
         quantum program and returns the name to be used to get this circuit
      */
-     func load_qasm(qasm_file: String, name: String? = nil, basis_gates: String = "u1,u2,u3,cx,id") throws -> String {
+    @discardableResult
+    public func load_qasm_file(_ qasm_file: String, name: String? = nil, basis_gates: String = "u1,u2,u3,cx,id") throws -> String {
         var n: String = ""
         if name != nil {
             n = name!
         }
         else {
             let url = URL(fileURLWithPath: qasm_file)
-            n = url.lastPathComponent 
+            n = url.lastPathComponent
         }
         return try self.load_qasm(Qasm(filename:qasm_file),n,basis_gates)
      }
@@ -574,7 +585,8 @@ public final class QuantumProgram: CustomStringConvertible {
      Returns:
         The dictionary with the result of the operation
      */
-    public func save(_ file_name: String, _ beauty: Bool = false) throws -> [String:[String:Any]] {
+    @discardableResult
+    public func save(_ file_name: String, beauty: Bool = false) throws -> [String:[String:Any]] {
         let (contents,elements_saved) = try self.getSaveElements()
         do {
             try contents.write(toFile: file_name, atomically: true, encoding: .utf8)
@@ -613,8 +625,10 @@ public final class QuantumProgram: CustomStringConvertible {
     public func load(_ file_name: String) throws -> QProgram {
         let elements_loaded = QProgram()
         do {
-            let file = FileHandle(forReadingAtPath: file_name)
-            let data = file!.readDataToEndOfFile()
+            guard let file = FileHandle(forReadingAtPath: file_name) else {
+                throw QISKitError.invalidFile(file: file_name)
+            }
+            let data = file.readDataToEndOfFile()
             let jsonAny = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
 
             if let dict = jsonAny as? [String:[String:Any]] {

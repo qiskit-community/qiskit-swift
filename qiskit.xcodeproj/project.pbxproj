@@ -285,6 +285,8 @@
 		698445241FCF59BD00F600A9 /* CompositeGateComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698445221FCF59B100F600A9 /* CompositeGateComponent.swift */; };
 		698445251FCF59C300F600A9 /* InstructionComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698445201FCF0C5300F600A9 /* InstructionComponent.swift */; };
 		699CAF671FC489A200402C05 /* ToolsError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 699CAF661FC489A200402C05 /* ToolsError.swift */; };
+		69ABEA2C1FD4D573006B9BBC /* entangled_registers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69ABEA291FD4D56E006B9BBC /* entangled_registers.swift */; };
+		69ABEA2D1FD4D578006B9BBC /* plaquette_check.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69ABEA281FD4D56E006B9BBC /* plaquette_check.swift */; };
 		69B5722D1FD0FF2A00B8C649 /* QI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694001E01FD0BC9900299E1A /* QI.swift */; };
 		69BB5A4B1FCD2169005AAE32 /* VectorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69BB5A4A1FCD2168005AAE32 /* VectorError.swift */; };
 		69BB5A4C1FCD2178005AAE32 /* VectorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69BB5A4A1FCD2168005AAE32 /* VectorError.swift */; };
@@ -483,6 +485,8 @@
 		698445201FCF0C5300F600A9 /* InstructionComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = InstructionComponent.swift; path = Sources/qiskit/sdk/InstructionComponent.swift; sourceTree = SOURCE_ROOT; };
 		698445221FCF59B100F600A9 /* CompositeGateComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CompositeGateComponent.swift; path = Sources/qiskit/sdk/CompositeGateComponent.swift; sourceTree = SOURCE_ROOT; };
 		699CAF661FC489A200402C05 /* ToolsError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ToolsError.swift; path = Sources/qiskit/tools/ToolsError.swift; sourceTree = SOURCE_ROOT; };
+		69ABEA281FD4D56E006B9BBC /* plaquette_check.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = plaquette_check.swift; path = Tests/qiskitTests/qasm/plaquette_check.swift; sourceTree = "<group>"; };
+		69ABEA291FD4D56E006B9BBC /* entangled_registers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = entangled_registers.swift; path = Tests/qiskitTests/qasm/entangled_registers.swift; sourceTree = "<group>"; };
 		69BB5A4A1FCD2168005AAE32 /* VectorError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = VectorError.swift; path = Sources/qiskit/datastructures/VectorError.swift; sourceTree = SOURCE_ROOT; };
 		69CB0D241FB7B0E300A1D546 /* LocalQasmSimulatorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LocalQasmSimulatorTests.swift; path = Tests/qiskitTests/LocalQasmSimulatorTests.swift; sourceTree = "<group>"; };
 		69CB0D251FB7B0E300A1D546 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Tests/qiskitTests/Info.plist; sourceTree = "<group>"; };
@@ -726,6 +730,8 @@
 		69CB0D211FB7B0AD00A1D546 /* qasm */ = {
 			isa = PBXGroup;
 			children = (
+				69ABEA291FD4D56E006B9BBC /* entangled_registers.swift */,
+				69ABEA281FD4D56E006B9BBC /* plaquette_check.swift */,
 				69CB0D321FB7B11D00A1D546 /* example.swift */,
 				69CB0D221FB7B0BC00A1D546 /* generic */,
 				69CB0D231FB7B0C400A1D546 /* ibmqx2 */,
@@ -1396,6 +1402,7 @@
 			files = (
 				69CB0D691FB7B24400A1D546 /* 011_3_qubit_grover_50_.swift in Sources */,
 				69CB0D6A1FB7B24400A1D546 /* Deutsch_Algorithm.swift in Sources */,
+				69ABEA2D1FD4D578006B9BBC /* plaquette_check.swift in Sources */,
 				69CB0D6B1FB7B24400A1D546 /* iswap.swift in Sources */,
 				69CB0D6C1FB7B24400A1D546 /* qe_qft_3.swift in Sources */,
 				69CB0D6D1FB7B24400A1D546 /* qe_qft_4.swift in Sources */,
@@ -1415,6 +1422,7 @@
 				6941A18B1FCDA17F0016C298 /* example_unitary_matrix.swift in Sources */,
 				69CB0D681FB7B23700A1D546 /* W-state.swift in Sources */,
 				69CB0D5A1FB7B21700A1D546 /* DataStructureTests.swift in Sources */,
+				69ABEA2C1FD4D573006B9BBC /* entangled_registers.swift in Sources */,
 				69CB0D5B1FB7B21700A1D546 /* LocalQasmSimulatorTests.swift in Sources */,
 				69CB0D5C1FB7B21700A1D546 /* example.swift in Sources */,
 				69DC78D31FD1AD3A00EB60A3 /* PauliTests.swift in Sources */,

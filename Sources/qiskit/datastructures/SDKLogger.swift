@@ -103,20 +103,40 @@ public final class SDKLogger {
             #endif
         }
     }
-    
+
+    static public func log(_ message: CustomStringConvertible, type: LogType = .typeDefault) {
+        log(message.description, type: type)
+    }
+
     static public func logInfo(_ message: String) {
+        log(message, type: .typeInfo)
+    }
+
+    static public func logInfo(_ message: CustomStringConvertible) {
         log(message, type: .typeInfo)
     }
     
     static public func logDebug(_ message: String) {
         log(message, type: .typeDebug)
     }
+
+    static public func logDebug(_ message: CustomStringConvertible) {
+        log(message, type: .typeDebug)
+    }
     
     static public func logError(_ message: String) {
         log(message, type: .typeError)
     }
+
+    static public func logError(_ message: CustomStringConvertible) {
+        log(message, type: .typeError)
+    }
     
     static public func logFault(_ message: String) {
+        log(message, type: .typeFault)
+    }
+
+    static public func logFault(_ message: CustomStringConvertible) {
         log(message, type: .typeFault)
     }
 
