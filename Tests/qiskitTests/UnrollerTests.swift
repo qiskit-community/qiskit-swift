@@ -18,11 +18,9 @@ import XCTest
 
 class UnrollerTests: XCTestCase {
 
-    #if os(Linux)
     static let allTests = [
         ("testRippleAddUnroller",testRippleAddUnroller)
     ]
-    #endif
 
     private static let backend: String = "simulator"
     private static let coupling_map = [0: [1, 8], 1: [2, 9], 2: [3, 10], 3: [4, 11], 4: [5, 12],

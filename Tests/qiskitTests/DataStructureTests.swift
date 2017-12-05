@@ -18,7 +18,6 @@ import XCTest
 
 class DataStructureTests: XCTestCase {
 
-    #if os(Linux)
     static let allTests = [
         ("testOrderedDictionary",testOrderedDictionary),
         ("testTopologicalSort",testTopologicalSort),
@@ -31,7 +30,6 @@ class DataStructureTests: XCTestCase {
         ("testVector",testVector),
         ("testMatrix",testMatrix),
     ]
-    #endif
 
     override func setUp() {
         super.setUp()

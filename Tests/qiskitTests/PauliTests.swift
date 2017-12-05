@@ -21,11 +21,9 @@ import XCTest
  */
 class PauliTests: XCTestCase {
 
-    #if os(Linux)
     static let allTests = [
         ("test_pauli",test_pauli)
     ]
-    #endif
 
     override func setUp() {
         super.setUp()

@@ -140,6 +140,10 @@ public struct Complex: Hashable, CustomStringConvertible, NumericType, Expressib
         let b = (self.imag / self.imag.absolute()) * ((self.radiusSquare - self.real) / 2.0).squareRoot()
         return Complex(a, b)
     }
+
+    public func almostEqual(_ n: Complex, _ delta: Double = 0.0000001) -> Bool {
+        return (self.real-n.real).absolute() <= delta && (self.imag-n.imag).absolute() <= delta
+    }
     
     public func add(_ n: Complex) -> Complex {
         return Complex(self.real + n.self.real, self.imag + n.imag)

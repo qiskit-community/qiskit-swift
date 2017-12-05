@@ -18,7 +18,6 @@ import qiskit
 
 class QiskitProgramTests: XCTestCase {
 
-    #if os(Linux)
     static let allTests = [
         ("testCreateProgram",testCreateProgram),
         ("testConfigScriptsFile",testConfigScriptsFile),
@@ -35,7 +34,6 @@ class QiskitProgramTests: XCTestCase {
         ("testContactMultipleHorizontalRegisters",testContactMultipleHorizontalRegisters),
         ("testCompileProgram",testCompileProgram)
     ]
-    #endif
 
     private static let QPS_SPECS: [String: Any] = [
         "name": "program-name",

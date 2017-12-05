@@ -21,14 +21,12 @@ import XCTest
  */
 class LocalQasmSimulatorTests: XCTestCase {
 
-    #if os(Linux)
     static let allTests = [
         ("test_qasm_simulator_single_shot",test_qasm_simulator_single_shot),
         ("test_qasm_simulator",test_qasm_simulator),
         ("test_if_statement",test_if_statement),
         ("test_teleport",test_teleport)
     ]
-    #endif
     
     private var seed: Int = 0
     private var qp: QuantumProgram? = nil

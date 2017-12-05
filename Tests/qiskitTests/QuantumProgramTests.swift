@@ -21,7 +21,6 @@ import XCTest
  */
 class QuantumProgramTests: XCTestCase {
 
-    //#if os(Linux)
     static let allTests = [
         ("test_create_program_with_specs",test_create_program_with_specs),
         ("test_create_program",test_create_program),
@@ -62,9 +61,14 @@ class QuantumProgramTests: XCTestCase {
         ("test_get_compiled_configuration",test_get_compiled_configuration),
         ("test_get_compiled_qasm",test_get_compiled_qasm),
         ("test_get_execution_list",test_get_execution_list),
-        ("test_compile_coupling_map",test_compile_coupling_map)
+        ("test_compile_coupling_map",test_compile_coupling_map),
+        ("test_change_circuit_qobj_after_compile",test_change_circuit_qobj_after_compile),
+        ("test_run_program",test_run_program),
+        ("test_run_batch",test_run_batch),
+        ("test_combine_results",test_combine_results),
+        ("test_local_qasm_simulator",test_local_qasm_simulator),
+        ("test_local_qasm_simulator_one_shot",test_local_qasm_simulator_one_shot)
     ]
-    //#endif
 
     private var QE_TOKEN: String? = nil
     private var QE_URL = Qconfig.BASEURL
@@ -891,7 +895,7 @@ class QuantumProgramTests: XCTestCase {
             QP_program.run_async(qobj) { (result) in
                 do {
                     if result.is_error() {
-                        XCTFail("Failure in runJob: \(result.get_error())")
+                        XCTFail("Failure in test_compile_coupling_map: \(result.get_error())")
                         asyncExpectation.fulfill()
                         return
                     }
@@ -911,42 +915,109 @@ class QuantumProgramTests: XCTestCase {
             XCTFail("test_compile_coupling_map: \(error)")
         }
     }
-/*
+
     func test_change_circuit_qobj_after_compile() {
-    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-    qr = QP_program.get_quantum_register("qname")
-    cr = QP_program.get_classical_register("cname")
-    qc2 = QP_program.create_circuit("qc2", [qr], [cr])
-    qc3 = QP_program.create_circuit("qc3", [qr], [cr])
-    qc2.h(qr[0])
-    qc2.cx(qr[0], qr[1])
-    qc2.cx(qr[0], qr[2])
-    qc3.h(qr)
-    qc2.measure(qr, cr)
-    qc3.measure(qr, cr)
-    circuits = ["qc2", "qc3"]
-    shots = 1024  // the number of shots in the experiment.
-    backend = "local_qasm_simulator"
-    config = ["seed": 10, "shots": 1, "xvals":[1, 2, 3, 4]]
-    qobj1 = QP_program.compile(circuits, backend=backend, shots=shots,
-    seed=88, config=config)
-    qobj1["circuits"][0]["config"]["shots"] = 50
-    qobj1["circuits"][0]["config"]["xvals"] = [1,1,1]
-    config["shots"] = 1000
-    config["xvals"][0] = "only for qobj2"
-    qobj2 = QP_program.compile(circuits, backend=backend, shots=shots,
-    seed=88, config=config)
-    self.assertTrue(qobj1["circuits"][0]["config"]["shots"] == 50)
-    self.assertTrue(qobj1["circuits"][1]["config"]["shots"] == 1)
-    self.assertTrue(qobj1["circuits"][0]["config"]["xvals"] == [1,1,1])
-    self.assertTrue(qobj1["circuits"][1]["config"]["xvals"] == [1,2,3,4])
-    self.assertTrue(qobj1["config"]["shots"] == 1024)
-    self.assertTrue(qobj2["circuits"][0]["config"]["shots"] == 1000)
-    self.assertTrue(qobj2["circuits"][1]["config"]["shots"] == 1000)
-    self.assertTrue(qobj2["circuits"][0]["config"]["xvals"] == [
-    "only for qobj2", 2, 3, 4])
-    self.assertTrue(qobj2["circuits"][1]["config"]["xvals"] == [
-    "only for qobj2", 2, 3, 4])
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            let qr = try QP_program.get_quantum_register("qname")
+            let cr = try QP_program.get_classical_register("cname")
+            let qc2 = try QP_program.create_circuit("qc2", [qr], [cr])
+            let qc3 = try QP_program.create_circuit("qc3", [qr], [cr])
+            try qc2.h(qr[0])
+            try qc2.cx(qr[0], qr[1])
+            try qc2.cx(qr[0], qr[2])
+            try qc3.h(qr)
+            try qc2.measure(qr, cr)
+            try qc3.measure(qr, cr)
+            let circuits = ["qc2", "qc3"]
+            let shots = 1024  // the number of shots in the experiment.
+            let backend = "local_qasm_simulator"
+            var config: [String:Any] = ["seed": 10, "shots": 1, "xvals": [1, 2, 3, 4]]
+            var qobj1 = try QP_program.compile(circuits, backend: backend, config: config,
+                                               shots:shots, seed: 88)
+            guard var qobj1Circuits = qobj1["circuits"] as? [[String:Any]] else {
+                XCTFail("test_change_circuit_qobj_after_compile")
+                return
+            }
+            guard var circuitConfig = qobj1Circuits[0]["config"] as? [String:Any] else {
+                XCTFail("test_change_circuit_qobj_after_compile")
+                return
+            }
+            circuitConfig["shots"] = 50
+            circuitConfig["xvals"] = [1,1,1]
+            qobj1Circuits[0]["config"] = circuitConfig
+            qobj1["circuits"] = qobj1Circuits
+            config["shots"] = 1000
+            guard var xvals = config["xvals"] as? [Any] else {
+                XCTFail("test_change_circuit_qobj_after_compile")
+                return
+            }
+            xvals[0] = "only for qobj2"
+            config["xvals"] = xvals
+            let qobj2 = try QP_program.compile(circuits, backend: backend, config: config,
+                                               shots: shots, seed: 88)
+            if let q1Circuits = qobj1["circuits"] as? [[String:Any]] {
+                if let config0 = q1Circuits[0]["config"] as? [String:Any],
+                    let config1 = q1Circuits[1]["config"] as? [String:Any] {
+                    XCTAssert(config0["shots"] as! Int == 50)
+                    XCTAssert(config1["shots"] as! Int == 1)
+                    XCTAssert(config0["xvals"] as! [Int] == [1,1,1])
+                    XCTAssert(config1["xvals"] as! [Int] == [1,2,3,4])
+                }
+                else {
+                    XCTFail("test_change_circuit_qobj_after_compile")
+                    return
+                }
+            }
+            else {
+                XCTFail("test_change_circuit_qobj_after_compile")
+                return
+            }
+            if let q1Config = qobj1["config"] as? [String:Any] {
+                XCTAssert(q1Config["shots"] as! Int == 1024)
+            }
+            else {
+                XCTFail("test_change_circuit_qobj_after_compile")
+                return
+            }
+            if let q2Circuits = qobj2["circuits"] as? [[String:Any]] {
+                if let config0 = q2Circuits[0]["config"] as? [String:Any],
+                    let config1 = q2Circuits[1]["config"] as? [String:Any] {
+                    XCTAssert(config0["shots"] as! Int == 1000)
+                    XCTAssert(config1["shots"] as! Int == 1000)
+                    if let xvals = config0["xvals"]  as? [Any] {
+                        XCTAssert(xvals[0] as! String == "only for qobj2")
+                        XCTAssert(xvals[1] as! Int == 2)
+                        XCTAssert(xvals[2] as! Int == 3)
+                        XCTAssert(xvals[3] as! Int == 4)
+                    }
+                    else {
+                        XCTFail("test_change_circuit_qobj_after_compile")
+                        return
+                    }
+                    if let xvals = config1["xvals"] as? [Any] {
+                        XCTAssert(xvals[0] as! String == "only for qobj2")
+                        XCTAssert(xvals[1] as! Int == 2)
+                        XCTAssert(xvals[2] as! Int == 3)
+                        XCTAssert(xvals[3] as! Int == 4)
+                    }
+                    else {
+                        XCTFail("test_change_circuit_qobj_after_compile")
+                        return
+                    }
+                }
+                else {
+                    XCTFail("test_change_circuit_qobj_after_compile")
+                    return
+                }
+            }
+            else {
+                XCTFail("test_change_circuit_qobj_after_compile")
+                return
+            }
+        } catch {
+            XCTFail("test_change_circuit_qobj_after_compile: \(error)")
+        }
     }
 
     //###############################################################
@@ -954,35 +1025,50 @@ class QuantumProgramTests: XCTestCase {
     //###############################################################
 
     func test_run_program() {
-    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-    qr = QP_program.get_quantum_register("qname")
-    cr = QP_program.get_classical_register("cname")
-    qc2 = QP_program.create_circuit("qc2", [qr], [cr])
-    qc3 = QP_program.create_circuit("qc3", [qr], [cr])
-    qc2.h(qr[0])
-    qc2.cx(qr[0], qr[1])
-    qc2.cx(qr[0], qr[2])
-    qc3.h(qr)
-    qc2.measure(qr, cr)
-    qc3.measure(qr, cr)
-    circuits = ["qc2", "qc3"]
-    shots = 1024  // the number of shots in the experiment.
-    backend = "local_qasm_simulator"
-    qobj = QP_program.compile(circuits, backend=backend, shots=shots,
-    seed=88)
-    out = QP_program.run(qobj)
-    results2 = out.get_counts("qc2")
-    results3 = out.get_counts("qc3")
-    XCTAssertEqual(results2, ["000": 518, "111": 506])
-    XCTAssertEqual(results3, ["001": 119, "111": 129, "110": 134,
-    "100": 117, "000": 129, "101": 126,
-    "010": 145, "011": 125])
-
+         do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            let qr = try QP_program.get_quantum_register("qname")
+            let cr = try QP_program.get_classical_register("cname")
+            let qc2 = try QP_program.create_circuit("qc2", [qr], [cr])
+            let qc3 = try QP_program.create_circuit("qc3", [qr], [cr])
+            try qc2.h(qr[0])
+            try qc2.cx(qr[0], qr[1])
+            try qc2.cx(qr[0], qr[2])
+            try qc3.h(qr)
+            try qc2.measure(qr, cr)
+            try qc3.measure(qr, cr)
+            let circuits = ["qc2", "qc3"]
+            let shots = 1024  // the number of shots in the experiment.
+            let backend = "local_qasm_simulator"
+            let qobj = try QP_program.compile(circuits, backend: backend, shots: shots, seed: 88)
+            let asyncExpectation = self.expectation(description: "test_run_program")
+            QP_program.run_async(qobj) { (out) in
+                do {
+                    if out.is_error() {
+                        XCTFail("Failure in test_run_program: \(out.get_error())")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    let results2 = try out.get_counts("qc2")
+                    let results3 = try out.get_counts("qc3")
+                    XCTAssertEqual(results2, ["000": 518, "111": 506])
+                    XCTAssertEqual(results3, ["001": 119, "111": 129, "110": 134,
+                                              "100": 117, "000": 129, "101": 126,
+                                              "010": 145, "011": 125])
+                    asyncExpectation.fulfill()
+                } catch {
+                    XCTFail("Failure in test_run_program: \(error)")
+                    asyncExpectation.fulfill()
+                }
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_run_program")
+            })
+        } catch {
+            XCTFail("test_run_program: \(error)")
+        }
     }
-
-    func test_run_async_program() {
-    }
-
+/*
     func _job_done_callback(_ result: Result) {
     results2 = result.get_counts("qc2")
     results3 = result.get_counts("qc3")
@@ -1024,45 +1110,57 @@ class QuantumProgramTests: XCTestCase {
             raise self.qp_program_exception
         }
     }
-
+*/
     func test_run_batch() {
-    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-    qr = QP_program.get_quantum_register("qname")
-    cr = QP_program.get_classical_register("cname")
-    qc2 = QP_program.create_circuit("qc2", [qr], [cr])
-    qc3 = QP_program.create_circuit("qc3", [qr], [cr])
-    qc2.h(qr[0])
-    qc2.cx(qr[0], qr[1])
-    qc2.cx(qr[0], qr[2])
-    qc3.h(qr)
-    qc2.measure(qr, cr)
-    qc3.measure(qr, cr)
-    circuits = ["qc2", "qc3"]
-    shots = 1024  // the number of shots in the experiment.
-    backend = "local_qasm_simulator"
-    qobj_list = [ QP_program.compile(circuits, backend=backend, shots=shots,
-    seed=88),
-    QP_program.compile(circuits, backend=backend, shots=shots,
-    seed=88),
-    QP_program.compile(circuits, backend=backend, shots=shots,
-    seed=88),
-    QP_program.compile(circuits, backend=backend, shots=shots,
-    seed=88) ]
-
-    results = QP_program.run_batch(qobj_list)
-    for result in results:
-    counts2 = result.get_counts("qc2")
-    counts3 = result.get_counts("qc3")
-    XCTAssertEqual(counts2, ["000": 518, "111": 506])
-    XCTAssertEqual(counts3, ["001": 119, "111": 129, "110": 134,
-    "100": 117, "000": 129, "101": 126,
-    "010": 145, "011": 125])
-
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            let qr = try QP_program.get_quantum_register("qname")
+            let cr = try QP_program.get_classical_register("cname")
+            let qc2 = try QP_program.create_circuit("qc2", [qr], [cr])
+            let qc3 = try QP_program.create_circuit("qc3", [qr], [cr])
+            try qc2.h(qr[0])
+            try qc2.cx(qr[0], qr[1])
+            try qc2.cx(qr[0], qr[2])
+            try qc3.h(qr)
+            try qc2.measure(qr, cr)
+            try qc3.measure(qr, cr)
+            let circuits = ["qc2", "qc3"]
+            let shots = 1024  // the number of shots in the experiment.
+            let backend = "local_qasm_simulator"
+            let qobj_list = [ try QP_program.compile(circuits, backend: backend, shots: shots, seed: 88),
+                              try QP_program.compile(circuits, backend: backend, shots: shots, seed: 88),
+                              try QP_program.compile(circuits, backend: backend, shots: shots, seed: 88),
+                              try QP_program.compile(circuits, backend: backend, shots: shots, seed: 88) ]
+            let asyncExpectation = self.expectation(description: "test_run_batch")
+            QP_program.run_batch_async(qobj_list) { (results) in
+                do {
+                    for result in results {
+                        if result.is_error() {
+                            XCTFail("Failure in test_run_batch: \(result.get_error())")
+                            asyncExpectation.fulfill()
+                            return
+                        }
+                        let counts2 = try result.get_counts("qc2")
+                        let counts3 = try result.get_counts("qc3")
+                        XCTAssertEqual(counts2, ["000": 518, "111": 506])
+                        XCTAssertEqual(counts3, ["001": 119, "111": 129, "110": 134,
+                                                 "100": 117, "000": 129, "101": 126,
+                                                 "010": 145, "011": 125])
+                    }
+                    asyncExpectation.fulfill()
+                } catch {
+                    XCTFail("Failure in test_run_batch: \(error)")
+                    asyncExpectation.fulfill()
+                }
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_run_batch")
+            })
+        } catch {
+            XCTFail("test_run_batch: \(error)")
+        }
     }
-
-    func test_run_batch_async() {
-    }
-
+/*
     func _jobs_done_callback(results):
 
     for result in results:
@@ -1113,91 +1211,165 @@ class QuantumProgramTests: XCTestCase {
         raise self.qp_program_exception
     }
     }
-
+*/
     func test_combine_results() {
-    let QP_program = try QuantumProgram()
-    qr = QP_program.create_quantum_register("qr", 1)
-    cr = QP_program.create_classical_register("cr", 1)
-    qc1 = QP_program.create_circuit("qc1", [qr], [cr])
-    qc2 = QP_program.create_circuit("qc2", [qr], [cr])
-    qc1.measure(qr[0], cr[0])
-    qc2.x(qr[0])
-    qc2.measure(qr[0], cr[0])
-    shots = 1024  // the number of shots in the experiment.
-    backend = "local_qasm_simulator"
-    res1 = QP_program.execute(["qc1"], backend=backend, shots=shots)
-    res2 = QP_program.execute(["qc2"], backend=backend, shots=shots)
-    counts1 = res1.get_counts("qc1")
-    counts2 = res2.get_counts("qc2")
-    res1 += res2  # combine results
-    counts12 = [res1.get_counts("qc1"), res1.get_counts("qc2")]
-    XCTAssertEqual(counts12, [counts1, counts2])
-
+        do {
+            let QP_program = try QuantumProgram()
+            let qr = try QP_program.create_quantum_register("qr", 1)
+            let cr = try QP_program.create_classical_register("cr", 1)
+            let qc1 = try QP_program.create_circuit("qc1", [qr], [cr])
+            let qc2 = try QP_program.create_circuit("qc2", [qr], [cr])
+            try qc1.measure(qr[0], cr[0])
+            try qc2.x(qr[0])
+            try qc2.measure(qr[0], cr[0])
+            let shots = 1024  // the number of shots in the experiment.
+            let backend = "local_qasm_simulator"
+            let asyncExpectation = self.expectation(description: "test_combine_results")
+            QP_program.execute(["qc1"], backend: backend, shots: shots)  { (res1) in
+                if res1.is_error() {
+                    XCTFail("Failure in test_combine_results: \(res1.get_error())")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                QP_program.execute(["qc2"], backend: backend, shots: shots)   { (res2) in
+                    do {
+                        if res2.is_error() {
+                            XCTFail("Failure in test_combine_results: \(res2.get_error())")
+                            asyncExpectation.fulfill()
+                            return
+                        }
+                        let counts1 = try res1.get_counts("qc1")
+                        let counts2 = try res2.get_counts("qc2")
+                        try res1.append(res2)  // combine results
+                        let counts12 = [try res1.get_counts("qc1"), try res1.get_counts("qc2")]
+                        XCTAssertEqual(counts12[0], counts1)
+                        XCTAssertEqual(counts12[1], counts2)
+                        asyncExpectation.fulfill()
+                    } catch {
+                        XCTFail("Failure in test_combine_results: \(error)")
+                        asyncExpectation.fulfill()
+                    }
+                }
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_combine_results")
+            })
+        } catch {
+            XCTFail("test_combine_results: \(error)")
+        }
     }
 
     func test_local_qasm_simulator() {
-    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-    qr = QP_program.get_quantum_register("qname")
-    cr = QP_program.get_classical_register("cname")
-    qc2 = QP_program.create_circuit("qc2", [qr], [cr])
-    qc3 = QP_program.create_circuit("qc3", [qr], [cr])
-    qc2.h(qr[0])
-    qc2.cx(qr[0], qr[1])
-    qc2.cx(qr[0], qr[2])
-    qc3.h(qr)
-    qc2.measure(qr[0], cr[0])
-    qc3.measure(qr[0], cr[0])
-    qc2.measure(qr[1], cr[1])
-    qc3.measure(qr[1], cr[1])
-    qc2.measure(qr[2], cr[2])
-    qc3.measure(qr[2], cr[2])
-    circuits = ["qc2", "qc3"]
-    shots = 1024  // the number of shots in the experiment.
-    backend = "local_qasm_simulator"
-    out = QP_program.execute(circuits, backend=backend, shots=shots,
-    seed=88)
-    results2 = out.get_counts("qc2")
-    results3 = out.get_counts("qc3")
-    SDKLogger.logInfo(results3)
-    XCTAssertEqual(results2, {"000": 518, "111": 506})
-    XCTAssertEqual(results3, {"001": 119, "111": 129, "110": 134,
-    "100": 117, "000": 129, "101": 126,
-    "010": 145, "011": 125})
-
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            let qr = try QP_program.get_quantum_register("qname")
+            let cr = try QP_program.get_classical_register("cname")
+            let qc2 = try QP_program.create_circuit("qc2", [qr], [cr])
+            let qc3 = try QP_program.create_circuit("qc3", [qr], [cr])
+            try qc2.h(qr[0])
+            try qc2.cx(qr[0], qr[1])
+            try qc2.cx(qr[0], qr[2])
+            try qc3.h(qr)
+            try qc2.measure(qr[0], cr[0])
+            try qc3.measure(qr[0], cr[0])
+            try qc2.measure(qr[1], cr[1])
+            try qc3.measure(qr[1], cr[1])
+            try qc2.measure(qr[2], cr[2])
+            try qc3.measure(qr[2], cr[2])
+            let circuits = ["qc2", "qc3"]
+            let shots = 1024  // the number of shots in the experiment.
+            let backend = "local_qasm_simulator"
+            let asyncExpectation = self.expectation(description: "test_local_qasm_simulator")
+            QP_program.execute(circuits, backend: backend, shots: shots, seed:88)  { (out) in
+                do {
+                    if out.is_error() {
+                        XCTFail("Failure in test_local_qasm_simulator: \(out.get_error())")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    let results2 = try out.get_counts("qc2")
+                    let results3 = try out.get_counts("qc3")
+                    SDKLogger.logInfo(results3)
+                    XCTAssertEqual(results2, ["000": 518, "111": 506])
+                    XCTAssertEqual(results3, ["001": 119, "111": 129, "110": 134,
+                                              "100": 117, "000": 129, "101": 126,
+                                              "010": 145, "011": 125])
+                    asyncExpectation.fulfill()
+                } catch {
+                    XCTFail("Failure in test_local_qasm_simulator: \(error)")
+                    asyncExpectation.fulfill()
+                }
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_local_qasm_simulator")
+            })
+        } catch {
+            XCTFail("test_local_qasm_simulator: \(error)")
+        }
     }
 
     func test_local_qasm_simulator_one_shot() {
-    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-    qr = QP_program.get_quantum_register("qname")
-    cr = QP_program.get_classical_register("cname")
-    qc2 = QP_program.create_circuit("qc2", [qr], [cr])
-    qc3 = QP_program.create_circuit("qc3", [qr], [cr])
-    qc2.h(qr[0])
-    qc3.h(qr[0])
-    qc3.cx(qr[0], qr[1])
-    qc3.cx(qr[0], qr[2])
-    circuits = ["qc2", "qc3"]
-    backend = "local_qasm_simulator"  // the backend to run on
-    shots = 1  // the number of shots in the experiment.
-    result = QP_program.execute(circuits, backend=backend, shots=shots,
-    seed=9)
-    quantum_state = np.array([0.70710678+0.j, 0.70710678+0.j,
-    0.00000000+0.j, 0.00000000+0.j,
-    0.00000000+0.j, 0.00000000+0.j,
-    0.00000000+0.j, 0.00000000+0.j])
-    norm = np.dot(np.conj(quantum_state),
-    result.get_data("qc2")["quantum_state"])
-    self.assertAlmostEqual(norm, 1)
-    quantum_state = np.array([0.70710678+0.j, 0+0.j,
-    0.00000000+0.j, 0.00000000+0.j,
-    0.00000000+0.j, 0.00000000+0.j,
-    0.00000000+0.j, 0.70710678+0.j])
-    norm = np.dot(np.conj(quantum_state),
-    result.get_data("qc3")["quantum_state"])
-    self.assertAlmostEqual(norm, 1)
-
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            let qr = try QP_program.get_quantum_register("qname")
+            let cr = try QP_program.get_classical_register("cname")
+            let qc2 = try QP_program.create_circuit("qc2", [qr], [cr])
+            let qc3 = try QP_program.create_circuit("qc3", [qr], [cr])
+            try qc2.h(qr[0])
+            try qc3.h(qr[0])
+            try qc3.cx(qr[0], qr[1])
+            try qc3.cx(qr[0], qr[2])
+            let circuits = ["qc2", "qc3"]
+            let backend = "local_qasm_simulator"  // the backend to run on
+            let shots = 1  // the number of shots in the experiment.
+            let asyncExpectation = self.expectation(description: "test_local_qasm_simulator_one_shot")
+            QP_program.execute(circuits, backend: backend, shots: shots, seed: 9)   { result in
+                do {
+                    if result.is_error() {
+                        XCTFail("Failure in test_local_qasm_simulator_one_shot: \(result.get_error())")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    var quantum_state: Vector<Complex> = [0.70710678, 0.70710678,
+                                                          0.00000000, 0.00000000,
+                                                          0.00000000, 0.00000000,
+                                                          0.00000000, 0.00000000]
+                    let qc2 = try result.get_data("qc2")
+                    guard let qs2 = qc2["quantum_state"] as? [Complex] else {
+                        XCTFail("Failure in test_local_qasm_simulator_one_shot.")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    var qsVector = Vector<Complex>(value:qs2)
+                    var norm = quantum_state.conjugate().dot(qsVector)
+                    XCTAssert(norm.almostEqual(1))
+                    quantum_state = [0.70710678, 0.00000000,
+                                     0.00000000, 0.00000000,
+                                     0.00000000, 0.00000000,
+                                     0.00000000, 0.70710678]
+                    let qc3 = try result.get_data("qc3")
+                    guard let qs3 = qc3["quantum_state"] as? [Complex] else {
+                        XCTFail("Failure in test_local_qasm_simulator_one_shot.")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    qsVector = Vector<Complex>(value:qs3)
+                    norm = quantum_state.conjugate().dot(qsVector)
+                    XCTAssert(norm.almostEqual(1))
+                    asyncExpectation.fulfill()
+                } catch {
+                    XCTFail("Failure in test_local_qasm_simulator: \(error)")
+                    asyncExpectation.fulfill()
+                }
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_local_qasm_simulator_one_shot")
+            })
+        } catch {
+            XCTFail("test_local_qasm_simulator_one_shot: \(error)")
+        }
     }
-
+/*
     func test_local_unitary_simulator() {
     let QP_program = try QuantumProgram()
     q = QP_program.create_quantum_register("q", 2)
@@ -1669,8 +1841,8 @@ class QuantumProgramTests: XCTestCase {
 
     yvals, xvals = result.get_qubitpol_vs_xval(xvals_dict=xvals_dict)
 
-    self.assertTrue(np.array_equal(yvals, [[-1,-1],[1,-1]]))
-    self.assertTrue(np.array_equal(xvals, [0,1]))
+    XCTAssert(np.array_equal(yvals, [[-1,-1],[1,-1]]))
+    XCTAssert(np.array_equal(xvals, [0,1]))
 
     } func test_reconfig() {
     """Test reconfiguring the qobj from 1024 shots to 2048 using

@@ -21,12 +21,10 @@ import XCTest
  */
 class LocalUnitarySimulatorTests: XCTestCase {
 
-    #if os(Linux)
     static let allTests = [
         ("test_unitary_simulator",test_unitary_simulator),
         ("test_two_unitary_simulator",test_two_unitary_simulator)
     ]
-    #endif
     
     private var seed: Int = 0
     private var qp: QuantumProgram? = nil

@@ -92,38 +92,38 @@ public final class Result: CustomStringConvertible {
      Returns:
         The current object with appended results.
      */
-    public static func += (left: inout Result, right: Result) throws {
-        if let leftConfig = left.__qobj["config"] as? [String:Any],
+    public func append(_ right: Result) throws {
+        if let leftConfig = self.__qobj["config"] as? [String:Any],
             let rightConfig = right.__qobj["config"] as? [String:Any] {
             if NSDictionary(dictionary: leftConfig).isEqual(to: rightConfig) {
-                if let leftId = left.__qobj["id"] as? String {
-                    left.__qobj["id"] = [leftId]
+                if let leftId = self.__qobj["id"] as? String {
+                    self.__qobj["id"] = [leftId]
                 }
-                if var leftIds = left.__qobj["id"] as? [String] {
+                if var leftIds = self.__qobj["id"] as? [String] {
                     if let rightId = right.__qobj["id"] as? String {
                         leftIds.append(rightId)
                     }
                     else if let rightIds = right.__qobj["id"] as? [String] {
                         leftIds.append(contentsOf:rightIds)
                     }
-                    left.__qobj["id"] = leftIds
+                    self.__qobj["id"] = leftIds
                 }
                 if let rightCircuits = right.__qobj["circuits"] as? [Any] {
-                    if var leftCircuits = left.__qobj["circuits"] as? [Any] {
+                    if var leftCircuits = self.__qobj["circuits"] as? [Any] {
                         leftCircuits.append(contentsOf: rightCircuits)
-                        left.__qobj["circuits"] = leftCircuits
+                        self.__qobj["circuits"] = leftCircuits
                     }
                     else {
-                        left.__qobj["circuits"] = rightCircuits
+                        self.__qobj["circuits"] = rightCircuits
                     }
                 }
                 if let rightResults = right.__result["result"] as? [Any] {
-                    if var leftResults = left.__result["result"] as? [Any] {
+                    if var leftResults = self.__result["result"] as? [Any] {
                         leftResults.append(contentsOf: rightResults)
-                        left.__result["result"] = leftResults
+                        self.__result["result"] = leftResults
                     }
                     else {
-                        left.__result["result"] = rightResults
+                        self.__result["result"] = rightResults
                     }
                 }
                 return
@@ -141,9 +141,9 @@ public final class Result: CustomStringConvertible {
      Returns:
         A new Result object consisting of combined objects.
      */
-    public static func + (left: Result, right: Result) throws -> Result {
-        var ret =  Result(left.__result, left.__qobj)
-        try ret += right
+    public static func add(left: Result, right: Result) throws -> Result {
+        let ret =  Result(left.__result, left.__qobj)
+        try ret.append(right)
         return ret
     }
 

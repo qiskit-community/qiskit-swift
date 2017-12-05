@@ -18,7 +18,6 @@ import XCTest
 
 class QiskitParserTests: XCTestCase {
 
-    #if os(Linux)
     static let allTests = [
         ("testExamples",testExamples),
         ("testParser",testParser),
@@ -29,7 +28,6 @@ class QiskitParserTests: XCTestCase {
         ("testParserExpressionList",testParserExpressionList),
         ("testParserQPT",testParserQPT)
     ]
-    #endif
 
     private static let qasmProgram1 =
                 "OPENQASM 2.0;\n" +
