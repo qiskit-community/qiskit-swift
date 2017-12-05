@@ -67,7 +67,13 @@ class QuantumProgramTests: XCTestCase {
         ("test_run_batch",test_run_batch),
         ("test_combine_results",test_combine_results),
         ("test_local_qasm_simulator",test_local_qasm_simulator),
-        ("test_local_qasm_simulator_one_shot",test_local_qasm_simulator_one_shot)
+        ("test_local_qasm_simulator_one_shot",test_local_qasm_simulator_one_shot),
+        ("test_local_unitary_simulator",test_local_unitary_simulator),
+        ("test_run_program_map",test_run_program_map),
+        ("test_execute_program_map",test_execute_program_map),
+        ("test_average_data",test_average_data),
+        ("test_execute_one_circuit_simulator_online",test_execute_one_circuit_simulator_online),
+        ("test_simulator_online_size",test_simulator_online_size)
     ]
 
     private var QE_TOKEN: String? = nil
@@ -894,8 +900,8 @@ class QuantumProgramTests: XCTestCase {
             let asyncExpectation = self.expectation(description: "test_compile_coupling_map")
             QP_program.run_async(qobj) { (result) in
                 do {
-                    if result.is_error() {
-                        XCTFail("Failure in test_compile_coupling_map: \(result.get_error())")
+                    if let error = result.get_error() {
+                        XCTFail("Failure in test_compile_coupling_map: \(error)")
                         asyncExpectation.fulfill()
                         return
                     }
@@ -1044,8 +1050,8 @@ class QuantumProgramTests: XCTestCase {
             let asyncExpectation = self.expectation(description: "test_run_program")
             QP_program.run_async(qobj) { (out) in
                 do {
-                    if out.is_error() {
-                        XCTFail("Failure in test_run_program: \(out.get_error())")
+                    if let error = out.get_error() {
+                        XCTFail("Failure in test_run_program: \(error)")
                         asyncExpectation.fulfill()
                         return
                     }
@@ -1135,8 +1141,8 @@ class QuantumProgramTests: XCTestCase {
             QP_program.run_batch_async(qobj_list) { (results) in
                 do {
                     for result in results {
-                        if result.is_error() {
-                            XCTFail("Failure in test_run_batch: \(result.get_error())")
+                        if let error = result.get_error() {
+                            XCTFail("Failure in test_run_batch: \(error)")
                             asyncExpectation.fulfill()
                             return
                         }
@@ -1225,16 +1231,17 @@ class QuantumProgramTests: XCTestCase {
             let shots = 1024  // the number of shots in the experiment.
             let backend = "local_qasm_simulator"
             let asyncExpectation = self.expectation(description: "test_combine_results")
-            QP_program.execute(["qc1"], backend: backend, shots: shots)  { (res1) in
-                if res1.is_error() {
-                    XCTFail("Failure in test_combine_results: \(res1.get_error())")
+            QP_program.execute(["qc1"], backend: backend, shots: shots)  { (res) in
+                var res1 = res
+                if let error = res1.get_error() {
+                    XCTFail("Failure in test_combine_results: \(error)")
                     asyncExpectation.fulfill()
                     return
                 }
                 QP_program.execute(["qc2"], backend: backend, shots: shots)   { (res2) in
                     do {
-                        if res2.is_error() {
-                            XCTFail("Failure in test_combine_results: \(res2.get_error())")
+                        if let error = res2.get_error() {
+                            XCTFail("Failure in test_combine_results: \(error)")
                             asyncExpectation.fulfill()
                             return
                         }
@@ -1282,8 +1289,8 @@ class QuantumProgramTests: XCTestCase {
             let asyncExpectation = self.expectation(description: "test_local_qasm_simulator")
             QP_program.execute(circuits, backend: backend, shots: shots, seed:88)  { (out) in
                 do {
-                    if out.is_error() {
-                        XCTFail("Failure in test_local_qasm_simulator: \(out.get_error())")
+                    if let error = out.get_error() {
+                        XCTFail("Failure in test_local_qasm_simulator: \(error)")
                         asyncExpectation.fulfill()
                         return
                     }
@@ -1323,10 +1330,10 @@ class QuantumProgramTests: XCTestCase {
             let backend = "local_qasm_simulator"  // the backend to run on
             let shots = 1  // the number of shots in the experiment.
             let asyncExpectation = self.expectation(description: "test_local_qasm_simulator_one_shot")
-            QP_program.execute(circuits, backend: backend, shots: shots, seed: 9)   { result in
+            QP_program.execute(circuits, backend: backend, shots: shots, seed: 9) { result in
                 do {
-                    if result.is_error() {
-                        XCTFail("Failure in test_local_qasm_simulator_one_shot: \(result.get_error())")
+                    if let error = result.get_error() {
+                        XCTFail("Failure in test_local_qasm_simulator_one_shot: \(error)")
                         asyncExpectation.fulfill()
                         return
                     }
@@ -1369,130 +1376,284 @@ class QuantumProgramTests: XCTestCase {
             XCTFail("test_local_qasm_simulator_one_shot: \(error)")
         }
     }
-/*
-    func test_local_unitary_simulator() {
-    let QP_program = try QuantumProgram()
-    q = QP_program.create_quantum_register("q", 2)
-    c = QP_program.create_classical_register("c", 2)
-    qc1 = QP_program.create_circuit("qc1", [q], [c])
-    qc2 = QP_program.create_circuit("qc2", [q], [c])
-    qc1.h(q)
-    qc2.cx(q[0], q[1])
-    circuits = ["qc1", "qc2"]
-    backend = "local_unitary_simulator"  // the backend to run on
-    result = QP_program.execute(circuits, backend=backend)
-    unitary1 = result.get_data("qc1")["unitary"]
-    unitary2 = result.get_data("qc2")["unitary"]
-    unitaryreal1 = np.array([[0.5, 0.5, 0.5, 0.5], [0.5, -0.5, 0.5, -0.5],
-    [0.5, 0.5, -0.5, -0.5],
-    [0.5, -0.5, -0.5, 0.5]])
-    unitaryreal2 = np.array([[1,  0,  0, 0], [0, 0,  0,  1],
-    [0.,  0, 1, 0], [0,  1,  0,  0]])
-    norm1 = np.trace(np.dot(np.transpose(np.conj(unitaryreal1)), unitary1))
-    norm2 = np.trace(np.dot(np.transpose(np.conj(unitaryreal2)), unitary2))
-    self.assertAlmostEqual(norm1, 4)
-    self.assertAlmostEqual(norm2, 4)
 
+    func test_local_unitary_simulator() {
+        do {
+            let QP_program = try QuantumProgram()
+            let q = try QP_program.create_quantum_register("q", 2)
+            let c = try QP_program.create_classical_register("c", 2)
+            let qc1 = try QP_program.create_circuit("qc1", [q], [c])
+            let qc2 = try QP_program.create_circuit("qc2", [q], [c])
+            try qc1.h(q)
+            try qc2.cx(q[0], q[1])
+            let circuits = ["qc1", "qc2"]
+            let backend = "local_unitary_simulator"  // the backend to run on
+            let asyncExpectation = self.expectation(description: "test_local_unitary_simulator")
+            QP_program.execute(circuits, backend: backend)  { result in
+                do {
+                    if let error = result.get_error() {
+                        XCTFail("Failure in test_local_unitary_simulator: \(error)")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    guard let unitary1 = try result.get_data("qc1")["unitary"] as? Matrix<Complex> else {
+                        XCTFail("test_local_unitary_simulator missing unitary result.")
+                        return
+                    }
+                    guard let unitary2 = try result.get_data("qc2")["unitary"] as? Matrix<Complex> else {
+                        XCTFail("test_local_unitary_simulator missing unitary result.")
+                        return
+                    }
+                    let unitaryreal1: Matrix<Complex> = [[0.5, 0.5,  0.5,  0.5], [0.5, -0.5,  0.5, -0.5],
+                                                         [0.5, 0.5, -0.5, -0.5], [0.5, -0.5, -0.5,  0.5]]
+                    let unitaryreal2: Matrix<Complex> = [[1,  0,  0, 0], [0, 0,  0,  1],
+                                                         [0,  0,  1, 0], [0, 1,  0,  0]]
+                    let norm1 = unitaryreal1.conjugate().transpose().dot(unitary1).trace()
+                    let norm2 = unitaryreal2.conjugate().transpose().dot(unitary2).trace()
+                    XCTAssert(norm1.almostEqual(4))
+                    XCTAssert(norm2.almostEqual(4))
+                    asyncExpectation.fulfill()
+                } catch {
+                    XCTFail("Failure in test_local_unitary_simulator: \(error)")
+                    asyncExpectation.fulfill()
+                }
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_local_unitary_simulator")
+            })
+        } catch {
+            XCTFail("test_local_unitary_simulator: \(error)")
+        }
     }
 
     func test_run_program_map() {
-    let QP_program = try QuantumProgram()
-    backend = "local_qasm_simulator"  // the backend to run on
-    shots = 100  // the number of shots in the experiment.
-    max_credits = 3
-    coupling_map = {0: [1], 1: [2], 2: [3], 3: [4]}
-    initial_layout = [("q", 0): ("q", 0), ("q", 1): ("q", 1),
-    ("q", 2): ("q", 2), ("q", 3): ("q", 3),
-    ("q", 4): ("q", 4)]
-    QP_program.load_qasm_file(self.QASM_FILE_PATH_2, name="circuit-dev")
-    circuits = ["circuit-dev"]
-    qobj = QP_program.compile(circuits, backend=backend, shots=shots,
-    max_credits=max_credits, seed=65,
-    coupling_map=coupling_map,
-    initial_layout=initial_layout)
-    result = QP_program.run(qobj)
-    XCTAssertEqual(result.get_counts("circuit-dev"), {"10010": 100})
-
+        do {
+            let QP_program = try QuantumProgram()
+            let backend = "local_qasm_simulator"  // the backend to run on
+            let shots = 100  // the number of shots in the experiment.
+            let max_credits = 3
+            let coupling_map = [0: [1], 1: [2], 2: [3], 3: [4]]
+            let initial_layout:OrderedDictionary<RegBit,RegBit> = [RegBit(("q", 0)): RegBit(("q", 0)),
+                                                                   RegBit(("q", 1)): RegBit(("q", 1)),
+                                                                   RegBit(("q", 2)): RegBit(("q", 2)),
+                                                                   RegBit(("q", 3)): RegBit(("q", 3)),
+                                                                   RegBit(("q", 4)): RegBit(("q", 4))]
+            try PlaquetteCheck.QASM.write(toFile: self.QASM_FILE_PATH_2, atomically: true, encoding: .utf8)
+            try QP_program.load_qasm_file(self.QASM_FILE_PATH_2, name: "circuit-dev")
+            let circuits = ["circuit-dev"]
+            let qobj = try QP_program.compile(circuits,
+                                      backend: backend,
+                                      coupling_map: coupling_map,
+                                      initial_layout: initial_layout,
+                                      shots: shots,
+                                      max_credits: max_credits,
+                                      seed: 65)
+            let asyncExpectation = self.expectation(description: "test_run_program_map")
+            QP_program.run_async(qobj) { result in
+                do {
+                    if let error = result.get_error() {
+                        XCTFail("Failure in test_run_program_map: \(error)")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    let counts = try result.get_counts("circuit-dev")
+                    XCTAssertEqual(counts, ["10010": 100])
+                    asyncExpectation.fulfill()
+                } catch {
+                    XCTFail("Failure in test_run_program_map: \(error)")
+                    asyncExpectation.fulfill()
+                }
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_run_program_map")
+            })
+        } catch {
+            XCTFail("test_run_program_map: \(error)")
+        }
     }
 
     func test_execute_program_map() {
-    let QP_program = try QuantumProgram()
-    backend = "local_qasm_simulator"  // the backend to run on
-    shots = 100  // the number of shots in the experiment.
-    max_credits = 3
-    coupling_map = [0: [1], 1: [2], 2: [3], 3: [4]]
-    initial_layout = [("q", 0): ("q", 0), ("q", 1): ("q", 1),
-    ("q", 2): ("q", 2), ("q", 3): ("q", 3),
-    ("q", 4): ("q", 4)]
-    QP_program.load_qasm_file(self.QASM_FILE_PATH_2, "circuit-dev")
-    circuits = ["circuit-dev"]
-    result = QP_program.execute(circuits, backend=backend, shots=shots,
-    max_credits=max_credits,
-    coupling_map=coupling_map,
-    initial_layout=initial_layout, seed=5455)
-    XCTAssertEqual(result.get_counts("circuit-dev"), ["10010": 100])
-
+        do {
+            let QP_program = try QuantumProgram()
+            let backend = "local_qasm_simulator"  // the backend to run on
+            let shots = 100  // the number of shots in the experiment.
+            let max_credits = 3
+            let coupling_map = [0: [1], 1: [2], 2: [3], 3: [4]]
+            let initial_layout:OrderedDictionary<RegBit,RegBit> = [RegBit(("q", 0)): RegBit(("q", 0)),
+                                                                   RegBit(("q", 1)): RegBit(("q", 1)),
+                                                                   RegBit(("q", 2)): RegBit(("q", 2)),
+                                                                   RegBit(("q", 3)): RegBit(("q", 3)),
+                                                                   RegBit(("q", 4)): RegBit(("q", 4))]
+            try PlaquetteCheck.QASM.write(toFile: self.QASM_FILE_PATH_2, atomically: true, encoding: .utf8)
+            try QP_program.load_qasm_file(self.QASM_FILE_PATH_2, name: "circuit-dev")
+            let circuits = ["circuit-dev"]
+            let asyncExpectation = self.expectation(description: "test_execute_program_map")
+            QP_program.execute(circuits,
+                               backend: backend,
+                               coupling_map: coupling_map,
+                               initial_layout: initial_layout,
+                               shots: shots,
+                               max_credits: max_credits,
+                               seed: 5455) { result in
+                do {
+                    if let error = result.get_error() {
+                        XCTFail("Failure in test_execute_program_map: \(error)")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    let counts = try result.get_counts("circuit-dev")
+                    XCTAssertEqual(counts, ["10010": 100])
+                    asyncExpectation.fulfill()
+                } catch {
+                    XCTFail("Failure in test_run_program_map: \(error)")
+                    asyncExpectation.fulfill()
+                }
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_run_program_map")
+            })
+        } catch {
+            XCTFail("test_execute_program_map: \(error)")
+        }
     }
 
     func test_average_data() {
-    let QP_program = try QuantumProgram()
-    q = QP_program.create_quantum_register("q", 2)
-    c = QP_program.create_classical_register("c", 2)
-    qc = QP_program.create_circuit("qc", [q], [c])
-    qc.h(q[0])
-    qc.cx(q[0], q[1])
-    qc.measure(q[0], c[0])
-    qc.measure(q[1], c[1])
-    circuits = ["qc"]
-    shots = 10000  // the number of shots in the experiment.
-    backend = "local_qasm_simulator"
-    results = QP_program.execute(circuits, backend=backend, shots=shots)
-    observable = ["00": 1, "11": 1, "01": -1, "10": -1]
-    meanzz = results.average_data("qc", observable)
-    observable = ["00": 1, "11": -1, "01": 1, "10": -1]
-    meanzi = results.average_data("qc", observable)
-    observable = ["00": 1, "11": -1, "01": -1, "10": 1]
-    meaniz = results.average_data("qc", observable)
-    self.assertAlmostEqual(meanzz,  1, places=1)
-    self.assertAlmostEqual(meanzi,  0, places=1)
-    self.assertAlmostEqual(meaniz,  0, places=1)
-
+        do {
+            let QP_program = try QuantumProgram()
+            let q = try QP_program.create_quantum_register("q", 2)
+            let c = try QP_program.create_classical_register("c", 2)
+            let qc = try QP_program.create_circuit("qc", [q], [c])
+            try qc.h(q[0])
+            try qc.cx(q[0], q[1])
+            try qc.measure(q[0], c[0])
+            try qc.measure(q[1], c[1])
+            let circuits = ["qc"]
+            let shots = 10000  // the number of shots in the experiment.
+            let backend = "local_qasm_simulator"
+            let asyncExpectation = self.expectation(description: "test_average_data")
+            QP_program.execute(circuits, backend: backend, shots: shots) { result in
+                do {
+                    if let error = result.get_error() {
+                        XCTFail("Failure in test_average_data: \(error)")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    var observable = ["00": 1, "11": 1, "01": -1, "10": -1]
+                    let meanzz = try result.average_data("qc", observable)
+                    observable = ["00": 1, "11": -1, "01": 1, "10": -1]
+                    let meanzi = try result.average_data("qc", observable)
+                    observable = ["00": 1, "11": -1, "01": -1, "10": 1]
+                    let meaniz = try result.average_data("qc", observable)
+                    XCTAssert(meanzz.almostEqual(1, 0.1))
+                    XCTAssert(meanzi.almostEqual(0, 0.1))
+                    XCTAssert(meaniz.almostEqual(0, 0.1))
+                    asyncExpectation.fulfill()
+                } catch {
+                    XCTFail("Failure in test_average_data: \(error)")
+                    asyncExpectation.fulfill()
+                }
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_average_data")
+            })
+        } catch {
+            XCTFail("test_average_data: \(error)")
+        }
     }
 
     func test_execute_one_circuit_simulator_online() {
-    let QP_program = try QuantumProgram()
-    qr = QP_program.create_quantum_register("q", 1)
-    cr = QP_program.create_classical_register("c", 1)
-    qc = QP_program.create_circuit("qc", [qr], [cr])
-    qc.h(qr[0])
-    qc.measure(qr[0], cr[0])
-    shots = 1024  // the number of shots in the experiment.
-    QP_program.set_api(token:token, url:QE_URL)
-    backend = QP_program.online_simulators()[0]
-    # print(backend)
-    result = QP_program.execute(["qc"], backend=backend,
-    shots=shots, max_credits=3,
-    seed=73846087)
-    counts = result.get_counts("qc")
-    XCTAssertEqual(counts, ["0": 498, "1": 526])
+        guard let token = self.QE_TOKEN else {
+            return
+        }
+        do {
+            let QP_program = try QuantumProgram()
+            let qr = try QP_program.create_quantum_register("q", 1)
+            let cr = try QP_program.create_classical_register("c", 1)
+            let qc = try QP_program.create_circuit("qc", [qr], [cr])
+            try qc.h(qr[0])
+            try qc.measure(qr[0], cr[0])
+            let shots = 1024  // the number of shots in the experiment.
+            try QP_program.set_api(token:token, url:QE_URL)
+            let asyncExpectation = self.expectation(description: "test_execute_one_circuit_simulator_online")
+            QP_program.online_simulators()  { (backends,error) in
+                if error != nil {
+                    XCTFail("Failure in test_execute_one_circuit_simulator_online: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                guard let backend = backends.first else {
+                    XCTFail("Failure in test_execute_one_circuit_simulator_online: Missing backend.")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                QP_program.execute(["qc"],
+                                   backend: backend,
+                                   shots: shots,
+                                   max_credits: 3,
+                                   seed: 73846087) { result in
+                    do {
+                        if let error = result.get_error() {
+                            XCTFail("Failure in test_execute_one_circuit_simulator_online: \(error)")
+                            asyncExpectation.fulfill()
+                            return
+                        }
+                        let counts = try result.get_counts("qc")
+                        XCTAssertEqual(counts, ["0": 498, "1": 526])
+                        asyncExpectation.fulfill()
+                    } catch {
+                        XCTFail("Failure in test_average_data: \(error)")
+                        asyncExpectation.fulfill()
+                    }
+                }
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_execute_one_circuit_simulator_online")
+            })
+        } catch {
+            XCTFail("test_execute_one_circuit_simulator_online: \(error)")
+        }
     }
 
     func test_simulator_online_size() {
-    let QP_program = try QuantumProgram()
-    qr = QP_program.create_quantum_register("q", 25)
-    cr = QP_program.create_classical_register("c", 25)
-    qc = QP_program.create_circuit("qc", [qr], [cr])
-    qc.h(qr)
-    qc.measure(qr, cr)
-    shots = 1  // the number of shots in the experiment.
-    QP_program.set_api(token:token, url:QE_URL)
-    backend = "ibmqx_qasm_simulator"
-    result = QP_program.execute(["qc"], backend=backend,
-                                shots=shots, max_credits=3,
-                                seed=73846087)
-    self.assertRaises(RegisterSizeError, result.get_data, "qc")
+        guard let token = self.QE_TOKEN else {
+            return
+        }
+        do {
+            let QP_program = try QuantumProgram()
+            let qr = try QP_program.create_quantum_register("q", 25)
+            let cr = try QP_program.create_classical_register("c", 25)
+            let qc = try QP_program.create_circuit("qc", [qr], [cr])
+            try qc.h(qr)
+            try qc.measure(qr, cr)
+            let shots = 1  // the number of shots in the experiment.
+            try QP_program.set_api(token:token, url:QE_URL)
+            let backend = "ibmqx_qasm_simulator"
+            let asyncExpectation = self.expectation(description: "test_simulator_online_size")
+            QP_program.execute(["qc"],
+                               backend: backend,
+                               shots: shots,
+                               max_credits: 3,
+                               seed: 73846087) { result in
+                if let error = result.get_error() {
+                    switch error {
+                        case IBMQuantumExperienceError.registerSizeError(_):
+                            break
+                        default:
+                            XCTFail("test_simulator_online_size: \(error)")
+                    }
+                    asyncExpectation.fulfill()
+                    return
+                }
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_simulator_online_size")
+            })
+        } catch {
+            XCTFail("test_simulator_online_size: \(error)")
+        }
     }
-
+/*
     func test_execute_several_circuits_simulator_online() {
     let QP_program = try QuantumProgram()
     qr = QP_program.create_quantum_register("q", 2)
@@ -1743,26 +1904,26 @@ class QuantumProgramTests: XCTestCase {
     q = qp.get_quantum_register("q")
     r = qp.get_quantum_register("r")
     ans = qp.get_classical_register("ans")
-    # Set the first bit of q
+    // Set the first bit of q
     qc.x(q[0])
-    # Swap the set bit
+    // Swap the set bit
     swap(qc, q[0], q[n-1])
     swap(qc, q[n-1], r[n-1])
     swap(qc, r[n-1], q[1])
     swap(qc, q[1], r[1])
-    # Insert a barrier before measurement
+    // Insert a barrier before measurement
     qc.barrier()
-    # Measure all of the qubits in the standard basis
+    // Measure all of the qubits in the standard basis
     for j in range(n):
     qc.measure(q[j], ans[j])
     qc.measure(r[j], ans[j+n])
-    # First version: no mapping
+    // First version: no mapping
     result = qp.execute(["swapping"], backend=backend,
     coupling_map=None, shots=1024,
     seed=14)
     XCTAssertEqual(result.get_counts("swapping"),
     {"010000": 1024})
-    # Second version: map to coupling graph
+    // Second version: map to coupling graph
     result = qp.execute(["swapping"], backend=backend,
     coupling_map=coupling_map, shots=1024,
     seed=14)
@@ -1777,14 +1938,12 @@ class QuantumProgramTests: XCTestCase {
     FAKE_URL = "http://{0}.com".format(
     "".join(random.choice(string.ascii_lowercase) for _ in range(63))
     )
-    # SDK will throw ConnectionError on every call that implies a connection
+    // SDK will throw ConnectionError on every call that implies a connection
     self.assertRaises(ConnectionError, qp.set_api, FAKE_TOKEN, FAKE_URL)
 
-    } func test_results_save_load() {
-    """Test saving and loading the results of a circuit.
+    }
 
-    Test for the "local_unitary_simulator" and "local_qasm_simulator"
-    """
+    func test_results_save_load() {
     let QP_program = try QuantumProgram()
     metadata = {"testval":5}
     q = QP_program.create_quantum_register("q", 2)
@@ -1801,7 +1960,7 @@ class QuantumProgramTests: XCTestCase {
     test_1_path = self._get_resource_path("test_save_load1.json")
     test_2_path = self._get_resource_path("test_save_load2.json")
 
-    #delete these files if they exist
+    // delete these files if they exist
     if os.path.exists(test_1_path):
     os.remove(test_1_path)
 
@@ -1817,15 +1976,13 @@ class QuantumProgramTests: XCTestCase {
     self.assertAlmostEqual(metadata_loaded1["testval"], 5)
     self.assertAlmostEqual(metadata_loaded2["testval"], 5)
 
-    #remove files to keep directory clean
+    // remove files to keep directory clean
     os.remove(file1)
     os.remove(file2)
 
-    } func test_qubitpol() {
+    }
 
-    """Test the results of the qubitpol function in Results. Do two 2Q circuits
-    in the first do nothing and in the second do X on the first qubit.
-    """
+    func test_qubitpol() {
     let QP_program = try QuantumProgram()
     q = QP_program.create_quantum_register("q", 2)
     c = QP_program.create_classical_register("c", 2)
@@ -1844,10 +2001,9 @@ class QuantumProgramTests: XCTestCase {
     XCTAssert(np.array_equal(yvals, [[-1,-1],[1,-1]]))
     XCTAssert(np.array_equal(xvals, [0,1]))
 
-    } func test_reconfig() {
-    """Test reconfiguring the qobj from 1024 shots to 2048 using
-    reconfig instead of recompile
-    """
+    }
+
+    func test_reconfig() {
     let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
     qr = QP_program.get_quantum_register("qname")
     cr = QP_program.get_classical_register("cname")
@@ -1862,8 +2018,8 @@ class QuantumProgramTests: XCTestCase {
     out = QP_program.run(qobj)
     results = out.get_counts("qc2")
 
-    #change the number of shots and re-run to test if the reconfig does not break
-    #the ability to run the qobj
+    // change the number of shots and re-run to test if the reconfig does not break
+    // the ability to run the qobj
     qobj = QP_program.reconfig(qobj, shots=2048)
     out2 = QP_program.run(qobj)
     results2 = out2.get_counts("qc2")
@@ -1871,7 +2027,7 @@ class QuantumProgramTests: XCTestCase {
     XCTAssertEqual(results, {"000": 1024})
     XCTAssertEqual(results2, {"000": 2048})
 
-    #change backend
+    // change backend
     qobj = QP_program.reconfig(qobj, backend="local_unitary_simulator")
     XCTAssertEqual(qobj["config"]["backend"], "local_unitary_simulator")
     #change maxcredits
@@ -1880,7 +2036,7 @@ class QuantumProgramTests: XCTestCase {
     #change seed
     qobj = QP_program.reconfig(qobj, seed=11)
     XCTAssertEqual(qobj["circuits"][0]["seed"], 11)
-    #change the config
+    // change the config
     test_config_2 = {"0": 2}
     qobj = QP_program.reconfig(qobj, config=test_config_2)
     XCTAssertEqual(qobj["circuits"][0]["config"]["0"], 2)

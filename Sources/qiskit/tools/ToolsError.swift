@@ -20,6 +20,7 @@ import Foundation
  */
 public enum ToolsError: LocalizedError, CustomStringConvertible {
 
+    case unknownHamiltonian
     case invalidPauliMultiplication
     case pauliToMatrixZ
     case pauliToMatrixX
@@ -32,6 +33,8 @@ public enum ToolsError: LocalizedError, CustomStringConvertible {
     }
     public var description: String {
         switch self {
+        case .unknownHamiltonian:
+            return "Unknown hamiltonian."
         case .invalidPauliMultiplication:
             return "Paulis cannot be multiplied - different number of qubits"
         case .pauliToMatrixZ:

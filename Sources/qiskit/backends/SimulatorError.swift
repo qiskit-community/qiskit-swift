@@ -19,7 +19,6 @@ import Foundation
 Exception for errors raised by the Simulator object.
 */
 public enum SimulatorError: LocalizedError, CustomStringConvertible {
-    case unknownSimulator(name: String)
     case unrecognizedOperation(backend: String, operation: String)
     case notImplemented(backend: String)
     case missingCompiledCircuit
@@ -30,8 +29,6 @@ public enum SimulatorError: LocalizedError, CustomStringConvertible {
     }
     public var description: String {
         switch self {
-        case .unknownSimulator(let name):
-            return "Unknown simulator '\(name)'"
         case .unrecognizedOperation(let backend,let operation):
             return "\(backend) encountered unrecognized operation '\(operation)'"
         case .notImplemented(let backend):

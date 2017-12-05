@@ -19,4 +19,7 @@ extension Double {
     func format(_ f: Int) -> String {
         return String(format: "%.\(f)f", self)
     }
+    public func almostEqual(_ n: Double, _ delta: Double = 0.0000001) -> Bool {
+        return (self-n).absolute() <= delta
+    }
 }

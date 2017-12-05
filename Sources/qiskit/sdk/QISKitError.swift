@@ -34,19 +34,14 @@ public enum QISKitError: LocalizedError, CustomStringConvertible {
     case regIndexRange
     case circuitsNotCompatible
     case noArguments
-    case missingFileName
     case missingCircuit
     case missingCircuits
     case missingQuantumProgram(name: String)
     case missingCompiledConfig
     case missingCompiledQasm
-    case errorShots
-    case errorMaxCredit
     case missingStatus
     case timeout
     case errorStatus(status: String)
-    case errorResult(result: ResultError)
-    case errorLocalSimulator
     case missingJobId
     case parserError(msg: String)
     case missingBackend(backend: String)
@@ -91,8 +86,6 @@ public enum QISKitError: LocalizedError, CustomStringConvertible {
             return "circuits are not compatible"
         case .noArguments:
             return "no arguments passed"
-        case .missingFileName:
-            return "No filename provided"
         case .missingCircuit:
             return "Circuit not found"
         case .missingCircuits:
@@ -103,20 +96,12 @@ public enum QISKitError: LocalizedError, CustomStringConvertible {
             return "No compiled configuration for this circuit"
         case .missingCompiledQasm:
             return "No compiled qasm for this circuit"
-        case .errorShots:
-            return "Online backends only support job batches with equal numbers of shots"
-        case .errorMaxCredit:
-            return "Online backends only support job batches with equal max credit"
         case .missingStatus:
             return "Missing Status"
         case .timeout:
             return "Timeout"
         case .errorStatus(let status):
             return "status: \(status)"
-        case .errorResult(let result):
-            return result.description
-        case .errorLocalSimulator:
-            return "Not a local simulator"
         case .missingJobId:
             return "Missing JobId"
         case .parserError(let msg):

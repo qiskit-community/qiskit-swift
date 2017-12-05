@@ -83,8 +83,8 @@ public final class GHZ {
             print("no mapping, simulator")
             let r = qp.execute(["ghz"], backend: "ibmqx_qasm_simulator", coupling_map: nil,shots: 1024) { (result) in
                 do {
-                    if result.is_error() {
-                        print(result.get_error())
+                    if let error = result.get_error() {
+                        print(error)
                         responseHandler?()
                         return
                     }
@@ -95,8 +95,8 @@ public final class GHZ {
                     print("map to \(backend), simulator")
                     let r = qp.execute(["ghz"], backend: "ibmqx_qasm_simulator", coupling_map: coupling_map,shots: 1024) { (result) in
                         do {
-                            if result.is_error() {
-                                print(result.get_error())
+                            if let error = result.get_error() {
+                                print(error)
                                 responseHandler?()
                                 return
                             }
@@ -107,8 +107,8 @@ public final class GHZ {
                             print("map to \(backend), local qasm simulator")
                             let r = qp.execute(["ghz"], backend: "local_qasm_simulator",coupling_map: coupling_map,shots: 1024) { (result) in
                                 do {
-                                    if result.is_error() {
-                                        print(result.get_error())
+                                    if let error = result.get_error() {
+                                        print(error)
                                         responseHandler?()
                                         return
                                     }
@@ -119,8 +119,8 @@ public final class GHZ {
                                     print("map to \(backend), backend")
                                     let r = qp.execute(["ghz"], backend: backend,timeout:120, coupling_map: coupling_map,shots: 1024) { (result) in
                                         do {
-                                            if result.is_error() {
-                                                print(result.get_error())
+                                            if let error = result.get_error() {
+                                                print(error)
                                                 responseHandler?()
                                                 return
                                             }

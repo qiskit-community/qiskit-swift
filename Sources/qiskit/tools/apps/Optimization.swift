@@ -313,7 +313,7 @@ public final class Optimization {
                                         _ input_circuit: QuantumCircuit,
                                         _ shots: Int,
                                         _ device: String,
-                                        _ callback: @escaping ((_:Complex, _:String?) -> Void)) throws -> RequestTask {
+                                        _ callback: @escaping ((_:Complex, _:Error?) -> Void)) throws -> RequestTask {
         var energy: Complex = 0.0
         var requestTask = RequestTask()
         do {
@@ -348,8 +348,8 @@ public final class Optimization {
                         i += 1
                     }
                     requestTask = Q_program.execute(circuits_labels, backend: device, shots: shots) { (result) in
-                        if result.is_error() {
-                            callback(energy,result.get_error())
+                        if let error = result.get_error() {
+                            callback(energy,error)
                             return
                         }
                         do {
@@ -368,7 +368,7 @@ public final class Optimization {
                             }
                             callback(energy,nil)
                         } catch {
-                            callback(energy,error.localizedDescription)
+                            callback(energy,error)
                         }
                     }
                 }
@@ -377,8 +377,8 @@ public final class Optimization {
                     var circuit = ["c"]
                     try Q_program.add_circuit(circuit[0], input_circuit)
                     requestTask = Q_program.execute(circuit, backend: device, config: ["data": ["quantum_state"]], shots: shots) { (result) in
-                        if result.is_error() {
-                            callback(energy,result.get_error())
+                        if let error = result.get_error() {
+                            callback(energy,error)
                             return
                         }
                         do {
@@ -407,12 +407,12 @@ public final class Optimization {
                                 energy = try quantum_state.conjugate().inner(Vector<Complex>(value:hamiltonianMatrix.dot(m).value[0]))
                             }
                             else {
-                                callback(energy,"Unknown hamiltonian: \(hamiltonian)")
+                                callback(energy,ToolsError.unknownHamiltonian)
                                 return
                             }
                             callback(energy,nil)
                         } catch {
-                            callback(energy,error.localizedDescription)
+                            callback(energy,error)
                         }
                     }
                 }
@@ -443,8 +443,8 @@ public final class Optimization {
                     i += 1
                 }
                 requestTask = Q_program.execute(circuits_labels, backend: device, shots: shots) { (result) in
-                    if result.is_error() {
-                        callback(energy,result.get_error())
+                    if let error = result.get_error() {
+                        callback(energy,error)
                         return
                     }
                     do {
@@ -456,18 +456,18 @@ public final class Optimization {
                         }
                         callback(energy,nil)
                     } catch {
-                        callback(energy,error.localizedDescription)
+                        callback(energy,error)
                     }
                 }
             }
             else {
                 DispatchQueue.main.async {
-                    callback(energy,"Unknown hamiltonian.")
+                    callback(energy,ToolsError.unknownHamiltonian)
                 }
             }
         } catch {
             DispatchQueue.main.async {
-                callback(energy,error.localizedDescription)
+                callback(energy,error)
             }
         }
         return requestTask

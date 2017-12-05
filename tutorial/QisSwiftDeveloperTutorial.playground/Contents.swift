@@ -57,15 +57,16 @@ var apitoken = "None"
  ### Quantum and Classical registers
  A Quantum Program can have several Quantum registers and several Classical Registers
  */
-let q = try QuantumRegister("q", 5)
-let c = try ClassicalRegister("c", 5)
+do {
+    let q = try QuantumRegister("q", 5)
+    let c = try ClassicalRegister("c", 5)
 
 /*: 
  ### Quantum Circuit
  The following code represents a quantum circuit
 */
 
-let circuit = try QuantumCircuit([q,c])
+    let circuit = try QuantumCircuit([q,c])
 
 /*:
 [Quantum Experience User Guide]: https://quantumexperience.ng.bluemix.net/qstage/#/tutorial?sectionId=71972f437b08e12d1f465a8857f4514c&pageIndex=2 "Quantum Experience User Guide"
@@ -86,32 +87,32 @@ let circuit = try QuantumCircuit([q,c])
  ### Extracting Qasm
 You obtain a QASM representation of your code by print your circuit any time as follows:
  */
-print(circuit.qasm())
+    print(circuit.qasm())
 
 
 /*:
  ### Execute your Program
  The following code initializes a quantum program compile, configures it with your API Token and API url, and runs the execution.
  */
-do {
+
     let qp = try QuantumProgram()
     try qp.set_api(token: apitoken, url: testurl)
     try qp.add_circuit("test", circuit)
 
     qp.execute(["test"], backend: "ibmqx_qasm_simulator") { (result) in
-        if result.is_error() {
-            debugPrint(result.get_error())
+        if let error = result.get_error() {
+            print(error)
             return
         }
         do {
             print(try result.get_counts("test"))
-        } catch let error {
-            print(error.localizedDescription)
+        } catch {
+            print(error)
         }
     }
 
-} catch let error {
-    print(error.localizedDescription)
+} catch {
+    print(error)
 }
 
 

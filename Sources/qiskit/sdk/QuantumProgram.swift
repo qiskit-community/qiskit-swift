@@ -1399,7 +1399,7 @@ public final class QuantumProgram: CustomStringConvertible {
                            callback)
         } catch {
             DispatchQueue.main.async {
-                callback(Result(["job_id": "0","status": "ERROR","result": error.localizedDescription],[:]))
+                callback(Result("0",error,[:]))
             }
         }
         return RequestTask()

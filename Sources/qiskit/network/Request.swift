@@ -24,6 +24,7 @@ final class Request {
     private static let REACHTIMEOUT: TimeInterval = 90.0
     private static let CONNTIMEOUT: TimeInterval = 120.0
     private static let HEADER_CLIENT_APPLICATION = "x-qx-client-application"
+    private static let _max_qubit_error_re = ".*registers exceed the number of qubits, it can't be greater than (\\d+).*"
 
     let credential: Credentials
     private var urlSession: URLSession
@@ -63,8 +64,8 @@ final class Request {
     private func check_token(_ error: IBMQuantumExperienceError?,
                              responseHandler: @escaping ((_:Bool, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         if error != nil {
-            if case IBMQuantumExperienceError.httpError(let status, _) = error! {
-                if status == 401 {
+            if case IBMQuantumExperienceError.httpError(let httpStatus, _, _, _) = error! {
+                if httpStatus == 401 {
                     return self.credential.obtain_token(self) { (error) -> Void in
                         responseHandler(true,error)
                     }
@@ -428,28 +429,45 @@ final class Request {
             }
             return value
         }
+        var jsonAny: Any? = nil
         do {
-            let jsonAny = try JSONSerialization.jsonObject(with: data!, options: .allowFragments)
-            var msg = ""
-            if let json = jsonAny as? [String:Any] {
-                if let errorObj = json["error"] as? [String:Any] {
-                    if let status = errorObj["status"] as? Int {
-                        msg.append("Status: \(status)")
-                    }
-                    if let code = errorObj["code"] as? String {
-                        msg.append("; Code: \(code)")
-                    }
-                    if let message = errorObj["message"] as? String {
-                        msg.append("; Msg: \(message)")
-                    }
-                }
-            }
-            if httpResponse.statusCode != Request.HTTPSTATUSOK {
-                throw IBMQuantumExperienceError.httpError(status: httpResponse.statusCode, msg: msg)
-            }
-            return jsonAny
+            jsonAny = try JSONSerialization.jsonObject(with: data!, options: .allowFragments)
         } catch let error {
             throw IBMQuantumExperienceError.internalError(error: error)
         }
+        return try _parse_response(httpResponse.statusCode, jsonAny!)
+    }
+
+    private static func _parse_response(_ httpStatus: Int, _ jsonAny: Any) throws -> Any {
+        var status: Int = 0
+        var code: String = ""
+        var message: String = ""
+        var isResultError: Bool = false
+        if let json = jsonAny as? [String:Any] {
+            if let errorObj = json["error"] as? [String:Any] {
+                isResultError = true
+                if let s = errorObj["status"] as? Int {
+                    status = s
+                }
+                if let c = errorObj["code"] as? String {
+                    code = c
+                }
+                if let m = errorObj["message"] as? String {
+                    message = m
+                }
+            }
+        }
+        // convert error messages into exceptions
+        let wholeRange = message.startIndex..<message.endIndex
+        if let match = message.range(of: _max_qubit_error_re, options: .regularExpression), wholeRange == match {
+            throw IBMQuantumExperienceError.registerSizeError(msg: message)
+        }
+        if httpStatus != Request.HTTPSTATUSOK {
+            throw IBMQuantumExperienceError.httpError(httpStatus: httpStatus, status: status, code: code, msg: message)
+        }
+        if isResultError {
+            throw IBMQuantumExperienceError.resultError(status: status, code: code, msg: message)
+        }
+        return jsonAny
     }
 }

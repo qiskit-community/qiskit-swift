@@ -110,20 +110,16 @@ final class QeRemote: BaseBackend {
             }
             let r = self.api!.run_job(qasms: api_jobs, backend: backend, shots: shots, maxCredits: max_credits, seed: seed0) { (output, error) -> Void in
                 if error != nil {
-                    response(Result(["job_id": "0","status": "ERROR","result": QISKitError.internalError(error: error!).localizedDescription],q_job.qobj))
-                    return
-                }
-                if let error = output["error"] as? [String:Any] {
-                    response(Result(["job_id": "0","status": "ERROR","result": QISKitError.errorResult(result: ResultError(error)).localizedDescription],q_job.qobj))
+                    response(Result("0",error!,q_job.qobj))
                     return
                 }
                 guard let jobId = output["id"] as? String else {
-                    response(Result(["job_id": "0","status": "ERROR","result": QISKitError.missingJobId.localizedDescription],q_job.qobj))
+                    response(Result("0",QISKitError.missingJobId,q_job.qobj))
                     return
                 }
                 let r = QeRemote.wait_for_job(jobId, self.api!, wait: wait, timeout: timeout) { (json, error) -> Void in
                     if error != nil {
-                        response(Result(["job_id": jobId, "status": "ERROR","result": QISKitError.internalError(error: error!).localizedDescription],q_job.qobj))
+                        response(Result(jobId, error!, q_job.qobj))
                         return
                     }
                     var job_result = json
@@ -137,12 +133,7 @@ final class QeRemote: BaseBackend {
             }
             reqTask.add(r)
         } catch {
-            if let err = error as? QISKitError {
-                response(Result(["job_id": "0","status": "ERROR","result": err.localizedDescription],q_job.qobj))
-            }
-            else {
-                response(Result(["job_id": "0","status": "ERROR","result": QISKitError.internalError(error: error).localizedDescription],q_job.qobj))
-            }
+            response(Result("0",error,q_job.qobj))
         }
         return reqTask
     }
@@ -151,7 +142,7 @@ final class QeRemote: BaseBackend {
                                            _ api: IBMQuantumExperience,
                                            _ wait: Int = 5,
                                            _ timeout: Int = 60,
-                                           _ responseHandler: @escaping ((_:Result,_:QISKitError?) -> Void)) -> RequestTask {
+                                           _ responseHandler: @escaping ((_:Result) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         do {
             var qobj = q
@@ -206,20 +197,16 @@ final class QeRemote: BaseBackend {
             }
             let r = api.run_job(qasms: api_jobs, backend: backend, shots: shots, maxCredits: max_credits, seed: seed0) { (output, error) -> Void in
                 if error != nil {
-                    responseHandler(Result(),QISKitError.internalError(error: error!))
-                    return
-                }
-                if let error = output["error"] as? [String:Any] {
-                    responseHandler(Result(),QISKitError.errorResult(result: ResultError(error)))
+                    responseHandler(Result("0",error!,[:]))
                     return
                 }
                 guard let jobId = output["id"] as? String else {
-                    responseHandler(Result(),QISKitError.missingJobId)
+                    responseHandler(Result("0",QISKitError.missingJobId,[:]))
                     return
                 }
                 let r = wait_for_job(jobId, api, wait: wait, timeout: timeout) { (json, error) -> Void in
                     if error != nil {
-                        responseHandler(Result(),QISKitError.internalError(error: error!))
+                        responseHandler(Result(jobId,error!,[:]))
                         return
                     }
                     var job_result = json
@@ -227,33 +214,28 @@ final class QeRemote: BaseBackend {
                         job_result["name"] = id
                     }
                     job_result["backend"] = backend
-                    responseHandler(Result(job_result, qobj),nil)
+                    responseHandler(Result(job_result, qobj))
                 }
                 reqTask.add(r)
             }
             reqTask.add(r)
         } catch {
-            if let err = error as? QISKitError {
-                responseHandler(Result(),err)
-            }
-            else {
-                responseHandler(Result(),QISKitError.internalError(error: error))
-            }
+            responseHandler(Result("0",error,[:]))
         }
         return reqTask
     }
 
     private static func wait_for_job(_ jobId: String, _ api: IBMQuantumExperience, wait: Int = 5, timeout: Int = 60,
-                                     _ responseHandler: @escaping ((_:[String:Any], _:QISKitError?) -> Void)) -> RequestTask {
+                                     _ responseHandler: @escaping ((_:[String:Any], _:Error?) -> Void)) -> RequestTask {
         return wait_for_job(api, jobId, wait, timeout, 0, responseHandler)
     }
 
     private static func wait_for_job(_ api: IBMQuantumExperience, _ jobid: String, _ wait: Int, _ timeout: Int, _ elapsed: Int,
-                                     _ responseHandler: @escaping ((_:[String:Any], _:QISKitError?) -> Void)) -> RequestTask {
+                                     _ responseHandler: @escaping ((_:[String:Any], _:Error?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r =  api.get_job(jobId: jobid) { (jobResult, error) -> Void in
             if error != nil {
-                responseHandler([:], QISKitError.internalError(error: error!))
+                responseHandler([:], error!)
                 return
             }
             guard let status = jobResult["status"] as? String else {

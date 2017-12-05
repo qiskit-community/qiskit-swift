@@ -47,7 +47,7 @@ final class QasmCppSimulator: BaseBackend {
         DispatchQueue.global().async {
             DispatchQueue.main.async {
                 let job_id = UUID().uuidString
-                response(Result(["job_id": job_id, "status": "ERROR","result": SimulatorError.notImplemented(backend: self.configuration["name"] as! String).localizedDescription],q_job.qobj))
+                response(Result(["job_id": job_id, "status": "ERROR","result": SimulatorError.notImplemented(backend: self.configuration["name"] as! String)],q_job.qobj))
             }
         }
         return reqTask

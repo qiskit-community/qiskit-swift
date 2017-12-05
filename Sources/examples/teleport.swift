@@ -101,8 +101,8 @@ public final class Teleport {
             print("First version: not mapped")
             let r = qp.execute(["teleport"], backend: backend,coupling_map: nil,shots: 1024) { (result) in
                 do {
-                    if result.is_error() {
-                        print(result.get_error())
+                    if let error = result.get_error() {
+                        print(error)
                         responseHandler?()
                         return
                     }
@@ -112,8 +112,8 @@ public final class Teleport {
                     print("Second version: mapped to qx2 coupling graph")
                     let r = qp.execute(["teleport"], backend: backend,coupling_map: coupling_map,shots: 1024) { (result) in
                         do {
-                            if result.is_error() {
-                                print(result.get_error())
+                            if let error = result.get_error() {
+                                print(error)
                                 responseHandler?()
                                 return
                             }

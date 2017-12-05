@@ -122,8 +122,8 @@ class UnrollerTests: XCTestCase {
        /* let asyncExpectation = self.expectation(description: "runJob")
         qp.run_async(qobj) { (result) in
             do {
-                if result.is_error() {
-                    XCTFail("Failure in runJob: \(result.get_error())")
+                if let error = result.get_error() {
+                    XCTFail("Failure in runJob: \(error)")
                     asyncExpectation.fulfill()
                     return
                 }

@@ -146,8 +146,8 @@ public final class QFT {
 
             let r = qp.execute(["qft3", "qft4", "qft5"], backend:"ibmqx_qasm_simulator", coupling_map: coupling_map,shots: 1024) { (result) in
                 do {
-                    if result.is_error() {
-                        print(result.get_error())
+                    if let error = result.get_error() {
+                        print(error)
                         responseHandler?()
                         return
                     }
@@ -161,8 +161,8 @@ public final class QFT {
 
                     let r = qp.execute(["qft3"], backend:backend,timeout:120, coupling_map: coupling_map,shots: 1024) { (result) in
                         do {
-                            if result.is_error() {
-                                print(result.get_error())
+                            if let error = result.get_error() {
+                                print(error)
                                 responseHandler?()
                                 return
                             }

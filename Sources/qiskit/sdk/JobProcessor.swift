@@ -94,7 +94,7 @@ final class JobProcessor {
             }
             let r = self.backendUtils.get_backend_instance(backend_name) { (backend,error) in
                 if error != nil {
-                    response(Result(["job_id": "0", "status": "ERROR","result": error!.localizedDescription],q_job.qobj))
+                    response(Result("0",error!,q_job.qobj))
                     return
                 }
                 let r = backend!.run(q_job,response: response)
@@ -103,7 +103,7 @@ final class JobProcessor {
             reqTask.add(r)
         } catch {
             DispatchQueue.main.async {
-                response(Result(["job_id": "0", "status": "ERROR","result": error.localizedDescription],q_job.qobj))
+                response(Result("0",error,q_job.qobj))
             }
         }
         return reqTask

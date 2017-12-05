@@ -83,7 +83,7 @@ final class BackendUtils {
 
     @discardableResult
     private func discover_local_backends() -> Set<String> {
-        let backends = [QasmCppSimulator.self,
+        let backends = [//QasmCppSimulator.self,
                         QasmSimulator.self,
                         UnitarySimulator.self]
         var backend_name_list = Set<String>()

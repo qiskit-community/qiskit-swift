@@ -91,8 +91,8 @@ public final class RippleAdd {
             print("First version: not mapped")
             let r = qp.execute(["rippleadd"], backend: backend, coupling_map: nil,shots: 1024) { (result) in
                 do {
-                    if result.is_error() {
-                        print(result.get_error())
+                    if let error = result.get_error() {
+                        print(error)
                         responseHandler?()
                         return
                     }
@@ -102,8 +102,8 @@ public final class RippleAdd {
                     let qobj = try qp.compile(["rippleadd"], backend: backend, coupling_map: coupling_map,shots: 1024)
                     let r = qp.run_async(qobj) { (result) in
                         do {
-                            if result.is_error() {
-                                print(result.get_error())
+                            if let error = result.get_error() {
+                                print(error)
                                 responseHandler?()
                                 return
                             }

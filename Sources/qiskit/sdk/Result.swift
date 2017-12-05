@@ -17,9 +17,7 @@
 import Foundation
 
 /**
- Result Class.
-
- Class internal properties.
+ Result struct.
 
  Methods to process the quantum program after it has been run
 
@@ -45,19 +43,21 @@ import Foundation
              ]
      }
  */
-public final class Result: CustomStringConvertible {
+public struct Result: CustomStringConvertible {
 
-    private var __qobj: [String:Any]
-    private var __result: [String:Any]
-
-    init() {
-        self.__qobj = [:]
-        self.__result = [:]
-    }
+    private var __qobj: [String:Any] = [:]
+    private var __result: [String:Any] = [:]
 
     init(_ qobj_result: [String:Any], _ qobj: [String:Any]) {
         self.__qobj = qobj
         self.__result = qobj_result
+    }
+
+    init(_ jobId: String, _ error: Error, _ qobj: [String:Any]) {
+        self.__qobj = qobj
+        self.__result = ["job_id": jobId,
+                         "status": "ERROR",
+                         "result": error]
     }
 
     /**
@@ -92,7 +92,7 @@ public final class Result: CustomStringConvertible {
      Returns:
         The current object with appended results.
      */
-    public func append(_ right: Result) throws {
+    public mutating func append(_ right: Result) throws {
         if let leftConfig = self.__qobj["config"] as? [String:Any],
             let rightConfig = right.__qobj["config"] as? [String:Any] {
             if NSDictionary(dictionary: leftConfig).isEqual(to: rightConfig) {
@@ -142,7 +142,7 @@ public final class Result: CustomStringConvertible {
         A new Result object consisting of combined objects.
      */
     public static func add(left: Result, right: Result) throws -> Result {
-        let ret =  Result(left.__result, left.__qobj)
+        var ret =  Result(left.__result, left.__qobj)
         try ret.append(right)
         return ret
     }
@@ -214,13 +214,11 @@ public final class Result: CustomStringConvertible {
         return ""
     }
 
-    public func get_error() -> String {
-        if self.is_error() {
-            if let result = self.__result["result"] as? String {
-                return result
-            }
+    public func get_error() -> Error? {
+        if let result = self.__result["result"] as? Error {
+            return result
         }
-        return ""
+        return nil
     }
 
     /**
@@ -271,8 +269,8 @@ public final class Result: CustomStringConvertible {
      A dictionary of data for the different backends
      */
     public func get_data(_ name: String) throws -> [String:Any] {
-        if self.is_error() {
-            throw QISKitError.errorStatus(status: self.get_error())
+        if let error = self.get_error() {
+            throw error
         }
         let qobj = self.__qobj
         if let circuits = qobj["circuits"] as? [[String:Any]], 

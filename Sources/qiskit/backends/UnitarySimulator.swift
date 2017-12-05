@@ -153,7 +153,7 @@ final class UnitarySimulator: BaseBackend {
     override public func run(_ q_job: QuantumJob, response: @escaping ((_:Result) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         DispatchQueue.global().async {
-            var result = Result()
+            var result: Result? = nil
             let job_id = UUID().uuidString
             do {
                 let qobj = q_job.qobj
@@ -165,10 +165,10 @@ final class UnitarySimulator: BaseBackend {
                 }
                 result = Result(["job_id": job_id, "result": result_list, "status": "COMPLETED"],qobj)
             } catch {
-                result = Result(["job_id": job_id, "status": "ERROR","result": error.localizedDescription],q_job.qobj)
+                result = Result(job_id,error,q_job.qobj)
             }
             DispatchQueue.main.async {
-                response(result)
+                response(result!)
             }
         }
         return reqTask
