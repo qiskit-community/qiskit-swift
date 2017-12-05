@@ -117,11 +117,7 @@ class LocalUnitarySimulatorTests: XCTestCase {
                     var fail = false
                     for row in 0..<unitary.rowCount {
                         for col in 0..<unitary.colCount {
-                            var diff = abs(unitary[row,col].real - complexMatrix[row,col].real)
-                            if diff <= cmp {
-                                diff = abs(unitary[row,col].imag - complexMatrix[row,col].imag)
-                            }
-                            if diff > cmp {
+                            if !unitary[row,col].almostEqual(complexMatrix[row,col],cmp) {
                                 XCTFail("test_unitary_simulator: (\(row),\(col)): \(unitary[row,col]) \(unitary[row,col])")
                                 fail = true
                                 break
@@ -223,8 +219,8 @@ class LocalUnitarySimulatorTests: XCTestCase {
                                                      [0,  1,  0, 0]]
                 let norm1 = unitaryreal1.conjugate().transpose().dot(unitary1).trace()
                 let norm2 = unitaryreal2.conjugate().transpose().dot(unitary2).trace()
-                XCTAssertEqual(norm1.real, 4.0)
-                XCTAssertEqual(norm2.real, 4.0)
+                XCTAssert(norm1.almostEqual(4.0))
+                XCTAssert(norm2.almostEqual(4.0))
                 asyncExpectation.fulfill()
             }
             self.waitForExpectations(timeout: 180, handler: { (error) in
