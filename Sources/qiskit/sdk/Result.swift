@@ -93,41 +93,51 @@ public struct Result: CustomStringConvertible {
         The current object with appended results.
      */
     public mutating func append(_ right: Result) throws {
-        if let leftConfig = self.__qobj["config"] as? [String:Any],
-            let rightConfig = right.__qobj["config"] as? [String:Any] {
-            if NSDictionary(dictionary: leftConfig).isEqual(to: rightConfig) {
-                if let leftId = self.__qobj["id"] as? String {
-                    self.__qobj["id"] = [leftId]
-                }
-                if var leftIds = self.__qobj["id"] as? [String] {
-                    if let rightId = right.__qobj["id"] as? String {
-                        leftIds.append(rightId)
-                    }
-                    else if let rightIds = right.__qobj["id"] as? [String] {
-                        leftIds.append(contentsOf:rightIds)
-                    }
-                    self.__qobj["id"] = leftIds
-                }
-                if let rightCircuits = right.__qobj["circuits"] as? [Any] {
-                    if var leftCircuits = self.__qobj["circuits"] as? [Any] {
-                        leftCircuits.append(contentsOf: rightCircuits)
-                        self.__qobj["circuits"] = leftCircuits
-                    }
-                    else {
-                        self.__qobj["circuits"] = rightCircuits
-                    }
-                }
-                if let rightResults = right.__result["result"] as? [Any] {
-                    if var leftResults = self.__result["result"] as? [Any] {
-                        leftResults.append(contentsOf: rightResults)
-                        self.__result["result"] = leftResults
-                    }
-                    else {
-                        self.__result["result"] = rightResults
-                    }
-                }
-                return
+        if let leftConfig = self.__qobj["config"] as? [String:AnyHashable],
+            let rightConfig = right.__qobj["config"] as? [String:AnyHashable] {
+            // comparison di=one this way due to Linux limitations
+            if leftConfig.count != rightConfig.count {
+                throw QISKitError.invalidResultsCombine
             }
+            for (key,value) in leftConfig {
+                guard let otherValue = rightConfig[key] else {
+                    throw QISKitError.invalidResultsCombine
+                }
+                if value != otherValue {
+                    throw QISKitError.invalidResultsCombine
+                }
+            }
+            if let leftId = self.__qobj["id"] as? String {
+                self.__qobj["id"] = [leftId]
+            }
+            if var leftIds = self.__qobj["id"] as? [String] {
+                if let rightId = right.__qobj["id"] as? String {
+                    leftIds.append(rightId)
+                }
+                else if let rightIds = right.__qobj["id"] as? [String] {
+                    leftIds.append(contentsOf:rightIds)
+                }
+                self.__qobj["id"] = leftIds
+            }
+            if let rightCircuits = right.__qobj["circuits"] as? [Any] {
+                if var leftCircuits = self.__qobj["circuits"] as? [Any] {
+                    leftCircuits.append(contentsOf: rightCircuits)
+                    self.__qobj["circuits"] = leftCircuits
+                }
+                else {
+                    self.__qobj["circuits"] = rightCircuits
+                }
+            }
+            if let rightResults = right.__result["result"] as? [Any] {
+                if var leftResults = self.__result["result"] as? [Any] {
+                    leftResults.append(contentsOf: rightResults)
+                    self.__result["result"] = leftResults
+                }
+                else {
+                    self.__result["result"] = rightResults
+                }
+            }
+            return
         }
         throw QISKitError.invalidResultsCombine
     }
