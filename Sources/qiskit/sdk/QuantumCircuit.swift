@@ -158,20 +158,6 @@ public final class QuantumCircuit: CustomStringConvertible {
         }
         return self
     }
-    
-    /**
-     Overload + to implement self.concatenate.
-     */
-    public static func + (left: QuantumCircuit, right: QuantumCircuit) throws -> QuantumCircuit {
-        return try left.combine(right)
-    }
-
-    /**
-     Overload += to implement self.extend.
-     */
-    public static func += (left: inout QuantumCircuit, right: QuantumCircuit) throws {
-        try left.extend(right)
-    }
 
     /**
      Return indexed operation.

@@ -254,7 +254,7 @@ class QiskitProgramTests: XCTestCase {
             try qc3.h(qname[0])
             try qc2.measure(qname[0], cname[0])
             try qc3.measure(qname[0], cname[0])
-            let qc_result = try qc2 + qc3
+            let qc_result = try qc2.combine(qc3)
 
             XCTAssertEqual(qc_result.qasm(), "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nh qname[0];\nmeasure qname[0] -> cname[0];\nh qname[0];\nmeasure qname[0] -> cname[0];\n")
         } catch {

@@ -78,7 +78,7 @@ class UnrollerTests: XCTestCase {
 
     private func rippleAdd(_ qConfig: Qconfig) throws {
         let qp = try QuantumProgram(specs: UnrollerTests.QPS_SPECS)
-        var qc = try qp.get_circuit("rippleadd")
+        let qc = try qp.get_circuit("rippleadd")
         let a = try qp.get_quantum_register("a")
         let b = try qp.get_quantum_register("b")
         let cin = try qp.get_quantum_register("cin")
@@ -102,7 +102,7 @@ class UnrollerTests: XCTestCase {
         try qc.x(a[0])  // Set input a = 0...0001
         try qc.x(b)   // Set input b = 1...1111
         // Apply the adder
-        try qc += adder_subcircuit
+        try qc.extend(adder_subcircuit)
         // Measure the output register in the computational basis
         for j in 0..<UnrollerTests.n {
             try qc.measure(b[j], ans[j])
