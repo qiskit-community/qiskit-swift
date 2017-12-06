@@ -45,17 +45,17 @@ import Foundation
  */
 public struct Result: CustomStringConvertible {
 
-    private var __qobj: [String:Any] = [:]
-    private var __result: [String:Any] = [:]
+    var _qobj: [String:Any] = [:]
+    var _result: [String:Any] = [:]
 
     init(_ qobj_result: [String:Any], _ qobj: [String:Any]) {
-        self.__qobj = qobj
-        self.__result = qobj_result
+        self._qobj = qobj
+        self._result = qobj_result
     }
 
     init(_ jobId: String, _ error: Error, _ qobj: [String:Any]) {
-        self.__qobj = qobj
-        self.__result = ["job_id": jobId,
+        self._qobj = qobj
+        self._result = ["job_id": jobId,
                          "status": "ERROR",
                          "result": error]
     }
@@ -70,7 +70,7 @@ public struct Result: CustomStringConvertible {
     }
 
     public subscript(index: Int) -> [String:Any]? {
-        if let results = self.__result["result"] as? [[String:Any]] {
+        if let results = self._result["result"] as? [[String:Any]] {
             if index < results.count {
                 return results[index]
             }
@@ -79,7 +79,7 @@ public struct Result: CustomStringConvertible {
     }
 
     public var count: Int {
-        if let results = self.__result["result"] as? [[String:Any]] {
+        if let results = self._result["result"] as? [[String:Any]] {
             return results.count
         }
         return 0
@@ -93,8 +93,8 @@ public struct Result: CustomStringConvertible {
         The current object with appended results.
      */
     public mutating func append(_ right: Result) throws {
-        if let leftConfig = self.__qobj["config"] as? [String:AnyHashable],
-            let rightConfig = right.__qobj["config"] as? [String:AnyHashable] {
+        if let leftConfig = self._qobj["config"] as? [String:AnyHashable],
+            let rightConfig = right._qobj["config"] as? [String:AnyHashable] {
             // comparison di=one this way due to Linux limitations
             if leftConfig.count != rightConfig.count {
                 throw QISKitError.invalidResultsCombine
@@ -107,34 +107,34 @@ public struct Result: CustomStringConvertible {
                     throw QISKitError.invalidResultsCombine
                 }
             }
-            if let leftId = self.__qobj["id"] as? String {
-                self.__qobj["id"] = [leftId]
+            if let leftId = self._qobj["id"] as? String {
+                self._qobj["id"] = [leftId]
             }
-            if var leftIds = self.__qobj["id"] as? [String] {
-                if let rightId = right.__qobj["id"] as? String {
+            if var leftIds = self._qobj["id"] as? [String] {
+                if let rightId = right._qobj["id"] as? String {
                     leftIds.append(rightId)
                 }
-                else if let rightIds = right.__qobj["id"] as? [String] {
+                else if let rightIds = right._qobj["id"] as? [String] {
                     leftIds.append(contentsOf:rightIds)
                 }
-                self.__qobj["id"] = leftIds
+                self._qobj["id"] = leftIds
             }
-            if let rightCircuits = right.__qobj["circuits"] as? [Any] {
-                if var leftCircuits = self.__qobj["circuits"] as? [Any] {
+            if let rightCircuits = right._qobj["circuits"] as? [Any] {
+                if var leftCircuits = self._qobj["circuits"] as? [Any] {
                     leftCircuits.append(contentsOf: rightCircuits)
-                    self.__qobj["circuits"] = leftCircuits
+                    self._qobj["circuits"] = leftCircuits
                 }
                 else {
-                    self.__qobj["circuits"] = rightCircuits
+                    self._qobj["circuits"] = rightCircuits
                 }
             }
-            if let rightResults = right.__result["result"] as? [Any] {
-                if var leftResults = self.__result["result"] as? [Any] {
+            if let rightResults = right._result["result"] as? [Any] {
+                if var leftResults = self._result["result"] as? [Any] {
                     leftResults.append(contentsOf: rightResults)
-                    self.__result["result"] = leftResults
+                    self._result["result"] = leftResults
                 }
                 else {
-                    self.__result["result"] = rightResults
+                    self._result["result"] = rightResults
                 }
             }
             return
@@ -152,13 +152,13 @@ public struct Result: CustomStringConvertible {
         A new Result object consisting of combined objects.
      */
     public static func add(left: Result, right: Result) throws -> Result {
-        var ret =  Result(left.__result, left.__qobj)
+        var ret =  Result(left._result, left._qobj)
         try ret.append(right)
         return ret
     }
 
     public func is_error() -> Bool {
-        if let status = self.__result["status"] as? String {
+        if let status = self._result["status"] as? String {
             return status == "ERROR"
         }
         return false
@@ -170,7 +170,7 @@ public struct Result: CustomStringConvertible {
      the status of the results.
      */
     public func get_status() -> String? {
-        guard let status = self.__result["status"] as? String else {
+        guard let status = self._result["status"] as? String else {
             return nil
         }
         return status
@@ -184,7 +184,7 @@ public struct Result: CustomStringConvertible {
      */
     public func circuit_statuses() -> [String] {
         var ret: [String] = []
-        if let results = self.__result["result"] as? [[String:Any]] {
+        if let results = self._result["result"] as? [[String:Any]] {
             for result in results {
                 if let status = result["status"] as? String {
                     ret.append(status)
@@ -201,7 +201,7 @@ public struct Result: CustomStringConvertible {
      icircuit (int): index of circuit
      */
     public func get_circuit_status(icircuit: Int) -> String? {
-        if let results = self.__result["result"] as? [[String:Any]] {
+        if let results = self._result["result"] as? [[String:Any]] {
             if !results.isEmpty && icircuit >= 0 && icircuit < results.count {
                 if let status = results[icircuit]["status"] as? String {
                     return status
@@ -218,14 +218,14 @@ public struct Result: CustomStringConvertible {
      a string containing the job id.
      */
     public func get_job_id() -> String {
-        if let job_id = self.__result["job_id"] as? String {
+        if let job_id = self._result["job_id"] as? String {
             return job_id
         }
         return ""
     }
 
     public func get_error() -> Error? {
-        if let result = self.__result["result"] as? Error {
+        if let result = self._result["result"] as? Error {
             return result
         }
         return nil
@@ -239,7 +239,7 @@ public struct Result: CustomStringConvertible {
      A text version of the qasm file that has been run
      */
     public func get_ran_qasm(_ name: String) throws -> String {
-        let qobj = self.__qobj
+        let qobj = self._qobj
         if let circuits = qobj["circuits"] as? [[String:Any]] {
             for circuit in circuits {
                 if let n = circuit["name"] as? String {
@@ -282,9 +282,9 @@ public struct Result: CustomStringConvertible {
         if let error = self.get_error() {
             throw error
         }
-        let qobj = self.__qobj
+        let qobj = self._qobj
         if let circuits = qobj["circuits"] as? [[String:Any]], 
-            let results = self.__result["result"] as? [[String:Any]] {
+            let results = self._result["result"] as? [[String:Any]] {
             for (index, circuit) in circuits.enumerated() {
                 if let n = circuit["name"] as? String {
                     if n == name {
@@ -323,7 +323,7 @@ public struct Result: CustomStringConvertible {
      */
     public func get_names() -> [String] {
         var names: [String] = []
-        if let circuits = self.__qobj["circuits"] as? [[String:Any]] {
+        if let circuits = self._qobj["circuits"] as? [[String:Any]] {
             for circuit in circuits {
                 if let name = circuit["name"] as? String {
                     names.append(name)
@@ -373,8 +373,8 @@ public struct Result: CustomStringConvertible {
      qubit_pol: mxn double array where m is the number of circuit, n the number of qubits
      xvals: mx1 array of the circuit xvals
      */
-    public func get_qubitpol_vs_xval(_ xvals_dict: [String:Double]? = nil) throws -> ([[Double]],[Double]) {
-        guard let circuits = self.__qobj["circuits"] as? [[String:Any]] else {
+    public func get_qubitpol_vs_xval(xvals_dict: [String:Double]? = nil) throws -> ([[Double]],[Double]) {
+        guard let circuits = self._qobj["circuits"] as? [[String:Any]] else {
             return ([],[])
         }
         if circuits.isEmpty {

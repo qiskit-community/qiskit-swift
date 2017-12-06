@@ -28,6 +28,7 @@ public enum MatrixError: LocalizedError, CustomStringConvertible {
     case colsOutOfBounds(colStart: Int,colEnd: Int)
     case detSquare
     case detEmpty
+    case sameShape
 
     public var errorDescription: String? {
         return self.description
@@ -50,6 +51,8 @@ public enum MatrixError: LocalizedError, CustomStringConvertible {
             return "Determinant of a non-square matrix"
         case .detEmpty:
             return "Determinant of an empty matrix"
+        case .sameShape:
+            return "Matrices must have same number of rows and columns"
         }
     }
 }

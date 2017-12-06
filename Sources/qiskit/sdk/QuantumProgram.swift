@@ -563,6 +563,19 @@ public final class QuantumProgram: CustomStringConvertible {
         self.backendUtils.api = try IBMQuantumExperience(self.__api_config.token, try Qconfig(url: self.__api_config.url.absoluteString))
     }
 
+    @discardableResult
+    public func check_connection(_ responseHandler: @escaping ((_:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        if let api = self.backendUtils.api {
+            return api.check_connection() { (error) -> Void in
+                responseHandler(error)
+            }
+        }
+        DispatchQueue.main.async {
+            responseHandler(IBMQuantumExperienceError.invalidCredentials)
+        }
+        return RequestTask()
+    }
+
     /**
      Return the program specs
      */
@@ -1108,7 +1121,7 @@ public final class QuantumProgram: CustomStringConvertible {
      Returns:
         qobj: updated qobj
      */
-    public func reconfig(qobj: [String:Any],
+    public func reconfig(_ qobj: [String:Any],
                          backend: String? = nil,
                          config: [String:Any]? = nil,
                          shots: Int? = nil,

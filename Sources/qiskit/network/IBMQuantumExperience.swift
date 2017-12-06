@@ -42,6 +42,13 @@ public final class IBMQuantumExperience {
         self.config = config
     }
 
+    @discardableResult
+    public func check_connection(_ responseHandler: @escaping ((_:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.getRequest() { (request,error) -> Void in 
+            responseHandler(error)
+        }
+    }
+
     private func getRequest(_ responseHandler: @escaping ((_:Request?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         if let req = self.request {
             responseHandler(req,nil)

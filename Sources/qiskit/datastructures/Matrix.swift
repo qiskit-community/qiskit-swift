@@ -393,6 +393,19 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
 
 extension Matrix where T == Complex {
 
+    public init(real: Matrix<Double>, imag: Matrix<Double>) throws {
+        if real.shape != imag.shape {
+            throw MatrixError.sameShape
+        }
+        var value = [[Complex]](repeating: [Complex](repeating: 0.0, count: real.colCount), count: real.rowCount)
+        for row in 0..<real.rowCount {
+            for col in 0..<real.colCount {
+                value[row][col] = Complex(real[row,col],imag[row,col])
+            }
+        }
+        self.init(value: value)
+    }
+
     public func conjugate() -> Matrix {
         var m = Matrix<T>(repeating: 0, rows: self.rowCount, cols: self.colCount)
         for row in 0..<m.rowCount {

@@ -185,6 +185,17 @@ extension Vector where T == Complex {
         }
     }
 
+    public init(real: [Double], imag: [Double]) throws {
+        if real.count != imag.count {
+            throw VectorError.differentSizes(count1: real.count, count2: imag.count)
+        }
+        var value: [Complex] = []
+        for i in 0..<real.count {
+            value.append(Complex(real[i],imag[i]))
+        }
+        self.init(value: value)
+    }
+
     public func power(_ n: Double) -> Vector {
         return Vector<T>(value: self.map {
             return $0.power(n)
@@ -194,6 +205,18 @@ extension Vector where T == Complex {
     public func conjugate() -> Vector {
         return Vector<T>(value: self.map {
             return $0.conjugate()
+        })
+    }
+
+    public func real() -> Vector<Double> {
+        return Vector<Double>(value: self.map {
+            return $0.real
+        })
+    }
+
+    public func imag() -> Vector<Double> {
+        return Vector<Double>(value: self.map {
+            return $0.imag
         })
     }
 }

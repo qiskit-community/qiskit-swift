@@ -80,7 +80,12 @@ class QuantumProgramTests: XCTestCase {
         ("test_online_qasm_simulator_two_registers",test_online_qasm_simulator_two_registers),
         ("test_add_circuit",test_add_circuit),
         ("test_add_circuit_fail",test_add_circuit_fail),
-        ("test_example_multiple_compile",test_example_multiple_compile)
+        ("test_example_multiple_compile",test_example_multiple_compile),
+        ("test_example_swap_bits",test_example_swap_bits),
+        ("test_offline",test_offline),
+        ("test_results_save_load",test_results_save_load),
+        ("test_qubitpol",test_qubitpol),
+        ("test_reconfig",test_reconfig)
     ]
 
     private var QE_TOKEN: String? = nil
@@ -2055,181 +2060,335 @@ class QuantumProgramTests: XCTestCase {
             XCTFail("test_example_multiple_compile: \(error)")
         }
     }
-/*
+
     func test_example_swap_bits() {
-    backend = "ibmqx_qasm_simulator"
-    coupling_map = {0: [1, 8], 1: [2, 9], 2: [3, 10], 3: [4, 11],
-    4: [5, 12], 5: [6, 13], 6: [7, 14], 7: [15], 8: [9],
-    9: [10], 10: [11], 11: [12], 12: [13], 13: [14],
-    14: [15]}
+        guard let token = self.QE_TOKEN else {
+            return
+        }
+        do {
+            let backend = "ibmqx_qasm_simulator"
+            let coupling_map = [0: [1,  8], 1: [2, 9],  2: [3, 10], 3: [4, 11],
+                                4: [5, 12], 5: [6, 13], 6: [7, 14], 7: [15],  8: [9],
+                                9: [10],   10: [11],   11: [12],   12: [13], 13: [14], 14: [15]]
 
+            func swap(_ qc: QuantumCircuit, _ q0: QuantumRegisterTuple, _ q1: QuantumRegisterTuple) throws {
+                try qc.cx(q0, q1)
+                try qc.cx(q1, q0)
+                try qc.cx(q0, q1)
+            }
+            let n = 3  // make this at least 3
+            let QPS_SPECS = [
+                "circuits": [[
+                    "name": "swapping",
+                    "quantum_registers": [[
+                        "name": "q",
+                        "size": n],
+                        ["name": "r",
+                        "size": n]
+                    ],
+                    "classical_registers": [
+                        ["name": "ans",
+                        "size": 2*n],
+                    ]
+                ]]
+            ]
+            let qp = try QuantumProgram(specs: QPS_SPECS)
+            try qp.set_api(token:token, url:QE_URL)
+            let asyncExpectation = self.expectation(description: "test_example_swap_bits")
+            qp.online_simulators() { (backends,error) in
+                do {
+                    if error != nil {
+                        XCTFail("Failure in test_example_swap_bits: \(error!.localizedDescription)")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    if !backends.contains(backend) {
+                        SDKLogger.logInfo("backend '\(backend)' not available")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    let qc = try qp.get_circuit("swapping")
+                    let q = try qp.get_quantum_register("q")
+                    let r = try qp.get_quantum_register("r")
+                    let ans = try qp.get_classical_register("ans")
+                    // Set the first bit of q
+                    try qc.x(q[0])
+                    // Swap the set bit
+                    try swap(qc, q[0], q[n-1])
+                    try swap(qc, q[n-1], r[n-1])
+                    try swap(qc, r[n-1], q[1])
+                    try swap(qc, q[1], r[1])
+                    // Insert a barrier before measurement
+                    try qc.barrier()
+                    // Measure all of the qubits in the standard basis
+                    for j in 0..<n {
+                        try qc.measure(q[j], ans[j])
+                        try qc.measure(r[j], ans[j+n])
+                    }
+                    // First version: no mapping
+                    qp.execute(["swapping"], backend:backend,
+                               coupling_map: nil, shots:1024,
+                               seed:14)  { result in
+                        do {
+                            if let error = result.get_error() {
+                                XCTFail("Failure in test_example_swap_bits: \(error)")
+                                asyncExpectation.fulfill()
+                                return
+                            }
+                            let c = try result.get_counts("swapping")
+                            XCTAssertEqual(c,["010000": 1024])
+                            // Second version: map to coupling graph
+                            qp.execute(["swapping"], backend:backend,
+                                                coupling_map:coupling_map, shots:1024,
+                                                seed:14) { result in
+                                do {
+                                    if let error = result.get_error() {
+                                        XCTFail("Failure in test_example_swap_bits: \(error)")
+                                        asyncExpectation.fulfill()
+                                        return
+                                    }
+                                    let c = try result.get_counts("swapping")
+                                    XCTAssertEqual(c,["010000": 1024])
+                                    asyncExpectation.fulfill()
+                                } catch {
+                                    XCTFail("Failure in test_example_swap_bits: \(error)")
+                                    asyncExpectation.fulfill()
+                                }
+                            }
+                        } catch {
+                            XCTFail("Failure in test_example_swap_bits: \(error)")
+                            asyncExpectation.fulfill()
+                        }
+                    }
+                } catch {
+                    XCTFail("Failure in test_example_swap_bits: \(error)")
+                    asyncExpectation.fulfill()
+                }
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_example_swap_bits")
+            })
+        } catch {
+            XCTFail("test_example_swap_bits: \(error)")
+        }
     }
 
-    func swap(qc, q0, q1):
-    qc.cx(q0, q1)
-    qc.cx(q1, q0)
-    qc.cx(q0, q1)
-    n = 3  # make this at least 3
-    QPS_SPECS = {
-    "circuits": [{
-    "name": "swapping",
-    "quantum_registers": [{
-    "name": "q",
-    "size": n},
-    {"name": "r",
-    "size": n}
-    ],
-    "classical_registers": [
-    {"name": "ans",
-    "size": 2*n},
-    ]
-    }]
-    }
-    qp = QuantumProgram(specs: QPS_SPECS)
-    qp.set_api(token:token, url:QE_URL)
-    if backend not in qp.online_simulators():
-    unittest.skip("backend "{}" not available".format(backend))
-    qc = qp.get_circuit("swapping")
-    q = qp.get_quantum_register("q")
-    r = qp.get_quantum_register("r")
-    ans = qp.get_classical_register("ans")
-    // Set the first bit of q
-    qc.x(q[0])
-    // Swap the set bit
-    swap(qc, q[0], q[n-1])
-    swap(qc, q[n-1], r[n-1])
-    swap(qc, r[n-1], q[1])
-    swap(qc, q[1], r[1])
-    // Insert a barrier before measurement
-    qc.barrier()
-    // Measure all of the qubits in the standard basis
-    for j in range(n):
-    qc.measure(q[j], ans[j])
-    qc.measure(r[j], ans[j+n])
-    // First version: no mapping
-    result = qp.execute(["swapping"], backend=backend,
-    coupling_map=None, shots=1024,
-    seed=14)
-    XCTAssertEqual(result.get_counts("swapping"),
-    {"010000": 1024})
-    // Second version: map to coupling graph
-    result = qp.execute(["swapping"], backend=backend,
-    coupling_map=coupling_map, shots=1024,
-    seed=14)
-    XCTAssertEqual(result.get_counts("swapping"),
-    {"010000": 1024})
-
-    } func test_offline() {
-    import string
-    import random
-    qp = QuantumProgram()
-    FAKE_TOKEN = "thistokenisnotgoingtobesentnowhere"
-    FAKE_URL = "http://{0}.com".format(
-    "".join(random.choice(string.ascii_lowercase) for _ in range(63))
-    )
-    // SDK will throw ConnectionError on every call that implies a connection
-    self.assertRaises(ConnectionError, qp.set_api, FAKE_TOKEN, FAKE_URL)
-
+    func test_offline() {
+        do {
+            let qp = try QuantumProgram()
+            let FAKE_TOKEN = "thistokenisnotgoingtobesentnowhere"
+            let FAKE_URL = "http://\(String.randomAlphanumeric(length: 63)).com"
+            // SDK will throw ConnectionError on every call that implies a connection
+            try qp.set_api(token:FAKE_TOKEN, url:FAKE_URL)
+            let asyncExpectation = self.expectation(description: "test_offline")
+            qp.check_connection() { (e) in
+                guard let error = e else {
+                    XCTFail("test_offline should have failed to get connection")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                switch error {
+                case IBMQuantumExperienceError.internalError(_):
+                    break
+                default:
+                    XCTFail("test_offline: \(error)")
+                }
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_offline")
+            })
+        } catch {
+            XCTFail("test_offline: \(error)")
+        }
     }
 
     func test_results_save_load() {
-    let QP_program = try QuantumProgram()
-    metadata = {"testval":5}
-    q = QP_program.create_quantum_register("q", 2)
-    c = QP_program.create_classical_register("c", 2)
-    qc1 = QP_program.create_circuit("qc1", [q], [c])
-    qc2 = QP_program.create_circuit("qc2", [q], [c])
-    qc1.h(q)
-    qc2.cx(q[0], q[1])
-    circuits = ["qc1", "qc2"]
+        do {
+            let QP_program = try QuantumProgram()
+            let metadata = ["testval":5]
+            let q = try QP_program.create_quantum_register("q", 2)
+            let c = try QP_program.create_classical_register("c", 2)
+            let qc1 = try QP_program.create_circuit("qc1", [q], [c])
+            let qc2 = try QP_program.create_circuit("qc2", [q], [c])
+            try qc1.h(q)
+            try qc2.cx(q[0], q[1])
+            let circuits = ["qc1", "qc2"]
+            let asyncExpectation = self.expectation(description: "test_results_save_load")
+            QP_program.execute(circuits, backend:"local_unitary_simulator") { result1 in
+                if let error = result1.get_error() {
+                    XCTFail("Failure in test_results_save_load: \(error)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                QP_program.execute(circuits, backend:"local_qasm_simulator") { result2 in
+                    do {
+                        if let error = result2.get_error() {
+                            XCTFail("Failure in test_results_save_load: \(error)")
+                            asyncExpectation.fulfill()
+                            return
+                        }
+                        let test_1_path = self._get_resource_path("test_save_load1.json")
+                        let test_2_path = self._get_resource_path("test_save_load2.json")
 
-    result1 = QP_program.execute(circuits, backend="local_unitary_simulator")
-    result2 = QP_program.execute(circuits, backend="local_qasm_simulator")
+                        // delete these files if they exist
+                        var url = URL(fileURLWithPath: test_1_path)
+                        if FileManager.default.fileExists(atPath: url.path) {
+                            try FileManager.default.removeItem(at: url)
+                        }
+                        url = URL(fileURLWithPath: test_2_path)
+                        if FileManager.default.fileExists(atPath: url.path) {
+                            try FileManager.default.removeItem(at: url)
+                        }
 
-    test_1_path = self._get_resource_path("test_save_load1.json")
-    test_2_path = self._get_resource_path("test_save_load2.json")
+                        let file1 = try FileIO.save_result_to_file(result1, test_1_path, metadata: metadata)
+                        let file2 = try FileIO.save_result_to_file(result2, test_2_path, metadata: metadata)
 
-    // delete these files if they exist
-    if os.path.exists(test_1_path):
-    os.remove(test_1_path)
+                        let (_, metadata_loaded1) = try FileIO.load_result_from_file(file1)
+                        let (_, metadata_loaded2) = try FileIO.load_result_from_file(file1)
 
-    if os.path.exists(test_2_path):
-    os.remove(test_2_path)
+                        // remove files to keep directory clean
+                        try FileManager.default.removeItem(at: URL(fileURLWithPath: file1))
+                        try FileManager.default.removeItem(at: URL(fileURLWithPath: file2))
 
-    file1 = file_io.save_result_to_file(result1, test_1_path, metadata=metadata)
-    file2 = file_io.save_result_to_file(result2, test_2_path, metadata=metadata)
-
-    result_loaded1, metadata_loaded1 = file_io.load_result_from_file(file1)
-    result_loaded2, metadata_loaded2 = file_io.load_result_from_file(file1)
-
-    self.assertAlmostEqual(metadata_loaded1["testval"], 5)
-    self.assertAlmostEqual(metadata_loaded2["testval"], 5)
-
-    // remove files to keep directory clean
-    os.remove(file1)
-    os.remove(file2)
-
+                        guard let val1 = metadata_loaded1["testval"] as? Double else {
+                            XCTFail("Failure in test_results_save_load. Invalid metadata_loaded1")
+                            return
+                        }
+                        guard let val2 = metadata_loaded2["testval"] as? Double else {
+                            XCTFail("Failure in test_results_save_load. Invalid metadata_loaded2")
+                            return
+                        }
+                        XCTAssert(val1.almostEqual(5.0))
+                        XCTAssert(val2.almostEqual(5.0))
+                        asyncExpectation.fulfill()
+                    } catch {
+                        XCTFail("Failure in test_results_save_load: \(error)")
+                        asyncExpectation.fulfill()
+                    }
+                }
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_results_save_load")
+            })
+        } catch {
+            XCTFail("test_results_save_load: \(error)")
+        }
     }
 
     func test_qubitpol() {
-    let QP_program = try QuantumProgram()
-    q = QP_program.create_quantum_register("q", 2)
-    c = QP_program.create_classical_register("c", 2)
-    qc1 = QP_program.create_circuit("qc1", [q], [c])
-    qc2 = QP_program.create_circuit("qc2", [q], [c])
-    qc2.x(q[0])
-    qc1.measure(q, c)
-    qc2.measure(q, c)
-    circuits = ["qc1", "qc2"]
-    xvals_dict = {circuits[0]: 0, circuits[1]: 1}
-
-    result = QP_program.execute(circuits, backend="local_qasm_simulator")
-
-    yvals, xvals = result.get_qubitpol_vs_xval(xvals_dict=xvals_dict)
-
-    XCTAssert(np.array_equal(yvals, [[-1,-1],[1,-1]]))
-    XCTAssert(np.array_equal(xvals, [0,1]))
-
+        do {
+            let QP_program = try QuantumProgram()
+            let q = try QP_program.create_quantum_register("q", 2)
+            let c = try QP_program.create_classical_register("c", 2)
+            let qc1 = try QP_program.create_circuit("qc1", [q], [c])
+            let qc2 = try QP_program.create_circuit("qc2", [q], [c])
+            try qc2.x(q[0])
+            try qc1.measure(q, c)
+            try qc2.measure(q, c)
+            let circuits = ["qc1", "qc2"]
+            let xvals_dict = [circuits[0]: 0.0, circuits[1]: 1.0]
+            let asyncExpectation = self.expectation(description: "test_qubitpol")
+            QP_program.execute(circuits, backend: "local_qasm_simulator") { result in
+                do {
+                    if let error = result.get_error() {
+                        XCTFail("Failure in test_qubitpol: \(error)")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    let (yvals, xvals) = try result.get_qubitpol_vs_xval(xvals_dict: xvals_dict)
+                    XCTAssert(Matrix<Double>(value: yvals) == Matrix<Double>(value: [[-1.0,-1.0],[1.0,-1.0]]))
+                    XCTAssert(xvals == [0.0,1.0])
+                    asyncExpectation.fulfill()
+                } catch {
+                    XCTFail("Failure in test_qubitpol: \(error)")
+                    asyncExpectation.fulfill()
+                }
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_qubitpol")
+            })
+        } catch {
+            XCTFail("test_qubitpol: \(error)")
+        }
     }
 
     func test_reconfig() {
-    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-    qr = QP_program.get_quantum_register("qname")
-    cr = QP_program.get_classical_register("cname")
-    qc2 = QP_program.create_circuit("qc2", [qr], [cr])
-    qc2.measure(qr[0], cr[0])
-    qc2.measure(qr[1], cr[1])
-    qc2.measure(qr[2], cr[2])
-    shots = 1024  # the number of shots in the experiment.
-    backend = "local_qasm_simulator"
-    test_config = {"0": 0, "1": 1}
-    qobj = QP_program.compile(["qc2"], backend=backend, shots=shots, config=test_config)
-    out = QP_program.run(qobj)
-    results = out.get_counts("qc2")
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            let qr = try QP_program.get_quantum_register("qname")
+            let cr = try QP_program.get_classical_register("cname")
+            let qc2 = try QP_program.create_circuit("qc2", [qr], [cr])
+            try qc2.measure(qr[0], cr[0])
+            try qc2.measure(qr[1], cr[1])
+            try qc2.measure(qr[2], cr[2])
+            let shots = 1024  // the number of shots in the experiment.
+            let backend = "local_qasm_simulator"
+            let test_config = ["0": 0, "1": 1]
+            var qobj = try QP_program.compile(["qc2"], backend:backend, config:test_config, shots:shots)
+            let asyncExpectation = self.expectation(description: "test_qubitpol")
+            QP_program.run_async(qobj) { out in
+                do {
+                    if let error = out.get_error() {
+                        XCTFail("Failure in test_reconfig: \(error)")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    let results = try out.get_counts("qc2")
+                    // change the number of shots and re-run to test if the reconfig does not break
+                    // the ability to run the qobj
+                    qobj = QP_program.reconfig(qobj, shots: 2048)
+                    QP_program.run_async(qobj) { out2 in
+                        do {
+                            if let error = out2.get_error() {
+                                XCTFail("Failure in test_reconfig: \(error)")
+                                asyncExpectation.fulfill()
+                                return
+                            }
+                            let results2 = try out2.get_counts("qc2")
+                            XCTAssertEqual(results, ["000": 1024])
+                            XCTAssertEqual(results2, ["000": 2048])
 
-    // change the number of shots and re-run to test if the reconfig does not break
-    // the ability to run the qobj
-    qobj = QP_program.reconfig(qobj, shots=2048)
-    out2 = QP_program.run(qobj)
-    results2 = out2.get_counts("qc2")
-
-    XCTAssertEqual(results, {"000": 1024})
-    XCTAssertEqual(results2, {"000": 2048})
-
-    // change backend
-    qobj = QP_program.reconfig(qobj, backend="local_unitary_simulator")
-    XCTAssertEqual(qobj["config"]["backend"], "local_unitary_simulator")
-    #change maxcredits
-    qobj = QP_program.reconfig(qobj, max_credits=11)
-    XCTAssertEqual(qobj["config"]["max_credits"], 11)
-    #change seed
-    qobj = QP_program.reconfig(qobj, seed=11)
-    XCTAssertEqual(qobj["circuits"][0]["seed"], 11)
-    // change the config
-    test_config_2 = {"0": 2}
-    qobj = QP_program.reconfig(qobj, config=test_config_2)
-    XCTAssertEqual(qobj["circuits"][0]["config"]["0"], 2)
-    XCTAssertEqual(qobj["circuits"][0]["config"]["1"], 1)
+                            // change backend
+                            qobj = QP_program.reconfig(qobj, backend: "local_unitary_simulator")
+                            if let config = qobj["config"] as? [String:Any] {
+                                XCTAssertEqual(config["backend"] as? String, "local_unitary_simulator")
+                            }
+                            // change maxcredits
+                            qobj = QP_program.reconfig(qobj, max_credits: 11)
+                            if let config = qobj["config"] as? [String:Any] {
+                                XCTAssertEqual(config["max_credits"] as? Int, 11)
+                            }
+                            //change seed
+                            qobj = QP_program.reconfig(qobj, seed: 11)
+                            if let circuits = qobj["circuits"] as? [[String:Any]] {
+                                XCTAssertEqual(circuits[0]["seed"] as? Int, 11)
+                            }
+                            // change the config
+                            let test_config_2 = ["0": 2]
+                            qobj = QP_program.reconfig(qobj, config: test_config_2)
+                            if let circuits = qobj["circuits"] as? [[String:Any]] {
+                                if let config = circuits[0]["config"] as? [String:Any] {
+                                    XCTAssertEqual(config["0"] as? Int, 2)
+                                    XCTAssertEqual(config["1"] as? Int, 1)
+                                }
+                            }
+                            asyncExpectation.fulfill()
+                        } catch {
+                            XCTFail("Failure in test_reconfig: \(error)")
+                            asyncExpectation.fulfill()
+                        }
+                    }
+                } catch {
+                    XCTFail("Failure in test_reconfig: \(error)")
+                    asyncExpectation.fulfill()
+                }
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_reconfig")
+            })
+        } catch {
+            XCTFail("test_reconfig: \(error)")
+        }
     }
-*/
 }
