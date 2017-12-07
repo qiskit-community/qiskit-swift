@@ -1086,49 +1086,7 @@ class QuantumProgramTests: XCTestCase {
             XCTFail("test_run_program: \(error)")
         }
     }
-/*
-    func _job_done_callback(_ result: Result) {
-    results2 = result.get_counts("qc2")
-    results3 = result.get_counts("qc3")
-    XCTAssertEqual(results2, ["000": 518, "111": 506])
-    XCTAssertEqual(results3, ["001": 119, "111": 129, "110": 134,
-    "100": 117, "000": 129, "101": 126,
-    "010": 145, "011": 125])
-    except Exception as e:
-    self.qp_program_exception = e
-    finally:
-    self.qp_program_finished = True
 
-    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-    qr = QP_program.get_quantum_register("qname")
-    cr = QP_program.get_classical_register("cname")
-    qc2 = QP_program.create_circuit("qc2", [qr], [cr])
-    qc3 = QP_program.create_circuit("qc3", [qr], [cr])
-    qc2.h(qr[0])
-    qc2.cx(qr[0], qr[1])
-    qc2.cx(qr[0], qr[2])
-    qc3.h(qr)
-    qc2.measure(qr, cr)
-    qc3.measure(qr, cr)
-    circuits = ["qc2", "qc3"]
-    shots = 1024  // the number of shots in the experiment.
-    backend = "local_qasm_simulator"
-    qobj = QP_program.compile(circuits, backend=backend, shots=shots,
-    seed=88)
-
-    self.qp_program_finished = False
-    self.qp_program_exception = None
-    out = QP_program.run_async(qobj, callback=_job_done_callback)
-
-        while not self.qp_program_finished {
-            // Wait until the job_done_callback is invoked and completed.
-            pass
-        }
-        if self.qp_program_exception {
-            raise self.qp_program_exception
-        }
-    }
-*/
     func test_run_batch() {
         do {
             let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
@@ -1178,58 +1136,7 @@ class QuantumProgramTests: XCTestCase {
             XCTFail("test_run_batch: \(error)")
         }
     }
-/*
-    func _jobs_done_callback(results):
 
-    for result in results:
-    counts2 = result.get_counts("qc2")
-    counts3 = result.get_counts("qc3")
-    XCTAssertEqual(counts2, ["000": 518, "111": 506])
-    XCTAssertEqual(counts3, ["001": 119, "111": 129,
-    "110": 134, "100": 117,
-    "000": 129, "101": 126,
-    "010": 145, "011": 125])
-    except Exception as e:
-    self.qp_program_exception = e
-    finally:
-    self.qp_program_finished = True
-
-    let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-    qr = QP_program.get_quantum_register("qname")
-    cr = QP_program.get_classical_register("cname")
-    qc2 = QP_program.create_circuit("qc2", [qr], [cr])
-    qc3 = QP_program.create_circuit("qc3", [qr], [cr])
-    qc2.h(qr[0])
-    qc2.cx(qr[0], qr[1])
-    qc2.cx(qr[0], qr[2])
-    qc3.h(qr)
-    qc2.measure(qr, cr)
-    qc3.measure(qr, cr)
-    circuits = ["qc2", "qc3"]
-    shots = 1024  // the number of shots in the experiment.
-    backend = "local_qasm_simulator"
-    qobj_list = [ QP_program.compile(circuits, backend=backend, shots=shots,
-    seed=88),
-    QP_program.compile(circuits, backend=backend, shots=shots,
-    seed=88),
-    QP_program.compile(circuits, backend=backend, shots=shots,
-    seed=88),
-    QP_program.compile(circuits, backend=backend, shots=shots,
-    seed=88) ]
-
-    self.qp_program_finished = False
-    self.qp_program_exception = None
-    results = QP_program.run_batch_async(qobj_list,
-    callback=_jobs_done_callback)
-    while not self.qp_program_finished {
-    // Wait until the job_done_callback is invoked and completed.
-        pass
-    }
-    if self.qp_program_exception {
-        raise self.qp_program_exception
-    }
-    }
-*/
     func test_combine_results() {
         do {
             let QP_program = try QuantumProgram()
@@ -1760,7 +1667,7 @@ class QuantumProgramTests: XCTestCase {
                     asyncExpectation.fulfill()
                     return
                 }
-                QP_program.execute(["qc"],
+                QP_program.execute(["circuitName"],
                                    backend: backend,
                                    shots: shots,
                                    max_credits: 3,
