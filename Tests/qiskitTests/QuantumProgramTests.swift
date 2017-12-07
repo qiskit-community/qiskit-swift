@@ -2250,17 +2250,19 @@ class QuantumProgramTests: XCTestCase {
                         // remove files to keep directory clean
                         try FileManager.default.removeItem(at: URL(fileURLWithPath: file1))
                         try FileManager.default.removeItem(at: URL(fileURLWithPath: file2))
-
-                        guard let val1 = metadata_loaded1["testval"] as? Double else {
+                        
+                        guard let val1 = metadata_loaded1["testval"] as? Int else {
                             XCTFail("Failure in test_results_save_load. Invalid metadata_loaded1")
+			                asyncExpectation.fulfill()
                             return
                         }
-                        guard let val2 = metadata_loaded2["testval"] as? Double else {
+                        guard let val2 = metadata_loaded2["testval"] as? Int else {
                             XCTFail("Failure in test_results_save_load. Invalid metadata_loaded2")
+			                asyncExpectation.fulfill()
                             return
                         }
-                        XCTAssert(val1.almostEqual(5.0))
-                        XCTAssert(val2.almostEqual(5.0))
+                        XCTAssertEqual(val1,5)
+                        XCTAssertEqual(val2,5)
                         asyncExpectation.fulfill()
                     } catch {
                         XCTFail("Failure in test_results_save_load: \(error)")
