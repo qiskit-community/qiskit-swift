@@ -45,21 +45,17 @@ class UnrollerTests: XCTestCase {
             ]]]
     ]
 
-    // enter your token in your test schema environment variable "QUANTUM_TOKEN"
-    static private var APItoken: String = "None"
-    static private let TESTURL = "https://quantumexperience.ng.bluemix.net/api/"
+    private var QE_TOKEN: String? = nil
+    private var QE_URL = Qconfig.BASEURL
 
-    static private var config: Qconfig? = nil
-
-    override class func setUp() {
+    override func setUp() {
+        super.setUp()
         let environment = ProcessInfo.processInfo.environment
-        if let token = environment["QUANTUM_TOKEN"] {
-            UnrollerTests.APItoken = token
+        if let token = environment["QE_TOKEN"] {
+            self.QE_TOKEN = token
         }
-        do {
-            UnrollerTests.config = try Qconfig(url: TESTURL)
-        } catch let error {
-            XCTFail("\(error)")
+        if let url = environment["QE_URL"] {
+            self.QE_URL = url
         }
     }
 
@@ -70,13 +66,13 @@ class UnrollerTests: XCTestCase {
 
     func testRippleAddUnroller() {
         do {
-            try self.rippleAdd(UnrollerTests.config!)
+            try self.rippleAdd()
         } catch let error {
-            XCTFail("\(error)")
+            XCTFail("testRippleAddUnroller fail: \(error)")
         }
     }
 
-    private func rippleAdd(_ qConfig: Qconfig) throws {
+    private func rippleAdd() throws {
         let qp = try QuantumProgram(specs: UnrollerTests.QPS_SPECS)
         let qc = try qp.get_circuit("rippleadd")
         let a = try qp.get_quantum_register("a")
@@ -109,21 +105,24 @@ class UnrollerTests: XCTestCase {
         }
         try qc.measure(cout[0], ans[UnrollerTests.n])
 
-        //###############################################################
-        //# Set up the API and execute the program.
-        //###############################################################
-        try qp.set_api(token: UnrollerTests.APItoken, url: qConfig.url.absoluteString)
-
         let QASM_source = try qp.get_qasm("rippleadd")
         SDKLogger.logInfo(QASM_source)
 
+        guard let token = self.QE_TOKEN else {
+            return
+        }
+        //###############################################################
+        //# Set up the API and execute the program.
+        //###############################################################
+        try qp.set_api(token:token, url:QE_URL)
+
         let qobj = try qp.compile(["rippleadd"], backend: UnrollerTests.backend, coupling_map: UnrollerTests.coupling_map, shots: 1024)
         qp.get_execution_list(qobj)
-       /* let asyncExpectation = self.expectation(description: "runJob")
+        let asyncExpectation = self.expectation(description: "rippleAdd")
         qp.run_async(qobj) { (result) in
             do {
                 if let error = result.get_error() {
-                    XCTFail("Failure in runJob: \(error)")
+                    XCTFail("Failure in rippleAdd: \(error)")
                     asyncExpectation.fulfill()
                     return
                 }
@@ -132,14 +131,13 @@ class UnrollerTests: XCTestCase {
                 // Both versions should give the same distribution
                 asyncExpectation.fulfill()
             } catch {
-                XCTFail("Failure in runJob: \(error)")
+                XCTFail("Failure in rippleAdd: \(error)")
                 asyncExpectation.fulfill()
             }
         }
-
         self.waitForExpectations(timeout: 180, handler: { (error) in
-            XCTAssertNil(error, "Failure in runJob")
-        })*/
+            XCTAssertNil(error, "Failure in rippleAdd")
+        })
     }
 
     private class func majority(_ p: QuantumCircuit,

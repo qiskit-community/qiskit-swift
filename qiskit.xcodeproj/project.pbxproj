@@ -327,6 +327,7 @@
 		69F198FA1FC2144D00CE05DC /* String+Padding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F198F91FC2144C00CE05DC /* String+Padding.swift */; };
 		69F198FB1FC2144D00CE05DC /* String+Padding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F198F91FC2144C00CE05DC /* String+Padding.swift */; };
 		69F42EA91FC555B700228A90 /* ToolsError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 699CAF661FC489A200402C05 /* ToolsError.swift */; };
+		69FEEE4D1FD9E39200526B78 /* IBMQuantumExperienceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69FEEE4B1FD9E38E00526B78 /* IBMQuantumExperienceTests.swift */; };
 		DFBC4F6C1EC7384200027640 /* qiskit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFBC4F621EC7384100027640 /* qiskit.framework */; };
 /* End PBXBuildFile section */
 
@@ -522,6 +523,7 @@
 		69F1791E1FC45ED300810FC9 /* Optimization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Optimization.swift; path = Sources/qiskit/tools/apps/Optimization.swift; sourceTree = SOURCE_ROOT; };
 		69F198F01FC1DEFD00CE05DC /* Pauli.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Pauli.swift; path = Sources/qiskit/tools/qi/Pauli.swift; sourceTree = SOURCE_ROOT; };
 		69F198F91FC2144C00CE05DC /* String+Padding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "String+Padding.swift"; path = "Sources/qiskit/datastructures/String+Padding.swift"; sourceTree = SOURCE_ROOT; };
+		69FEEE4B1FD9E38E00526B78 /* IBMQuantumExperienceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IBMQuantumExperienceTests.swift; path = Tests/qiskitTests/IBMQuantumExperienceTests.swift; sourceTree = "<group>"; };
 		DFBC4F621EC7384100027640 /* qiskit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = qiskit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFBC4F6B1EC7384200027640 /* qiskitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = qiskitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -711,6 +713,7 @@
 		69CB0D201FB7B08900A1D546 /* qiskitTests */ = {
 			isa = PBXGroup;
 			children = (
+				69FEEE4B1FD9E38E00526B78 /* IBMQuantumExperienceTests.swift */,
 				6941A1891FCDA1740016C298 /* example_unitary_matrix.swift */,
 				69CB0D261FB7B0E300A1D546 /* DataStructureTests.swift */,
 				69CB0D251FB7B0E300A1D546 /* Info.plist */,
@@ -1403,6 +1406,7 @@
 				69CB0D691FB7B24400A1D546 /* 011_3_qubit_grover_50_.swift in Sources */,
 				69CB0D6A1FB7B24400A1D546 /* Deutsch_Algorithm.swift in Sources */,
 				69ABEA2D1FD4D578006B9BBC /* plaquette_check.swift in Sources */,
+				69FEEE4D1FD9E39200526B78 /* IBMQuantumExperienceTests.swift in Sources */,
 				69CB0D6B1FB7B24400A1D546 /* iswap.swift in Sources */,
 				69CB0D6C1FB7B24400A1D546 /* qe_qft_3.swift in Sources */,
 				69CB0D6D1FB7B24400A1D546 /* qe_qft_4.swift in Sources */,
