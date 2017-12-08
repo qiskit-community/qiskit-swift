@@ -46,7 +46,7 @@ class UnrollerTests: XCTestCase {
     ]
 
     private var QE_TOKEN: String? = nil
-    private var QE_URL = Qconfig.BASEURL
+    private var QE_URL = IBMQuantumExperience.URL_BASE
 
     override func setUp() {
         super.setUp()
@@ -114,7 +114,7 @@ class UnrollerTests: XCTestCase {
         //###############################################################
         //# Set up the API and execute the program.
         //###############################################################
-        try qp.set_api(token:token, url:QE_URL)
+        qp.set_api(token:token, url:QE_URL)
 
         let qobj = try qp.compile(["rippleadd"], backend: UnrollerTests.backend, coupling_map: UnrollerTests.coupling_map, shots: 1024)
         qp.get_execution_list(qobj)

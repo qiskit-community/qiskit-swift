@@ -101,7 +101,6 @@ public final class QFT {
             print()
             print("#################################################################")
             print("QFT:")
-            let qConfig = try Qconfig()
             let qp = try QuantumProgram(specs: QPS_SPECS)
             let q = try qp.get_quantum_register("q")
             let c = try qp.get_classical_register("c")
@@ -142,7 +141,7 @@ public final class QFT {
             //##############################################################
             // Set up the API and execute the program.
             //##############################################################
-            try qp.set_api(token: apiToken, url: qConfig.url.absoluteString)
+            qp.set_api(token: apiToken)
 
             let r = qp.execute(["qft3", "qft4", "qft5"], backend:"ibmqx_qasm_simulator", coupling_map: coupling_map,shots: 1024) { (result) in
                 do {

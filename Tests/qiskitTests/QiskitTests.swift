@@ -349,10 +349,10 @@ class QiskitTests: XCTestCase {
         }
     }
 
-    private func runJob(_ qConfig: Qconfig, _ circuit: QuantumCircuit, _ device: String) throws {
+    private func runJob(_ circuit: QuantumCircuit, _ device: String) throws {
         let qp = try QuantumProgram()
         try qp.add_circuit("circuit",circuit)
-        try qp.set_api(token: QiskitTests.APItoken, url: qConfig.url.absoluteString)
+        qp.set_api(token: QiskitTests.APItoken)
 
         let asyncExpectation = self.expectation(description: "runJob")
         qp.execute(["circuit"], backend: device) { (result) in

@@ -89,7 +89,7 @@ class QuantumProgramTests: XCTestCase {
     ]
 
     private var QE_TOKEN: String? = nil
-    private var QE_URL = Qconfig.BASEURL
+    private var QE_URL = IBMQuantumExperience.URL_BASE
     private var QPS_SPECS: [String:Any] = [:]
     private var QASM_FILE_PATH: String = ""
     private var QASM_FILE_PATH_2: String = ""
@@ -520,7 +520,7 @@ class QuantumProgramTests: XCTestCase {
         }
         do {
             let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-            try QP_program.set_api(token:token, url:QE_URL)
+            QP_program.set_api(token:token, url:QE_URL)
             let config = QP_program.get_api_config()
             SDKLogger.logInfo(config)
         } catch {
@@ -534,7 +534,7 @@ class QuantumProgramTests: XCTestCase {
         }
         do {
             let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-            try QP_program.set_api(token:token, url:QE_URL)
+            QP_program.set_api(token:token, url:QE_URL)
             let asyncExpectation = self.expectation(description: "test_available_backends_exist")
             QP_program.available_backends() { (available_backends,error) in
                 if error != nil {
@@ -570,7 +570,7 @@ class QuantumProgramTests: XCTestCase {
         do {
             // TODO: should we check if we the QX is online before running
             let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-            try QP_program.set_api(token:token, url:QE_URL)
+            QP_program.set_api(token:token, url:QE_URL)
             let asyncExpectation = self.expectation(description: "test_available_backends_exist")
             QP_program.online_backends()  { (online_backends,error) in
                 if error != nil {
@@ -596,7 +596,7 @@ class QuantumProgramTests: XCTestCase {
         do {
             // TODO: should we check if we the QX is online before running
             let qp = try QuantumProgram(specs: self.QPS_SPECS)
-            try qp.set_api(token:token, url:QE_URL)
+            qp.set_api(token:token, url:QE_URL)
             let asyncExpectation = self.expectation(description: "test_online_devices")
             qp.online_devices()  { (online_devices,error) in
                 if error != nil {
@@ -622,7 +622,7 @@ class QuantumProgramTests: XCTestCase {
         do {
             // TODO: should we check if we the QX is online before running
             let qp = try QuantumProgram(specs: self.QPS_SPECS)
-            try qp.set_api(token:token, url:QE_URL)
+            qp.set_api(token:token, url:QE_URL)
             let asyncExpectation = self.expectation(description: "test_online_simulators")
             qp.online_simulators() { (online_simulators,error) in
                 if error != nil {
@@ -726,7 +726,7 @@ class QuantumProgramTests: XCTestCase {
         }
         do {
             let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-            try QP_program.set_api(token:token, url:QE_URL)
+            QP_program.set_api(token:token, url:QE_URL)
             let asyncExpectation = self.expectation(description: "test_get_backend_calibration")
             QP_program.online_backends() { (backend_list,error) in
                 if error != nil {
@@ -764,7 +764,7 @@ class QuantumProgramTests: XCTestCase {
         }
         do {
             let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
-            try QP_program.set_api(token:token, url:QE_URL)
+            QP_program.set_api(token:token, url:QE_URL)
             let asyncExpectation = self.expectation(description: "test_get_backend_parameters")
             QP_program.online_backends() { (backend_list,error) in
                 if error != nil {
@@ -1492,7 +1492,7 @@ class QuantumProgramTests: XCTestCase {
             try qc.h(qr[0])
             try qc.measure(qr[0], cr[0])
             let shots = 1024  // the number of shots in the experiment.
-            try QP_program.set_api(token:token, url:QE_URL)
+            QP_program.set_api(token:token, url:QE_URL)
             let asyncExpectation = self.expectation(description: "test_execute_one_circuit_simulator_online")
             QP_program.online_simulators()  { (backends,error) in
                 if error != nil {
@@ -1545,7 +1545,7 @@ class QuantumProgramTests: XCTestCase {
             try qc.h(qr)
             try qc.measure(qr, cr)
             let shots = 1  // the number of shots in the experiment.
-            try QP_program.set_api(token:token, url:QE_URL)
+            QP_program.set_api(token:token, url:QE_URL)
             let backend = "ibmqx_qasm_simulator"
             let asyncExpectation = self.expectation(description: "test_simulator_online_size")
             QP_program.execute(["qc"],
@@ -1592,7 +1592,7 @@ class QuantumProgramTests: XCTestCase {
             try qc2.measure(qr[1], cr[1])
             let circuits = ["qc1", "qc2"]
             let shots = 1024  // the number of shots in the experiment.
-            try QP_program.set_api(token:token, url:QE_URL)
+            QP_program.set_api(token:token, url:QE_URL)
             let asyncExpectation = self.expectation(description: "test_execute_several_circuits_simulator_online")
             QP_program.online_simulators()  { (backends,error) in
                 if error != nil {
@@ -1646,7 +1646,7 @@ class QuantumProgramTests: XCTestCase {
             let qc = try QP_program.create_circuit("circuitName", [qr], [cr])
             try qc.h(qr)
             try qc.measure(qr[0], cr[0])
-            try QP_program.set_api(token:token, url:QE_URL)
+            QP_program.set_api(token:token, url:QE_URL)
             let backend = "ibmqx_qasm_simulator"
             let shots = 1  // the number of shots in the experiment.
             let asyncExpectation = self.expectation(description: "test_execute_one_circuit_real_online")
@@ -1767,7 +1767,7 @@ class QuantumProgramTests: XCTestCase {
             try qc2.measure(q2[1], c2[1])
             let circuits = ["qc1", "qc2"]
             let shots = 1024  // the number of shots in the experiment.
-            try QP_program.set_api(token:token, url:QE_URL)
+            QP_program.set_api(token:token, url:QE_URL)
             let asyncExpectation = self.expectation(description: "test_online_qasm_simulator_two_registers")
             QP_program.online_simulators()  { (backends,error) in
                 if error != nil {
@@ -2000,7 +2000,7 @@ class QuantumProgramTests: XCTestCase {
                 ]]
             ]
             let qp = try QuantumProgram(specs: QPS_SPECS)
-            try qp.set_api(token:token, url:QE_URL)
+            qp.set_api(token:token, url:QE_URL)
             let asyncExpectation = self.expectation(description: "test_example_swap_bits")
             qp.online_simulators() { (backends,error) in
                 do {
@@ -2086,7 +2086,7 @@ class QuantumProgramTests: XCTestCase {
             let FAKE_TOKEN = "thistokenisnotgoingtobesentnowhere"
             let FAKE_URL = "http://\(String.randomAlphanumeric(length: 63)).com"
             // SDK will throw ConnectionError on every call that implies a connection
-            try qp.set_api(token:FAKE_TOKEN, url:FAKE_URL)
+            qp.set_api(token:FAKE_TOKEN, url:FAKE_URL)
             let asyncExpectation = self.expectation(description: "test_offline")
             qp.check_connection() { (e) in
                 guard let error = e else {

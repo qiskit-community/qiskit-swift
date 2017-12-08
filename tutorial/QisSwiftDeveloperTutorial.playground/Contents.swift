@@ -96,7 +96,7 @@ You obtain a QASM representation of your code by print your circuit any time as 
  */
 
     let qp = try QuantumProgram()
-    try qp.set_api(token: apitoken, url: testurl)
+    qp.set_api(token: apitoken, url: testurl)
     try qp.add_circuit("test", circuit)
 
     qp.execute(["test"], backend: "ibmqx_qasm_simulator") { (result) in

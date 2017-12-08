@@ -87,23 +87,6 @@ public final class QProgram: CustomStringConvertible {
     }
 }
 
-public final class APIConfig: CustomStringConvertible {
-    public let token: String
-    public let url: URL
-
-    init(_ token: String = "None" , _ url: String = Qconfig.BASEURL) throws {
-        guard let u = URL(string: url) else {
-            throw IBMQuantumExperienceError.invalidURL(url: url)
-        }
-        self.token = token
-        self.url = u
-    }
-
-    public var description: String {
-        return "{\"token\":\"\(self.token)\", \"url\":\"\(self.url.absoluteString)\"}"
-    }
-}
-
 public final class QuantumProgram: CustomStringConvertible {
 
     final class JobProcessorData {
@@ -126,7 +109,7 @@ public final class QuantumProgram: CustomStringConvertible {
     /**
      only exists once you set the api to use the online backends
      */
-    private var __api_config: APIConfig
+    private var __api_config: [String:Any] = [:]
  
     private var __quantum_registers:   OrderedDictionary<String,QuantumRegister> = OrderedDictionary<String,QuantumRegister>()
     private var __classical_registers: OrderedDictionary<String,ClassicalRegister> = OrderedDictionary<String,ClassicalRegister>()
@@ -138,8 +121,6 @@ public final class QuantumProgram: CustomStringConvertible {
      stores the intial quantum circuit of the program
      */
     private var __init_circuit: QuantumCircuit? = nil
-
-    private var config: Qconfig
 
     private let backendUtils : BackendUtils = BackendUtils()
 
@@ -170,8 +151,6 @@ public final class QuantumProgram: CustomStringConvertible {
     }
 
     public init(specs: [String:Any]? = nil) throws {
-        self.__api_config = try APIConfig()
-        self.config  = try Qconfig()
         self.__quantum_program = QProgram()
         if let s = specs {
             try self.__init_specs(s)
@@ -550,17 +529,66 @@ public final class QuantumProgram: CustomStringConvertible {
 
     /**
      Setup the API.
-        Args:
-            Token (str): The token used to register on the online backend such
-                as the quantum experience.
-            URL (str): The url used for online backend such as the quantum
-                experience.
-        Returns:
-            Nothing but fills __api, and __api_config
+
+     Fills the __ONLINE_BACKENDS, __api, and __api_config variables.
+     Does not catch exceptions from IBMQuantumExperience.
+
+     Args:
+         token (str): The token used to register on the online backend such
+         as the quantum experience.
+         url (str): The url used for online backend such as the quantum
+         experience.
+         hub (str): The hub used for online backend.
+         group (str): The group used for online backend.
+         project (str): The project used for online backend.
      */
-    public func set_api(token: String, url: String) throws {
-        self.__api_config = try APIConfig(token,url)
-        self.backendUtils.api = try IBMQuantumExperience(self.__api_config.token, try Qconfig(url: self.__api_config.url.absoluteString))
+    public func set_api(token: String,
+                        url: String = IBMQuantumExperience.URL_BASE,
+                        hub: String? = nil,
+                        group: String? = nil,
+                        project: String? = nil) {
+        let config_dict: [String:Any] = [
+            "url": url,
+            "hub": hub != nil ? hub! : NSNull(),
+            "group": group != nil ? group! : NSNull(),
+            "project": project != nil ? project! : NSNull()
+        ]
+        self.backendUtils.api = IBMQuantumExperience(token, config_dict)
+        self.__api_config["token"] = token
+        self.__api_config["config"] = config_dict
+    }
+
+    /**
+     Update the API hubs configuration, replacing the previous one.
+
+        hub (str): The hub used for online backend.
+        group (str): The group used for online backend.
+        project (str): The project used for online backend.
+     */
+    public func set_api_hubs_config(hub: String, group: String, project: String) {
+        let config_dict: [String:Any] = [
+            "hub": hub,
+            "group": group,
+            "project": project
+        ]
+        var config: [String:Any] = [:]
+        if let c = self.__api_config["config"] as? [String:Any] {
+            config = c
+        }
+        var apiConfig: [String:Any] = [:]
+        if let api = self.backendUtils.api {
+            if let c = api.config {
+                config = c
+            }
+        }
+        for (k,v) in config_dict {
+            apiConfig[k] = v
+            config[k] = v
+        }
+        self.__api_config["config"] = config
+        if let api = self.backendUtils.api {
+            api.config = apiConfig
+        }
     }
 
     @discardableResult
@@ -579,7 +607,7 @@ public final class QuantumProgram: CustomStringConvertible {
     /**
      Return the program specs
      */
-    public func get_api_config() -> APIConfig {
+    public func get_api_config() -> [String:Any] {
         return self.__api_config
     }
 

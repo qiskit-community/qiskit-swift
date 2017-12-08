@@ -32,7 +32,7 @@ final class Request {
     private let timeout_interval: Double
 
     init(_ token: String?,
-         _ config: Qconfig? = nil,
+         _ config: [String:Any]? = nil,
          _ retries: Int = 5,
          _ timeout_interval: TimeInterval = 1.0) throws {
         self.credential = try Credentials(token, config)
@@ -137,14 +137,21 @@ final class Request {
                               params: String = "",
                               data: [String : Any] = [:],
                               responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        guard let baseURLPath = self.credential.config["url"] as? String else {
+            responseHandler(nil, IBMQuantumExperienceError.invalidURL(url: ""))
+            return RequestTask()
+        }
+        guard let baseURL = URL(string: baseURLPath) else {
+            responseHandler(nil, IBMQuantumExperienceError.invalidURL(url: baseURLPath))
+            return RequestTask()
+        }
         guard let token = self.credential.get_token() else {
             responseHandler(nil, IBMQuantumExperienceError.missingTokenId)
             return RequestTask()
         }
-        let fullPath = "\(path)?access_token=\(token)\(params)"
-        guard let url = URL(string: fullPath, relativeTo: self.credential.config.url) else {
-            responseHandler(nil,
-                    IBMQuantumExperienceError.invalidURL(url: "\(self.credential.config.url.description)\(fullPath)"))
+        let fullPath = "\(path)\(Request.encodeURLQueryParams(token,params))"
+        guard let url = URL(string: fullPath, relativeTo: baseURL) else {
+            responseHandler(nil,IBMQuantumExperienceError.invalidURL(url: "\(baseURLPath)\(fullPath)"))
             return RequestTask()
         }
         return postInternal(url: url, data: data, responseHandler: responseHandler)
@@ -156,7 +163,11 @@ final class Request {
         var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData,
                                  timeoutInterval: Request.CONNTIMEOUT)
         request.httpMethod = "POST"
-        request.addValue(self.credential.config.client_application, forHTTPHeaderField: Request.HEADER_CLIENT_APPLICATION)
+        var client_application = Credentials.CLIENT_APPLICATION
+        if let c = self.credential.config["client_application"] as? String {
+            client_application += ":" + c
+        }
+        request.addValue(client_application, forHTTPHeaderField: Request.HEADER_CLIENT_APPLICATION)
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: data, options: .prettyPrinted)
@@ -250,14 +261,21 @@ final class Request {
                               params: String = "",
                               data: [String : Any] = [:],
                               responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        guard let baseURLPath = self.credential.config["url"] as? String else {
+            responseHandler(nil, IBMQuantumExperienceError.invalidURL(url: ""))
+            return RequestTask()
+        }
+        guard let baseURL = URL(string: baseURLPath) else {
+            responseHandler(nil, IBMQuantumExperienceError.invalidURL(url: baseURLPath))
+            return RequestTask()
+        }
         guard let token = self.credential.get_token() else {
             responseHandler(nil, IBMQuantumExperienceError.missingTokenId)
             return RequestTask()
         }
-        let fullPath = "\(path)?access_token=\(token)\(params)"
-        guard let url = URL(string: fullPath, relativeTo: self.credential.config.url) else {
-            responseHandler(nil,
-                            IBMQuantumExperienceError.invalidURL(url: "\(self.credential.config.url.description)\(fullPath)"))
+        let fullPath = "\(path)\(Request.encodeURLQueryParams(token,params))"
+        guard let url = URL(string: fullPath, relativeTo: baseURL) else {
+            responseHandler(nil,IBMQuantumExperienceError.invalidURL(url: "\(baseURLPath)\(fullPath)"))
             return RequestTask()
         }
         return putInternal(url: url, data: data, responseHandler: responseHandler)
@@ -269,7 +287,11 @@ final class Request {
         var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData,
                                  timeoutInterval: Request.CONNTIMEOUT)
         request.httpMethod = "PUT"
-        request.addValue(self.credential.config.client_application, forHTTPHeaderField: Request.HEADER_CLIENT_APPLICATION)
+        var client_application = Credentials.CLIENT_APPLICATION
+        if let c = self.credential.config["client_application"] as? String {
+            client_application += ":" + c
+        }
+        request.addValue(client_application, forHTTPHeaderField: Request.HEADER_CLIENT_APPLICATION)
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: data, options: .prettyPrinted)
@@ -354,30 +376,38 @@ final class Request {
                              params: String,
                              with_token: Bool,
                              responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        guard let baseURLPath = self.credential.config["url"] as? String else {
+            responseHandler(nil, IBMQuantumExperienceError.invalidURL(url: ""))
+            return RequestTask()
+        }
+        guard let baseURL = URL(string: baseURLPath) else {
+            responseHandler(nil, IBMQuantumExperienceError.invalidURL(url: baseURLPath))
+            return RequestTask()
+        }
         var access_token = ""
         if with_token {
             if let token = self.credential.get_token() {
-                access_token = "?access_token=\(token)"
+                access_token = token
             }
             else {
                 responseHandler(nil, IBMQuantumExperienceError.missingTokenId)
                 return RequestTask()
             }
         }
-        var encodedParams = params
-        if let e = params.addingPercentEncoding(withAllowedCharacters:NSCharacterSet.urlQueryAllowed) {
-            encodedParams = e
-        }
-        let fullPath = "\(path)\(access_token)\(encodedParams)"
-        guard let url = URL(string: fullPath, relativeTo:self.credential.config.url) else {
+        let fullPath = "\(path)\(Request.encodeURLQueryParams(access_token,params))"
+        guard let url = URL(string: fullPath, relativeTo:baseURL) else {
             responseHandler(nil,
-                IBMQuantumExperienceError.invalidURL(url: "\(self.credential.config.url.description)\(fullPath)"))
+                IBMQuantumExperienceError.invalidURL(url: "\(baseURLPath)\(fullPath)"))
             return RequestTask()
         }
         var request = URLRequest(url:url, cachePolicy:.reloadIgnoringLocalCacheData,
                                  timeoutInterval:Request.CONNTIMEOUT)
         request.httpMethod = "GET"
-        request.addValue(self.credential.config.client_application, forHTTPHeaderField: Request.HEADER_CLIENT_APPLICATION)
+        var client_application = Credentials.CLIENT_APPLICATION
+        if let c = self.credential.config["client_application"] as? String {
+            client_application += ":" + c
+        }
+        request.addValue(client_application, forHTTPHeaderField: Request.HEADER_CLIENT_APPLICATION)
         var reqTask = RequestTask()
         let task = self.urlSession.dataTask(with: request) { (data, response, error) -> Void in
             do {
@@ -394,6 +424,36 @@ final class Request {
         reqTask += RequestTask(task)
         task.resume()
         return reqTask
+    }
+
+    static private func encodeURLQueryParams(_ token: String, _ params: String) -> String {
+        var query = ""
+        if !token.isEmpty {
+            query += "access_token=\(token)"
+        }
+        if !params.isEmpty {
+            if !query.isEmpty {
+                if !params.hasPrefix("&") {
+                    query += "&"
+                }
+                query += params
+            }
+            else {
+                var p = params
+                if p.hasPrefix("&") {
+                    let index = p.index(p.startIndex, offsetBy:1)
+                    p = String(p[...index])
+                }
+                query += p
+            }
+        }
+        if !query.isEmpty {
+            if let p = query.addingPercentEncoding(withAllowedCharacters:NSCharacterSet.urlQueryAllowed) {
+                query = p
+            }
+            query = "?" + query
+        }
+        return query
     }
 
     static private func response_good(_ requestTask: RequestTask, _ url: URL, _ data: Data?, _ response: URLResponse?, _ error: Error?) throws -> Any {

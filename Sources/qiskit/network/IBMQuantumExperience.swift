@@ -23,12 +23,13 @@ import Dispatch
  */
 public final class IBMQuantumExperience {
 
+    public static let URL_BASE = "https://quantumexperience.ng.bluemix.net/api/"
     private static let __names_backend_ibmqxv2 = Set<String>(["ibmqx5qv2", "ibmqx2", "qx5qv2", "qx5q", "real"])
     private static let __names_backend_ibmqxv3 = Set<String>(["ibmqx3"])
     private static let __names_backend_simulator = Set<String>(["simulator", "sim_trivial_2", "ibmqx_qasm_simulator"])
 
     private let token: String?
-    private let config: Qconfig?
+    var config: [String:Any]? = nil
     private var request: Request? = nil
 
     /**
@@ -37,9 +38,87 @@ public final class IBMQuantumExperience {
      - parameter token: API token
      - parameter config: Qconfig object
      */
-    public init(_ token: String? = nil, _ config: Qconfig? = nil) throws {
+    public init(_ token: String? = nil, _ config: [String:Any]? = nil) {
         self.token = token
         self.config = config
+    }
+
+    /**
+     Util method to get job url
+     */
+    private static func get_job_url(_ config: [String:Any]?, _ hub: String?, _ group: String?, _ project: String?) -> String {
+        var hubValue: String? = hub
+        var groupValue: String? = group
+        var projectValue: String? = project
+        if let c = config {
+            if hub == nil {
+                if let h = c["hub"] as? String {
+                    hubValue = h
+                }
+            }
+            if group == nil {
+                if let g = c["group"] as? String {
+                    groupValue = g
+                }
+            }
+            if project == nil {
+                if let p = c["project"] as? String {
+                    projectValue = p
+                }
+            }
+        }
+        if hubValue != nil && groupValue != nil && projectValue != nil {
+            return "Network/\(hubValue!)/Groups/\(groupValue!)/Projects/\(projectValue!)/jobs"
+        }
+        return "Jobs"
+    }
+
+    /**
+     Util method to get backend stats url
+     */
+    private static func get_backend_stats_url(_ config: [String:Any]?, _ hub: String?, _ backend_type: String) -> String {
+        var hubValue: String? = hub
+        if let c = config {
+            if hub == nil {
+                if let h = c["hub"] as? String {
+                    hubValue = h
+                }
+            }
+        }
+        if hubValue != nil {
+            return "/Network/\(hubValue!)/devices/\(backend_type)"
+        }
+        return "Backends/\(backend_type)"
+    }
+
+    /**
+     Util method to get backend url
+     */
+    private static func get_backend_url(_ config: [String:Any]?, _ hub: String?, _ group: String?, _ project: String?) -> String {
+        var hubValue: String? = hub
+        var groupValue: String? = group
+        var projectValue: String? = project
+        if let c = config {
+            if hub == nil {
+                if let h = c["hub"] as? String {
+                    hubValue = h
+                }
+            }
+            if group == nil {
+                if let g = c["group"] as? String {
+                    groupValue = g
+                }
+            }
+            if project == nil {
+                if let p = c["project"] as? String {
+                    projectValue = p
+                }
+            }
+        }
+        if hubValue != nil && groupValue != nil && projectValue != nil {
+            return "Network/\(hubValue!)/Groups/\(groupValue!)/Projects/\(projectValue!)/devices"
+        }
+        return "Backends"
     }
 
     @discardableResult
@@ -642,7 +721,7 @@ public final class IBMQuantumExperience {
     }
 
     /**
-     Runs a job. Asynchronous.
+     Executes a job. Asynchronous.
      */
     @discardableResult
     public func run_job(qasms: [[String:Any]],
@@ -650,6 +729,9 @@ public final class IBMQuantumExperience {
                         shots: Int = 1,
                         maxCredits: Int = 3,
                         seed: Int? = nil,
+                        hub: String? = nil,
+                        group: String? = nil,
+                        project: String? = nil,
                         access_token: String? = nil,
                         user_id: String? = nil,
                         responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
@@ -704,7 +786,9 @@ public final class IBMQuantumExperience {
                 var backendDict: [String:String] = [:]
                 backendDict["name"] = backend_type!
                 data["backend"] = backendDict
-                let r = req!.post(path: "Jobs", data: data) { (out, error) -> Void in
+
+                let path = IBMQuantumExperience.get_job_url(self.config, hub, group, project)
+                let r = req!.post(path: path, data: data) { (out, error) -> Void in
                     if error != nil {
                         responseHandler([:], error)
                         return
@@ -731,6 +815,9 @@ public final class IBMQuantumExperience {
      */
     @discardableResult
     public func get_job(jobId: String,
+                        hub: String? = nil,
+                        group: String? = nil,
+                        project: String? = nil,
                         access_token: String? = nil,
                         user_id: String? = nil,
                         responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
@@ -750,7 +837,8 @@ public final class IBMQuantumExperience {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
                 return
             }
-            let r = req!.get(path: "Jobs/\(jobId)") { (out, error) -> Void in
+            let path = IBMQuantumExperience.get_job_url(self.config, hub, group, project)
+            let r = req!.get(path: "\(path)/\(jobId)") { (out, error) -> Void in
                 if error != nil {
                     responseHandler([:], error)
                     return
@@ -887,6 +975,7 @@ public final class IBMQuantumExperience {
      */
     @discardableResult
     public func backend_calibration(backend: String = "ibmqx4",
+                                    hub: String? = nil,
                                     access_token: String? = nil,
                                     user_id: String? = nil,
                                     responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
@@ -919,7 +1008,8 @@ public final class IBMQuantumExperience {
                     responseHandler(["backend" : backend_type!],nil)
                     return
                 }
-                let r = req!.get(path:"Backends/\(backend_type!)/calibration") { (out, error) -> Void in
+                let path = IBMQuantumExperience.get_backend_stats_url(self.config, hub, backend_type!)
+                let r = req!.get(path:"\(path)/calibration") { (out, error) -> Void in
                     if error != nil {
                         responseHandler([:], error)
                         return
@@ -944,6 +1034,7 @@ public final class IBMQuantumExperience {
      */
     @discardableResult
     public func backend_parameters(backend: String = "ibmqx4",
+                                   hub: String? = nil,
                                    access_token: String? = nil,
                                    user_id: String? = nil,
                                   responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
@@ -976,7 +1067,8 @@ public final class IBMQuantumExperience {
                     responseHandler(["backend" : backend_type!],nil)
                     return
                 }
-                let r = req!.get(path:"Backends/\(backend_type!)/parameters") { (out, error) -> Void in
+                let path = IBMQuantumExperience.get_backend_stats_url(self.config, hub, backend_type!)
+                let r = req!.get(path:"\(path)/parameters") { (out, error) -> Void in
                     if error != nil {
                         responseHandler([:], error)
                         return
@@ -1001,6 +1093,9 @@ public final class IBMQuantumExperience {
      */
     @discardableResult
     public func available_backends(access_token: String? = nil,
+                                   hub: String? = nil,
+                                   group: String? = nil,
+                                   project: String? = nil,
                                    user_id: String? = nil,
                                    responseHandler: @escaping ((_:[[String:Any]], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
@@ -1019,7 +1114,8 @@ public final class IBMQuantumExperience {
                 responseHandler([],IBMQuantumExperienceError.invalidCredentials)
                 return
             }
-            let r = req!.get(path: "Backends") { (out, error) -> Void in
+            let path = IBMQuantumExperience.get_backend_url(self.config, hub, group, project)
+            let r = req!.get(path: path) { (out, error) -> Void in
                 if error != nil {
                     responseHandler([], error)
                     return

@@ -20,7 +20,6 @@ class QiskitProgramTests: XCTestCase {
 
     static let allTests = [
         ("testCreateProgram",testCreateProgram),
-        ("testConfigScriptsFile",testConfigScriptsFile),
         ("testGetComponents",testGetComponents),
         ("testGetIndividualComponents",testGetIndividualComponents),
         ("testCreateClassicalRegister",testCreateClassicalRegister),
@@ -64,15 +63,6 @@ class QiskitProgramTests: XCTestCase {
         }
     }
 
-    func testConfigScriptsFile() {
-        do {
-            let qconf = try Qconfig()
-            XCTAssertEqual(qconf.url.absoluteString, "https://quantumexperience.ng.bluemix.net/api/")
-        } catch {
-            XCTFail("\(error)")
-        }
-    }
-    
     func testGetComponents() {
         do {
             let qprogram = try QuantumProgram(specs: QiskitProgramTests.QPS_SPECS)

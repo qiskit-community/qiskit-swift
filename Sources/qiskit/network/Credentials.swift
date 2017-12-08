@@ -23,18 +23,25 @@ final class Credentials {
     /**
      Configuration setted to connect with QX Platform
      */
-    let config: Qconfig
+    var config: [String:Any]
     private let token_unique: String?
     private(set) var data_credentials: [String:Any] = [:]
+
+    private static let config_base: [String:Any] = ["url": IBMQuantumExperience.URL_BASE]
+    static let CLIENT_APPLICATION: String = "qiskit-sdk-swift"
     
     init(_ token: String?,
-         _ config: Qconfig? = nil) throws {
+         _ config: [String:Any]? = nil) throws {
         self.token_unique = token
         if let c = config {
             self.config = c
+            let u = self.config["url"] as? String
+            if u == nil {
+                self.config["url"] = Credentials.config_base["url"]
+            }
         }
         else {
-            self.config = try Qconfig()
+            self.config = Credentials.config_base
         }
     }
 
@@ -45,9 +52,9 @@ final class Credentials {
                 responseHandler(error)
             }
         }
-        else if let access_token = self.config.access_token {
+        else if let access_token = self.config["access_token"] as? String {
             self.set_token(access_token)
-            if let user_id = self.config.user_id {
+            if let user_id = self.config["user_id"] as? String {
                 self.set_user_id(user_id)
             }
             DispatchQueue.main.async {
@@ -97,11 +104,19 @@ final class Credentials {
         CredentialsError: when token is invalid.
      */
     func obtain_token(_ request: Request, _ responseHandler: @escaping ((_:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        guard let baseURLPath = self.config["url"] as? String else {
+            responseHandler(IBMQuantumExperienceError.invalidURL(url: ""))
+            return RequestTask()
+        }
+        guard let baseURL = URL(string: baseURLPath) else {
+            responseHandler(IBMQuantumExperienceError.invalidURL(url: baseURLPath))
+            return RequestTask()
+        }
         if let token = self.token_unique {
             let path = "users/loginWithToken"
-            guard let url = URL(string: path, relativeTo: self.config.url) else {
+            guard let url = URL(string: path, relativeTo: baseURL) else {
                 DispatchQueue.main.async {
-                    responseHandler(IBMQuantumExperienceError.invalidURL(url: "\(self.config.url.description)/\(path)"))
+                    responseHandler(IBMQuantumExperienceError.invalidURL(url: "\(baseURLPath)/\(path)"))
                 }
                 return RequestTask()
             }
@@ -122,12 +137,12 @@ final class Credentials {
                 responseHandler(nil)
             }
         }
-        else if let email = self.config.email,
-            let password = self.config.password {
+        else if let email = self.config["email"] as? String,
+            let password = self.config["password"] as? String {
             let path = "users/login"
-            guard let url = URL(string: path, relativeTo: self.config.url) else {
+            guard let url = URL(string: path, relativeTo: baseURL) else {
                 DispatchQueue.main.async {
-                    responseHandler(IBMQuantumExperienceError.invalidURL(url: "\(self.config.url.description)/\(path)"))
+                    responseHandler(IBMQuantumExperienceError.invalidURL(url: "\(baseURLPath)/\(path)"))
                 }
                 return RequestTask()
             }
