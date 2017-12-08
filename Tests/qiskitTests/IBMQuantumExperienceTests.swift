@@ -21,7 +21,7 @@ class IBMQuantumExperienceTests: XCTestCase {
     static let allTests = [
         ("test_api_auth_token",test_api_auth_token),
         ("test_api_get_my_credits",test_api_get_my_credits),
-     /* ("test_api_auth_token_fail",test_api_auth_token_fail),
+        ("test_api_auth_token_fail",test_api_auth_token_fail),
         ("test_api_last_codes",test_api_last_codes),
         ("test_api_run_experiment",test_api_run_experiment),
         ("test_api_run_experiment_with_seed",test_api_run_experiment_with_seed),
@@ -35,7 +35,7 @@ class IBMQuantumExperienceTests: XCTestCase {
         ("test_api_backends_availables",test_api_backends_availables),
         ("test_api_backend_simulators_available",test_api_backend_simulators_available),
         ("test_register_size_limit_exception",test_register_size_limit_exception),
-        ("test_qx_api_version",test_qx_api_version)*/
+        ("test_qx_api_version",test_qx_api_version)
     ]
 
     private var QE_TOKEN: String? = nil
@@ -101,8 +101,20 @@ measure q[2] -> f[0];
             guard let api = try self.getAPI() else {
                 return
             }
-            let credential = api.check_credentials()
-            XCTAssert(credential)
+            let asyncExpectation = self.expectation(description: "test_api_auth_token")
+            api.check_connection() { (error) in
+                if error != nil {
+                    XCTFail("Failure in test_api_auth_token: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                let credential = api.check_credentials()
+                XCTAssert(credential)
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_api_auth_token_fail")
+            })
         } catch {
             XCTFail("test_api_auth_token: \(error)")
         }
@@ -135,13 +147,28 @@ measure q[2] -> f[0];
             XCTFail("test_api_get_my_credits: \(error)")
         }
     }
-/*
+
     func test_api_auth_token_fail() {
         do {
-            guard let api = try self.getAPI() else {
-                return
+            let api = try IBMQuantumExperience()
+            let asyncExpectation = self.expectation(description: "test_api_auth_token_fail")
+            api.check_connection() { (e) in
+                guard let error = e else {
+                    XCTFail("test_api_auth_token_fail should have failed to get connection")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                switch error {
+                case IBMQuantumExperienceError.missingTokenId:
+                    break
+                default:
+                    XCTFail("test_api_auth_token_fail: \(error)")
+                }
+                asyncExpectation.fulfill()
             }
-            self.assertRaises(ApiError,IBMQuantumExperience, "fail")
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_api_auth_token_fail")
+            })
         } catch {
             XCTFail("test_api_auth_token_fail: \(error)")
         }
@@ -152,7 +179,19 @@ measure q[2] -> f[0];
             guard let api = try self.getAPI() else {
                 return
             }
-            self.assertIsNotNone(api.get_last_codes())
+            let asyncExpectation = self.expectation(description: "test_api_last_codes")
+            api.get_last_codes() { (lastCodes,error) in
+                if error != nil {
+                    XCTFail("Failure in test_api_last_codes: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                SDKLogger.logInfo(lastCodes)
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_api_last_codes")
+            })
         } catch {
             XCTFail("test_api_last_codes: \(error)")
         }
@@ -163,14 +202,37 @@ measure q[2] -> f[0];
             guard let api = try self.getAPI() else {
                 return
             }
-            let backend = api.available_backend_simulators()[0]["name"]
-            let shots = 1
-            experiment = api.run_experiment(self.qasm, backend, shots)
-            check_status = None
-            if "status" in experiment {
-                check_status = experiment["status"]
+            let asyncExpectation = self.expectation(description: "test_api_run_experiment")
+            api.available_backend_simulators() { (backends,error) in
+                if error != nil {
+                    XCTFail("Failure in test_api_run_experiment: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                guard let backend = backends.first?["name"] as? String else {
+                    XCTFail("Failure in test_api_run_experiment: no backends.")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                let shots = 1
+                api.run_experiment(qasm: self.qasm, backend: backend, shots: shots) { (experiment,error) in
+                    if error != nil {
+                        XCTFail("Failure in test_api_run_experiment: \(error!.localizedDescription)")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    var check_status: String? = nil
+                    if let s = experiment["status"] as? String {
+                        check_status = s
+                        SDKLogger.logInfo("\(s)")
+                    }
+                    XCTAssertNotNil(check_status)
+                    asyncExpectation.fulfill()
+                }
             }
-            self.assertIsNotNone(check_status)
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_api_run_experiment")
+            })
         } catch {
             XCTFail("test_api_run_experiment: \(error)")
         }
@@ -181,20 +243,51 @@ measure q[2] -> f[0];
             guard let api = try self.getAPI() else {
                 return
             }
-        backend = api.available_backend_simulators()[0]["name"]
-        shots = 1
-        seed = 815
-        experiment = api.run_experiment(self.qasm, backend, shots,
-        seed=seed)
-        check_seed = -1
-        if ("result" in experiment) and \
-        ("extraInfo" in experiment["result"]) and \
-        ("seed" in experiment["result"]["extraInfo"]):
-        check_seed = int(experiment["result"]["extraInfo"]["seed"])
-        self.assertEqual(check_seed, seed)
-} catch {
-    XCTFail("test_api_auth_token: \(error)")
-}
+            let asyncExpectation = self.expectation(description: "test_api_run_experiment_with_seed")
+            api.available_backend_simulators() { (backends,error) in
+                if error != nil {
+                    XCTFail("Failure in test_api_run_experiment_with_seed: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                guard let backend = backends.first?["name"] as? String else {
+                    XCTFail("Failure in test_api_run_experiment_with_seed: no backends.")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                let shots = 1
+                let seed = 815
+                api.run_experiment(qasm: self.qasm, backend: backend, shots: shots, seed: seed) { (experiment,error) in
+                    if error != nil {
+                        XCTFail("Failure in test_api_run_experiment_with_seed: \(error!.localizedDescription)")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    guard let result = experiment["result"] as? [String:Any] else {
+                        XCTFail("Failure in test_api_run_experiment_with_seed: no results.")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    guard let extraInfo = result["extraInfo"] as? [String:Any] else {
+                        XCTFail("Failure in test_api_run_experiment_with_seed: no extraInfo.")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    guard let check_seed = extraInfo["seed"] as? Int else {
+                        XCTFail("Failure in test_api_run_experiment_with_seed: no seed.")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    XCTAssertEqual(seed,check_seed)
+                    asyncExpectation.fulfill()
+                }
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_api_run_experiment_with_seed")
+            })
+        } catch {
+            XCTFail("test_api_run_experiment_with_seed: \(error)")
+        }
     }
 
     func test_api_run_experiment_fail_backend() {
@@ -202,13 +295,29 @@ measure q[2] -> f[0];
             guard let api = try self.getAPI() else {
                 return
             }
-        backend = "5qreal"
-        shots = 1
-        self.assertRaises(BadBackendError,
-        api.run_experiment, self.qasm, backend, shots)
-} catch {
-    XCTFail("test_api_auth_token: \(error)")
-}
+            let backend = "5qreal"
+            let shots = 1
+            let asyncExpectation = self.expectation(description: "test_api_run_experiment_fail_backend")
+            api.run_experiment(qasm: self.qasm, backend: backend, shots: shots) { (experiment,e) in
+                guard let error = e else {
+                    XCTFail("test_api_run_experiment_fail_backend should have failed")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                switch error {
+                case IBMQuantumExperienceError.missingBackend(_):
+                    break
+                default:
+                    XCTFail("test_api_run_experiment_fail_backend: \(error)")
+                }
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_api_run_experiment_fail_backend")
+            })
+        } catch {
+            XCTFail("test_api_run_experiment_fail_backend: \(error)")
+        }
     }
 
     func test_api_run_job() {
@@ -216,16 +325,29 @@ measure q[2] -> f[0];
             guard let api = try self.getAPI() else {
                 return
             }
-        backend = "simulator"
-        shots = 1
-        job = api.run_job(self.qasms, backend, shots)
-        check_status = None
-        if "status" in job:
-        check_status = job["status"]
-        self.assertIsNotNone(check_status)
-} catch {
-    XCTFail("test_api_auth_token: \(error)")
-}
+            let backend = "simulator"
+            let shots = 1
+            let asyncExpectation = self.expectation(description: "test_api_run_job")
+            api.run_job(qasms: self.qasms, backend: backend, shots: shots) { (job,error) in
+                if error != nil {
+                    XCTFail("Failure in test_api_run_job: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                var check_status: String? = nil
+                if let s = job["status"] as? String {
+                    check_status = s
+                    SDKLogger.logInfo("\(s)")
+                }
+                XCTAssertNotNil(check_status)
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_api_run_job")
+            })
+        } catch {
+            XCTFail("test_api_run_job: \(error)")
+        }
     }
 
     func test_api_run_job_fail_backend() {
@@ -233,24 +355,52 @@ measure q[2] -> f[0];
             guard let api = try self.getAPI() else {
                 return
             }
-        backend = "real5"
-        shots = 1
-        self.assertRaises(BadBackendError, api.run_job, self.qasms,
-        backend, shots)
-} catch {
-    XCTFail("test_api_auth_token: \(error)")
-}
+            let backend = "real5"
+            let shots = 1
+            let asyncExpectation = self.expectation(description: "test_api_run_job_fail_backend")
+            api.run_job(qasms: self.qasms, backend: backend, shots: shots) { (experiment,e) in
+                guard let error = e else {
+                    XCTFail("test_api_run_job_fail_backend should have failed")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                switch error {
+                case IBMQuantumExperienceError.missingBackend(_):
+                    break
+                default:
+                    XCTFail("test_api_run_job_fail_backend: \(error)")
+                }
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_api_run_job_fail_backend")
+            })
+        } catch {
+            XCTFail("test_api_run_job_fail_backend: \(error)")
+        }
     }
+
     func test_api_get_jobs() {
         do {
             guard let api = try self.getAPI() else {
                 return
             }
-        jobs = api.get_jobs(2)
-        self.assertEqual(len(jobs), 2)
-} catch {
-    XCTFail("test_api_auth_token: \(error)")
-}
+            let asyncExpectation = self.expectation(description: "test_api_get_jobs")
+            api.get_jobs(limit: 2) { (jobs,error) in
+                if error != nil {
+                    XCTFail("Failure in test_api_get_jobs: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                XCTAssert(jobs.count == 2)
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_api_get_jobs")
+            })
+        } catch {
+            XCTFail("test_api_get_jobs: \(error)")
+        }
     }
 
     func test_api_backend_status() {
@@ -258,11 +408,27 @@ measure q[2] -> f[0];
             guard let api = try self.getAPI() else {
                 return
             }
-        is_available = api.backend_status()
-        self.assertIsNotNone(is_available["available"])
-} catch {
-    XCTFail("test_api_auth_token: \(error)")
-}
+            let asyncExpectation = self.expectation(description: "test_api_backend_status")
+            api.backend_status() { (status,error) in
+                if error != nil {
+                    XCTFail("Failure in test_api_backend_status: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                guard let available = status["available"] as? Bool else {
+                    XCTFail("test_backend_status: Missing status.")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                SDKLogger.logInfo(available)
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_api_backend_status")
+            })
+        } catch {
+            XCTFail("test_api_backend_status: \(error)")
+        }
     }
 
     func test_api_backend_calibration() {
@@ -270,11 +436,23 @@ measure q[2] -> f[0];
             guard let api = try self.getAPI() else {
                 return
             }
-        calibration = api.backend_calibration()
-        self.assertIsNotNone(calibration)
-} catch {
-    XCTFail("test_api_auth_token: \(error)")
-}
+            let asyncExpectation = self.expectation(description: "test_api_backend_calibration")
+            api.backend_calibration() { (calibration,error) in
+                if error != nil {
+                    XCTFail("Failure in test_api_backend_calibration: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                SDKLogger.logInfo(calibration)
+                XCTAssert(!calibration.isEmpty)
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_api_backend_status")
+            })
+        } catch {
+            XCTFail("test_api_backend_calibration: \(error)")
+        }
     }
 
     func test_api_backend_parameters() {
@@ -282,11 +460,23 @@ measure q[2] -> f[0];
             guard let api = try self.getAPI() else {
                 return
             }
-        parameters = api.backend_parameters()
-        self.assertIsNotNone(parameters)
-} catch {
-    XCTFail("test_api_auth_token: \(error)")
-}
+            let asyncExpectation = self.expectation(description: "test_api_backend_parameters")
+            api.backend_parameters() { (parameters,error) in
+                if error != nil {
+                    XCTFail("Failure in test_api_backend_parameters: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                SDKLogger.logInfo(parameters)
+                XCTAssert(!parameters.isEmpty)
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_api_backend_parameters")
+            })
+        } catch {
+            XCTFail("test_api_backend_parameters: \(error)")
+        }
     }
 
     func test_api_backends_availables() {
@@ -294,22 +484,47 @@ measure q[2] -> f[0];
             guard let api = try self.getAPI() else {
                 return
             }
-        backends = api.available_backends()
-        self.assertGreaterEqual(len(backends), 2)
-} catch {
-    XCTFail("test_api_auth_token: \(error)")
-}
+            let asyncExpectation = self.expectation(description: "test_api_backends_availables")
+            api.available_backends() { (backends,error) in
+                if error != nil {
+                    XCTFail("Failure in test_api_backends_availables: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                SDKLogger.logInfo(backends)
+                XCTAssertGreaterThanOrEqual(backends.count,2)
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_api_backends_availables")
+            })
+        } catch {
+            XCTFail("test_api_backends_availables: \(error)")
+        }
     }
+
     func test_api_backend_simulators_available() {
         do {
             guard let api = try self.getAPI() else {
                 return
             }
-        backends = api.available_backend_simulators()
-        self.assertGreaterEqual(len(backends), 1)
-} catch {
-    XCTFail("test_api_auth_token: \(error)")
-}
+            let asyncExpectation = self.expectation(description: "test_api_backend_simulators_available")
+            api.available_backend_simulators() { (backends,error) in
+                if error != nil {
+                    XCTFail("Failure in test_api_backend_simulators_available: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                SDKLogger.logInfo(backends)
+                XCTAssertGreaterThanOrEqual(backends.count,1)
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_api_backend_simulators_available")
+            })
+        } catch {
+            XCTFail("test_api_backend_simulators_available: \(error)")
+        }
     }
 
     func test_register_size_limit_exception() {
@@ -317,9 +532,9 @@ measure q[2] -> f[0];
             guard let api = try self.getAPI() else {
                 return
             }
-        backend = "simulator"
-        shots = 1
-        qasm = """
+            let backend = "simulator"
+            let shots = 1
+            let qasm = """
 OPENQASM 2.0;
 include "qelib1.inc";
 qreg q[25];
@@ -328,12 +543,28 @@ h q[0];
 h q[24];
 measure q[0] -> c[0];
 measure q[24] -> c[24];
-        """
-        self.assertRaises(RegisterSizeError, api.run_job,
-        [{"qasm": qasm}], backend, shots)
-} catch {
-    XCTFail("test_api_auth_token: \(error)")
-}
+"""
+            let asyncExpectation = self.expectation(description: "test_register_size_limit_exception")
+            api.run_job(qasms: [["qasm":qasm]], backend: backend, shots: shots) { (experiment,e) in
+                guard let error = e else {
+                    XCTFail("test_register_size_limit_exception should have failed")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                switch error {
+                case IBMQuantumExperienceError.registerSizeError(_):
+                    break
+                default:
+                    XCTFail("test_register_size_limit_exception: \(error)")
+                }
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_register_size_limit_exception")
+            })
+        } catch {
+            XCTFail("test_register_size_limit_exception: \(error)")
+        }
     }
 
     func test_qx_api_version() {
@@ -341,10 +572,33 @@ measure q[24] -> c[24];
             guard let api = try self.getAPI() else {
                 return
             }
-        version = api.api_version()
-        self.assertGreaterEqual(int(version.split(".")[0]), 4)
-} catch {
-    XCTFail("test_api_auth_token: \(error)")
-}
-    }*/
+            let asyncExpectation = self.expectation(description: "test_qx_api_version")
+            api.api_version() { (version,error) in
+                if error != nil {
+                    XCTFail("Failure in test_qx_api_version: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                SDKLogger.logInfo(version)
+                let components = version.components(separatedBy: ".")
+                guard let first = components.first else {
+                    XCTFail("Failure in test_qx_api_version: \(version)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                guard let major = Int(first) else {
+                    XCTFail("Failure in test_qx_api_version: \(version)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                XCTAssertGreaterThanOrEqual(major,4)
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_register_size_limit_exception")
+            })
+        } catch {
+            XCTFail("test_qx_api_version: \(error)")
+        }
+    }
 }

@@ -364,7 +364,11 @@ final class Request {
                 return RequestTask()
             }
         }
-        let fullPath = "\(path)\(access_token)\(params)"
+        var encodedParams = params
+        if let e = params.addingPercentEncoding(withAllowedCharacters:NSCharacterSet.urlQueryAllowed) {
+            encodedParams = e
+        }
+        let fullPath = "\(path)\(access_token)\(encodedParams)"
         guard let url = URL(string: fullPath, relativeTo:self.credential.config.url) else {
             responseHandler(nil,
                 IBMQuantumExperienceError.invalidURL(url: "\(self.credential.config.url.description)\(fullPath)"))

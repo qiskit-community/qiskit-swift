@@ -22,7 +22,7 @@ class UnrollerTests: XCTestCase {
         ("testRippleAddUnroller",testRippleAddUnroller)
     ]
 
-    private static let backend: String = "simulator"
+    private static let backend: String = "ibmqx_qasm_simulator"
     private static let coupling_map = [0: [1, 8], 1: [2, 9], 2: [3, 10], 3: [4, 11], 4: [5, 12],
                                        5: [6, 13], 6: [7, 14], 7: [15], 8: [9], 9: [10], 10: [11],
                                        11: [12], 12: [13], 13: [14], 14: [15]

@@ -383,11 +383,11 @@ public final class IBMQuantumExperience {
     @discardableResult
     public func get_last_codes(access_token: String? = nil,
                                user_id: String? = nil,
-                               responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+                               responseHandler: @escaping ((_:[String], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
-                responseHandler([:], error)
+                responseHandler([], error)
                 return
             }
             if let token = access_token {
@@ -397,24 +397,24 @@ public final class IBMQuantumExperience {
                 req!.credential.set_user_id(user)
             }
             if !self.check_credentials() {
-                responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
+                responseHandler([],IBMQuantumExperienceError.invalidCredentials)
                 return
             }
             let r = req!.get(path: "users/\(req!.credential.get_user_id()!)/codes/latest",
                          params: "&includeExecutions=true") { (out, error) -> Void in
                 if error != nil {
-                    responseHandler([:], error)
+                    responseHandler([], error)
                     return
                 }
                 guard let result = out as? [String:Any] else {
-                    responseHandler([:],IBMQuantumExperienceError.invalidResponseData)
+                    responseHandler([],IBMQuantumExperienceError.invalidResponseData)
                     return
                 }
-                if let codes = result["codes"] as? [String:Any] {
+                if let codes = result["codes"] as? [String] {
                     responseHandler(codes, error)
                 }
                 else {
-                    responseHandler([:],IBMQuantumExperienceError.invalidResponseData)
+                    responseHandler([],IBMQuantumExperienceError.invalidResponseData)
                 }
             }
             reqTask.add(r)
@@ -795,11 +795,11 @@ public final class IBMQuantumExperience {
     public func get_jobs(limit: Int = 50,
                          access_token: String? = nil,
                          user_id: String? = nil,
-                         responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+                         responseHandler: @escaping ((_:[[String:Any]], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
-                responseHandler([:], error)
+                responseHandler([], error)
                 return
             }
             if let token = access_token {
@@ -809,16 +809,16 @@ public final class IBMQuantumExperience {
                 req!.credential.set_user_id(user)
             }
             if !self.check_credentials() {
-                responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
+                responseHandler([],IBMQuantumExperienceError.invalidCredentials)
                 return
             }
             let r = req!.get(path: "Jobs", params: "&filter={\"limit\":\(limit)}") { (out, error) -> Void in
                 if error != nil {
-                    responseHandler([:], error)
+                    responseHandler([], error)
                     return
                 }
-                guard let json = out as? [String:Any] else {
-                    responseHandler([:],IBMQuantumExperienceError.invalidResponseData)
+                guard let json = out as? [[String:Any]] else {
+                    responseHandler([],IBMQuantumExperienceError.invalidResponseData)
                     return
                 }
                 responseHandler(json, error)
