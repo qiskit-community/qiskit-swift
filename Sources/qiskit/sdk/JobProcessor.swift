@@ -116,7 +116,7 @@ final class JobProcessor {
             }
             reqTask.add(r)
             // cancel in case of timeout
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(q_job.timeout)) {
+            DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + .seconds(q_job.timeout)) {
                 isTimeout = true
                 reqTask.cancel()
             }

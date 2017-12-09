@@ -88,16 +88,14 @@ final class Request {
         let r = self.postWithCheckToken(path: path, params: params, data: data) { (json, error) in
             if error != nil {
                 if retries > 0 {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + self.timeout_interval) {
+                    DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + self.timeout_interval) {
                         let r = self.postRetry(path: path, params: params, data: data, retries: retries-1,responseHandler: responseHandler)
                         reqTask.add(r)
                     }
                     return
                 }
             }
-            DispatchQueue.main.async {
-                responseHandler(json, error)
-            }
+            responseHandler(json, error)
         }
         reqTask.add(r)
         return reqTask
@@ -168,26 +166,20 @@ final class Request {
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: data, options: .prettyPrinted)
         } catch let error {
-            DispatchQueue.main.async {
-                responseHandler(nil, IBMQuantumExperienceError.internalError(error: error))
-            }
+            responseHandler(nil, IBMQuantumExperienceError.internalError(error: error))
             return RequestTask()
         }
         var reqTask = RequestTask()
         let task = self.urlSession.dataTask(with: request) { (data, response, error) -> Void in
             do {
                 let out = try Request.response_good(reqTask, url, data, response, error)
-                DispatchQueue.main.async {
-                    responseHandler(out, nil)
-                }
+                responseHandler(out, nil)
             } catch let error {
-                DispatchQueue.main.async {
-                    if let e = error as? IBMQuantumExperienceError {
-                        responseHandler(nil, e)
-                    }
-                    else {
-                        responseHandler(nil, IBMQuantumExperienceError.internalError(error: error))
-                    }
+                if let e = error as? IBMQuantumExperienceError {
+                    responseHandler(nil, e)
+                }
+                else {
+                    responseHandler(nil, IBMQuantumExperienceError.internalError(error: error))
                 }
             }
         }
@@ -212,16 +204,14 @@ final class Request {
         let r = self.putWithCheckToken(path: path, params: params, data: data) { (json, error) in
             if error != nil {
                 if retries > 0 {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + self.timeout_interval) {
+                    DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + self.timeout_interval) {
                         let r = self.putRetry(path: path, params: params, data: data, retries: retries-1,responseHandler: responseHandler)
                         reqTask.add(r)
                     }
                     return
                 }
             }
-            DispatchQueue.main.async {
-                responseHandler(json, error)
-            }
+            responseHandler(json, error)
         }
         reqTask.add(r)
         return reqTask
@@ -327,16 +317,14 @@ final class Request {
         let r = self.getWithCheckToken(path: path, params: params, with_token: with_token) { (json, error) in
             if error != nil {
                 if retries > 0 {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + self.timeout_interval) {
+                    DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + self.timeout_interval) {
                         let r = self.getRetry(path: path, params: params, with_token: with_token, retries: retries-1,responseHandler: responseHandler)
                         reqTask.add(r)
                     }
                     return
                 }
             }
-            DispatchQueue.main.async {
-                responseHandler(json, error)
-            }
+            responseHandler(json, error)
         }
         reqTask.add(r)
         return reqTask

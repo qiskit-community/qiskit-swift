@@ -129,7 +129,15 @@ public final class IBMQuantumExperience {
 
     @discardableResult
     public func check_connection(_ responseHandler: @escaping ((_:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
-        return self.getRequest() { (request,error) -> Void in 
+        return self.check_connectionInternal() { (error) in
+            DispatchQueue.main.async {
+                responseHandler(error)
+            }
+        }
+    }
+
+    private func check_connectionInternal(_ responseHandler: @escaping ((_:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.getRequest() { (request,error) -> Void in
             responseHandler(error)
         }
     }
@@ -252,6 +260,19 @@ public final class IBMQuantumExperience {
                               access_token: String? = nil,
                               user_id: String? = nil,
                               responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.get_executionInternal(id_execution,
+                                   access_token,
+                                   user_id) { (res,error) in
+            DispatchQueue.main.async {
+                responseHandler(res,error)
+            }
+        }
+    }
+
+    private func get_executionInternal(_ id_execution: String,
+                                       _ access_token: String?,
+                                       _ user_id: String?,
+                                       _ responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
@@ -305,6 +326,19 @@ public final class IBMQuantumExperience {
                                           access_token: String? = nil,
                                           user_id: String? = nil,
                                           responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.get_result_from_executionInternal(id_execution,
+                                                      access_token,
+                                                      user_id) { (res,error) in
+            DispatchQueue.main.async {
+                responseHandler(res,error)
+            }
+        }
+    }
+
+    private func get_result_from_executionInternal(_ id_execution: String,
+                                                   _ access_token: String?,
+                                                   _ user_id: String?,
+                                                   _ responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
@@ -372,6 +406,19 @@ public final class IBMQuantumExperience {
                          access_token: String? = nil,
                          user_id: String? = nil,
                          responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.get_codeInternal(id_code,
+                                     access_token,
+                                     user_id) { (res,error) in
+            DispatchQueue.main.async {
+                responseHandler(res,error)
+            }
+        }
+    }
+
+    private func get_codeInternal(_ id_code: String,
+                                  _ access_token: String?,
+                                  _ user_id: String?,
+                                  _ responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
@@ -422,6 +469,19 @@ public final class IBMQuantumExperience {
                                access_token: String? = nil,
                                user_id: String? = nil,
                                responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.get_image_codeInternal(id_code,
+                                           access_token,
+                                           user_id) { (res,error) in
+            DispatchQueue.main.async {
+                responseHandler(res,error)
+            }
+        }
+    }
+
+    private func get_image_codeInternal(_ id_code: String,
+                                        _ access_token: String?,
+                                        _ user_id: String?,
+                                        _ responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
@@ -462,6 +522,17 @@ public final class IBMQuantumExperience {
     public func get_last_codes(access_token: String? = nil,
                                user_id: String? = nil,
                                responseHandler: @escaping ((_:[String], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.get_last_codesInternal(access_token,
+                                           user_id) { (res,error) in
+                DispatchQueue.main.async {
+                    responseHandler(res,error)
+                }
+        }
+    }
+
+    private func get_last_codesInternal(_ access_token: String?,
+                                        _ user_id: String?,
+                                        _ responseHandler: @escaping ((_:[String], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
@@ -514,6 +585,29 @@ public final class IBMQuantumExperience {
                                access_token: String? = nil,
                                user_id: String? = nil,
                                responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.run_experimentInternal(qasm,
+                                           backend,
+                                           shots,
+                                           name,
+                                           seed,
+                                           timeout,
+                                           access_token,
+                                           user_id) { (res,error) in
+            DispatchQueue.main.async {
+                responseHandler(res,error)
+            }
+        }
+    }
+
+    private func run_experimentInternal(_ qasm: String,
+                                        _ backend: String,
+                                        _ shots: Int,
+                                        _ name: String?,
+                                        _ seed: Int?,
+                                        _ timeout: Int,
+                                        _ access_token: String?,
+                                        _ user_id: String?,
+                                        _ responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
@@ -704,7 +798,7 @@ public final class IBMQuantumExperience {
                 if timeOut <= 0 {
                     responseHandler(execution, error)
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 2) {
                     let r = self.getCompleteResultFromExecution(id_execution: id_execution,
                                                         timeOut: timeOut-1,
                                                         access_token: access_token,
@@ -734,6 +828,33 @@ public final class IBMQuantumExperience {
                         access_token: String? = nil,
                         user_id: String? = nil,
                         responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.run_jobInternal(qasms,
+                                    backend,
+                                    shots,
+                                    maxCredits,
+                                    seed,
+                                    hub,
+                                    group,
+                                    project,
+                                    access_token,
+                                    user_id) { (res,error) in
+            DispatchQueue.main.async {
+                responseHandler(res,error)
+            }
+        }
+    }
+
+    private func run_jobInternal(_ qasms: [[String:Any]],
+                                 _ backend: String,
+                                 _ shots: Int,
+                                 _ maxCredits: Int,
+                                 _ seed: Int?,
+                                 _ hub: String?,
+                                 _ group: String?,
+                                 _ project: String?,
+                                 _ access_token: String?,
+                                 _ user_id: String?,
+                                 _ responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
@@ -820,6 +941,25 @@ public final class IBMQuantumExperience {
                         access_token: String? = nil,
                         user_id: String? = nil,
                         responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.get_jobInternal(jobId,
+                                    hub,
+                                    group,
+                                    project,
+                                    access_token,
+                                    user_id) { (res,error) in
+            DispatchQueue.main.async {
+                responseHandler(res,error)
+            }
+        }
+    }
+
+    private func get_jobInternal(_ jobId: String,
+                                 _ hub: String?,
+                                 _ group: String?,
+                                 _ project: String?,
+                                 _ access_token: String?,
+                                 _ user_id: String?,
+                                 _ responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
@@ -883,6 +1023,19 @@ public final class IBMQuantumExperience {
                          access_token: String? = nil,
                          user_id: String? = nil,
                          responseHandler: @escaping ((_:[[String:Any]], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.get_jobsInternal(limit,
+                                     access_token,
+                                     user_id) { (res,error) in
+            DispatchQueue.main.async {
+                responseHandler(res,error)
+            }
+        }
+    }
+
+    private func get_jobsInternal(_ limit: Int,
+                                  _ access_token: String?,
+                                  _ user_id: String?,
+                                  _ responseHandler: @escaping ((_:[[String:Any]], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
@@ -924,6 +1077,19 @@ public final class IBMQuantumExperience {
                                access_token: String? = nil,
                                user_id: String? = nil,
                                responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.backend_statusInternal(backend,
+                                           access_token,
+                                           user_id) { (res,error) in
+            DispatchQueue.main.async {
+                responseHandler(res,error)
+            }
+        }
+    }
+
+    private func backend_statusInternal(_ backend: String,
+                                        _ access_token: String?,
+                                        _ user_id: String?,
+                                        _ responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self._check_backend(backend, "status") { (backend_type,error) -> Void in
             if error != nil {
@@ -978,6 +1144,21 @@ public final class IBMQuantumExperience {
                                     access_token: String? = nil,
                                     user_id: String? = nil,
                                     responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.backend_calibrationInternal(backend,
+                                                hub,
+                                                access_token,
+                                                user_id) { (res,error) in
+            DispatchQueue.main.async {
+                responseHandler(res,error)
+            }
+        }
+    }
+
+    private func backend_calibrationInternal(_ backend: String,
+                                             _ hub: String?,
+                                             _ access_token: String?,
+                                             _ user_id: String?,
+                                             _ responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
@@ -1036,7 +1217,22 @@ public final class IBMQuantumExperience {
                                    hub: String? = nil,
                                    access_token: String? = nil,
                                    user_id: String? = nil,
-                                  responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+                                   responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.backend_parametersInternal(backend,
+                                               hub,
+                                               access_token,
+                                               user_id) { (res,error) in
+            DispatchQueue.main.async {
+                responseHandler(res,error)
+            }
+        }
+    }
+
+    private func backend_parametersInternal(_ backend: String,
+                                            _ hub: String?,
+                                            _ access_token: String?,
+                                            _ user_id: String?,
+                                            _ responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
@@ -1097,6 +1293,23 @@ public final class IBMQuantumExperience {
                                    project: String? = nil,
                                    user_id: String? = nil,
                                    responseHandler: @escaping ((_:[[String:Any]], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.available_backendsInternal(access_token,
+                                               hub,
+                                               group,
+                                               project,
+                                               user_id) { (res,error) in
+            DispatchQueue.main.async {
+                responseHandler(res,error)
+            }
+        }
+    }
+
+    private func available_backendsInternal(_ access_token: String?,
+                                            _ hub: String?,
+                                            _ group: String?,
+                                            _ project: String?,
+                                            _ user_id: String?,
+                                            _ responseHandler: @escaping ((_:[[String:Any]], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
@@ -1146,6 +1359,17 @@ public final class IBMQuantumExperience {
     public func available_backend_simulators(access_token: String? = nil,
                                              user_id: String? = nil,
                                              responseHandler: @escaping ((_:[[String:Any]], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.available_backend_simulatorsInternal(access_token,
+                                                         user_id) { (res,error) in
+            DispatchQueue.main.async {
+                responseHandler(res,error)
+            }
+        }
+    }
+
+    private func available_backend_simulatorsInternal(_ access_token: String?,
+                                                      _ user_id: String? = nil,
+                                                      _ responseHandler: @escaping ((_:[[String:Any]], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.available_backends(access_token: access_token,
                                 user_id: user_id) { (backends,error) -> Void in
@@ -1174,6 +1398,17 @@ public final class IBMQuantumExperience {
     public func get_my_credits(access_token: String? = nil,
                                user_id: String? = nil,
                                responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.get_my_creditsInternal(access_token,
+                                           user_id) { (res,error) in
+            DispatchQueue.main.async {
+                responseHandler(res,error)
+            }
+        }
+    }
+
+    public func get_my_creditsInternal(_ access_token: String?,
+                                       _ user_id: String?,
+                                       _ responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
@@ -1222,6 +1457,14 @@ public final class IBMQuantumExperience {
      */
     @discardableResult
     public func api_version(responseHandler: @escaping ((_:String, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+        return self.api_versionInternal() { (res,error) in
+            DispatchQueue.main.async {
+                responseHandler(res,error)
+            }
+        }
+    }
+
+    private func api_versionInternal(_ responseHandler: @escaping ((_:String, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.getRequest() { (req,error) -> Void in
             if error != nil {

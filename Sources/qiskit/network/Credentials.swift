@@ -46,7 +46,7 @@ public final class Credentials {
     }
 
     func initialize(_ request: Request,
-                            _ responseHandler: @escaping ((_:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+                    _ responseHandler: @escaping ((_:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         if self.token_unique != nil {
             return self.obtain_token(request) { (error) -> Void in
                 responseHandler(error)
@@ -57,9 +57,7 @@ public final class Credentials {
             if let user_id = self.config["user_id"] as? String {
                 self.set_user_id(user_id)
             }
-            DispatchQueue.main.async {
-                responseHandler(nil)
-            }
+            responseHandler(nil)
             return RequestTask()
         }
         else {
@@ -103,7 +101,8 @@ public final class Credentials {
      Raises:
         CredentialsError: when token is invalid.
      */
-    func obtain_token(_ request: Request, _ responseHandler: @escaping ((_:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+    func obtain_token(_ request: Request,
+                              _ responseHandler: @escaping ((_:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         guard let baseURLPath = self.config["url"] as? String else {
             responseHandler(IBMQuantumExperienceError.invalidURL(url: ""))
             return RequestTask()
@@ -115,9 +114,7 @@ public final class Credentials {
         if let token = self.token_unique {
             let path = "users/loginWithToken"
             guard let url = URL(string: path, relativeTo: baseURL) else {
-                DispatchQueue.main.async {
-                    responseHandler(IBMQuantumExperienceError.invalidURL(url: "\(baseURLPath)/\(path)"))
-                }
+                responseHandler(IBMQuantumExperienceError.invalidURL(url: "\(baseURLPath)/\(path)"))
                 return RequestTask()
             }
             return request.postInternal(url: url, data: ["apiToken": token]) { (out, error) -> Void in
@@ -141,9 +138,7 @@ public final class Credentials {
             let password = self.config["password"] as? String {
             let path = "users/login"
             guard let url = URL(string: path, relativeTo: baseURL) else {
-                DispatchQueue.main.async {
-                    responseHandler(IBMQuantumExperienceError.invalidURL(url: "\(baseURLPath)/\(path)"))
-                }
+                responseHandler(IBMQuantumExperienceError.invalidURL(url: "\(baseURLPath)/\(path)"))
                 return RequestTask()
             }
             return request.postInternal(url: url, data: ["email": email, "password" : password]) { (out, error) -> Void in
@@ -164,9 +159,7 @@ public final class Credentials {
             }
         }
         else {
-            DispatchQueue.main.async {
-                responseHandler(IBMQuantumExperienceError.missingTokenId)
-            }
+            responseHandler(IBMQuantumExperienceError.missingTokenId)
             return RequestTask()
         }
     }

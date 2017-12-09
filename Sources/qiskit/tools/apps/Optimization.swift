@@ -313,7 +313,24 @@ public final class Optimization {
                                         _ input_circuit: QuantumCircuit,
                                         _ shots: Int,
                                         _ device: String,
-                                        _ callback: @escaping ((_:Complex, _:Error?) -> Void)) throws -> RequestTask {
+                                        _ callback: @escaping ((_:Complex, _:Error?) -> Void)) -> RequestTask {
+        return eval_hamiltonianInternal(Q_program,
+                                        hamiltonian,
+                                        input_circuit,
+                                        shots,
+                                        device) { (ret,error) in
+            DispatchQueue.main.async {
+                callback(ret,error)
+            }
+        }
+    }
+
+    private static func eval_hamiltonianInternal(_ Q_program: QuantumProgram,
+                                                 _ hamiltonian: Any,
+                                                 _ input_circuit: QuantumCircuit,
+                                                 _ shots: Int,
+                                                 _ device: String,
+                                                 _ callback: @escaping ((_:Complex, _:Error?) -> Void)) -> RequestTask {
         var energy: Complex = 0.0
         var requestTask = RequestTask()
         do {
@@ -461,14 +478,10 @@ public final class Optimization {
                 }
             }
             else {
-                DispatchQueue.main.async {
-                    callback(energy,ToolsError.unknownHamiltonian)
-                }
+                callback(energy,ToolsError.unknownHamiltonian)
             }
         } catch {
-            DispatchQueue.main.async {
-                callback(energy,error)
-            }
+            callback(energy,error)
         }
         return requestTask
     }

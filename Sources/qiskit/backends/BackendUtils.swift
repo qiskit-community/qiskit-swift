@@ -131,9 +131,7 @@ final class BackendUtils {
                 self.needsUpdate = false
             }
             backend_name_list = backend_name_list.union(backends)
-            DispatchQueue.main.async {
-                responseHandler(backend_name_list,error)
-            }
+            responseHandler(backend_name_list,error)
         }
     }
 
