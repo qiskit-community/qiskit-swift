@@ -44,7 +44,7 @@ final class QasmCppSimulator: BaseBackend {
     @discardableResult
     override public func run(_ q_job: QuantumJob, response: @escaping ((_:Result) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
-        DispatchQueue.global().async {
+        DispatchQueue.global(qos: .background).async {
             DispatchQueue.main.async {
                 let job_id = UUID().uuidString
                 response(Result(["job_id": job_id, "status": "ERROR","result": SimulatorError.notImplemented(backend: self.configuration["name"] as! String)],q_job.qobj))

@@ -152,7 +152,7 @@ final class UnitarySimulator: BaseBackend {
     @discardableResult
     override public func run(_ q_job: QuantumJob, response: @escaping ((_:Result) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
-        DispatchQueue.global().async {
+        DispatchQueue.global(qos: .background).async {
             var result: Result? = nil
             let job_id = UUID().uuidString
             do {
