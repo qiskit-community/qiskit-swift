@@ -28,19 +28,25 @@ public final class IBMQuantumExperience {
     private static let __names_backend_ibmqxv3 = Set<String>(["ibmqx3"])
     private static let __names_backend_simulator = Set<String>(["simulator", "sim_trivial_2", "ibmqx_qasm_simulator"])
 
-    private let token: String?
-    var config: [String:Any]? = nil
+    public  let credentials: Credentials
+    public var config: [String:Any] {
+        get {
+            return self.credentials.config
+        }
+        set {
+            self.credentials.config = newValue
+        }
+    }
     private var request: Request? = nil
 
     /**
      Creates Quantum Experience object with a given configuration.
      
      - parameter token: API token
-     - parameter config: Qconfig object
+     - parameter config: Dictionary
      */
     public init(_ token: String? = nil, _ config: [String:Any]? = nil) {
-        self.token = token
-        self.config = config
+        self.credentials = Credentials(token,config)
     }
 
     /**
@@ -133,18 +139,11 @@ public final class IBMQuantumExperience {
             responseHandler(req,nil)
             return RequestTask()
         }
-        do {
-            let req = try Request(self.token,self.config)
-            return req.initialize() { (request,error) -> Void in
-                self.request = request
-                responseHandler(self.request,error)
-            }
-        } catch let error as IBMQuantumExperienceError {
-            responseHandler(nil,error)
-        } catch {
-            responseHandler(nil,IBMQuantumExperienceError.internalError(error: error))
+        let req = Request(self.credentials)
+        return req.initialize() { (request,error) -> Void in
+            self.request = request
+            responseHandler(self.request,error)
         }
-        return RequestTask()
     }
 
     /**
@@ -237,7 +236,7 @@ public final class IBMQuantumExperience {
      */
     public func check_credentials() -> Bool {
         if let req = self.request {
-            return req.credential.get_token() != nil
+            return req.credentials.get_token() != nil
         }
         return false
     }
@@ -260,10 +259,10 @@ public final class IBMQuantumExperience {
                 return
             }
             if let token = access_token {
-                req!.credential.set_token(token)
+                req!.credentials.set_token(token)
             }
             if let user = user_id {
-                req!.credential.set_user_id(user)
+                req!.credentials.set_user_id(user)
             }
             if !self.check_credentials() {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
@@ -313,10 +312,10 @@ public final class IBMQuantumExperience {
                 return
             }
             if let token = access_token {
-                req!.credential.set_token(token)
+                req!.credentials.set_token(token)
             }
             if let user = user_id {
-                req!.credential.set_user_id(user)
+                req!.credentials.set_user_id(user)
             }
             if !self.check_credentials() {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
@@ -380,10 +379,10 @@ public final class IBMQuantumExperience {
                 return
             }
             if let token = access_token {
-                req!.credential.set_token(token)
+                req!.credentials.set_token(token)
             }
             if let user = user_id {
-                req!.credential.set_user_id(user)
+                req!.credentials.set_user_id(user)
             }
             if !self.check_credentials() {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
@@ -430,10 +429,10 @@ public final class IBMQuantumExperience {
                 return
             }
             if let token = access_token {
-                req!.credential.set_token(token)
+                req!.credentials.set_token(token)
             }
             if let user = user_id {
-                req!.credential.set_user_id(user)
+                req!.credentials.set_user_id(user)
             }
             if !self.check_credentials() {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
@@ -470,16 +469,16 @@ public final class IBMQuantumExperience {
                 return
             }
             if let token = access_token {
-                req!.credential.set_token(token)
+                req!.credentials.set_token(token)
             }
             if let user = user_id {
-                req!.credential.set_user_id(user)
+                req!.credentials.set_user_id(user)
             }
             if !self.check_credentials() {
                 responseHandler([],IBMQuantumExperienceError.invalidCredentials)
                 return
             }
-            let r = req!.get(path: "users/\(req!.credential.get_user_id()!)/codes/latest",
+            let r = req!.get(path: "users/\(req!.credentials.get_user_id()!)/codes/latest",
                          params: "&includeExecutions=true") { (out, error) -> Void in
                 if error != nil {
                     responseHandler([], error)
@@ -522,10 +521,10 @@ public final class IBMQuantumExperience {
                 return
             }
             if let token = access_token {
-                req!.credential.set_token(token)
+                req!.credentials.set_token(token)
             }
             if let user = user_id {
-                req!.credential.set_user_id(user)
+                req!.credentials.set_user_id(user)
             }
             if !self.check_credentials() {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
@@ -742,10 +741,10 @@ public final class IBMQuantumExperience {
                 return
             }
             if let token = access_token {
-                req!.credential.set_token(token)
+                req!.credentials.set_token(token)
             }
             if let user = user_id {
-                req!.credential.set_user_id(user)
+                req!.credentials.set_user_id(user)
             }
             if !self.check_credentials() {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
@@ -828,10 +827,10 @@ public final class IBMQuantumExperience {
                 return
             }
             if let token = access_token {
-                req!.credential.set_token(token)
+                req!.credentials.set_token(token)
             }
             if let user = user_id {
-                req!.credential.set_user_id(user)
+                req!.credentials.set_user_id(user)
             }
             if !self.check_credentials() {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
@@ -891,10 +890,10 @@ public final class IBMQuantumExperience {
                 return
             }
             if let token = access_token {
-                req!.credential.set_token(token)
+                req!.credentials.set_token(token)
             }
             if let user = user_id {
-                req!.credential.set_user_id(user)
+                req!.credentials.set_user_id(user)
             }
             if !self.check_credentials() {
                 responseHandler([],IBMQuantumExperienceError.invalidCredentials)
@@ -986,10 +985,10 @@ public final class IBMQuantumExperience {
                 return
             }
             if let token = access_token {
-                req!.credential.set_token(token)
+                req!.credentials.set_token(token)
             }
             if let user = user_id {
-                req!.credential.set_user_id(user)
+                req!.credentials.set_user_id(user)
             }
             if !self.check_credentials() {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
@@ -1045,10 +1044,10 @@ public final class IBMQuantumExperience {
                 return
             }
             if let token = access_token {
-                req!.credential.set_token(token)
+                req!.credentials.set_token(token)
             }
             if let user = user_id {
-                req!.credential.set_user_id(user)
+                req!.credentials.set_user_id(user)
             }
             if !self.check_credentials() {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
@@ -1105,10 +1104,10 @@ public final class IBMQuantumExperience {
                 return
             }
             if let token = access_token {
-                req!.credential.set_token(token)
+                req!.credentials.set_token(token)
             }
             if let user = user_id {
-                req!.credential.set_user_id(user)
+                req!.credentials.set_user_id(user)
             }
             if !self.check_credentials() {
                 responseHandler([],IBMQuantumExperienceError.invalidCredentials)
@@ -1182,16 +1181,16 @@ public final class IBMQuantumExperience {
                 return
             }
             if let token = access_token {
-                req!.credential.set_token(token)
+                req!.credentials.set_token(token)
             }
             if let user = user_id {
-                req!.credential.set_user_id(user)
+                req!.credentials.set_user_id(user)
             }
             if !self.check_credentials() {
                 responseHandler([:],IBMQuantumExperienceError.invalidCredentials)
                 return
             }
-            let r = req!.get(path: "users/\(req!.credential.get_user_id()!)") { (out, error) -> Void in
+            let r = req!.get(path: "users/\(req!.credentials.get_user_id()!)") { (out, error) -> Void in
                 if error != nil {
                     responseHandler([:], error)
                     return

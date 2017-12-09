@@ -577,9 +577,7 @@ public final class QuantumProgram: CustomStringConvertible {
         }
         var apiConfig: [String:Any] = [:]
         if let api = self.backendUtils.api {
-            if let c = api.config {
-                config = c
-            }
+            config = api.config
         }
         for (k,v) in config_dict {
             apiConfig[k] = v

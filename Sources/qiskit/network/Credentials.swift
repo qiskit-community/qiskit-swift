@@ -18,10 +18,10 @@ import Foundation
 import Dispatch
 #endif
 
-final class Credentials {
+public final class Credentials {
 
     /**
-     Configuration setted to connect with QX Platform
+     Configuration to connect with QX Platform
      */
     var config: [String:Any]
     private let token_unique: String?
@@ -31,7 +31,7 @@ final class Credentials {
     static let CLIENT_APPLICATION: String = "qiskit-sdk-swift"
     
     init(_ token: String?,
-         _ config: [String:Any]? = nil) throws {
+         _ config: [String:Any]? = nil) {
         self.token_unique = token
         if let c = config {
             self.config = c

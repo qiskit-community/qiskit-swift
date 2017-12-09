@@ -26,21 +26,17 @@ final class Request {
     private static let HEADER_CLIENT_APPLICATION = "x-qx-client-application"
     private static let _max_qubit_error_re = ".*registers exceed the number of qubits, it can't be greater than (\\d+).*"
 
-    let credential: Credentials
+    let credentials: Credentials
     private var urlSession: URLSession
-    private let retries: Int
+    private let retries: UInt
     private let timeout_interval: Double
 
-    init(_ token: String?,
-         _ config: [String:Any]? = nil,
-         _ retries: Int = 5,
-         _ timeout_interval: TimeInterval = 1.0) throws {
-        self.credential = try Credentials(token, config)
+    init(_ credentials: Credentials,
+         _ retries: UInt = 5,
+         _ timeout_interval: TimeInterval = 1.0) {
+        self.credentials = credentials
         self.retries = retries
         self.timeout_interval = timeout_interval
-        if self.retries < 0 {
-            throw IBMQuantumExperienceError.retriesPositive
-        }
         #if os(Linux)
             let sessionConfig = URLSessionConfiguration.default
         #else
@@ -53,7 +49,7 @@ final class Request {
     }
 
     func initialize(responseHandler: @escaping ((_:Request, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
-        return self.credential.initialize(self) { (error) -> Void in
+        return self.credentials.initialize(self) { (error) -> Void in
             responseHandler(self,error)
         }
     }
@@ -66,7 +62,7 @@ final class Request {
         if error != nil {
             if case IBMQuantumExperienceError.httpError(let httpStatus, _, _, _) = error! {
                 if httpStatus == 401 {
-                    return self.credential.obtain_token(self) { (error) -> Void in
+                    return self.credentials.obtain_token(self) { (error) -> Void in
                         responseHandler(true,error)
                     }
                 }
@@ -86,7 +82,7 @@ final class Request {
     private func postRetry(path: String,
               params: String,
               data: [String : Any],
-              retries: Int,
+              retries: UInt,
               responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.postWithCheckToken(path: path, params: params, data: data) { (json, error) in
@@ -137,7 +133,7 @@ final class Request {
                               params: String = "",
                               data: [String : Any] = [:],
                               responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
-        guard let baseURLPath = self.credential.config["url"] as? String else {
+        guard let baseURLPath = self.credentials.config["url"] as? String else {
             responseHandler(nil, IBMQuantumExperienceError.invalidURL(url: ""))
             return RequestTask()
         }
@@ -145,7 +141,7 @@ final class Request {
             responseHandler(nil, IBMQuantumExperienceError.invalidURL(url: baseURLPath))
             return RequestTask()
         }
-        guard let token = self.credential.get_token() else {
+        guard let token = self.credentials.get_token() else {
             responseHandler(nil, IBMQuantumExperienceError.missingTokenId)
             return RequestTask()
         }
@@ -164,7 +160,7 @@ final class Request {
                                  timeoutInterval: Request.CONNTIMEOUT)
         request.httpMethod = "POST"
         var client_application = Credentials.CLIENT_APPLICATION
-        if let c = self.credential.config["client_application"] as? String {
+        if let c = self.credentials.config["client_application"] as? String {
             client_application += ":" + c
         }
         request.addValue(client_application, forHTTPHeaderField: Request.HEADER_CLIENT_APPLICATION)
@@ -210,7 +206,7 @@ final class Request {
     private func putRetry(path: String,
                            params: String,
                            data: [String : Any],
-                           retries: Int,
+                           retries: UInt,
                            responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.putWithCheckToken(path: path, params: params, data: data) { (json, error) in
@@ -261,7 +257,7 @@ final class Request {
                               params: String = "",
                               data: [String : Any] = [:],
                               responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
-        guard let baseURLPath = self.credential.config["url"] as? String else {
+        guard let baseURLPath = self.credentials.config["url"] as? String else {
             responseHandler(nil, IBMQuantumExperienceError.invalidURL(url: ""))
             return RequestTask()
         }
@@ -269,7 +265,7 @@ final class Request {
             responseHandler(nil, IBMQuantumExperienceError.invalidURL(url: baseURLPath))
             return RequestTask()
         }
-        guard let token = self.credential.get_token() else {
+        guard let token = self.credentials.get_token() else {
             responseHandler(nil, IBMQuantumExperienceError.missingTokenId)
             return RequestTask()
         }
@@ -288,7 +284,7 @@ final class Request {
                                  timeoutInterval: Request.CONNTIMEOUT)
         request.httpMethod = "PUT"
         var client_application = Credentials.CLIENT_APPLICATION
-        if let c = self.credential.config["client_application"] as? String {
+        if let c = self.credentials.config["client_application"] as? String {
             client_application += ":" + c
         }
         request.addValue(client_application, forHTTPHeaderField: Request.HEADER_CLIENT_APPLICATION)
@@ -325,7 +321,7 @@ final class Request {
     private func getRetry(path: String,
                           params: String,
                           with_token: Bool,
-                          retries: Int,
+                          retries: UInt,
                           responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.getWithCheckToken(path: path, params: params, with_token: with_token) { (json, error) in
@@ -376,7 +372,7 @@ final class Request {
                              params: String,
                              with_token: Bool,
                              responseHandler: @escaping ((_:Any?, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
-        guard let baseURLPath = self.credential.config["url"] as? String else {
+        guard let baseURLPath = self.credentials.config["url"] as? String else {
             responseHandler(nil, IBMQuantumExperienceError.invalidURL(url: ""))
             return RequestTask()
         }
@@ -386,7 +382,7 @@ final class Request {
         }
         var access_token = ""
         if with_token {
-            if let token = self.credential.get_token() {
+            if let token = self.credentials.get_token() {
                 access_token = token
             }
             else {
@@ -404,7 +400,7 @@ final class Request {
                                  timeoutInterval:Request.CONNTIMEOUT)
         request.httpMethod = "GET"
         var client_application = Credentials.CLIENT_APPLICATION
-        if let c = self.credential.config["client_application"] as? String {
+        if let c = self.credentials.config["client_application"] as? String {
             client_application += ":" + c
         }
         request.addValue(client_application, forHTTPHeaderField: Request.HEADER_CLIENT_APPLICATION)

@@ -39,7 +39,6 @@ public enum IBMQuantumExperienceError: LocalizedError, CustomStringConvertible {
     case errorSeedLength
     case missingBackends
     case badBackendError(backend: String)
-    case retriesPositive
     case invalidCredentials
     case userGroupError(user_group: String)
     case requestCancelled(error: Error)
@@ -88,8 +87,6 @@ public enum IBMQuantumExperienceError: LocalizedError, CustomStringConvertible {
             return "Missing backends"
         case .badBackendError(let backend):
             return "Could not find backend '\(backend)' available."
-        case .retriesPositive:
-            return "post retries must be positive integer"
         case .invalidCredentials:
             return "Not credentials valid"
         case .userGroupError(let user_group):
