@@ -160,7 +160,10 @@ final class UnitarySimulator: BaseBackend {
                 var result_list: [[String:Any]] = []
                 if let circuits = qobj["circuits"] as? [[String:Any]] {
                     for circuit in circuits {
-                        result_list.append(try self.run_circuit(circuit))
+                        result_list.append(try self.run_circuit(circuit,reqTask))
+                        if reqTask.isCancelled() {
+                            throw SimulatorError.simulationCancelled
+                        }
                     }
                 }
                 result = Result(["job_id": job_id, "result": result_list, "status": "COMPLETED"],qobj)
@@ -177,7 +180,7 @@ final class UnitarySimulator: BaseBackend {
     /**
      Apply the single-qubit gate.
      */
-    private func run_circuit(_ circuit: [String:Any]) throws -> [String:Any] {
+    private func run_circuit(_ circuit: [String:Any], _ reqTask: RequestTask) throws -> [String:Any] {
         var result: [String:Any] = [:]
         result["data"] = [:]
         guard let ccircuit = circuit["compiled_circuit"] as? [String:Any] else {
@@ -194,6 +197,9 @@ final class UnitarySimulator: BaseBackend {
             return result
         }
         for operation in operations {
+            if reqTask.isCancelled() {
+                throw SimulatorError.simulationCancelled
+            }
             guard let name = operation["name"] as? String else {
                 throw SimulatorError.missingOperationName
             }

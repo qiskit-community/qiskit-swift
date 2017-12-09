@@ -23,6 +23,7 @@ public enum SimulatorError: LocalizedError, CustomStringConvertible {
     case notImplemented(backend: String)
     case missingCompiledCircuit
     case missingOperationName
+    case simulationCancelled
    
     public var errorDescription: String? {
         return self.description
@@ -37,6 +38,8 @@ public enum SimulatorError: LocalizedError, CustomStringConvertible {
             return "Missing compiled circuit."
         case .missingOperationName:
             return "Missing Operation name"
+        case .simulationCancelled:
+            return "Simulation cancelled."
         }
     }
 }

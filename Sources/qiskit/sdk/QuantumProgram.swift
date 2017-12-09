@@ -1330,7 +1330,13 @@ public final class QuantumProgram: CustomStringConvertible {
                                callbackMultiple: ((_:[Result]) -> Void)? = nil) -> RequestTask {
         var q_job_list: [QuantumJob] = []
         for qobj in qobj_list {
-            q_job_list.append(QuantumJob(qobj))
+            var max_credits = 0
+            if let config = qobj["config"] as? [String:Any] {
+                if let m = config["max_credits"] as? Int {
+                    max_credits = m
+                }
+            }
+            q_job_list.append(QuantumJob(qobj, resources: [ "max_credits": max_credits, "wait": wait, "timeout":timeout]))
         }
         let job_processor = JobProcessor(self.backendUtils,q_job_list,self._jobs_done_callback)
         let data = JobProcessorData(job_processor,

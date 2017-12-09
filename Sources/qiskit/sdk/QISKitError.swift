@@ -40,7 +40,6 @@ public enum QISKitError: LocalizedError, CustomStringConvertible {
     case missingCompiledConfig
     case missingCompiledQasm
     case missingStatus
-    case timeout
     case errorStatus(status: String)
     case missingJobId
     case parserError(msg: String)
@@ -51,6 +50,7 @@ public enum QISKitError: LocalizedError, CustomStringConvertible {
     case noCounts(name: String)
     case invalidResultsCombine
     case invalidFile(file: String)
+    case jobTimeout(timeout: Int)
     case internalError(error: Error)
 
     public var errorDescription: String? {
@@ -98,8 +98,6 @@ public enum QISKitError: LocalizedError, CustomStringConvertible {
             return "No compiled qasm for this circuit"
         case .missingStatus:
             return "Missing Status"
-        case .timeout:
-            return "Timeout"
         case .errorStatus(let status):
             return "status: \(status)"
         case .missingJobId:
@@ -120,6 +118,8 @@ public enum QISKitError: LocalizedError, CustomStringConvertible {
             return "Result objects have different configs and cannot be combined."
         case .invalidFile(let file):
             return "Invalid file '\(file)'."
+        case .jobTimeout(let timeout):
+            return "Error waiting for Job results: Timeout after \(timeout) seconds."
         case .internalError(let error):
             return error.localizedDescription
         }

@@ -261,7 +261,7 @@ final class QeRemote: BaseBackend {
                 return
             }
             if elapsed >= timeout {
-                responseHandler([:], QISKitError.timeout)
+                responseHandler([:], QISKitError.jobTimeout(timeout: timeout))
                 return
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(wait)) {

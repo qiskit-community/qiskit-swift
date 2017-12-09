@@ -85,7 +85,8 @@ class QuantumProgramTests: XCTestCase {
         ("test_offline",test_offline),
         ("test_results_save_load",test_results_save_load),
         ("test_qubitpol",test_qubitpol),
-        ("test_reconfig",test_reconfig)
+        ("test_reconfig",test_reconfig),
+        ("test_timeout",test_timeout)
     ]
 
     private var QE_TOKEN: String? = nil
@@ -2298,6 +2299,44 @@ class QuantumProgramTests: XCTestCase {
             })
         } catch {
             XCTFail("test_reconfig: \(error)")
+        }
+    }
+
+    func test_timeout() {
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            let qr = try QP_program.get_quantum_register("qname")
+            let cr = try QP_program.get_classical_register("cname")
+            let qc2 = try QP_program.create_circuit("qc2", [qr], [cr])
+            try qc2.h(qr[0])
+            try qc2.cx(qr[0], qr[1])
+            try qc2.cx(qr[0], qr[2])
+            try qc2.measure(qr, cr)
+            let circuits = ["qc2"]
+            let shots = 1024  // the number of shots in the experiment.
+            let backend = "local_qasm_simulator"
+            let qobj = try QP_program.compile(circuits, backend: backend, shots: shots, seed: 88)
+            let asyncExpectation = self.expectation(description: "test_timeout")
+            QP_program.run_async(qobj, timeout: 0) { out in
+                guard let error = out.get_error() else {
+                    XCTFail("test_timeout should have failed.")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                switch error {
+                case QISKitError.jobTimeout(_):
+                    SDKLogger.logInfo(error.localizedDescription)
+                    break
+                default:
+                    XCTFail("test_offline: \(error)")
+                }
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_timeout")
+            })
+        } catch {
+            XCTFail("test_timeout: \(error)")
         }
     }
 }

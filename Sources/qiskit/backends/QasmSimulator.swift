@@ -304,7 +304,7 @@ final class QasmSimulator: BaseBackend {
     @discardableResult
     override public func run(_ q_job: QuantumJob, response: @escaping ((_:Result) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
-        DispatchQueue.global().async {
+        DispatchQueue.global(qos: .background).async {
             var result: Result? = nil
             let job_id = UUID().uuidString
             do {
@@ -318,7 +318,10 @@ final class QasmSimulator: BaseBackend {
                 }
                 if let circuits = qobj["circuits"] as? [[String:Any]] {
                     for circuit in circuits {
-                        result_list.append(try self.run_circuit(circuit))
+                        result_list.append(try self.run_circuit(circuit,reqTask))
+                        if reqTask.isCancelled() {
+                            throw SimulatorError.simulationCancelled
+                        }
                     }
                 }
                 result = Result(["job_id": job_id, "result": result_list, "status": "COMPLETED"],qobj)
@@ -348,7 +351,7 @@ final class QasmSimulator: BaseBackend {
          "status": --status (string)--
          }
      */
-    private func run_circuit(_ circuit: [String:Any]) throws -> [String:Any] {
+    private func run_circuit(_ circuit: [String:Any], _ reqTask: RequestTask) throws -> [String:Any] {
         var result: [String:Any] = [:]
         result["data"] = [:]
         guard let ccircuit = circuit["compiled_circuit"] as? [String:Any] else {
@@ -390,6 +393,9 @@ final class QasmSimulator: BaseBackend {
         var outcomes: [String] = []
         // Do each shot
         for _ in 0..<self._shots {
+            if reqTask.isCancelled() {
+                throw SimulatorError.simulationCancelled
+            }
             self._quantum_state = [Complex](repeating: Complex(), count: 1 << self._number_of_qubits)
             self._quantum_state[0] = 1
             self._classical_state = 0
