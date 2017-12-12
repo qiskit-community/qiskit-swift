@@ -158,20 +158,39 @@ public final class QFT {
                     print(try result.get_counts("qft4"))
                     print(try result.get_counts("qft5"))
 
-                    let r = qp.execute(["qft3"], backend:backend,timeout:120, coupling_map: coupling_map,shots: 1024) { (result) in
-                        do {
-                            if let error = result.get_error() {
-                                print(error)
-                                responseHandler?()
-                                return
-                            }
-                            print(result)
-                            print(try result.get_ran_qasm("qft3"))
-                            print(try result.get_counts("qft3"))
-                        } catch {
-                            print(error.localizedDescription)
+                    let r = qp.get_backend_status(backend) { (status,e) in
+                        if let error = e {
+                            print(error)
+                            responseHandler?()
+                            return
                         }
-                        responseHandler?()
+                        print("Status \(backend): \(status)")
+                        guard let available = status["available"] as? Bool else {
+                            print("backend \(backend) not available")
+                            responseHandler?()
+                            return
+                        }
+                        if !available {
+                            print("backend \(backend) not available")
+                            responseHandler?()
+                            return
+                        }
+                        let r = qp.execute(["qft3"], backend:backend,timeout:120, coupling_map: coupling_map,shots: 1024) { (result) in
+                            do {
+                                if let error = result.get_error() {
+                                    print(error)
+                                    responseHandler?()
+                                    return
+                                }
+                                print(result)
+                                print(try result.get_ran_qasm("qft3"))
+                                print(try result.get_counts("qft3"))
+                            } catch {
+                                print(error.localizedDescription)
+                            }
+                            responseHandler?()
+                        }
+                        reqTask += r
                     }
                     reqTask += r
                 } catch {

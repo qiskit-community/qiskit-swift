@@ -116,20 +116,39 @@ public final class GHZ {
 
                                     print("Fourth version: map to qx2 coupling graph and run on qx2")
                                     print("map to \(backend), backend")
-                                    let r = qp.execute(["ghz"], backend: backend,timeout:120, coupling_map: coupling_map,shots: 1024) { (result) in
-                                        do {
-                                            if let error = result.get_error() {
-                                                print(error)
-                                                responseHandler?()
-                                                return
-                                            }
-                                            print(result)
-                                            print(try result.get_counts("ghz"))
-                                            print("ghz end")
-                                        } catch {
-                                            print(error.localizedDescription)
+                                    let r = qp.get_backend_status(backend) { (status,e) in
+                                        if let error = e {
+                                            print(error)
+                                            responseHandler?()
+                                            return
                                         }
-                                        responseHandler?()
+                                        print("Status \(backend): \(status)")
+                                        guard let available = status["available"] as? Bool else {
+                                            print("backend \(backend) not available")
+                                            responseHandler?()
+                                            return
+                                        }
+                                        if !available {
+                                            print("backend \(backend) not available")
+                                            responseHandler?()
+                                            return
+                                        }
+                                        let r = qp.execute(["ghz"], backend: backend,timeout:120, coupling_map: coupling_map,shots: 1024) { (result) in
+                                            do {
+                                                if let error = result.get_error() {
+                                                    print(error)
+                                                    responseHandler?()
+                                                    return
+                                                }
+                                                print(result)
+                                                print(try result.get_counts("ghz"))
+                                                print("ghz end")
+                                            } catch {
+                                                print(error.localizedDescription)
+                                            }
+                                            responseHandler?()
+                                        }
+                                        reqTask += r
                                     }
                                     reqTask += r
                                 } catch {
