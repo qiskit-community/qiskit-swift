@@ -34,7 +34,7 @@ public enum QISKitError: LocalizedError, CustomStringConvertible {
     case regIndexRange
     case circuitsNotCompatible
     case noArguments
-    case missingCircuit
+    case missingCircuit(name: String)
     case missingCircuits
     case missingQuantumProgram(name: String)
     case missingCompiledConfig
@@ -86,8 +86,8 @@ public enum QISKitError: LocalizedError, CustomStringConvertible {
             return "circuits are not compatible"
         case .noArguments:
             return "no arguments passed"
-        case .missingCircuit:
-            return "Circuit not found"
+        case .missingCircuit(let name):
+            return "Circuit '\(name)' not found"
         case .missingCircuits:
             return "No circuits"
         case .missingQuantumProgram(let name):

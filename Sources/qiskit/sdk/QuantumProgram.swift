@@ -58,35 +58,6 @@ Class internal properties.
 //# TODO: Jay: coupling_map, basis_gates will move into a config object
 //# only exists once you set the api to use the online backends
 
-public final class QCircuit: CustomStringConvertible {
-    public let name: String
-    public let circuit: QuantumCircuit
-    public private(set) var execution: [String:Any] = [:]
-
-    fileprivate init(_ name: String, _ circuit: QuantumCircuit) {
-        self.name = name
-        self.circuit = circuit
-    }
-
-    public var description: String {
-        return ["name"      : self.name,
-                "circuit"   : self.circuit.description,
-                "execution" : self.execution].description
-    }
-}
-
-public final class QProgram: CustomStringConvertible {
-    public private(set) var circuits: OrderedDictionary<String,QCircuit> = OrderedDictionary<String,QCircuit>()
-
-    func setCircuit(_ name: String, _ circuit: QCircuit) {
-        self.circuits[name] = circuit
-    }
-
-    public var description: String {
-        return self.circuits.description
-    }
-}
-
 public final class QuantumProgram: CustomStringConvertible {
 
     final class JobProcessorData {
@@ -116,7 +87,7 @@ public final class QuantumProgram: CustomStringConvertible {
     /**
      stores all the quantum programs
      */
-    private var __quantum_program: QProgram
+    private var __quantum_program: OrderedDictionary<String,QuantumCircuit> = OrderedDictionary<String,QuantumCircuit>()
     /**
      stores the intial quantum circuit of the program
      */
@@ -151,7 +122,7 @@ public final class QuantumProgram: CustomStringConvertible {
     }
 
     public init(specs: [String:Any]? = nil) throws {
-        self.__quantum_program = QProgram()
+        self.__quantum_program = [:]
         if let s = specs {
             try self.__init_specs(s)
         }
@@ -229,6 +200,23 @@ public final class QuantumProgram: CustomStringConvertible {
     }
 
     /**
+     Destroy an existing Quantum Register.
+
+     Args:
+        name (str): the name of the quantum register
+
+     Raises:
+        QISKitError: if the register does not exist in the program.
+     */
+    public func destroy_quantum_register(_ name: String) throws {
+        if self.__quantum_registers[name] == nil {
+            throw QISKitError.regNotExists(name: name)
+        }
+        self.__quantum_registers[name] = nil
+        SDKLogger.logInfo(">> quantum register destroyed: '\(name)'")
+    }
+
+    /**
      Create a new set of Quantum Registers based on a array of them.
 
      Args:
@@ -258,6 +246,32 @@ public final class QuantumProgram: CustomStringConvertible {
             new_registers.append(try self.create_quantum_register(name,size))
         }
         return new_registers
+    }
+
+    /**
+     Destroy a set of Quantum Registers based on a array of them.
+
+     Args:
+        register_array (list[dict]): An array of quantum registers in
+             dictionay format::
+
+                 "quantum_registers": [
+                     {
+                     "name": "qr",
+                     },
+                     ...
+                 ]
+                "size" may be a key for compatibility, but is ignored.
+     */
+    public func destroy_quantum_registers(_ register_array: [String:Any]) throws {
+        guard let registers = register_array["quantum_registers"] as? [[String:Any]] else {
+            return
+        }
+        for register in registers {
+            if let name = register["name"] as? String {
+                try self.destroy_quantum_register(name)
+            }
+        }
     }
 
     /**
@@ -318,6 +332,50 @@ public final class QuantumProgram: CustomStringConvertible {
     }
 
     /**
+     Destroy an existing Classical Register.
+
+     Args:
+     name (str): the name of the classical register
+
+     Raises:
+     QISKitError: if the register does not exist in the program.
+     */
+    public func destroy_classical_register(_ name: String) throws {
+        if self.__classical_registers[name] == nil {
+            throw QISKitError.regNotExists(name: name)
+        }
+        self.__classical_registers[name] = nil
+        SDKLogger.logInfo(">> classical register destroyed: '\(name)'")
+    }
+
+    /**
+     Destroy a set of Quantum Registers based on a array of them.
+
+     Args:
+         register_array (list[dict]): An array of classical registers in
+             dictionay format::
+
+                 "classical_registers": [
+                     {
+                     "name": "qr",
+                     },
+                     ...
+                 ]
+                "size" may be a key for compatibility, but is ignored.
+     */
+    public func destroy_classical_registers(_ register_array: [String:Any]) throws {
+        guard let registers = register_array["classical_registers"] as? [[String:Any]] else {
+            return
+        }
+        for register in registers {
+            if let name = register["name"] as? String {
+                try self.destroy_classical_register(name)
+            }
+        }
+    }
+
+
+    /**
      Create a empty Quantum Circuit in the Quantum Program.
 
      Args:
@@ -340,7 +398,24 @@ public final class QuantumProgram: CustomStringConvertible {
         try quantum_circuit.add(qregisters)
         try quantum_circuit.add(cregisters)
         try self.add_circuit(name, quantum_circuit)
-        return self.__quantum_program.circuits[name]!.circuit
+        return self.__quantum_program[name]!
+    }
+
+    /**
+     "Destroy a Quantum Circuit in the Quantum Program. This will not
+     destroy any registers associated with the circuit.
+
+     Args:
+        name (str): the name of the circuit
+
+     Raises:
+        QISKitError: if the register does not exist in the program.
+     */
+    public func destroy_circuit(_ name: String) throws {
+        if self.__quantum_program[name] == nil {
+            throw QISKitError.missingCircuit(name: name)
+        }
+        self.__quantum_program[name] = nil
     }
 
     /**
@@ -360,8 +435,8 @@ public final class QuantumProgram: CustomStringConvertible {
         for (cname, creg) in quantum_circuit.get_cregs() {
             try self.create_classical_register(cname, creg.size)
         }
-        self.__quantum_program.setCircuit(name,QCircuit(name, quantum_circuit))
-        return quantum_circuit
+        self.__quantum_program[name] = quantum_circuit
+        return self.__quantum_program[name]!
     }
 
     /**
@@ -480,17 +555,17 @@ public final class QuantumProgram: CustomStringConvertible {
      */
     @discardableResult
     public func get_circuit(_ name: String) throws -> QuantumCircuit {
-        guard let qCircuit =  self.__quantum_program.circuits[name] else {
-            throw QISKitError.missingCircuit
+        guard let qCircuit =  self.__quantum_program[name] else {
+            throw QISKitError.missingCircuit(name: name)
         }
-        return qCircuit.circuit
+        return qCircuit
     }
 
     /**
      Return all the names of the quantum circuits.
      */
     public func get_circuit_names() -> [String] {
-        return Array(self.__quantum_program.circuits.keys)
+        return Array(self.__quantum_program.keys)
     }
 
     /**
@@ -637,12 +712,12 @@ public final class QuantumProgram: CustomStringConvertible {
 
     private func getSaveElements(_ beauty: Bool = false) throws -> (String, [String:[String:Any]]) {
         do {
-            let elements_to_save = self.__quantum_program.circuits
+            let elements_to_save = self.__quantum_program
             var elements_saved: [String:[String:Any]] = [:]
 
             for (name,value) in elements_to_save {
                 elements_saved[name] = [:]
-                elements_saved[name]!["qasm"] = value.circuit.qasm()
+                elements_saved[name]!["qasm"] = value.qasm()
             }
 
             let options = beauty ? JSONSerialization.WritingOptions.prettyPrinted : []
@@ -661,8 +736,8 @@ public final class QuantumProgram: CustomStringConvertible {
      Returns:
         The result of the operation
     */
-    public func load(_ file_name: String) throws -> QProgram {
-        let elements_loaded = QProgram()
+    public func load(_ file_name: String) throws -> OrderedDictionary<String,QuantumCircuit> {
+        var elements_loaded = OrderedDictionary<String,QuantumCircuit>()
         do {
             guard let file = FileHandle(forReadingAtPath: file_name) else {
                 throw QISKitError.invalidFile(file: file_name)
@@ -679,7 +754,7 @@ public final class QuantumProgram: CustomStringConvertible {
                         let basis_gates = "u1,u2,u3,cx,id"  // QE target basis
                         let unrolled_circuit = Unroller(node_circuit, CircuitBackend(basis_gates.components(separatedBy:",")))
                         let circuit_unrolled = try unrolled_circuit.execute() as! QuantumCircuit
-                        elements_loaded.setCircuit(name,QCircuit(name,circuit_unrolled))
+                        elements_loaded[name] = circuit_unrolled
                     }
                 }
             }
@@ -1079,7 +1154,7 @@ public final class QuantumProgram: CustomStringConvertible {
         }
 
         for name in name_of_circuits {
-            guard let qCircuit = self.__quantum_program.circuits[name] else {
+            guard let qCircuit = self.__quantum_program[name] else {
                 throw QISKitError.missingQuantumProgram(name: name)
             }
             var basis: String = "u1,u2,u3,cx,id"  // QE target basis
@@ -1087,7 +1162,7 @@ public final class QuantumProgram: CustomStringConvertible {
                 basis = basis_gates!
             }
             // TODO: The circuit object has to have .qasm() method (be careful)
-            let compiledCircuit = try OpenQuantumCompiler.compile(qCircuit.circuit.qasm(),
+            let compiledCircuit = try OpenQuantumCompiler.compile(qCircuit.qasm(),
                                                                           basis_gates: basis,
                                                                           coupling_map: coupling_map,
                                                                           initial_layout: initial_layout,

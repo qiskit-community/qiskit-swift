@@ -32,8 +32,11 @@ class QuantumProgramTests: XCTestCase {
         ("test_create_classical_register_same",test_create_classical_register_same),
         ("test_create_classical_registers",test_create_classical_registers),
         ("test_create_quantum_registers",test_create_quantum_registers),
+        ("test_destroy_classical_register",test_destroy_classical_register),
+        ("test_destroy_quantum_register",test_destroy_quantum_register),
         ("test_create_circuit",test_create_circuit),
         ("test_create_several_circuits",test_create_several_circuits),
+        ("test_destroy_circuit",test_destroy_circuit),
         ("test_load_qasm_file",test_load_qasm_file),
         ("test_fail_load_qasm_file",test_fail_load_qasm_file),
         ("test_load_qasm_text",test_load_qasm_text),
@@ -85,6 +88,7 @@ class QuantumProgramTests: XCTestCase {
         ("test_offline",test_offline),
         ("test_results_save_load",test_results_save_load),
         ("test_qubitpol",test_qubitpol),
+        ("test_ccx",test_ccx),
         ("test_reconfig",test_reconfig),
         ("test_timeout",test_timeout)
     ]
@@ -255,6 +259,52 @@ class QuantumProgramTests: XCTestCase {
         }
     }
 
+    func test_destroy_classical_register() {
+         do {
+            let QP_program = try QuantumProgram()
+            try QP_program.create_classical_register("c1", 3)
+            XCTAssert(Set<String>(QP_program.get_classical_register_names()).contains("c1"))
+            try QP_program.destroy_classical_register("c1")
+            XCTAssertFalse(Set<String>(QP_program.get_classical_register_names()).contains("c1"))
+            do {
+                // Destroying an invalid register should fail.
+                try QP_program.destroy_classical_register("c1")
+            } catch {
+                switch error {
+                case QISKitError.regNotExists(_):
+                    break
+                default:
+                    XCTFail("test_destroy_classical_register: \(error)")
+                }
+            }
+        } catch {
+            XCTFail("test_destroy_classical_register: \(error)")
+        }
+    }
+
+    func test_destroy_quantum_register() {
+        do {
+            let QP_program = try QuantumProgram()
+            try QP_program.create_quantum_register("q1", 3)
+            XCTAssert(Set<String>(QP_program.get_quantum_register_names()).contains("q1"))
+            try QP_program.destroy_quantum_register("q1")
+            XCTAssertFalse(Set<String>(QP_program.get_quantum_register_names()).contains("q1"))
+            do {
+                // Destroying an invalid register should fail.
+                try QP_program.destroy_quantum_register("q1")
+            } catch {
+                switch error {
+                case QISKitError.regNotExists(_):
+                    break
+                default:
+                    XCTFail("test_destroy_quantum_register: \(error)")
+                }
+            }
+        } catch {
+            XCTFail("test_destroy_quantum_register: \(error)")
+        }
+    }
+
     func test_create_circuit() {
         do {
             let QP_program = try QuantumProgram()
@@ -282,6 +332,31 @@ class QuantumProgramTests: XCTestCase {
             SDKLogger.logInfo(qc3)
         } catch {
             XCTFail("test_create_several_circuits: \(error)")
+        }
+    }
+
+    func test_destroy_circuit() {
+        do {
+            let QP_program = try QuantumProgram()
+            let qr = try QP_program.create_quantum_register("qr", 3)
+            let cr = try QP_program.create_classical_register("cr", 3)
+            try QP_program.create_circuit("qc", [qr], [cr])
+            XCTAssert(Set<String>(QP_program.get_circuit_names()).contains("qc"))
+            try QP_program.destroy_circuit("qc")
+            XCTAssertFalse(Set<String>(QP_program.get_circuit_names()).contains("qc"))
+            do {
+                // Destroying an invalid register should fail.
+                try QP_program.destroy_circuit("qc")
+            } catch {
+                switch error {
+                case QISKitError.missingCircuit(_):
+                    break
+                default:
+                    XCTFail("test_destroy_circuit: \(error)")
+                }
+            }
+        } catch {
+            XCTFail("test_destroy_circuit: \(error)")
         }
     }
 
@@ -2223,6 +2298,54 @@ class QuantumProgramTests: XCTestCase {
         }
     }
 
+    func test_ccx() {
+        do {
+            let Q_program = try QuantumProgram()
+            let q = try Q_program.create_quantum_register("q", 3)
+            let c = try Q_program.create_classical_register("c", 3)
+            let pqm = try Q_program.create_circuit("pqm", [q], [c])
+
+            // Toffoli gate.
+            try pqm.ccx(q[0], q[1], q[2])
+
+            // Measurement.
+            for k in 0..<3 {
+                try pqm.measure(q[k], c[k])
+            }
+            // Prepare run.
+            let circuits = ["pqm"]
+            let backend = "local_qasm_simulator"
+            let shots = 1024  // the number of shots in the experiment
+            // Run.
+            let asyncExpectation = self.expectation(description: "test_reconfig")
+            Q_program.execute(circuits,
+                               backend: backend,
+                               wait: 10,
+                               timeout: 240,
+                               shots: shots,
+                               max_credits: 3) { result in
+                do {
+                    if let error = result.get_error() {
+                        XCTFail("Failure in test_ccx: \(error)")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    let count = try result.get_counts("pqm")
+                    XCTAssertEqual(count,["000": 1024])
+                    asyncExpectation.fulfill()
+                } catch {
+                    XCTFail("Failure in test_ccx: \(error)")
+                    asyncExpectation.fulfill()
+                }
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_ccx")
+            })
+        } catch {
+            XCTFail("test_ccx: \(error)")
+        }
+    }
+
     func test_reconfig() {
         do {
             let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
@@ -2236,7 +2359,7 @@ class QuantumProgramTests: XCTestCase {
             let backend = "local_qasm_simulator"
             let test_config = ["0": 0, "1": 1]
             var qobj = try QP_program.compile(["qc2"], backend:backend, config:test_config, shots:shots)
-            let asyncExpectation = self.expectation(description: "test_qubitpol")
+            let asyncExpectation = self.expectation(description: "test_reconfig")
             QP_program.run_async(qobj) { out in
                 do {
                     if let error = out.get_error() {
