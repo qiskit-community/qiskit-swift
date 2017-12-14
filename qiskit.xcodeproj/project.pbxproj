@@ -16,6 +16,7 @@
 		6903E0AB1FC3213E007C1C60 /* NumericType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6903E0A91FC3213E007C1C60 /* NumericType.swift */; };
 		6903E0AD1FC340B7007C1C60 /* Vector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6903E0AC1FC340B7007C1C60 /* Vector.swift */; };
 		6903E0AE1FC340B7007C1C60 /* Vector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6903E0AC1FC340B7007C1C60 /* Vector.swift */; };
+		690BDBF91FE2331100C44210 /* SymbolicValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C583161FE1A9A5008709E4 /* SymbolicValue.swift */; };
 		6932A9F01FB9F50400382CF7 /* BaseBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932A9E81FB9F50400382CF7 /* BaseBackend.swift */; };
 		6932A9F11FB9F50400382CF7 /* QasmCppSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932A9E91FB9F50400382CF7 /* QasmCppSimulator.swift */; };
 		6932A9F21FB9F50400382CF7 /* QasmSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932A9EA1FB9F50400382CF7 /* QasmSimulator.swift */; };
@@ -1125,6 +1126,7 @@
 				6932AA2E1FB9F5DD00382CF7 /* SDKLogger.swift in Sources */,
 				6932AB4C1FB9F8F600382CF7 /* NodeCreg.swift in Sources */,
 				6932AA2A1FB9F5D000382CF7 /* OrderedDictionary.swift in Sources */,
+				690BDBF91FE2331100C44210 /* SymbolicValue.swift in Sources */,
 				69F198FB1FC2144D00CE05DC /* String+Padding.swift in Sources */,
 				6903E0A81FC317B3007C1C60 /* Matrix.swift in Sources */,
 				6932AA841FB9F6B600382CF7 /* CU3.swift in Sources */,
