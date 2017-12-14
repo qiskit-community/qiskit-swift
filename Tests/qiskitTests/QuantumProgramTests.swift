@@ -935,7 +935,7 @@ class QuantumProgramTests: XCTestCase {
                                               coupling_map: coupling_map)
             let result = try QP_program.get_compiled_qasm(qobj, "circuitName")
             SDKLogger.logInfo(result)
-            XCTAssertEqual(result.count, 184)
+            XCTAssertEqual(result.count, 167)
         } catch {
             XCTFail("test_get_compiled_qasm: \(error)")
         }
@@ -1733,15 +1733,12 @@ class QuantumProgramTests: XCTestCase {
                     return
                 }
                 SDKLogger.logInfo(status)
-                guard let available = status["available"] as? Bool else {
-                    XCTFail("test_execute_one_circuit_real_online: Missing status.")
-                    asyncExpectation.fulfill()
-                    return
-                }
-                if !available {
-                    SDKLogger.logInfo("'\(backend)' not available")
-                    asyncExpectation.fulfill()
-                    return
+                if let available = status["available"] as? Bool {
+                    if !available {
+                        SDKLogger.logInfo("'\(backend)' not available")
+                        asyncExpectation.fulfill()
+                        return
+                    }
                 }
                 QP_program.execute(["circuitName"],
                                    backend: backend,

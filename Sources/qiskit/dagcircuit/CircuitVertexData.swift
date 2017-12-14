@@ -95,25 +95,14 @@ final class CircuitVertexOpData: CircuitVertexData {
     var name: String
     var qargs: [RegBit]
     var cargs: [RegBit]
-    var params: [String] {
-        get {
-            // Just to conform to Python SDK for now
-            return self._params.map() {
-                return ($0 == "0.000000000000000") ? "0.0" : $0
-            }
-        }
-        set {
-            return self._params = newValue
-        }
-    }
+    var params: [SymbolicValue]
     var condition: RegBit?
-    private var _params: [String]
 
-    init(_ name: String,_ qargs: [RegBit], _ cargs: [RegBit], _ params: [String], _ condition: RegBit?) {
+    init(_ name: String,_ qargs: [RegBit], _ cargs: [RegBit], _ params: [SymbolicValue], _ condition: RegBit?) {
         self.name = name
         self.qargs = qargs
         self.cargs = cargs
-        self._params = params
+        self.params = params
         self.condition = condition
         super.init("op")
     }
@@ -122,12 +111,16 @@ final class CircuitVertexOpData: CircuitVertexData {
         self.name = instance.name
         self.qargs = instance.qargs
         self.cargs = instance.cargs
-        self._params = instance._params
+        self.params = instance.params
         self.condition = instance.condition
         super.init(instance)
     }
 
     override func copy() -> GraphDataCopying {
         return CircuitVertexOpData(self)
+    }
+
+    func formatParams(_ precision: Int) -> [String] {
+         return self.params.map { $0.format(precision) }
     }
 }

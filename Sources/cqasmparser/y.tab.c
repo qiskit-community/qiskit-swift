@@ -1929,7 +1929,7 @@ yyreduce:
 
   case 79:
 #line 383 "parser.y"
-    { (yyval.node) = CreateReal(M_PI); }
+    { (yyval.node) = CreateRealPI(); }
     break;
 
   case 80:

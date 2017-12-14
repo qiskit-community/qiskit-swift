@@ -160,8 +160,9 @@ final class SimulatorTools {
      */
     static func single_gate_matrix(_ gate: String, _ params: [Double]? = nil) -> Matrix<Complex> {
         let (theta, phi, lam) = SimulatorTools.single_gate_params(gate, params)
+        let c00 = Complex(real:cos(theta/2.0))
         return [[
-                    Complex(real:cos(theta/2.0)),
+                    c00,
                     Complex(imag: lam).exp() * -sin(theta/2.0)
                 ],
                 [

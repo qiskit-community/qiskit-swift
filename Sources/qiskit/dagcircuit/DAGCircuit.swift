@@ -355,7 +355,7 @@ final class DAGCircuit {
     private func _check_basis_data(_ name: String,
                                    _ qargs: [RegBit],
                                    _ cargs: [RegBit],
-                                   _ params: [String]) throws {
+                                   _ params: [SymbolicValue]) throws {
         // Check that we have this operation
         if self.basis[name] == nil {
             throw DAGCircuitError.noBasicOp(name: name)
@@ -452,7 +452,7 @@ final class DAGCircuit {
     private func _add_op_node(_ nname: String,
                               _ nqargs: [RegBit],
                               _ ncargs: [RegBit],
-                              _ nparams: [String],
+                              _ nparams: [SymbolicValue],
                               _ ncondition: RegBit?) {
         // Add a new operation node to the graph
         self.node_counter += 1
@@ -470,7 +470,7 @@ final class DAGCircuit {
     func apply_operation_back(_ name: String,
                                       _ qargs: [RegBit],
                                       _ cargs: [RegBit] = [],
-                                      _ params:[String] = [],
+                                      _ params:[SymbolicValue] = [],
                                       _ condition: RegBit? = nil) throws {
         var all_cbits = self._bits_in_condition(condition)
         all_cbits.append(contentsOf: cargs)
@@ -508,7 +508,7 @@ final class DAGCircuit {
     public func apply_operation_front(_ name: String,
                                       _ qargs: [RegBit],
                                       _ cargs: [RegBit] = [],
-                                      _ params:[String] = [],
+                                      _ params:[SymbolicValue] = [],
                                       _ condition: RegBit?) throws {
         var all_cbits = self._bits_in_condition(condition)
         all_cbits.append(contentsOf: cargs)
@@ -1040,7 +1040,7 @@ final class DAGCircuit {
                         }
                         let qarg = args.joined(separator: ",")
                         if !dataOp.params.isEmpty {
-                            let param = dataOp.params.joined(separator: ",")
+                            let param = dataOp.formatParams(self.prec).joined(separator: ",")
                             out += "\(nm)(\(param)) \(qarg);\n"
                         }
                         else {

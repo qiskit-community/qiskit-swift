@@ -162,7 +162,9 @@ final class JsonBackend: UnrollerBackend {
             }
             var operation: [String:Any] = [:]
             operation["name"] = "U"
-            operation["params"] = [try arg.0.real(nested_scope),try arg.1.real(nested_scope),try arg.2.real(nested_scope)]
+            operation["params"] = [try arg.0.real(nested_scope).value,
+                                   try arg.1.real(nested_scope).value,
+                                   try arg.2.real(nested_scope).value]
             operation["qubits"] = qubit_indices
             operations.append(operation)
             self.circuit["operations"] = operations
@@ -352,7 +354,7 @@ final class JsonBackend: UnrollerBackend {
             operation["name"] = name
             var params: [Double] = []
             for arg in args {
-                params.append(try arg.real(nested_scope))
+                params.append(try arg.real(nested_scope).value)
             }
             operation["params"] = params
             operation["qubits"] = qubit_indices

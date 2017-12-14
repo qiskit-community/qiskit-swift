@@ -54,7 +54,7 @@ final class NodeBinaryOp: NodeRealValue {
         return "\(lhsqasm) \(op) \(rhs.qasm(prec))"
     }
 
-    func real(_ nested_scope: [[String:NodeRealValue]]? = nil) throws -> Double {
+    func real(_ nested_scope: [[String:NodeRealValue]]? = nil) throws -> SymbolicValue {
         let operation = self.op
         guard let lexpr = self._children[0] as? NodeRealValue else {
             throw QasmError.errorBinop(qasm: self.qasm(15))

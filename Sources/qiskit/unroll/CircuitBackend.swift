@@ -126,9 +126,9 @@ final class CircuitBackend: UnrollerBackend {
             if !self.basis.contains("U") {
                 self.basis.append("U")
             }
-            let this_gate = try self.circuit.u_base([try arg.0.real(nested_scope),
-                                                     try arg.1.real(nested_scope),
-                                                     try arg.2.real(nested_scope)],
+            let this_gate = try self.circuit.u_base([try arg.0.real(nested_scope).value,
+                                                     try arg.1.real(nested_scope).value,
+                                                     try arg.2.real(nested_scope).value],
                                                     try self._map_qubit(qubit))
             if let reg = self.creg,
                 let val = self.cval {
@@ -261,7 +261,7 @@ final class CircuitBackend: UnrollerBackend {
                 if  1 != args.count || 2 != qubits.count {
                     throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
                 }
-                this_gate = try self.circuit.crz(args[0].real(nested_scope),self._map_qubit(qubits[0]),self._map_qubit(qubits[1]))
+                this_gate = try self.circuit.crz(args[0].real(nested_scope).value,self._map_qubit(qubits[0]),self._map_qubit(qubits[1]))
             }
             else if name == "cswap" {
                 if 0 != args.count || 3 != qubits.count {
@@ -273,13 +273,15 @@ final class CircuitBackend: UnrollerBackend {
                 if 1 != args.count || 2 != qubits.count {
                     throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
                 }
-                this_gate = try self.circuit.cu1(args[0].real(nested_scope),self._map_qubit(qubits[0]),self._map_qubit(qubits[1]))
+                this_gate = try self.circuit.cu1(args[0].real(nested_scope).value,self._map_qubit(qubits[0]),self._map_qubit(qubits[1]))
             }
             else if name == "cu3" {
                 if 3 != args.count || 2 != qubits.count {
                     throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
                 }
-                this_gate = try self.circuit.cu3(args[0].real(nested_scope),args[1].real(nested_scope),args[2].real(nested_scope),
+                this_gate = try self.circuit.cu3(args[0].real(nested_scope).value,
+                                                 args[1].real(nested_scope).value,
+                                                 args[2].real(nested_scope).value,
                                                  self._map_qubit(qubits[0]),self._map_qubit(qubits[1]))
             }
             else if name == "cx" {
@@ -322,19 +324,19 @@ final class CircuitBackend: UnrollerBackend {
                 if 1 != args.count || 1 != qubits.count {
                     throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
                 }
-                this_gate = try self.circuit.rx(args[0].real(nested_scope),self._map_qubit(qubits[0]))
+                this_gate = try self.circuit.rx(args[0].real(nested_scope).value,self._map_qubit(qubits[0]))
             }
             else if name == "ry" {
                 if 1 != args.count || 1 != qubits.count {
                     throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
                 }
-                this_gate = try self.circuit.ry(args[0].real(nested_scope),self._map_qubit(qubits[0]))
+                this_gate = try self.circuit.ry(args[0].real(nested_scope).value,self._map_qubit(qubits[0]))
             }
             else if name == "rz" {
                 if 1 != args.count || 1 != qubits.count {
                     throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
                 }
-                this_gate = try self.circuit.rz(args[0].real(nested_scope),self._map_qubit(qubits[0]))
+                this_gate = try self.circuit.rz(args[0].real(nested_scope).value,self._map_qubit(qubits[0]))
             }
             else if name == "s" {
                 if 0 != args.count || 1 != qubits.count {
@@ -364,19 +366,24 @@ final class CircuitBackend: UnrollerBackend {
                 if 1 != args.count || 1 != qubits.count {
                     throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
                 }
-                this_gate = try self.circuit.u1(args[0].real(nested_scope),self._map_qubit(qubits[0]))
+                this_gate = try self.circuit.u1(args[0].real(nested_scope).value,
+                                                self._map_qubit(qubits[0]))
             }
             else if name == "u2" {
                 if 2 != args.count || 1 != qubits.count {
                     throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
                 }
-                this_gate = try self.circuit.u2(args[0].real(nested_scope),args[1].real(nested_scope),self._map_qubit(qubits[0]))
+                this_gate = try self.circuit.u2(args[0].real(nested_scope).value,
+                                                args[1].real(nested_scope).value,
+                                                self._map_qubit(qubits[0]))
             }
             else if name == "u3" {
                 if 3 != args.count || 1 != qubits.count {
                     throw BackendError.gateIncompatible(name: name,args: args.count, qubits: qubits.count)
                 }
-                this_gate = try self.circuit.u3(args[0].real(nested_scope),args[1].real(nested_scope),args[2].real(nested_scope),
+                this_gate = try self.circuit.u3(args[0].real(nested_scope).value,
+                                                args[1].real(nested_scope).value,
+                                                args[2].real(nested_scope).value,
                                                  self._map_qubit(qubits[0]))
             }
             else if name == "x" {

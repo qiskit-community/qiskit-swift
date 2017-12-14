@@ -46,7 +46,7 @@ final class NodePrefix: NodeRealValue {
         return "\(op)\(operand.qasm(prec))"
     }
 
-    func real(_ nested_scope: [[String:NodeRealValue]]?) throws -> Double {
+    func real(_ nested_scope: [[String:NodeRealValue]]?) throws -> SymbolicValue {
         let operation = self.op
         guard let operand = self._children[0] as? NodeRealValue else {
             throw QasmError.errorPrefix(qasm: self.qasm(15))

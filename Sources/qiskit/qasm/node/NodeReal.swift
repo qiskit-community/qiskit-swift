@@ -19,7 +19,7 @@ import Foundation
 Node for an OPENQASM real number.
 This node has no children. The data is in the value field.
 */
-final class NodeReal: NodeRealValue {
+class NodeReal: NodeRealValue {
 
     let value: Double
     
@@ -39,7 +39,22 @@ final class NodeReal: NodeRealValue {
         return self.value.format(prec)
     }
 
-    func real(_ nested_scope: [[String:NodeRealValue]]?) throws -> Double {
-        return self.value
+    func real(_ nested_scope: [[String:NodeRealValue]]?) throws -> SymbolicValue {
+        return SymbolicValue(self.value)
+    }
+}
+
+final class NodeRealPI: NodeReal {
+
+    init() {
+        super.init(id: Double.pi)
+    }
+
+    override func qasm(_ prec: Int) -> String {
+        return SymbolicValue.pi.format(prec)
+    }
+
+    override func real(_ nested_scope: [[String:NodeRealValue]]?) throws -> SymbolicValue {
+        return SymbolicValue.pi
     }
 }

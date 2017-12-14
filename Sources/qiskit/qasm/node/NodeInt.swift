@@ -41,7 +41,7 @@ final class NodeNNInt: NodeRealValue {
         return qasm
     }
 
-    func real(_ nested_scope: [[String:NodeRealValue]]?) throws -> Double {
-        return Double(self.value)
+    func real(_ nested_scope: [[String:NodeRealValue]]?) throws -> SymbolicValue {
+        return SymbolicValue(Double(self.value))
     }
 }

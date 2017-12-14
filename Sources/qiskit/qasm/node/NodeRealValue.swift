@@ -17,5 +17,5 @@
 import Foundation
 
 protocol NodeRealValue: Node {
-    func real(_ nested_scope: [[String:NodeRealValue]]?) throws -> Double
+    func real(_ nested_scope: [[String:NodeRealValue]]?) throws -> SymbolicValue
 }

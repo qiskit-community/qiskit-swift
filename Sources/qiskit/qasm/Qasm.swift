@@ -181,6 +181,9 @@ final class Qasm {
         CreateReal = { (real: Double) -> NodeIdType in
             return Qasm.createReal(real: real)
         }
+        CreateRealPI = { () -> NodeIdType in
+            return Qasm.createRealPI()
+        }
         CreateReset = { (identifier: NodeIdType) -> NodeIdType in
             return Qasm.createReset(identifier: identifier)
         }
@@ -424,6 +427,11 @@ final class Qasm {
 
     static private func createReal(real: Double) -> NodeIdType {
         let node = NodeReal(id: real)
+        return Qasm.addNode(node)
+    }
+
+    static private func createRealPI() -> NodeIdType {
+        let node = NodeRealPI()
         return Qasm.addNode(node)
     }
 

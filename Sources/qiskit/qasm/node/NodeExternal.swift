@@ -47,7 +47,7 @@ final class NodeExternal: NodeRealValue {
         return qasm
     }
 
-    func real(_ nested_scope: [[String:NodeRealValue]]?) throws -> Double {
+    func real(_ nested_scope: [[String:NodeRealValue]]?) throws -> SymbolicValue {
         if let expr = self.expression as? NodeRealValue {
             let arg = try expr.real(nested_scope)
             if self.operation == "sin" {

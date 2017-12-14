@@ -78,6 +78,10 @@ public struct Complex: Hashable, CustomStringConvertible, NumericType, Expressib
         self.init(real, 0)
     }
 
+    public init(real: SymbolicValue) {
+        self.init(real.value, 0)
+    }
+
     public init(integerLiteral value: Int) {
         self.init(real: Double(value))
     }
@@ -146,29 +150,29 @@ public struct Complex: Hashable, CustomStringConvertible, NumericType, Expressib
     }
     
     public func add(_ n: Complex) -> Complex {
-        return Complex(self.real + n.self.real, self.imag + n.imag)
+        return Complex(self.real + n.real, self.imag + n.imag)
     }
-
     public func subtract(_ n: Complex) -> Complex {
-        return Complex(self.real - n.self.real, self.imag - n.imag)
+        return Complex(self.real - n.real, self.imag - n.imag)
     }
-
-    public func multiply(_ n: Double) -> Complex {
-        return Complex(self.real * n, self.imag * n)
-    }
-
     public func multiply(_ n: Complex) -> Complex {
         return Complex(self.real * n.real - self.imag * n.imag, self.real * n.imag + self.imag * n.real)
     }
-
+    public func multiply(_ n: Double) -> Complex {
+        return Complex(self.real * n, self.imag * n)
+    }
+    public func multiply(_ n: SymbolicValue) -> Complex {
+        return Complex(self.real * n.value, self.imag * n.value)
+    }
     public func divide(_ n: Complex) -> Complex {
         return self.multiply((n.conjugate().divide(n.radiusSquare)))
     }
-
     public func divide(_ n: Double) -> Complex {
         return Complex(self.real / n, self.imag / n)
     }
-
+    public func divide(_ n: SymbolicValue) -> Complex {
+        return Complex(self.real / n.value, self.imag / n.value)
+    }
     public func power(_ n: Double) -> Complex {
         return pow(radiusSquare, n / 2) *  Complex(cos(n * arg), sin(n * arg))
     }
@@ -267,6 +271,9 @@ public func * (left: Double,  right: Complex) -> Complex {
 public func * (left: Complex, right: Double ) -> Complex {
     return left.multiply(right)
 }
+public func * (left: Complex, right: SymbolicValue ) -> Complex {
+    return left.multiply(right)
+}
 
 public func / (left: Complex, right: Complex) -> Complex {
     return left.divide(right)
@@ -275,6 +282,9 @@ public func / (left: Double,  right: Complex) -> Complex {
     return Complex(real: left).divide(right)
 }
 public func / (left: Complex, right: Double ) -> Complex {
+    return left.divide(right)
+}
+public func / (left: Complex, right: SymbolicValue ) -> Complex {
     return left.divide(right)
 }
 

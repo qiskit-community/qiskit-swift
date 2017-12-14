@@ -494,12 +494,12 @@ final class Mapping {
      Sin[phi-lamb] * Sin[theta] = Sin[xi] * Sin[-theta1+theta2]
      Returns the maximum absolute difference between right and left hand sides.
      */
-    static func test_trig_solution(_ theta: Double,
-                                   _ phi: Double,
-                                   _ lamb: Double,
-                                   _ xi: Double,
-                                   _ theta1: Double,
-                                   _ theta2: Double) -> Double {
+    static func test_trig_solution(_ theta: SymbolicValue,
+                                   _ phi: SymbolicValue,
+                                   _ lamb: SymbolicValue,
+                                   _ xi: SymbolicValue,
+                                   _ theta1: SymbolicValue,
+                                   _ theta2: SymbolicValue) -> SymbolicValue {
         let delta1 = cos(phi + lamb) * cos(theta) - cos(xi) * cos(theta1 + theta2)
         let delta2 = sin(phi + lamb) * cos(theta) - sin(xi) * cos(theta1 - theta2)
         let delta3 = cos(phi - lamb) * sin(theta) - cos(xi) * sin(theta1 + theta2)
@@ -515,28 +515,28 @@ final class Mapping {
      given in the comment for test_solution. Use eps for comparisons with zero.
      Return a solution theta, phi, and lambda.
      */
-    static func yzy_to_zyz(_ xi: Double,
-                           _ theta1: Double,
-                           _ theta2: Double,
-                           _ eps: Double = 1e-9) -> (Double,Double,Double) {
-        var solutions: [(Double,Double,Double)] = []  // list of potential solutions
+    static func yzy_to_zyz(_ xi: SymbolicValue,
+                           _ theta1: SymbolicValue,
+                           _ theta2: SymbolicValue,
+                           _ eps: Double = 1e-9) -> (SymbolicValue,SymbolicValue,SymbolicValue) {
+        var solutions: [(SymbolicValue,SymbolicValue,SymbolicValue)] = []  // list of potential solutions
         // Four cases to avoid singularities
         if abs(cos(xi)) < eps / 10 {
             solutions.append((theta2 - theta1, xi, 0.0))
         }
         else if abs(sin(theta1 + theta2)) < eps / 10.0 {
-            let phi_minus_lambda: [Double] = [Double.pi / 2.0 , 3.0 * Double.pi / 2.0, Double.pi / 2.0, 3.0 * Double.pi / 2.0]
-            let stheta_1: Double = asin(sin(xi) * sin(-theta1 + theta2))
-            let stheta_2: Double = asin(-sin(xi) * sin(-theta1 + theta2))
-            let stheta_3: Double = Double.pi - stheta_1
-            let stheta_4: Double = Double.pi - stheta_2
-            let stheta: [Double] = [stheta_1, stheta_2, stheta_3, stheta_4]
-            var phi_plus_lambda: [Double] = []
+            let phi_minus_lambda: [SymbolicValue] = [SymbolicValue.pi / 2.0 , 3.0 * SymbolicValue.pi / 2.0, SymbolicValue.pi / 2.0, 3.0 * SymbolicValue.pi / 2.0]
+            let stheta_1: SymbolicValue = asin(sin(xi) * sin(-theta1 + theta2))
+            let stheta_2: SymbolicValue = asin(-sin(xi) * sin(-theta1 + theta2))
+            let stheta_3: SymbolicValue = SymbolicValue.pi - stheta_1
+            let stheta_4: SymbolicValue = SymbolicValue.pi - stheta_2
+            let stheta: [SymbolicValue] = [stheta_1, stheta_2, stheta_3, stheta_4]
+            var phi_plus_lambda: [SymbolicValue] = []
             for x in stheta {
                 phi_plus_lambda.append(acos(cos(theta1 + theta2) * cos(xi) / cos(x)))
             }
-            var sphi: [Double] = []
-            var slam: [Double] = []
+            var sphi: [SymbolicValue] = []
+            var slam: [SymbolicValue] = []
             for i in 0..<phi_plus_lambda.count {
                 if i < phi_minus_lambda.count {
                     sphi.append((phi_plus_lambda[i] + phi_minus_lambda[i]) / 2.0)
@@ -556,18 +556,18 @@ final class Mapping {
             }
         }
         else if abs(cos(theta1 + theta2)) < eps / 10.0 {
-            let phi_plus_lambda: [Double] = [Double.pi / 2.0, 3.0 * Double.pi / 2.0, Double.pi / 2.0, 3.0 * Double.pi / 2.0]
-            let stheta_1: Double = acos(sin(xi) * cos(theta1 - theta2))
-            let stheta_2: Double = acos(-sin(xi) * cos(theta1 - theta2))
-            let stheta_3: Double = -stheta_1
-            let stheta_4: Double = -stheta_2
-            let stheta: [Double] = [stheta_1, stheta_2, stheta_3, stheta_4]
-            var phi_minus_lambda: [Double] = []
+            let phi_plus_lambda: [SymbolicValue] = [SymbolicValue.pi / 2.0, 3.0 * SymbolicValue.pi / 2.0, SymbolicValue.pi / 2.0, 3.0 * SymbolicValue.pi / 2.0]
+            let stheta_1: SymbolicValue = acos(sin(xi) * cos(theta1 - theta2))
+            let stheta_2: SymbolicValue = acos(-sin(xi) * cos(theta1 - theta2))
+            let stheta_3: SymbolicValue = -stheta_1
+            let stheta_4: SymbolicValue = -stheta_2
+            let stheta: [SymbolicValue] = [stheta_1, stheta_2, stheta_3, stheta_4]
+            var phi_minus_lambda: [SymbolicValue] = []
             for x in stheta {
                 phi_minus_lambda.append(acos(sin(theta1 + theta2) * cos(xi) / sin(x)))
             }
-            var sphi: [Double] = []
-            var slam: [Double] = []
+            var sphi: [SymbolicValue] = []
+            var slam: [SymbolicValue] = []
             for i in 0..<phi_plus_lambda.count {
                 if i < phi_minus_lambda.count {
                     sphi.append((phi_plus_lambda[i] + phi_minus_lambda[i]) / 2.0)
@@ -587,18 +587,18 @@ final class Mapping {
             }
         }
         else {
-            let phi_plus_lambda: Double = atan(sin(xi) * cos(theta1 - theta2) / (cos(xi) * cos(theta1 + theta2)))
-            let phi_minus_lambda: Double = atan(sin(xi) * sin(-theta1 + theta2) / (cos(xi) * sin(theta1 + theta2)))
-            let sphi: Double = (phi_plus_lambda + phi_minus_lambda) / 2.0
-            let slam: Double = (phi_plus_lambda - phi_minus_lambda) / 2.0
+            let phi_plus_lambda: SymbolicValue = atan(sin(xi) * cos(theta1 - theta2) / (cos(xi) * cos(theta1 + theta2)))
+            let phi_minus_lambda: SymbolicValue = atan(sin(xi) * sin(-theta1 + theta2) / (cos(xi) * sin(theta1 + theta2)))
+            let sphi: SymbolicValue = (phi_plus_lambda + phi_minus_lambda) / 2.0
+            let slam: SymbolicValue = (phi_plus_lambda - phi_minus_lambda) / 2.0
             solutions.append((acos(cos(xi) * cos(theta1 + theta2) / cos(sphi + slam)), sphi, slam))
-            solutions.append((acos(cos(xi) * cos(theta1 + theta2) / cos(sphi + slam + Double.pi)), sphi + Double.pi / 2.0, slam + Double.pi / 2.0))
-            solutions.append((acos(cos(xi) * cos(theta1 + theta2) / cos(sphi + slam)), sphi + Double.pi / 2.0, slam - Double.pi / 2.0))
-            solutions.append((acos(cos(xi) * cos(theta1 + theta2) / cos(sphi + slam + Double.pi)), sphi + Double.pi, slam))
+            solutions.append((acos(cos(xi) * cos(theta1 + theta2) / cos(sphi + slam + SymbolicValue.pi)), sphi + SymbolicValue.pi / 2.0, slam + SymbolicValue.pi / 2.0))
+            solutions.append((acos(cos(xi) * cos(theta1 + theta2) / cos(sphi + slam)), sphi + SymbolicValue.pi / 2.0, slam - SymbolicValue.pi / 2.0))
+            solutions.append((acos(cos(xi) * cos(theta1 + theta2) / cos(sphi + slam + SymbolicValue.pi)), sphi + SymbolicValue.pi, slam))
         }
 
         // Select the first solution with the required accuracy
-        var deltas: [Double] = []
+        var deltas: [SymbolicValue] = []
         for x in solutions {
             deltas.append(Mapping.test_trig_solution(x.0, x.1, x.2, xi, theta1, theta2))
         }
@@ -630,12 +630,12 @@ final class Mapping {
      = u3(theta', phi1 + phi', lambda2 + lambda')
      Return theta, phi, lambda.
      */
-    static func compose_u3(_ theta1: Double,
-                           _ phi1: Double,
-                           _ lambda1: Double,
-                           _ theta2: Double,
-                           _ phi2: Double,
-                           _ lambda2: Double) -> (Double, Double, Double) {
+    static func compose_u3(_ theta1: SymbolicValue,
+                           _ phi1: SymbolicValue,
+                           _ lambda1: SymbolicValue,
+                           _ theta2: SymbolicValue,
+                           _ phi2: SymbolicValue,
+                           _ lambda2: SymbolicValue) -> (SymbolicValue, SymbolicValue, SymbolicValue) {
         // Careful with the factor of two in yzy_to_zyz
         let (thetap, phip, lambdap) = Mapping.yzy_to_zyz((lambda1 + phi2) / 2.0, theta1 / 2.0, theta2 / 2.0)
         return (2.0 * thetap, phi1 + 2.0 * phip, lambda2 + 2.0 * lambdap)
@@ -690,7 +690,7 @@ final class Mapping {
         for run in runs {
             let qname = (run[0].data as! CircuitVertexOpData).qargs[0]
             var right_name = "u1"
-            var right_parameters = (0.0, 0.0, 0.0)  // (theta, phi, lambda)
+            var right_parameters: (SymbolicValue, SymbolicValue, SymbolicValue) = (0.0, 0.0, 0.0)  // (theta, phi, lambda)
             for node in run {
                 let nd = node.data as! CircuitVertexOpData
                 assert(nd.condition == nil, "internal error")
@@ -698,15 +698,15 @@ final class Mapping {
                 assert(nd.qargs[0] == qname, "internal error")
                 var left_name = nd.name
                 assert(Set<String>(["u1", "u2", "u3", "id"]).contains(left_name), "internal error")
-                var left_parameters: (Double, Double, Double) = (0.0,0.0,0.0)
+                var left_parameters: (SymbolicValue, SymbolicValue, SymbolicValue) = (0.0,0.0,0.0)
                 if left_name == "u1" {
-                    left_parameters = (0.0, 0.0, Double(nd.params[0])!)
+                    left_parameters = (0.0, 0.0, nd.params[0])
                 }
                 else if left_name == "u2" {
-                    left_parameters = (Double.pi / 2.0, Double(nd.params[0])!, Double(nd.params[1])!)
+                    left_parameters = (SymbolicValue.pi / 2.0, nd.params[0], nd.params[1])
                 }
                 else if left_name == "u3" {
-                    left_parameters = (Double(nd.params[0])!, Double(nd.params[1])!, Double(nd.params[2])!)
+                    left_parameters = (nd.params[0], nd.params[1], nd.params[2])
                 }
                 else {
                     left_name = "u1"  // replace id with u1
@@ -720,12 +720,12 @@ final class Mapping {
                 }
                 else if name_tuple == ("u1", "u2") {
                     // u1(lambda1) * u2(phi2, lambda2) = u2(phi2 + lambda1, lambda2)
-                    right_parameters = (Double.pi / 2, right_parameters.1 + left_parameters.2, right_parameters.2)
+                    right_parameters = (SymbolicValue.pi / 2, right_parameters.1 + left_parameters.2, right_parameters.2)
                 }
                 else if name_tuple == ("u2", "u1") {
                     // u2(phi1, lambda1) * u1(lambda2) = u2(phi1, lambda1 + lambda2)
                     right_name = "u2"
-                    right_parameters = (Double.pi / 2.0, left_parameters.1, right_parameters.2 + left_parameters.2)
+                    right_parameters = (SymbolicValue.pi / 2.0, left_parameters.1, right_parameters.2 + left_parameters.2)
                 }
                 else if name_tuple == ("u1", "u3") {
                     // u1(lambda1) * u3(theta2, phi2, lambda2) =
@@ -744,7 +744,7 @@ final class Mapping {
                     // u2(phi1, lambda1) * u2(phi2, lambda2) =
                     //    u3(pi - lambda1 - phi2, phi1 + pi/2, lambda2 + pi/2)
                     right_name = "u3"
-                    right_parameters = (Double.pi - left_parameters.2 - right_parameters.1, left_parameters.1 + Double.pi / 2.0, right_parameters.2 + Double.pi / 2)
+                    right_parameters = (SymbolicValue.pi - left_parameters.2 - right_parameters.1, left_parameters.1 + SymbolicValue.pi / 2.0, right_parameters.2 + SymbolicValue.pi / 2)
                 }
                 else {
                     // For composing u3's or u2's with u3's, use
@@ -763,38 +763,38 @@ final class Mapping {
                 // the other steps preserve the global phase, so we continue.
                 let epsilon = 1e-9  // for comparison with zero
                 // Y rotation is 0 mod 2*pi, so the gate is a u1
-                if abs(right_parameters.0.truncatingRemainder(dividingBy: 2.0) * Double.pi) < epsilon && right_name != "u1" {
+                if abs(right_parameters.0.truncatingRemainder(dividingBy: 2.0) * SymbolicValue.pi) < epsilon && right_name != "u1" {
                     right_name = "u1"
                     right_parameters = (0.0, 0.0, right_parameters.1 + right_parameters.2 + right_parameters.0)
                 }
                 // Y rotation is pi/2 or -pi/2 mod 2*pi, so the gate is a u2
                 if right_name == "u3" {
                     // theta = pi/2 + 2*k*pi
-                    if abs((right_parameters.0 - Double.pi / 2.0).truncatingRemainder(dividingBy: 2.0) * Double.pi) < epsilon {
+                    if abs((right_parameters.0 - SymbolicValue.pi / 2.0).truncatingRemainder(dividingBy: 2.0) * SymbolicValue.pi) < epsilon {
                         right_name = "u2"
-                        right_parameters = (Double.pi / 2.0, right_parameters.1, right_parameters.2 + (right_parameters.0 - Double.pi / 2.0))
+                        right_parameters = (SymbolicValue.pi / 2.0, right_parameters.1, right_parameters.2 + (right_parameters.0 - SymbolicValue.pi / 2.0))
                     }
                     // theta = -pi/2 + 2*k*pi
-                    if abs((right_parameters.0 + Double.pi / 2.0).truncatingRemainder(dividingBy: 2.0) * Double.pi) < epsilon {
+                    if abs((right_parameters.0 + SymbolicValue.pi / 2.0).truncatingRemainder(dividingBy: 2.0) * SymbolicValue.pi) < epsilon {
                         right_name = "u2"
-                        right_parameters = (Double.pi / 2.0, right_parameters.1 + Double.pi, right_parameters.2 - Double.pi + (right_parameters.0 + Double.pi / 2.0))
+                        right_parameters = (SymbolicValue.pi / 2.0, right_parameters.1 + SymbolicValue.pi, right_parameters.2 - SymbolicValue.pi + (right_parameters.0 + SymbolicValue.pi / 2.0))
                     }
                 }
                 // u1 and lambda is 0 mod 4*pi so gate is nop
-                if right_name == "u1" && abs(right_parameters.2.truncatingRemainder(dividingBy: 4.0) * Double.pi) < epsilon {
+                if right_name == "u1" && abs(right_parameters.2.truncatingRemainder(dividingBy: 4.0) * SymbolicValue.pi) < epsilon {
                     right_name = "nop"
                 }
             }
             // Replace the data of the first node in the run
-            var new_params: [String] = []
+            var new_params: [SymbolicValue] = []
             if right_name == "u1" {
-                new_params.append(String(right_parameters.2))
+                new_params.append(right_parameters.2)
             }
             if right_name == "u2" {
-                new_params = [String(right_parameters.1), String(right_parameters.2)]
+                new_params = [right_parameters.1, right_parameters.2]
             }
             if right_name == "u3" {
-                new_params = [String(right_parameters.0), String(right_parameters.1), String(right_parameters.2)]
+                new_params = [right_parameters.0, right_parameters.1, right_parameters.2]
             }
             (run[0].data as! CircuitVertexOpData).name = right_name
             (run[0].data as! CircuitVertexOpData).params = new_params

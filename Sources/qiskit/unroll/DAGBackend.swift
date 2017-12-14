@@ -101,9 +101,10 @@ final class DAGBackend: UnrollerBackend {
                 try self.circuit.add_basis_element("U", 1, 0, 3)
             }
             try self.circuit.apply_operation_back("U", [qubit], [],
-                                [arg.0.real(nested_scope).format(self.prec),
-                                 arg.1.real(nested_scope).format(self.prec),
-                                 arg.2.real(nested_scope).format(self.prec)], condition)
+                                [arg.0.real(nested_scope),
+                                 arg.1.real(nested_scope),
+                                 arg.2.real(nested_scope)],
+                                condition)
         }
     }
 
@@ -230,9 +231,9 @@ final class DAGBackend: UnrollerBackend {
             self.in_gate = name
             self.listen = false
             try self.circuit.add_basis_element(name, qubits.count, 0, args.count)
-            var params: [String] = []
+            var params: [SymbolicValue] = []
             for arg in args {
-                params.append(try arg.real(nested_scope).format(self.prec))
+                params.append(try arg.real(nested_scope))
             }
             try self.circuit.apply_operation_back(name, qubits, [], params, condition)
         }

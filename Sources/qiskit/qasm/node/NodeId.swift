@@ -53,7 +53,7 @@ final class NodeId: NodeRealValue {
         return qasm
     }
 
-    func real(_ nested_scope: [[String:NodeRealValue]]?) throws -> Double {
+    func real(_ nested_scope: [[String:NodeRealValue]]?) throws -> SymbolicValue {
         guard let scope = nested_scope else {
             throw QasmError.errorLocalParameter(qasm: self.qasm(15))
         }

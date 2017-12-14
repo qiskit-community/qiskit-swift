@@ -54,5 +54,6 @@ NodeIdType (*CreateProgram1)(NodeIdType);
 NodeIdType (*CreateProgram2)(NodeIdType,NodeIdType);
 NodeIdType (*CreateQReg)(NodeIdType);
 NodeIdType (*CreateReal)(double);
+NodeIdType (*CreateRealPI)(void);
 NodeIdType (*CreateReset)(NodeIdType);
 NodeIdType (*CreateUniversalUnitary)(NodeIdType,NodeIdType);

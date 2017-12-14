@@ -380,7 +380,7 @@ exp_list : expression { $$ = CreateExpressionList1($1);  }
 // ----------------------------------------
 nninteger : NNINTEGER { $$ = CreateInt($1); }
 real : REAL { $$ = CreateReal($1); }
-pi : PI { $$ = CreateReal(M_PI); }
+pi : PI { $$ = CreateRealPI(); }
 
 assign : ASSIGN { $$ = $1; }
 matches : MATCHES { $$ = $1; }

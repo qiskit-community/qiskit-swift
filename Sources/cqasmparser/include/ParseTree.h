@@ -67,6 +67,7 @@ extern NodeIdType (*CreateProgram1)(NodeIdType);
 extern NodeIdType (*CreateProgram2)(NodeIdType,NodeIdType);
 extern NodeIdType (*CreateQReg)(NodeIdType);
 extern NodeIdType (*CreateReal)(double);
+extern NodeIdType (*CreateRealPI)(void);
 extern NodeIdType (*CreateReset)(NodeIdType);
 extern NodeIdType (*CreateUniversalUnitary)(NodeIdType,NodeIdType);
 

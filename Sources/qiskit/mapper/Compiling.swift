@@ -34,7 +34,7 @@ public final class Compiling {
      element of the tuple is the OpenQASM gate name with parameter
      values substituted.
      */
-    public static func  euler_angles_1q(_ unitary_matrix: Matrix<Complex>) throws -> (Double,Double,Double,String) {
+    public static func  euler_angles_1q(_ unitary_matrix: Matrix<Complex>) throws -> (SymbolicValue,SymbolicValue,SymbolicValue,String) {
         let small: Double = pow(1.0, -10.0)
         if unitary_matrix.shape != (2, 2) {
             throw MappingError.eulerAngles1q2_2
@@ -47,12 +47,12 @@ public final class Compiling {
         // U[1, 0] = exp(i(phi-lambda)/2) * sin(theta/2)
         // U[1, 1] = exp(i(phi+lambda)/2) * cos(theta/2)
         // Find theta
-        var theta: Double = 0
+        var theta: SymbolicValue = 0.0
         if U[0, 0].abs() > small {
-            theta = 2 * acos(U[0, 0].abs())
+            theta = SymbolicValue(2) * acos(U[0, 0].abs())
         }
         else {
-            theta = 2 * asin(U[1, 0].abs())
+            theta = SymbolicValue(2) * asin(U[1, 0].abs())
         }
         // Find phi and lambda
         var phase11: Complex = 0.0
@@ -63,10 +63,10 @@ public final class Compiling {
         if abs(sin(theta/2.0)) > small {
             phase10 = U[1, 0] / sin(theta/2.0)
         }
-        let phiplambda = 2.0 * atan2(phase11.imag, phase11.real)
-        let phimlambda = 2.0 * atan2(phase10.imag, phase10.real)
-        var phi = 0.0
-        var lamb = 0.0
+        let phiplambda: SymbolicValue = 2.0 * atan2(phase11.imag, phase11.real)
+        let phimlambda: SymbolicValue = 2.0 * atan2(phase10.imag, phase10.real)
+        var phi: SymbolicValue = 0.0
+        var lamb: SymbolicValue = 0.0
         if U[0, 0].abs() > small && U[1, 0].abs() > small {
             phi = (phiplambda + phimlambda) / 2.0
             lamb = (phiplambda - phimlambda) / 2.0
@@ -92,7 +92,7 @@ public final class Compiling {
         if V.subtract(U).norm() > small {
             throw MappingError.eulerAngles1qResult
         }
-        return (theta, phi, lamb, "U(\(theta.format(15)),\(phi.format(15)),\(lamb.format(15)))")
+        return (theta, phi, lamb, "U(\(theta),\(phi),\(lamb))")
     }
 
     /**
@@ -106,34 +106,36 @@ public final class Compiling {
      "u1", "u2", "u3", "id" and params is a 3-tuple of parameter values. The
      OpenQASM string is the name of the gate with parameters substituted.
      */
-    public static func simplify_U(_ theta: Double, _ phi: Double, _ lam: Double) -> (String, (Double,Double,Double), String) {
+    public static func simplify_U(_ theta: SymbolicValue,
+                                  _ phi: SymbolicValue,
+                                  _ lam: SymbolicValue) -> (String, (SymbolicValue,SymbolicValue,SymbolicValue), String) {
         let epsilon: Double = pow(1.0, -13.0)
         var name = "u3"
         var params = (theta, phi, lam)
-        var qasm = "u3(\(params.0.format(15)),\(params.1.format(15)),\(params.2.format(15)))"
+        var qasm = "u3(\(params.0),\(params.1),\(params.2))"
         // Y rotation is 0 mod 2*pi, so the gate is a u1
-        if abs(params.0.truncatingRemainder(dividingBy: 2.0 * Double.pi)) < epsilon {
+        if abs(params.0.truncatingRemainder(dividingBy: 2.0 * SymbolicValue.pi)) < epsilon {
             name = "u1"
             params = (0.0, 0.0, params.1 + params.2 + params.0)
-            qasm = "u1(\(params.2.format(15)))"
+            qasm = "u1(\(params.2))"
         }
         // Y rotation is pi/2 or -pi/2 mod 2*pi, so the gate is a u2
         if name == "u3" {
             // theta = pi/2 + 2*k*pi
-            if abs((params.0 - Double.pi / 2).truncatingRemainder(dividingBy: 2.0 * Double.pi)) < epsilon {
+            if abs((params.0 - SymbolicValue.pi / 2).truncatingRemainder(dividingBy: 2.0 * SymbolicValue.pi)) < epsilon {
                 name = "u2"
-                params = (Double.pi / 2, params.1, params.2 + (params.0 - Double.pi / 2))
-                qasm = "u2(\(params.1.format(15)),\(params.2.format(15)))"
+                params = (SymbolicValue.pi / 2, params.1, params.2 + (params.0 - SymbolicValue.pi / 2))
+                qasm = "u2(\(params.1),\(params.2))"
             }
             // theta = -pi/2 + 2*k*pi
-            if abs((params.0 + Double.pi / 2).truncatingRemainder(dividingBy: 2.0 * Double.pi)) < epsilon {
+            if abs((params.0 + SymbolicValue.pi / 2).truncatingRemainder(dividingBy: 2.0 * SymbolicValue.pi)) < epsilon {
                 name = "u2"
-                params = (Double.pi / 2, params.1 + Double.pi, params.2 - Double.pi + (params.0 + Double.pi / 2))
-                qasm = "u2(\(params.1.format(15)),\(params.2.format(15)))"
+                params = (SymbolicValue.pi / 2, params.1 + SymbolicValue.pi, params.2 - SymbolicValue.pi + (params.0 + SymbolicValue.pi / 2))
+                qasm = "u2(\(params.1),\(params.2))"
             }
         }
         // u1 and lambda is 0 mod 4*pi so gate is nop
-        if name == "u1" && abs(params.2.truncatingRemainder(dividingBy: 4.0 * Double.pi)) < epsilon {
+        if name == "u1" && abs(params.2.truncatingRemainder(dividingBy: 4.0 * SymbolicValue.pi)) < epsilon {
             name = "id"
             params = (0.0, 0.0, 0.0)
             qasm = "id"
@@ -274,14 +276,14 @@ public final class Compiling {
         // Circuit that implements K1 * A * K2 (up to phase), using
         // Vatan and Williams Fig. 6 of quant-ph/0308006v3
         // Include prefix and suffix single-qubit gates into U2, V1 respectively.
-        let m: Matrix<Complex> = [[(Complex(imag:1) * Double.pi/4.0).exp(), 0],
-                                  [0, (Complex(imag:-1) * Double.pi/4.0).exp()]]
+        let m: Matrix<Complex> = [[(Complex(imag:1) * SymbolicValue.pi/4.0).exp(), 0],
+                                  [0, (Complex(imag:-1) * SymbolicValue.pi/4.0).exp()]]
         V2 = m.dot(V2)
-        U1 = U1.dot([[(Complex(imag:-1) * Double.pi/4.0).exp(), 0],
-                     [0, (Complex(imag:1) * Double.pi/4.0).exp()]])
+        U1 = U1.dot([[(Complex(imag:-1) * SymbolicValue.pi/4.0).exp(), 0],
+                     [0, (Complex(imag:1) * SymbolicValue.pi/4.0).exp()]])
         // Corrects global phase: exp(ipi/4)*phase'
-        U1 = U1.dot([[(Complex(imag:1) * Double.pi/4.0).exp(), 0],
-                     [0, (Complex(imag:1) * Double.pi/4.0).exp()]])
+        U1 = U1.dot([[(Complex(imag:1) * SymbolicValue.pi/4.0).exp(), 0],
+                     [0, (Complex(imag:1) * SymbolicValue.pi/4.0).exp()]])
         U1 = U1.mult(phase.conjugate())
 
         // Test
@@ -290,10 +292,10 @@ public final class Compiling {
                                     [0, 0, 0, 1],
                                     [0, 0, 1, 0],
                                     [0, 1, 0, 0]]
-        let theta = 2*gamma - Double.pi/2
+        let theta = 2*gamma - SymbolicValue.pi/2
         let Ztheta: Matrix<Complex> = [[(Complex(imag:1) * theta/2.0).exp(), 0],
                                        [0, (Complex(imag:-1) * theta/2.0).exp()]]
-        let kappa = Double.pi/2 - 2*alpha
+        let kappa = SymbolicValue.pi/2 - 2*alpha
         let Ykappa: Matrix<Complex> = [[Complex(real: cos(kappa/2)), Complex(real:sin(kappa/2))],
                                        [Complex(real:-sin(kappa/2)), Complex(real:cos(kappa/2))]]
         let g3 = Ztheta.kron(Ykappa)
@@ -301,7 +303,7 @@ public final class Compiling {
                                      [0, 1, 0, 0],
                                      [0, 0, 0, 1],
                                      [0, 0, 1, 0]]
-        let zeta = 2*beta - Double.pi/2
+        let zeta = 2*beta - SymbolicValue.pi/2
         let Yzeta: Matrix<Complex> = [[Complex(real: cos(zeta/2)), Complex(real:sin(zeta/2))],
                                       [Complex(real:-sin(zeta/2)), Complex(real:cos(zeta/2))]]
         let g5 = Matrix<Complex>.identity(2).kron(Yzeta)
@@ -345,13 +347,13 @@ public final class Compiling {
             "params": []
         ])
 
-        var gate = simplify_U(0.0, 0.0, -2.0*gamma + Double.pi/2.0)
+        var gate = simplify_U(0.0, 0.0, -2.0*gamma + SymbolicValue.pi/2.0)
         return_circuit.append([
             "name": gate.0,
             "args": [0],
             "params": [gate.1.0,gate.1.1,gate.1.2]
         ])
-        gate = simplify_U(-Double.pi/2.0 + 2.0*alpha, 0.0, 0.0)
+        gate = simplify_U(-SymbolicValue.pi/2.0 + 2.0*alpha, 0.0, 0.0)
         return_circuit.append([
             "name": gate.0,
             "args": [1],
@@ -362,7 +364,7 @@ public final class Compiling {
             "args": [0, 1],
             "params": []
         ])
-        gate = simplify_U(-2.0*beta + Double.pi/2.0, 0.0, 0.0)
+        gate = simplify_U(-2.0*beta + SymbolicValue.pi/2.0, 0.0, 0.0)
         return_circuit.append([
             "name": gate.0,
             "args": [1],
