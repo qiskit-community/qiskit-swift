@@ -35,16 +35,16 @@ import Foundation
  Clifford group, stabilizer states, and linear and quadratic operations over GF(2)
  Phys. Rev. A 68, 042318 – Published 20 October 2003
  */
-public final class Pauli: CustomStringConvertible, Hashable {
+public struct Pauli: CustomStringConvertible, Hashable {
 
-    public private(set) var v: Vector<Int> = []
-    public private(set) var w: Vector<Int> = []
+    public internal(set) var v: Vector<Int> = []
+    public internal(set) var w: Vector<Int> = []
     public let numberofqubits: Int
 
     /**
      Make the Pauli class.
     */
-    public convenience init(_ v: [Int], _ w: [Int]) {
+    public init(_ v: [Int], _ w: [Int]) {
         self.init(Vector<Int>(value:v),Vector<Int>(value:w))
     }
 
@@ -54,31 +54,11 @@ public final class Pauli: CustomStringConvertible, Hashable {
         self.w = w
     }
 
-    public func copy() -> Pauli {
-        return Pauli(self.v,self.w)
-    }
-
     public var hashValue : Int {
         return self.v.hashValue &* 31 &+ self.w.hashValue
     }
     public static func ==(lhs: Pauli, rhs:Pauli) -> Bool {
         return lhs.v == rhs.v && lhs.w == rhs.w
-    }
-
-    public func getV(_ index: Int) -> Int {
-        return self.v[index]
-    }
-
-    public func setV(_ index: Int, _ value: Int) {
-        self.v[index] = value
-    }
-
-    public func getW(_ index: Int) -> Int {
-        return self.w[index]
-    }
-
-    public func setW(_ index: Int, _ value: Int) {
-        self.w[index] = value
     }
 
     /**
@@ -99,12 +79,12 @@ public final class Pauli: CustomStringConvertible, Hashable {
     /**
      Multiply two Paulis.
      */
-    static func * (left: Pauli, right: Pauli) throws -> Pauli {
-        if left.numberofqubits != right.numberofqubits {
+    public func multiply(_ p: Pauli) throws -> Pauli {
+        if self.numberofqubits != p.numberofqubits {
             throw ToolsError.invalidPauliMultiplication
         }
-        let vnew = left.v.add(right.v).remainder(2)
-        let wnew = left.w.add(right.w).remainder(2)
+        let vnew = self.v.add(p.v).remainder(2)
+        let wnew = self.w.add(p.w).remainder(2)
         return Pauli(vnew, wnew)
     }
 

@@ -15,30 +15,22 @@
 
 import Foundation
 
-public final class SymbolicValue: ExpressibleByFloatLiteral, Comparable, Hashable {
+public struct SymbolicValue: ExpressibleByFloatLiteral, Comparable, Hashable {
 
     public typealias FloatLiteralType = Swift.FloatLiteralType
 
-    public static let pi: SymbolicValue = SymbolicValue(Double.pi,true)
+    public static let pi: SymbolicValue = SymbolicValue(Double.pi)
 
     public let value: FloatLiteralType
-    private let isPI: Bool
 
-    private init(_ value: Swift.FloatLiteralType, _ isPI: Bool) {
-        self.value = value
-        self.isPI = isPI
-    }
     public init() {
         self.value = 0.0
-        self.isPI = false
     }
     public init(_ value: Swift.FloatLiteralType) {
         self.value = value
-        self.isPI = self.value == 3.141592653589793
     }
     public init(floatLiteral value: FloatLiteralType) {
         self.value = value
-        self.isPI = self.value == 3.141592653589793
     }
     public var hashValue : Int {
         get {
@@ -61,13 +53,13 @@ public final class SymbolicValue: ExpressibleByFloatLiteral, Comparable, Hashabl
         return left.value == right.value
     }
     public func format(_ precision: Int) -> String {
-        if self.isPI {
+        if self.value == Double.pi {
             return "pi"
         }
         if self.value == 0.0 {
             return "0"
         }
-        return String(format: "%.\(precision)f", self.value)
+        return self.value.format(precision)
     }
     public func truncatingRemainder(dividingBy other: SymbolicValue) -> SymbolicValue {
         return SymbolicValue(self.value.truncatingRemainder(dividingBy: other.value))

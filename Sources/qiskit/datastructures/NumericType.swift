@@ -15,7 +15,7 @@
 
 import Foundation
 
-public protocol NumericType: ExpressibleByIntegerLiteral {
+public protocol NumericType: ExpressibleByIntegerLiteral, Hashable {
     static func +(lhs: Self, rhs: Self) -> Self
     static func -(lhs: Self, rhs: Self) -> Self
     static func *(lhs: Self, rhs: Self) -> Self
@@ -28,8 +28,14 @@ public protocol NumericType: ExpressibleByIntegerLiteral {
     func absolute() -> Double
 }
 
-public protocol SignedNumericType: NumericType {
+public protocol PrimitiveNumericType: NumericType, Comparable {
+}
+
+public protocol SignedNumericType: PrimitiveNumericType {
     static prefix func -(value: Self) -> Self
+}
+
+public protocol UnsignedNumericType: PrimitiveNumericType {
 }
 
 public protocol FloatingPointType: SignedNumericType {
@@ -60,27 +66,27 @@ extension Int64  : SignedNumericType {
         return Double(abs(self))
     }
 }
-extension UInt   : NumericType {
+extension UInt   : UnsignedNumericType {
     public func absolute() -> Double {
         return Double(self)
     }
 }
-extension UInt8  : NumericType {
+extension UInt8  : UnsignedNumericType {
     public func absolute() -> Double {
         return Double(self)
     }
 }
-extension UInt16 : NumericType {
+extension UInt16 : UnsignedNumericType {
     public func absolute() -> Double {
         return Double(self)
     }
 }
-extension UInt32 : NumericType {
+extension UInt32 : UnsignedNumericType {
     public func absolute() -> Double {
         return Double(self)
     }
 }
-extension UInt64 : NumericType {
+extension UInt64 : UnsignedNumericType {
     public func absolute() -> Double {
         return Double(self)
     }

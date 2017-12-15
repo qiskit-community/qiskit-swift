@@ -109,6 +109,7 @@ class UnrollerTests: XCTestCase {
         SDKLogger.logInfo(QASM_source)
 
         guard let token = self.QE_TOKEN else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         //###############################################################

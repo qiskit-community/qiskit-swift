@@ -104,6 +104,7 @@ measure q[2] -> f[0];
 
     func test_api_auth_token() {
         guard let api = self.getAPI() else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         let asyncExpectation = self.expectation(description: "test_api_auth_token")
@@ -124,6 +125,7 @@ measure q[2] -> f[0];
 
     func test_api_get_my_credits() {
         guard let api = self.getAPI() else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         let asyncExpectation = self.expectation(description: "test_api_get_my_credits")
@@ -170,6 +172,7 @@ measure q[2] -> f[0];
 
     func test_api_last_codes() {
         guard let api = self.getAPI() else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         let asyncExpectation = self.expectation(description: "test_api_last_codes")
@@ -189,6 +192,7 @@ measure q[2] -> f[0];
 
     func test_api_run_experiment() {
         guard let api = self.getAPI() else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         let asyncExpectation = self.expectation(description: "test_api_run_experiment")
@@ -226,6 +230,7 @@ measure q[2] -> f[0];
 
     func test_api_run_experiment_with_seed() {
         guard let api = self.getAPI() else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         let asyncExpectation = self.expectation(description: "test_api_run_experiment_with_seed")
@@ -274,6 +279,7 @@ measure q[2] -> f[0];
 
     func test_api_run_experiment_fail_backend() {
         guard let api = self.getAPI() else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         let backend = "5qreal"
@@ -300,6 +306,7 @@ measure q[2] -> f[0];
 
     func test_api_run_job() {
         guard let api = self.getAPI() else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         let backend = "simulator"
@@ -326,6 +333,7 @@ measure q[2] -> f[0];
 
     func test_api_run_job_fail_backend() {
         guard let api = self.getAPI() else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         let backend = "real5"
@@ -352,6 +360,7 @@ measure q[2] -> f[0];
 
     func test_api_get_jobs() {
         guard let api = self.getAPI() else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         let asyncExpectation = self.expectation(description: "test_api_get_jobs")
@@ -371,6 +380,7 @@ measure q[2] -> f[0];
 
     func test_api_backend_status() {
         guard let api = self.getAPI() else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         let asyncExpectation = self.expectation(description: "test_api_backend_status")
@@ -395,6 +405,7 @@ measure q[2] -> f[0];
 
     func test_api_backend_calibration() {
         guard let api = self.getAPI() else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         let asyncExpectation = self.expectation(description: "test_api_backend_calibration")
@@ -415,6 +426,7 @@ measure q[2] -> f[0];
 
     func test_api_backend_parameters() {
         guard let api = self.getAPI() else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         let asyncExpectation = self.expectation(description: "test_api_backend_parameters")
@@ -435,6 +447,7 @@ measure q[2] -> f[0];
 
     func test_api_backends_availables() {
         guard let api = self.getAPI() else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         let asyncExpectation = self.expectation(description: "test_api_backends_availables")
@@ -455,6 +468,7 @@ measure q[2] -> f[0];
 
     func test_api_backend_simulators_available() {
         guard let api = self.getAPI() else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         let asyncExpectation = self.expectation(description: "test_api_backend_simulators_available")
@@ -475,6 +489,7 @@ measure q[2] -> f[0];
 
     func test_register_size_limit_exception() {
         guard let api = self.getAPI() else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         let backend = "simulator"
@@ -511,6 +526,7 @@ measure q[24] -> c[24];
 
     func test_qx_api_version() {
         guard let api = self.getAPI() else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         let asyncExpectation = self.expectation(description: "test_qx_api_version")

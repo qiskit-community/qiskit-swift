@@ -175,6 +175,24 @@ public struct Vector<T: NumericType> : Hashable, Sequence, CustomStringConvertib
         }
         return ret
     }
+
+    public func contains(_ value: T) -> Bool {
+        for i in 0..<self.count {
+            if value == self[i] {
+                return true
+            }
+        }
+        return false
+    }
+}
+
+extension Vector where T : PrimitiveNumericType {
+
+    public func setdiff1d(_ other: Vector<T>) -> Vector<T> {
+        var set = Set<T>(other.value)
+        set = Set<T>(self.value.filter({ !set.contains($0) }))
+        return Vector<T>(value:Array<T>(set).sorted())
+    }
 }
 
 extension Vector where T == Complex {

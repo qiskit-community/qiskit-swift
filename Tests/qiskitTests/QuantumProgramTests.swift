@@ -592,6 +592,7 @@ class QuantumProgramTests: XCTestCase {
 
     func test_setup_api() {
         guard let token = self.QE_TOKEN else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         do {
@@ -606,6 +607,7 @@ class QuantumProgramTests: XCTestCase {
 
     func test_available_backends_exist() {
         guard let token = self.QE_TOKEN else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         do {
@@ -641,6 +643,7 @@ class QuantumProgramTests: XCTestCase {
 
     func test_online_backends_exist() {
         guard let token = self.QE_TOKEN else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         do {
@@ -667,6 +670,7 @@ class QuantumProgramTests: XCTestCase {
 
     func test_online_devices() {
         guard let token = self.QE_TOKEN else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         do {
@@ -693,6 +697,7 @@ class QuantumProgramTests: XCTestCase {
 
     func test_online_simulators() {
         guard let token = self.QE_TOKEN else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         do {
@@ -798,6 +803,7 @@ class QuantumProgramTests: XCTestCase {
 
     func test_get_backend_calibration() {
         guard let token = self.QE_TOKEN else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         do {
@@ -836,6 +842,7 @@ class QuantumProgramTests: XCTestCase {
 
     func test_get_backend_parameters() {
         guard let token = self.QE_TOKEN else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         do {
@@ -1558,6 +1565,7 @@ class QuantumProgramTests: XCTestCase {
 
     func test_execute_one_circuit_simulator_online() {
         guard let token = self.QE_TOKEN else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         do {
@@ -1611,6 +1619,7 @@ class QuantumProgramTests: XCTestCase {
 
     func test_simulator_online_size() {
         guard let token = self.QE_TOKEN else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         do {
@@ -1651,6 +1660,7 @@ class QuantumProgramTests: XCTestCase {
 
     func test_execute_several_circuits_simulator_online() {
         guard let token = self.QE_TOKEN else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         do {
@@ -1713,6 +1723,7 @@ class QuantumProgramTests: XCTestCase {
 
     func test_execute_one_circuit_real_online() {
         guard let token = self.QE_TOKEN else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         do {
@@ -1817,6 +1828,7 @@ class QuantumProgramTests: XCTestCase {
 
     func test_online_qasm_simulator_two_registers() {
         guard let token = self.QE_TOKEN else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         do {
@@ -2043,6 +2055,7 @@ class QuantumProgramTests: XCTestCase {
 
     func test_example_swap_bits() {
         guard let token = self.QE_TOKEN else {
+            print("Set environment variable QE_TOKEN to execute this method")
             return
         }
         do {

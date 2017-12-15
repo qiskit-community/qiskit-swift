@@ -240,7 +240,7 @@ public final class Optimization {
                 // pauli_list_temp.extend(p_1) # this is going to signal the total
                 // post-rotations of the set (set master)
                 pauli_list_temp.append(p_1)
-                pauli_list_temp.append((p_1.0,p_1.1.copy()))
+                pauli_list_temp.append(p_1)
                 pauli_list_temp[0].0 = 0
                 for p_2 in pauli_list {
                     if !pauli_list_sorted.contains(HashableTuple<Int,Pauli>(p_2.0,p_2.1)) && p_1.1 != p_2.1 {
@@ -253,8 +253,8 @@ public final class Optimization {
                             else {
                                 // update master
                                 if p_2.1.v[i] == 1 || p_2.1.w[i] == 1 {
-                                    pauli_list_temp[0].1.setV(i,p_2.1.v[i])
-                                    pauli_list_temp[0].1.setW(i,p_2.1.w[i])
+                                    pauli_list_temp[0].1.v[i] = p_2.1.v[i]
+                                    pauli_list_temp[0].1.w[i] = p_2.1.w[i] 
                                 }
                             }
                             j += 1
@@ -345,11 +345,14 @@ public final class Optimization {
                     try Q_program.add_circuit(circuits_labels[0], circuits[0])
                     // Execute trial circuit with final rotations for each Pauli in
                     // hamiltonian and store from circuits[1] on
-                    let q = try QuantumRegister("q", Int(log2(Double(hamiltonianList.count))))
+                    guard let n_qubits = input_circuit.regs["q"]?.size else {
+                        throw ToolsError.unknownHamiltonian
+                    }
+                    let q = try QuantumRegister("q", n_qubits)
                     var i: Int = 1
                     for p in hamiltonianList {
                         circuits.append(input_circuit.copy())
-                        for j in 0..<(Int(log2(Double(hamiltonianList.count)))) {
+                        for j in 0..<n_qubits {
                             if p.1.v[j] == 1 && p.1.w[j] == 0 {
                                 try circuits[i].x(q[j])
                             }
