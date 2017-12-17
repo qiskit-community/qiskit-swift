@@ -379,4 +379,97 @@ public final class Fermion {
         }
         return pauli_list
     }
+
+    /**
+     Eliminates the central and last qubit in a list of Pauli that has
+     diagonal operators (Z,I) at those positions.abs
+
+     It can be used to taper two qubits in parity and binary-tree mapped
+     fermionic Hamiltonians when the spin orbitals are ordered in two spin
+     sectors, according to the number of particles in the system.
+
+     Args:
+         ham_in : a list of Paulis representing the mapped fermionic Hamiltonian
+         m (int) : number of fermionic particles
+         out_file (string) : option to write the simplified Hamiltonian to a
+         file
+         out_file : name of the optional file to write the Pauli list on
+         threshold : threshold for Pauli simplification
+     Returns:
+        A tapered Hamiltonian in the form of list of Paulis with coefficients
+     */
+    public static func two_qubit_reduction(_ ham_any: Any,
+                                           _ m: Int,
+                                           _ out_file: String? = nil,
+                                           _ threshold: Double = 0.000000000001) throws -> [(Complex,Pauli)] {
+        var ham_out: [(Complex,Pauli)] = []
+        var par_1: Double = 0
+        var par_2: Double = 0
+        if m % 4 == 0 {
+            par_1 = 1
+            par_2 = 1
+        }
+        else if m % 4 == 1 {
+            par_1 = -1
+            par_2 = -1    // could be also +1, +1/-1 are  spin-parity sectors
+        }
+        else if m % 4 == 2 {
+            par_1 = 1
+            par_2 = -1
+        }
+        else {
+            par_1 = -1
+            par_2 = -1    // could be also +1, +1/-1 are  spin-parity sectors
+        }
+        var ham_in: [(Complex,Pauli)] = []
+        if let file_name = ham_any as? String {
+            // conversion from Hamiltonian text file to pauli_list
+            let hamf = try Optimization.Hamiltonian_from_file(file_name)
+            for h in hamf {
+                ham_in.append((Complex(real:h.0),h.1))
+            }
+        }
+        else if let h = ham_any as? [(Complex,Pauli)] {
+            ham_in = h
+        }
+        else {
+            throw ToolsError.unknownHamiltonian
+        }
+        // number of qubits
+        let n = ham_in[0].1.v.count
+        for pauli_term in ham_in {  // loop over Pauli terms
+            var coeff_out = pauli_term.0
+            // Z operator encountered at qubit n/2-1
+            if pauli_term.1.v[n / 2 - 1] == 1 && pauli_term.1.w[n / 2 - 1] == 0 {
+                coeff_out = par_2 * coeff_out
+            }
+            // Z operator encountered at qubit n-1
+            if pauli_term.1.v[n - 1] == 1 && pauli_term.1.w[n - 1] == 0 {
+                coeff_out = par_1 * coeff_out
+            }
+            var v_temp: [Int] = []
+            var w_temp: [Int] = []
+            for j in 0..<n {
+                if j != (n / 2 - 1) && j != (n - 1) {
+                    v_temp.append(pauli_term.1.v[j])
+                    w_temp.append(pauli_term.1.w[j])
+                }
+            }
+            let pauli_term_out = (coeff_out, Pauli(v_temp, w_temp))
+            ham_out = pauli_term_append(pauli_term_out, ham_out, threshold)
+        }
+        //####################################################################
+        //#################          WRITE TO FILE         ###################
+        //####################################################################
+
+        if let out = out_file {
+            var out_stream = ""
+            for pauli_term in ham_out {
+                out_stream += pauli_term.1.to_label() + "\n"
+                out_stream += pauli_term.0.real.format(15) + "\n"
+            }
+            try out_stream.write(toFile: out, atomically: true, encoding: .utf8)
+        }
+        return ham_out
+    }
 } 
