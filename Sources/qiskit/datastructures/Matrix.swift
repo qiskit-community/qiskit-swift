@@ -389,6 +389,26 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
     public func expm() -> Matrix<T> {
         fatalError("Matrix expm not implemented")
     }
+
+    public func flattenRow() -> [T] {
+        var ret: [T] = []
+        for row in 0..<self.rowCount {
+            for col in 0..<self.colCount {
+                ret.append(self[row,col])
+            }
+        }
+        return ret
+    }
+
+    public func flattenCol() -> [T] {
+        var ret: [T] = []
+        for col in 0..<self.colCount {
+            for row in 0..<self.rowCount {
+                ret.append(self[row,col])
+            }
+        }
+        return ret
+    }
 }
 
 extension Matrix where T == Complex {

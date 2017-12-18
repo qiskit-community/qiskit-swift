@@ -22,6 +22,7 @@ SDKLogger.type = .typeError
 
 XCTMain([
     testCase(DataStructureTests.allTests),
+    testCase(HamiltonianTests.allTests),
     testCase(IBMQuantumExperienceTests.allTests),
     testCase(LocalQasmSimulatorTests.allTests),
     testCase(LocalUnitarySimulatorTests.allTests),
@@ -29,6 +30,7 @@ XCTMain([
     testCase(QiskitParserTests.allTests),
     testCase(QiskitProgramTests.allTests),
     testCase(QiskitTests.allTests),
+    testCase(QuantumOptimizationTests.allTests),
     testCase(QuantumProgramTests.allTests),
     testCase(UnrollerTests.allTests)
 ])

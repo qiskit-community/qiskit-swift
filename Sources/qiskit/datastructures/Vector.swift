@@ -129,6 +129,14 @@ public struct Vector<T: NumericType> : Hashable, Sequence, CustomStringConvertib
         return ab
     }
 
+    public func prod() -> T {
+        var p: T = 1
+        for i in 0..<self.count {
+            p *= self[i]
+        }
+        return p
+    }
+
     public func inner(_ other: Vector<T>) throws -> T {
         if self.count != other.count {
             throw VectorError.differentSizes(count1: self.count, count2: other.count)
@@ -138,6 +146,16 @@ public struct Vector<T: NumericType> : Hashable, Sequence, CustomStringConvertib
             sum += self[i] * other[i]
         }
         return sum
+    }
+
+    public func outer(_ other: Vector<T>) -> Matrix<T> {
+        var m = Matrix<T>(repeating: 0, rows: self.count, cols: other.count)
+        for i in 0..<self.count {
+            for j in 0..<other.count {
+                m[i,j] += self[i] * other[j]
+            }
+        }
+        return m
     }
 
     public func div(_ scalar: T) -> Vector<T> {
@@ -183,6 +201,14 @@ public struct Vector<T: NumericType> : Hashable, Sequence, CustomStringConvertib
             }
         }
         return false
+    }
+
+    public static func + (left: Vector<T>, right: Vector<T>) -> Vector<T> {
+        var v = left.value
+        for elem in right.value {
+            v.append(elem)
+        }
+        return Vector<T>(value:v)
     }
 }
 

@@ -27,6 +27,11 @@ public enum ToolsError: LocalizedError, CustomStringConvertible {
     case invalidPauliString(label: String)
     case errorPauliGroup
     case errorPartialTrace
+    case errorSubsystem
+    case errorVectorize
+    case invalidMethod(method: String)
+    case errorVectorizedMatrix
+    case errorConcurrence
 
     public var errorDescription: String? {
         return self.description
@@ -47,6 +52,16 @@ public enum ToolsError: LocalizedError, CustomStringConvertible {
             return "Please set the number of qubits to less than 5"
         case .errorPartialTrace:
             return "Input is not a multi-qubit state, specifify input state dims"
+        case .errorSubsystem:
+            return "Invalid subsystem"
+        case .errorVectorize:
+            return "Input state must be n-qubit state"
+        case .invalidMethod(let method):
+            return "Invalid method: '\(method)'"
+        case .errorVectorizedMatrix:
+            return "Input is not a vectorized square matrix"
+        case .errorConcurrence:
+            return "Concurrence is not defined for more than two qubits"
         }
     }
 }

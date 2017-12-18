@@ -64,49 +64,62 @@ import Foundation
      Returns:
         A matrix with the appropriate subsytems traced over.
      */
- /*   public static func partial_trace(_ state: [[Complex]],
-                                     _ sys: [Int],
-                                     _ dims: [Int]? = nil,
+/*    public static func partial_trace(_ state: [Any],
+                                     _ subsystems: Any,
+                                     _ dimensions: [Int]? = nil,
                                      _ reverse: Bool = true) throws -> Matrix<Complex> {
         // convert op to density matrix
-        var rho = Matrix<Complex>(value:state)
-        if rho.rowCount == 1 {
-            rho = QI.outer(rho)  // convert state vector to density mat
+        var rho = Matrix<Complex>()
+        if let s = state as? [Complex] {
+            rho = QI.outer(Vector<Complex>(value:s))  // convert state vector to density mat
+        }
+        else if let s = state as? [[Complex]] {
+            rho = Matrix<Complex>(value:s)
+        }
+        else {
+            throw ToolsError.errorPartialTrace
         }
         // compute dims if not specified
-        if dims == nil {
-            let n = Int(log2(Double(rho.rowCount)))
-            dims = Array(repeating: 2, count:n)
-            if rho.rowCount != pow(2.0,n) {
+        var dims = Vector<Int>()
+        if let d = dimensions {
+            dims = Vector<Int>(value:d)
+        }
+        else {
+            let n = log2(Double(rho.count))
+            dims = Vector<Int>(repeating: 2, count:Int(n))
+            if Double(rho.count) != pow(2.0,n) {
                 throw ToolsError.errorPartialTrace
             }
         }
-        else {
-            dims = list(dims)
-        }
 
         // reverse sort trace sys
-        if isinstance(sys, int) {
-            sys = [sys]
+        var sys: [Int] = []
+        if let s = subsystems as? Int {
+            sys = [s]
+        }
+        else if let s = subsystems as? [Int] {
+            sys = s.reversed()
         }
         else {
-            sys = QI.sorted(sys, reverse: true)
+            throw ToolsError.errorSubsystem
         }
 
         // trace out subsystems
         for j in sys {
             // get trace dims
+            var dpre = Vector<Int>()
+            var dpost = Vector<Int>()
             if reverse {
-                dpre = dims[j + 1:]
-                dpost = dims[:j]
+                dpre = Vector<Int>(value: Array(dims.value[(j + 1)...]))
+                dpost = Vector<Int>(value: Array(dims.value[..<j]))
             }
             else {
-                dpre = dims[:j]
-                dpost = dims[j + 1:]
+                dpre = Vector<Int>(value: Array(dims.value[..<j]))
+                dpost = Vector<Int>(value: Array(dims.value[(j + 1)...]))
             }
-            dim1 = int(np.prod(dpre))
-            dim2 = int(dims[j])
-            dim3 = int(np.prod(dpost))
+            let dim1 = dpre.prod()
+            let dim2 = dims[j]
+            let dim3 = dpost.prod()
             // dims with sys-j removed
             dims = dpre + dpost
             // do the trace over j
@@ -114,7 +127,7 @@ import Foundation
         }
         return rho
     }
-
+*/
     /**
      Get system dimensions for __trace_middle.
 
@@ -129,16 +142,16 @@ import Foundation
     private static func __trace_middle_dims(_ sys: Int,
                                             _ dims: [Int],
                                             reverse: Bool = true) -> (Int,Int,Int) {
-        var dpre = dims[:sys]
-        var dpost = dims[sys + 1:]
+        var dpre = Vector<Int>(value: Array(dims[..<sys]))
+        var dpost = Vector<Int>(value: Array(dims[(sys + 1)...]))
         if reverse {
-            var temp = dpre
+            let temp = dpre
             dpre  = dpost
             dpost = temp
         }
-        dim1 = Int(np.prod(dpre))
-        dim2 = Int(dims[sys])
-        dim3 = Int(np.prod(dpost))
+        let dim1 = dpre.prod()
+        let dim2 = dims[sys]
+        let dim3 = dpost.prod()
         return (dim1, dim2, dim3)
     }
 
@@ -153,16 +166,16 @@ import Foundation
 
      Returns:
         A (D,D) matrix where D = dim1 * dim3
-     */
-    public static func __trace_middle(_ op: Matrix<Complex>,
+    */
+/*  private static func __trace_middle(_ op: Matrix<Complex>,
                                       _ dim1: Int = 1,
                                       _ dim2: Int = 1,
-                                      _ dim3: Int = 1) {
+                                      _ dim3: Int = 1) -> Matrix<Complex> {
         let op = op.reshape(dim1, dim2, dim3, dim1, dim2, dim3)
-        d = dim1 * dim3
+        let d = dim1 * dim3
         return op.trace(axis1=1, axis2=4).reshape(d, d)
     }
-
+*/
     /**
      Flatten an operator to a vector in a specified basis.
 
@@ -177,23 +190,35 @@ import Foundation
 
      Returns:
         ndarray: the resulting vector.
-     */
-    public static func vectorize(_ rho: Matrix<Complex>, _ method: String = "col") {
-        rho = np.array(rho)
-        if method == "col":
-        return rho.flatten(order='F")
-        elif method == "row":
-        return rho.flatten(order="C")
-        elif method in ["pauli", "pauli_weights"]:
-        num = int(np.log2(len(rho)))  # number of qubits
-        if len(rho) != 2**num:
-        raise Exception("Input state must be n-qubit state")
-        if method is "pauli_weights":
-        pgroup = pauli_group(num, case=0)
-        else:
-        pgroup = pauli_group(num, case=1)
-        vals = [np.trace(np.dot(p.to_matrix(), rho)) for p in pgroup]
-        return np.array(vals)
+    */
+    public static func vectorize(_ rho: Matrix<Complex>, _ method: String = "col") throws -> [Complex] {
+        if method == "col" {
+            return rho.flattenCol()
+        }
+        else if method == "row" {
+            return rho.flattenRow()
+        }
+        else if Set<String>(["pauli", "pauli_weights"]).contains(method) {
+            let num = Int(log2(Double(rho.count)))  // number of qubits
+            if Double(rho.count) != pow(2.0,Double(num)) {
+                throw ToolsError.errorVectorize
+            }
+            var pgroup: [Pauli] = []
+            if method == "pauli_weights" {
+                pgroup = try Pauli.pauli_group(num, 0)
+            }
+            else {
+                pgroup = try Pauli.pauli_group(num, 1)
+            }
+            var vals: [Complex] = []
+            for p in pgroup {
+                vals.append(try p.to_matrix().dot(rho).trace())
+            }
+            return vals
+        }
+        else {
+            throw ToolsError.invalidMethod(method: method)
+        }
     }
 
     /**
@@ -210,29 +235,41 @@ import Foundation
 
      Returns:
         ndarray: the resulting matrix.
-     */
-    public static func devectorize(vec: , method="col") {
-        vec = np.array(vec)
-        d = int(np.sqrt(vec.size))  // the dimension of the matrix
-        if len(vec) != d*d:
-        raise Exception("Input is not a vectorized square matrix")
-
-        if method == "col":
-        return vec.reshape(d, d, order="F")
-        elif method == "row":
-        return vec.reshape(d, d, order="C")
-        elif method in ["pauli", "pauli_weights"]:
-        num = int(np.log2(d))  # number of qubits
-        if d != 2 ** num:
-        raise Exception("Input state must be n-qubit state")
-        if method is "pauli_weights":
-        pgroup = pauli_group(num, case=0)
-        else:
-        pgroup = pauli_group(num, case=1)
-        pbasis = np.array([p.to_matrix() for p in pgroup]) / 2 ** num
-        return np.tensordot(vec, pbasis, axes=1)
+    */
+ /*   public static func devectorize(_ vec: [Complex] , _ method: String = "col") throws {
+        let d = Int(Double(vec.count).squareRoot())  // the dimension of the matrix
+        if vec.count != d*d {
+            throw ToolsError.errorVectorizedMatrix
+        }
+        if method == "col"{
+            return vec.reshape(d, d, order="F")
+        }
+        else if method == "row" {
+            return vec.reshape(d, d, order="C")
+        }
+        else if Set<String>(["pauli", "pauli_weights"]).contains(method) {
+            let num = Int(log2(Double(d)))  // number of qubits
+            if d != Int(pow(2.0,Double(num))) {
+                throw ToolsError.errorVectorize
+            }
+            var pgroup: [Pauli] = []
+            if method == "pauli_weights" {
+                pgroup = try Pauli.pauli_group(num, 0)
+            }
+            else {
+                pgroup = try Pauli.pauli_group(num, 1)
+            }
+            var pbasis: [Matrix<Complex>] = []
+            for p in pgroup {
+                pbasis.append(try p.to_matrix().div(Complex(real:pow(2.0,Double(num)))))
+            }
+            return np.tensordot(vec, pbasis, axes=1)
+        }
+        else {
+            throw ToolsError.invalidMethod(method: method)
+        }
     }
-
+*/
     /**
      Convert a Choi-matrix to a Pauli-basis superoperator.
 
@@ -256,19 +293,21 @@ import Foundation
 
      Returns:
         A superoperator in the Pauli basis.
-     */
-    public static func choi_to_rauli(choi, order=1) {
+    */
+/*    public static func choi_to_rauli(_ choi: Matrix<Complex>, _ order: Int = 1) throws {
         // get number of qubits'
-        n = int(np.log2(np.sqrt(len(choi))))
-        pgp = pauli_group(n, case=order)
-        rauli = []
-        for i in pgp:
-        for j in pgp:
-        pauliop = np.kron(j.to_matrix().T, i.to_matrix())
-        rauli += [np.trace(np.dot(choi, pauliop))]
+        let n = Int(log2(np.sqrt(Double(choi.count)).squareRoot()))
+        let pgp = try Pauli.pauli_group(n, order)
+        var rauli = []
+        for i in pgp {
+            for j in pgp {
+                pauliop = np.kron(j.to_matrix().T, i.to_matrix())
+                rauli += [np.trace(np.dot(choi, pauliop))]
+            }
+        }
         return np.array(rauli).reshape(4 ** n, 4 ** n)
     }
-
+*/
     /**
      Truncate small values of a complex array.
 
@@ -279,10 +318,19 @@ import Foundation
      Returns:
         A new operator with small values set to zero.
      */
-    public static func chop(op, epsilon=1e-10) {
-        op.real[abs(op.real) < epsilon] = 0.0
-        op.imag[abs(op.imag) < epsilon] = 0.0
-        return op
+    public static func chop(_ op: [Complex], _ epsilon: Double = 1e-10) -> [Complex] {
+        var vec = op
+        for i in 0..<vec.count {
+            var complex = vec[i]
+            if abs(complex.real) < epsilon {
+                complex.real = 0.0
+            }
+            if abs(complex.imag) < epsilon {
+                complex.imag = 0.0
+            }
+            vec[i] = complex
+        }
+        return vec
     }
 
     /**
@@ -297,13 +345,16 @@ import Foundation
 
      Returns:
         The matrix |v1><v2|.
-     */
-    public static func outer(_ v1, _ v2 = nil) {
-        if v2 is None:
-        u = np.array(v1).conj()
-        else:
-        u = np.array(v2).conj()
-        return np.outer(v1, u)
+    */
+    public static func outer(_ v1: Vector<Complex>, _ v2: Vector<Complex>? = nil) -> Matrix<Complex> {
+        var u = Vector<Complex>()
+        if let v = v2 {
+            u = v.conjugate()
+        }
+        else {
+            u = v1.conjugate()
+        }
+        return v1.outer(u)
     }
 
     //###############################################################
@@ -323,7 +374,7 @@ import Foundation
         funm : (N, N) ndarray
         Value of the matrix function specified by func evaluated at `A`.
      */
-    public static func funm_svd(a, func) {
+/*    public static func funm_svd(_ a: Matrix<Double>, _ f: ((_:[Double]) -> [Double]) ) {
         U, s, Vh = la.svd(a, lapack_driver="gesvd")
         S = np.diag(func(s))
         return U.dot(S).dot(Vh)
@@ -341,26 +392,30 @@ import Foundation
      Returns:
         The state fidelity F(state1, state2).
      */
-    public static func state_fidelity(state1, state2) {
+    public static func state_fidelity(_ state1, _ state2) {
         // convert input to numpy arrays
         s1 = np.array(state1)
         s2 = np.array(state2)
 
         // fidelity of two state vectors
-        if s1.ndim == 1 and s2.ndim == 1:
-        return np.abs(s2.conj().dot(s1))
+        if s1.ndim == 1 && s2.ndim == 1 {
+            return np.abs(s2.conj().dot(s1))
+        }
         // fidelity of vector and density matrix
-        elif s1.ndim == 1:
-        // psi = s1, rho = s2
-        return np.sqrt(np.abs(s1.conj().dot(s2).dot(s1)))
-        elif s2.ndim == 1:
-        // psi = s2, rho = s1
-        return np.sqrt(np.abs(s2.conj().dot(s1).dot(s2)))
+        else if s1.ndim == 1 {
+            // psi = s1, rho = s2
+            return np.sqrt(np.abs(s1.conj().dot(s2).dot(s1)))
+        }
+        else if s2.ndim == 1 {
+            // psi = s2, rho = s1
+            return np.sqrt(np.abs(s2.conj().dot(s1).dot(s2)))
+        }
         // fidelity of two density matrices
-        else:
-        s1sq = funm_svd(s1, np.sqrt)
-        s2sq = funm_svd(s2, np.sqrt)
-        return np.linalg.norm(s1sq.dot(s2sq), ord="nuc")
+        else {
+            s1sq = funm_svd(s1, np.sqrt)
+            s2sq = funm_svd(s2, np.sqrt)
+            return np.linalg.norm(s1sq.dot(s2sq), ord="nuc")
+        }
     }
 
     /**
@@ -371,10 +426,11 @@ import Foundation
      Returns:
         purity.
      */
-    public static func purity(state) {
+    public static func purity(_ state) {
         rho = np.array(state)
-        if rho.ndim == 1:
-        rho = outer(rho)
+        if rho.ndim == 1 {
+            rho = outer(rho)
+        }
         return np.real(np.trace(rho.dot(rho)))
     }
 
@@ -386,13 +442,14 @@ import Foundation
      Returns:
         concurrence.
      */
-    public static func concurrence(state) {
+    public static func concurrence(_ state) throws {
         rho = np.array(state)
-        if rho.ndim == 1:
-        rho = outer(state)
-        if len(state) != 4:
-        raise Exception("Concurence is not defined for more than two qubits")
-
+        if rho.ndim == 1 {
+            rho = outer(state)
+        }
+        if len(state) != 4 {
+            throw ToolsError.errorConcurrence
+        }
         YY = np.fliplr(np.diag([-1, 1, 1, -1]))
         A = rho.dot(YY).dot(rho.conj()).dot(YY)
         w = la.eigh(A, eigvals_only=True)
