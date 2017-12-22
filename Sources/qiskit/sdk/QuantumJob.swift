@@ -34,7 +34,7 @@ public final class QuantumJob {
 
     init(_ qobj: [String:Any],
          seed: Int? = nil,
-         resources: [String:Any] = ["max_credits":3, "wait":5, "timeout":120],
+         resources: [String:Any] = ["max_credits":10, "wait":5, "timeout":120],
          names: [String]? = nil) {
 
         if let n = names {

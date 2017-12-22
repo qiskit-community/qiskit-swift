@@ -29,6 +29,10 @@ public protocol NumericType: ExpressibleByIntegerLiteral, Hashable {
 }
 
 public protocol PrimitiveNumericType: NumericType, Comparable {
+    static func <(lhs: Self, rhs: Self) -> Bool
+    static func <=(lhs: Self, rhs: Self) -> Bool
+    static func >(lhs: Self, rhs: Self) -> Bool
+    static func >=(lhs: Self, rhs: Self) -> Bool
 }
 
 public protocol SignedNumericType: PrimitiveNumericType {

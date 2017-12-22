@@ -145,22 +145,22 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
 
     public func slice(_ rowRange: (Int,Int), _ colRange: (Int,Int)) throws -> Matrix<T> {
         if rowRange.0 < 0 || rowRange.0 >= self.rowCount {
-            throw MatrixError.rowStartOutOfBounds(row: rowRange.0)
+            throw ArrayError.rowStartOutOfBounds(row: rowRange.0)
         }
         if rowRange.1 < 0 || rowRange.1 > self.rowCount {
-            throw MatrixError.rowEndOutOfBounds(row: rowRange.1)
+            throw ArrayError.rowEndOutOfBounds(row: rowRange.1)
         }
         if rowRange.0 >= rowRange.1 {
-            throw MatrixError.rowsOutOfBounds(rowStart: rowRange.0, rowEnd: rowRange.1)
+            throw ArrayError.rowsOutOfBounds(rowStart: rowRange.0, rowEnd: rowRange.1)
         }
         if colRange.0 < 0 || colRange.0 >= self.colCount {
-            throw MatrixError.colStartOutOfBounds(col: colRange.0)
+            throw ArrayError.colStartOutOfBounds(col: colRange.0)
         }
         if colRange.1 < 0 || colRange.1 > self.colCount {
-            throw MatrixError.colEndOutOfBounds(col: colRange.1)
+            throw ArrayError.colEndOutOfBounds(col: colRange.1)
         }
         if colRange.0 >= colRange.1 {
-            throw MatrixError.colsOutOfBounds(colStart: colRange.0, colEnd: colRange.1)
+            throw ArrayError.colsOutOfBounds(colStart: colRange.0, colEnd: colRange.1)
         }
 
         var m = Matrix<T>(repeating:0, rows: rowRange.1 - rowRange.0, cols: colRange.1 - colRange.0)
@@ -216,7 +216,10 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
         return sum
     }
 
-    public func add(_ other: Matrix<T>) -> Matrix<T> {
+    public func add(_ other: Matrix<T>) throws -> Matrix<T> {
+        if self.rowCount != other.rowCount || self.colCount != other.colCount {
+            throw ArrayError.sameShape
+        }
         let rows = self.rowCount <= other.rowCount ? self.rowCount : other.rowCount
         let cols = self.colCount <= other.colCount ? self.colCount : other.colCount
         var sum = Matrix<T>(repeating: 0, rows:rows, cols:cols)
@@ -228,7 +231,10 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
         return sum
     }
 
-    public func subtract(_ other: Matrix<T>) -> Matrix<T> {
+    public func subtract(_ other: Matrix<T>) throws -> Matrix<T> {
+        if self.rowCount != other.rowCount || self.colCount != other.colCount {
+            throw ArrayError.sameShape
+        }
         let rows = self.rowCount <= other.rowCount ? self.rowCount : other.rowCount
         let cols = self.colCount <= other.colCount ? self.colCount : other.colCount
         var sub = Matrix<T>(repeating: 0, rows:rows, cols:cols)
@@ -354,10 +360,10 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
 
     private static func det(_ matrix: Matrix<T>) throws -> T {
         if !matrix.isSquare {
-            throw MatrixError.detSquare
+            throw ArrayError.detSquare
         }
         if matrix.isEmpty {
-            throw MatrixError.detEmpty
+            throw ArrayError.detEmpty
         }
         if matrix.count == 1 {
             return matrix[0,0]
@@ -409,13 +415,18 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
         }
         return ret
     }
+
+    public func reshape(_ shape: [Int]) throws -> MultiDArray<T> {
+        let m = MultiDArray<T>(self)
+        return try m.reshape(shape)
+    }
 }
 
 extension Matrix where T == Complex {
 
     public init(real: Matrix<Double>, imag: Matrix<Double>) throws {
         if real.shape != imag.shape {
-            throw MatrixError.sameShape
+            throw ArrayError.sameShape
         }
         var value = [[Complex]](repeating: [Complex](repeating: 0.0, count: real.colCount), count: real.rowCount)
         for row in 0..<real.rowCount {

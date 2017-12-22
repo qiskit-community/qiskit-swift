@@ -30,6 +30,7 @@ XCTMain([
     testCase(QiskitParserTests.allTests),
     testCase(QiskitProgramTests.allTests),
     testCase(QiskitTests.allTests),
+    testCase(QITests.allTests),
     testCase(QuantumOptimizationTests.allTests),
     testCase(QuantumProgramTests.allTests),
     testCase(UnrollerTests.allTests)

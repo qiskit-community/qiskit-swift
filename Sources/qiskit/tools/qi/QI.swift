@@ -64,9 +64,9 @@ import Foundation
      Returns:
         A matrix with the appropriate subsytems traced over.
      */
-/*    public static func partial_trace(_ state: [Any],
-                                     _ subsystems: Any,
-                                     _ dimensions: [Int]? = nil,
+    public static func partial_trace(_ state: [Any],
+                                     sys: Any,
+                                     dims: [Int]? = nil,
                                      _ reverse: Bool = true) throws -> Matrix<Complex> {
         // convert op to density matrix
         var rho = Matrix<Complex>()
@@ -80,54 +80,54 @@ import Foundation
             throw ToolsError.errorPartialTrace
         }
         // compute dims if not specified
-        var dims = Vector<Int>()
-        if let d = dimensions {
-            dims = Vector<Int>(value:d)
+        var dimensions = Vector<Int>()
+        if let d = dims {
+            dimensions = Vector<Int>(value:d)
         }
         else {
-            let n = log2(Double(rho.count))
-            dims = Vector<Int>(repeating: 2, count:Int(n))
-            if Double(rho.count) != pow(2.0,n) {
+            let n = log2(Double(rho.rowCount))
+            dimensions = Vector<Int>(repeating: 2, count:Int(n))
+            if Double(rho.rowCount) != pow(2.0,n) {
                 throw ToolsError.errorPartialTrace
             }
         }
 
         // reverse sort trace sys
-        var sys: [Int] = []
-        if let s = subsystems as? Int {
-            sys = [s]
+        var subsystems: [Int] = []
+        if let s = sys as? Int {
+            subsystems = [s]
         }
-        else if let s = subsystems as? [Int] {
-            sys = s.reversed()
+        else if let s = sys as? [Int] {
+            subsystems = s.reversed()
         }
         else {
             throw ToolsError.errorSubsystem
         }
 
         // trace out subsystems
-        for j in sys {
+        for j in subsystems {
             // get trace dims
             var dpre = Vector<Int>()
             var dpost = Vector<Int>()
             if reverse {
-                dpre = Vector<Int>(value: Array(dims.value[(j + 1)...]))
-                dpost = Vector<Int>(value: Array(dims.value[..<j]))
+                dpre = Vector<Int>(value: Array(dimensions.value[(j + 1)...]))
+                dpost = Vector<Int>(value: Array(dimensions.value[..<j]))
             }
             else {
-                dpre = Vector<Int>(value: Array(dims.value[..<j]))
-                dpost = Vector<Int>(value: Array(dims.value[(j + 1)...]))
+                dpre = Vector<Int>(value: Array(dimensions.value[..<j]))
+                dpost = Vector<Int>(value: Array(dimensions.value[(j + 1)...]))
             }
             let dim1 = dpre.prod()
-            let dim2 = dims[j]
+            let dim2 = dimensions[j]
             let dim3 = dpost.prod()
             // dims with sys-j removed
-            dims = dpre + dpost
+            dimensions = dpre + dpost
             // do the trace over j
-            rho = QI.__trace_middle(rho, dim1, dim2, dim3)
+            rho = try QI.__trace_middle(rho, dim1, dim2, dim3)
         }
         return rho
     }
-*/
+
     /**
      Get system dimensions for __trace_middle.
 
@@ -167,15 +167,15 @@ import Foundation
      Returns:
         A (D,D) matrix where D = dim1 * dim3
     */
-/*  private static func __trace_middle(_ op: Matrix<Complex>,
+    private static func __trace_middle(_ op: Matrix<Complex>,
                                       _ dim1: Int = 1,
                                       _ dim2: Int = 1,
-                                      _ dim3: Int = 1) -> Matrix<Complex> {
-        let op = op.reshape(dim1, dim2, dim3, dim1, dim2, dim3)
+                                      _ dim3: Int = 1) throws  -> Matrix<Complex> {
+        let m = try op.reshape([dim1,dim2,dim3,dim1,dim2,dim3])
         let d = dim1 * dim3
-        return op.trace(axis1=1, axis2=4).reshape(d, d)
+        return Matrix<Complex>(value:try m.trace(axis1: 1, axis2: 4).reshape([d, d]).value as! [[Complex]])
     }
-*/
+
     /**
      Flatten an operator to a vector in a specified basis.
 
@@ -199,8 +199,8 @@ import Foundation
             return rho.flattenRow()
         }
         else if Set<String>(["pauli", "pauli_weights"]).contains(method) {
-            let num = Int(log2(Double(rho.count)))  // number of qubits
-            if Double(rho.count) != pow(2.0,Double(num)) {
+            let num = Int(log2(Double(rho.rowCount)))  // number of qubits
+            if Double(rho.rowCount) != pow(2.0,Double(num)) {
                 throw ToolsError.errorVectorize
             }
             var pgroup: [Pauli] = []
@@ -237,8 +237,8 @@ import Foundation
         ndarray: the resulting matrix.
     */
  /*   public static func devectorize(_ vec: [Complex] , _ method: String = "col") throws {
-        let d = Int(Double(vec.count).squareRoot())  // the dimension of the matrix
-        if vec.count != d*d {
+        let d = Int(Double(vec.rowCount).squareRoot())  // the dimension of the matrix
+        if vec.rowCount != d*d {
             throw ToolsError.errorVectorizedMatrix
         }
         if method == "col"{
@@ -296,7 +296,7 @@ import Foundation
     */
 /*    public static func choi_to_rauli(_ choi: Matrix<Complex>, _ order: Int = 1) throws {
         // get number of qubits'
-        let n = Int(log2(np.sqrt(Double(choi.count)).squareRoot()))
+        let n = Int(log2(np.sqrt(Double(choi.rowCount)).squareRoot()))
         let pgp = try Pauli.pauli_group(n, order)
         var rauli = []
         for i in pgp {

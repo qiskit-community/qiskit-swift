@@ -82,6 +82,10 @@ public struct Vector<T: NumericType> : Hashable, Sequence, CustomStringConvertib
         }
     }
 
+    public mutating func remove(at: Int) {
+        self.value.remove(at: at)
+    }
+
     public func add(_ other: Vector<T>) -> Vector<T> {
         let m = self.count <= other.count ? self.count : other.count
         var sum: Vector<T> = Vector<T>(repeating: 0, count:m)
@@ -120,7 +124,7 @@ public struct Vector<T: NumericType> : Hashable, Sequence, CustomStringConvertib
 
     public func mult(_ other: Vector<T>) throws -> Vector<T> {
         if self.count != other.count {
-            throw VectorError.differentSizes(count1: self.count, count2: other.count)
+            throw ArrayError.differentSizes(count1: self.count, count2: other.count)
         }
         var ab = self
         for i in 0..<ab.count {
@@ -139,7 +143,7 @@ public struct Vector<T: NumericType> : Hashable, Sequence, CustomStringConvertib
 
     public func inner(_ other: Vector<T>) throws -> T {
         if self.count != other.count {
-            throw VectorError.differentSizes(count1: self.count, count2: other.count)
+            throw ArrayError.differentSizes(count1: self.count, count2: other.count)
         }
         var sum: T = 0
         for i in 0..<self.count {
@@ -203,6 +207,11 @@ public struct Vector<T: NumericType> : Hashable, Sequence, CustomStringConvertib
         return false
     }
 
+    public func reshape(_ shape: [Int]) throws -> MultiDArray<T> {
+        let m = MultiDArray<T>(self)
+        return try m.reshape(shape)
+    }
+
     public static func + (left: Vector<T>, right: Vector<T>) -> Vector<T> {
         var v = left.value
         for elem in right.value {
@@ -213,6 +222,16 @@ public struct Vector<T: NumericType> : Hashable, Sequence, CustomStringConvertib
 }
 
 extension Vector where T : PrimitiveNumericType {
+
+    public init(start: T = 0, stop: T, step: T = 1) {
+        var value: [T] = []
+        var s = start
+        while s < stop {
+            value.append(s)
+            s += step
+        }
+        self.init(value:value)
+    }
 
     public func setdiff1d(_ other: Vector<T>) -> Vector<T> {
         var set = Set<T>(other.value)
@@ -231,7 +250,7 @@ extension Vector where T == Complex {
 
     public init(real: [Double], imag: [Double]) throws {
         if real.count != imag.count {
-            throw VectorError.differentSizes(count1: real.count, count2: imag.count)
+            throw ArrayError.differentSizes(count1: real.count, count2: imag.count)
         }
         var value: [Complex] = []
         for i in 0..<real.count {

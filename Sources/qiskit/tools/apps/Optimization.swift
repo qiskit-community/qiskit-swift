@@ -614,7 +614,7 @@ public final class Optimization {
         var Hamiltonian = Matrix<Complex>()
         for p in pauli_list {
             let m = try p.1.to_matrix().mult(Complex(real:p.0))
-            Hamiltonian = Hamiltonian.shape != (0,0) ? Hamiltonian.add(m) : m
+            Hamiltonian = Hamiltonian.shape != (0,0) ? try Hamiltonian.add(m) : m
         }
         return Hamiltonian
     }

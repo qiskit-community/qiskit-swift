@@ -89,4 +89,43 @@ class PauliTests: XCTestCase {
             XCTFail("test_pauli: \(error)")
         }
     }
+
+    /*
+     func test_equality_equal() {
+         let p1 = random_pauli(5)
+         let p2 = deepcopy(p1)
+         XCTAssert(p1 == p2)
+         SDKLogger.logInfo(p2.to_label())
+         SDKLogger.logInfo(p1.to_label())
+         SDKLogger.logInfo(p1 == p2)
+     }
+
+     func test_equality_different() {
+         let p1 = random_pauli(5)
+         let p2 = deepcopy(p1)
+         p2.v[0] = (p1.v[0] + 1) % 2
+         self.assertFalse(p1 == p2)
+         SDKLogger.logInfo(p2.to_label())
+         SDKLogger.logInfo(p1.to_label())
+         SDKLogger.logInfo(p1 == p2)
+     }
+
+     func test_inequality_equal() {
+         let p1 = random_pauli(5)
+         let p2 = deepcopy(p1)
+         self.assertFalse(p1 != p2)
+         SDKLogger.logInfo(p2.to_label())
+         SDKLogger.logInfo(p1.to_label())
+         SDKLogger.logInfo(p1 != p2)
+     }
+
+     func test_inequality_different() {
+         let p1 = random_pauli(5)
+         let p2 = deepcopy(p1)
+         p2.v[0] = (p1.v[0] + 1) % 2
+         XCTAssert(p1 != p2)
+         SDKLogger.logInfo(p2.to_label())
+         SDKLogger.logInfo(p1.to_label())
+         SDKLogger.logInfo(p1 != p2)
+     }*/
 }

@@ -19,7 +19,7 @@ import Foundation
 /**
  Exception for errors raised by the Materix object.
  */
-public enum MatrixError: LocalizedError, CustomStringConvertible {
+public enum ArrayError: LocalizedError, CustomStringConvertible {
     case rowStartOutOfBounds(row: Int)
     case rowEndOutOfBounds(row: Int)
     case rowsOutOfBounds(rowStart: Int,rowEnd: Int)
@@ -29,6 +29,12 @@ public enum MatrixError: LocalizedError, CustomStringConvertible {
     case detSquare
     case detEmpty
     case sameShape
+    case errorShape(shape: [Int])
+    case errorIndex(index: [Int])
+    case errorReshape(count: Int, shape: [Int])
+    case errorAxis(axis1: Int, axis2: Int)
+    case errorAxisForShape(axis1: Int, axis2: Int, shape: [Int])
+    case differentSizes(count1: Int, count2: Int)
 
     public var errorDescription: String? {
         return self.description
@@ -53,6 +59,18 @@ public enum MatrixError: LocalizedError, CustomStringConvertible {
             return "Determinant of an empty matrix"
         case .sameShape:
             return "Matrices must have same number of rows and columns"
+        case .errorShape(let shape):
+            return "Invalid shape: \(shape.description)"
+        case .errorIndex(let index):
+            return "Invalid index: \(index.description)"
+        case .errorReshape(let count, let shape):
+            return "Unable to reshape size \(count) to shape \(shape.description))"
+        case .errorAxis(let axis1, let axis2):
+            return "Invalid axis \(axis1),\(axis2)"
+        case .errorAxisForShape(let axis1, let axis2, let shape):
+            return "Invalid axis \(axis1),\(axis2) for shape \(shape.description)"
+        case .differentSizes(let count1, let count2):
+            return "Vectors have different sizes: (\(count1),\(count2))"
         }
     }
 }

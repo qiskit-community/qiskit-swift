@@ -89,7 +89,7 @@ public final class Compiling {
         c2 = Complex(imag: 1) * lamb / 2.0
         let Rzlambda: Matrix<Complex> = [[c1.exp(), 0],[0, c2.exp()]]
         let V = Rzphi.dot(Rytheta.dot(Rzlambda))
-        if V.subtract(U).norm() > small {
+        if try V.subtract(U).norm() > small {
             throw MappingError.eulerAngles1qResult
         }
         return (theta, phi, lamb, "U(\(theta),\(phi),\(lamb))")
@@ -216,7 +216,7 @@ public final class Compiling {
         let A = B.dot(Q.dot(B.conjugate().transpose()))
         let K2 = B.dot(P.transpose().dot(B.conjugate().transpose()))
         let KAK = K1.dot(A.dot(K2))
-        if (KAK.subtract(U)).norm(2) > 1e-6 {
+        if try KAK.subtract(U).norm(2) > 1e-6 {
             throw MappingError.twoQubitKakDecomposition
         }
         // Compute parameters alpha, beta, gamma so that
@@ -265,12 +265,12 @@ public final class Compiling {
         V1[0, 1] = R[0, 2]
         V1[1, 0] = R[2, 0]
         V1[1, 1] = R[2, 2]
-        if U1.kron(U2).subtract(K1).norm() > pow(1.0, -4.0) ||
-           V1.kron(V2).subtract(K2).norm() > pow(1.0, -4.0) {
+        if try U1.kron(U2).subtract(K1).norm() > pow(1.0, -4.0) ||
+               V1.kron(V2).subtract(K2).norm() > pow(1.0, -4.0) {
             throw MappingError.twoQubitKakSU
         }
-        let test = xx.mult(Complex(real:alpha)).add(yy.mult(Complex(real:beta))).add(zz.mult(Complex(real:gamma))).mult(Complex(imag:1)).expm()
-        if A.subtract(test).norm() > pow(1.0, -4.0) {
+        let test = try xx.mult(Complex(real:alpha)).add(yy.mult(Complex(real:beta))).add(zz.mult(Complex(real:gamma))).mult(Complex(imag:1)).expm()
+        if try A.subtract(test).norm() > pow(1.0, -4.0) {
             throw MappingError.twoQubitKakA
         }
         // Circuit that implements K1 * A * K2 (up to phase), using
@@ -317,7 +317,7 @@ public final class Compiling {
         V = g6.dot(V)
         V = g7.dot(V)
 
-        if V.subtract(U.mult(phase.conjugate())).norm() > pow(1.0, -6.0) {
+        if try V.subtract(U.mult(phase.conjugate())).norm() > pow(1.0, -6.0) {
             throw MappingError.twoQubitKakSequence
         }
         let v1_param = try euler_angles_1q(V1)
@@ -432,10 +432,10 @@ public final class Compiling {
         }
         // Put V in SU(4) and test up to global phase
         V = V.mult(try V.det().power((-1.0/4.0)))
-        if V.subtract(U).norm()                         > pow(1.0, -6.0) &&
-            V.mult(Complex(imag:1)).subtract(U).norm()  > pow(1.0, -6.0) &&
-            V.mult(-1).subtract(U).norm()               > pow(1.0, -6.0) &&
-            V.mult(Complex(imag:-1)).subtract(U).norm() > pow(1.0, -6.0) {
+        if try V.subtract(U).norm()                        > pow(1.0, -6.0) &&
+               V.mult(Complex(imag:1)).subtract(U).norm()  > pow(1.0, -6.0) &&
+               V.mult(-1).subtract(U).norm()               > pow(1.0, -6.0) &&
+               V.mult(Complex(imag:-1)).subtract(U).norm() > pow(1.0, -6.0) {
             throw MappingError.twoQubitKakSequence
         }
         return return_circuit

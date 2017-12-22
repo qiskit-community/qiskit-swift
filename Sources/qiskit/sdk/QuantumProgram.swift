@@ -1136,7 +1136,7 @@ public final class QuantumProgram: CustomStringConvertible {
                         coupling_map: [Int:[Int]]? = nil,
                         initial_layout: OrderedDictionary<RegBit,RegBit>? = nil,
                         shots: Int = 1024,
-                        max_credits: Int = 3,
+                        max_credits: Int = 10,
                         seed: Int? = nil,
                         qobj_id: String? = nil) throws -> [String:Any] {
         // TODO: Jay: currently basis_gates, coupling_map, initial_layout, shots,

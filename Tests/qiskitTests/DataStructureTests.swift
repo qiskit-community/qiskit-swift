@@ -29,6 +29,7 @@ class DataStructureTests: XCTestCase {
         ("testLongestPath",testLongestPath),
         ("testVector",testVector),
         ("testMatrix",testMatrix),
+        ("testTrace",testTrace)
     ]
 
     override func setUp() {
@@ -240,6 +241,23 @@ class DataStructureTests: XCTestCase {
         a = [[10,0,3, 6], [-2,-4,1, 9], [3,0,2, 11], [7,8,9, 24]]
         XCTAssertEqual(try a.slice((0,2),(0,2)).description, [[10, 0],[-2, -4]].description)
         XCTAssertEqual(try a.slice((2,4),(2,4)).description, [[2, 11], [9, 24]].description)
+    }
+
+    func testTrace() {
+        do {
+            var m = try Vector<Int>(stop:8).reshape([2,2,2])
+            XCTAssertEqual(m.description, [[[0,1], [2,3]], [[4,5], [6,7]]].description)
+            XCTAssertEqual(try m.trace().description, [6, 8].description)
+            m = try Vector<Int>(stop:24).reshape([2,2,2,3])
+            XCTAssertEqual(m.description, [[[[ 0, 1, 2],[ 3, 4, 5]],
+                                            [[ 6, 7, 8],[ 9,10,11]]],
+                                           [[[12,13,14],[15,16,17]],
+                                            [[18,19,20],[21,22,23]]]].description)
+            XCTAssertEqual(try m.trace().description, [[18, 20, 22],[24, 26, 28]].description)
+
+        } catch let error {
+            XCTFail("testTrace: \(error)")
+        }
     }
 
     private class func formatList(_ list: [GraphVertex<EmptyGraphData>]) -> String {
