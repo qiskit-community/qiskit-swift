@@ -191,7 +191,7 @@ import Foundation
      Returns:
         ndarray: the resulting vector.
     */
-    public static func vectorize(_ rho: Matrix<Complex>, _ method: String = "col") throws -> [Complex] {
+    public static func vectorize(_ rho: Matrix<Complex>, method: String = "col") throws -> Vector<Complex> {
         if method == "col" {
             return rho.flattenCol()
         }
@@ -210,7 +210,7 @@ import Foundation
             else {
                 pgroup = try Pauli.pauli_group(num, 1)
             }
-            var vals: [Complex] = []
+            var vals = Vector<Complex>()
             for p in pgroup {
                 vals.append(try p.to_matrix().dot(rho).trace())
             }
@@ -236,16 +236,16 @@ import Foundation
      Returns:
         ndarray: the resulting matrix.
     */
- /*   public static func devectorize(_ vec: [Complex] , _ method: String = "col") throws {
-        let d = Int(Double(vec.rowCount).squareRoot())  // the dimension of the matrix
-        if vec.rowCount != d*d {
+  /*  public static func devectorize(_ vec: Vector<Complex> , method: String = "col") throws -> Matrix<Complex> {
+        let d = Int(Double(vec.count).squareRoot())  // the dimension of the matrix
+        if vec.count != d*d {
             throw ToolsError.errorVectorizedMatrix
         }
         if method == "col"{
-            return vec.reshape(d, d, order="F")
+            return vec.reshape(d, d, order:"F")
         }
         else if method == "row" {
-            return vec.reshape(d, d, order="C")
+            return vec.reshape(d, d, order:"C")
         }
         else if Set<String>(["pauli", "pauli_weights"]).contains(method) {
             let num = Int(log2(Double(d)))  // number of qubits
@@ -263,13 +263,13 @@ import Foundation
             for p in pgroup {
                 pbasis.append(try p.to_matrix().div(Complex(real:pow(2.0,Double(num)))))
             }
-            return np.tensordot(vec, pbasis, axes=1)
+            return np.tensordot(vec, pbasis, axes: 1)
         }
         else {
             throw ToolsError.invalidMethod(method: method)
         }
-    }
-*/
+    }*/
+
     /**
      Convert a Choi-matrix to a Pauli-basis superoperator.
 

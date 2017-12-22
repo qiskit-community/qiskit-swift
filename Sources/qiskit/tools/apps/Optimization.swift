@@ -59,7 +59,7 @@ public final class Optimization {
                                          _ SPSA_parameters: [Double],
                                          _ max_trials: Int,
                                          _ save_steps: Int = 1,
-                                         _ last_avg: Int = 1) -> (Double,[Double],[Double],[Double],[[Double]],[[Double]]) {
+                                         _ last_avg: Int = 1) throws -> (Double,[Double],[Double],[Double],[[Double]],[[Double]]) {
         let random = Random(time(nil))
         var theta_plus_save: [[Double]] = []
         var theta_minus_save: [[Double]] = []
@@ -77,15 +77,15 @@ public final class Optimization {
             }
             let delta = arr.mult(2).subtract(1)
             // plus and minus directions
-            let theta_plus = theta.add(delta.mult(c_spsa))
-            let theta_minus = theta.subtract(delta.mult(c_spsa))
+            let theta_plus = try theta.add(delta.mult(c_spsa))
+            let theta_minus = try theta.subtract(delta.mult(c_spsa))
             // cost fuction for the two directions
             let cost_plus = obj_fun(theta_plus.value)
             let cost_minus = obj_fun(theta_minus.value)
             // derivative estimate
             let g_spsa = delta.mult(cost_plus - cost_minus).div(2.0 * c_spsa)
             // updated theta
-            theta = theta.subtract(g_spsa.mult(a_spsa))
+            theta = try theta.subtract(g_spsa.mult(a_spsa))
             // saving
             if k % save_steps == 0 {
                 SDKLogger.logInfo("objective function at theta+ for step # \(k)")
@@ -98,7 +98,7 @@ public final class Optimization {
                 cost_minus_save.append(cost_minus)
             }
             if k >= max_trials - last_avg {
-                theta_best = theta_best.add(theta.div(Double(last_avg)))
+                theta_best = try theta_best.add(theta.div(Double(last_avg)))
             }
         }
         // final cost update
@@ -126,7 +126,7 @@ public final class Optimization {
                                         _ initial_theta: [Double],
                                         _ initial_c: Double,
                                         _ target_update: Double,
-                                        _ stat: Int) -> [Double] {
+                                        _ stat: Int) throws -> [Double] {
         let random = Random(time(nil))
         var SPSA_parameters = Array<Double>(repeating:0.0, count: 5)
         SPSA_parameters[1] = initial_c
@@ -144,8 +144,8 @@ public final class Optimization {
                 arr[i] = Double(random.randint(0, 2))
             }
             let delta = arr.mult(2).subtract(1)
-            let obj_plus = obj_fun(theta.add(delta.mult(initial_c)).value)
-            let obj_minus = obj_fun(theta.subtract(delta.mult(initial_c)).value)
+            let obj_plus = obj_fun(try theta.add(delta.mult(initial_c)).value)
+            let obj_minus = obj_fun(try theta.subtract(delta.mult(initial_c)).value)
             delta_obj += abs(obj_plus - obj_minus) / Double(stat)
         }
         SPSA_parameters[0] = target_update * 2 / delta_obj * SPSA_parameters[1] * (SPSA_parameters[4] + 1)

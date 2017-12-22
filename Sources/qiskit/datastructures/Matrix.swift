@@ -220,11 +220,9 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
         if self.rowCount != other.rowCount || self.colCount != other.colCount {
             throw ArrayError.sameShape
         }
-        let rows = self.rowCount <= other.rowCount ? self.rowCount : other.rowCount
-        let cols = self.colCount <= other.colCount ? self.colCount : other.colCount
-        var sum = Matrix<T>(repeating: 0, rows:rows, cols:cols)
-        for row in 0..<rows {
-            for col in 0..<cols {
+        var sum = Matrix<T>(repeating: 0, rows:self.rowCount, cols:self.colCount)
+        for row in 0..<self.rowCount {
+            for col in 0..<self.colCount {
                 sum[row,col] = self[row,col] + other[row,col]
             }
         }
@@ -235,11 +233,9 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
         if self.rowCount != other.rowCount || self.colCount != other.colCount {
             throw ArrayError.sameShape
         }
-        let rows = self.rowCount <= other.rowCount ? self.rowCount : other.rowCount
-        let cols = self.colCount <= other.colCount ? self.colCount : other.colCount
-        var sub = Matrix<T>(repeating: 0, rows:rows, cols:cols)
-        for row in 0..<rows {
-            for col in 0..<cols {
+        var sub = Matrix<T>(repeating: 0, rows:self.rowCount, cols:self.colCount)
+        for row in 0..<self.rowCount {
+            for col in 0..<self.colCount {
                 sub[row,col] = self[row,col] - other[row,col]
             }
         }
@@ -396,24 +392,24 @@ public struct Matrix<T: NumericType> : Hashable, CustomStringConvertible, Expres
         fatalError("Matrix expm not implemented")
     }
 
-    public func flattenRow() -> [T] {
+    public func flattenRow() -> Vector<T> {
         var ret: [T] = []
         for row in 0..<self.rowCount {
             for col in 0..<self.colCount {
                 ret.append(self[row,col])
             }
         }
-        return ret
+        return Vector<T>(value:ret)
     }
 
-    public func flattenCol() -> [T] {
+    public func flattenCol() -> Vector<T> {
         var ret: [T] = []
         for col in 0..<self.colCount {
             for row in 0..<self.rowCount {
                 ret.append(self[row,col])
             }
         }
-        return ret
+        return Vector<T>(value:ret)
     }
 
     public func reshape(_ shape: [Int]) throws -> MultiDArray<T> {

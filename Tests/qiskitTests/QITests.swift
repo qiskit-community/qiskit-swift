@@ -23,7 +23,9 @@ class QITests: XCTestCase {
 
     static let allTests = [
         ("test_trial_functions",test_trial_functions),
-        ("test_partial_trace",test_partial_trace)
+        ("test_partial_trace",test_partial_trace),
+        ("test_vectorize",test_vectorize),
+        ("test_outer",test_outer)
     ]
 
     override func setUp() {
@@ -96,45 +98,57 @@ class QITests: XCTestCase {
             XCTFail("test_partial_trace: \(error)")
         }
     }
-/*
+
     func test_vectorize() {
-        let mat = [[1, 2], [3, 4]]
-        let col = [1, 3, 2, 4]
-        let row = [1, 2, 3, 4]
-        let paul = [5, 5, -1j, -3]
-        let test_pass = np.linalg.norm(vectorize(mat) - col) == 0 &&
-        np.linalg.norm(vectorize(mat, method='col') - col) == 0 &&
-        np.linalg.norm(vectorize(mat, method='row') - row) == 0 &&
-        np.linalg.norm(vectorize(mat, method='pauli') - paul) == 0
-        XCTAssert(test_pass)
+        do {
+            let mat: Matrix<Complex> = [[1, 2], [3, 4]]
+            let col: Vector<Complex> = [1, 3, 2, 4]
+            let row: Vector<Complex> = [1, 2, 3, 4]
+            let paul: Vector<Complex> = [5, 5, Complex(imag:-1), -3]
+            let test_pass = try QI.vectorize(mat).subtract(col).norm() == 0 &&
+                                QI.vectorize(mat, method: "col").subtract(col).norm() == 0 &&
+                                QI.vectorize(mat, method: "row").subtract(row).norm() == 0 &&
+                                QI.vectorize(mat, method: "pauli").subtract(paul).norm() == 0
+            XCTAssert(test_pass)
+        } catch {
+            XCTFail("test_vectorize: \(error)")
+        }
     }
-
+/*
     func test_devectorize() {
-        let mat = [[1, 2], [3, 4]]
-        let col = [1, 3, 2, 4]
-        let row = [1, 2, 3, 4]
-        let paul = [5, 5, -1j, -3]
-        let test_pass = np.linalg.norm(devectorize(col) - mat) == 0 &&
-        np.linalg.norm(devectorize(col, method='col') - mat) == 0 &&
-        np.linalg.norm(devectorize(row, method='row') - mat) == 0 &&
-        np.linalg.norm(devectorize(paul, method='pauli') - mat) == 0
-        XCTAssert(test_pass)
+        do {
+            let mat: Matrix<Complex> = [[1, 2], [3, 4]]
+            let col: Vector<Complex> = [1, 3, 2, 4]
+            let row: Vector<Complex> = [1, 2, 3, 4]
+            let paul: Vector<Complex> = [5, 5, Complex(imag:-1), -3]
+            let test_pass = QI.devectorize(col).subtract(mat).norm() == 0 &&
+                            QI.devectorize(col, method="col").subtract(mat).norm() == 0 &&
+                            QI.devectorize(row, method="row").subtract(mat).norm() == 0 &&
+                            QI.devectorize(paul, method="pauli").subtract(mat).norm() == 0
+            XCTAssert(test_pass)
+        } catch {
+            XCTFail("test_devectorize: \(error)")
+        }
     }
-
+*/
     func test_outer() {
-        let v_z = [1, 0]
-        let v_y = [1, 1j]
-        let rho_z = [[1, 0], [0, 0]]
-        let rho_y = [[1, -1j], [1j, 1]]
-        let op_zy = [[1, -1j], [0, 0]]
-        let op_yz = [[1, 0], [1j, 0]]
-        let test_pass = np.linalg.norm(outer(v_z) - rho_z) == 0 &&
-        np.linalg.norm(outer(v_y) - rho_y) == 0 &&
-        np.linalg.norm(outer(v_y, v_z) - op_yz) == 0 &&
-        np.linalg.norm(outer(v_z, v_y) - op_zy) == 0
-        XCTAssert(test_pass)
+         do {
+            let v_z: Vector<Complex> = [1, 0]
+            let v_y: Vector<Complex> = [1, Complex(imag:1)]
+            let rho_z: Matrix<Complex> = [[1, 0], [0, 0]]
+            let rho_y: Matrix<Complex> = [[1, Complex(imag:-1)], [Complex(imag:1), 1]]
+            let op_zy: Matrix<Complex> = [[1, Complex(imag:-1)], [0, 0]]
+            let op_yz: Matrix<Complex> = [[1, 0], [Complex(imag:1), 0]]
+            let test_pass = try QI.outer(v_z).subtract(rho_z).norm() == 0 &&
+                                QI.outer(v_y).subtract(rho_y).norm() == 0 &&
+                                QI.outer(v_y, v_z).subtract(op_yz).norm() == 0 &&
+                                QI.outer(v_z, v_y).subtract(op_zy).norm() == 0
+            XCTAssert(test_pass)
+         } catch {
+            XCTFail("test_outer: \(error)")
+        }
     }
-
+/*
     func test_state_fidelity() {
         let psi1 = [0.70710678118654746, 0, 0, 0.70710678118654746]
         let psi2 = [0., 0.70710678118654746, 0.70710678118654746, 0.]

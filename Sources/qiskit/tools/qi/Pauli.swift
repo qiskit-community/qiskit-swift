@@ -83,8 +83,8 @@ public struct Pauli: CustomStringConvertible, Hashable {
         if self.numberofqubits != p.numberofqubits {
             throw ToolsError.invalidPauliMultiplication
         }
-        let vnew = self.v.add(p.v).remainder(2)
-        let wnew = self.w.add(p.w).remainder(2)
+        let vnew = try self.v.add(p.v).remainder(2)
+        let wnew = try self.w.add(p.w).remainder(2)
         return Pauli(vnew, wnew)
     }
 
@@ -165,8 +165,8 @@ public struct Pauli: CustomStringConvertible, Hashable {
         if P1.numberofqubits != P2.numberofqubits {
             throw ToolsError.invalidPauliMultiplication
         }
-        let vnew = P1.v.add(P2.v).remainder(2)
-        let wnew = P1.w.add(P2.w).remainder(2)
+        let vnew = try P1.v.add(P2.v).remainder(2)
+        let wnew = try P1.w.add(P2.w).remainder(2)
         let paulinew = Pauli(vnew, wnew)
         var phase = Complex(real: 1)
         for i in 0..<P1.v.count {

@@ -82,11 +82,18 @@ public struct Vector<T: NumericType> : Hashable, Sequence, CustomStringConvertib
         }
     }
 
+    public mutating func append(_ newElement: T) {
+        self.value.append(newElement)
+    }
+
     public mutating func remove(at: Int) {
         self.value.remove(at: at)
     }
 
-    public func add(_ other: Vector<T>) -> Vector<T> {
+    public func add(_ other: Vector<T>) throws -> Vector<T> {
+        if self.count != other.count {
+            throw ArrayError.differentSizes(count1: self.count, count2: other.count)
+        }
         let m = self.count <= other.count ? self.count : other.count
         var sum: Vector<T> = Vector<T>(repeating: 0, count:m)
         for i in 0..<m {
@@ -95,7 +102,10 @@ public struct Vector<T: NumericType> : Hashable, Sequence, CustomStringConvertib
         return sum
     }
 
-    public func subtract(_ other: Vector<T>) -> Vector<T> {
+    public func subtract(_ other: Vector<T>) throws -> Vector<T> {
+        if self.count != other.count {
+            throw ArrayError.differentSizes(count1: self.count, count2: other.count)
+        }
         let m = self.count <= other.count ? self.count : other.count
         var sum: Vector<T> = Vector<T>(repeating: 0, count:m)
         for i in 0..<m {
@@ -187,6 +197,26 @@ public struct Vector<T: NumericType> : Hashable, Sequence, CustomStringConvertib
             sum += self[i]
         }
         return sum
+    }
+
+    public func oneNorm() -> Double {
+       return self.pnorm(1)
+    }
+
+    public func pnorm(_ p: Double) -> Double {
+        var sum = 0.0
+        for i in 0..<self.count {
+            sum += pow(self[i].absolute(),p)
+        }
+        return pow(sum, 1.0/Double(p))
+    }
+
+    public func norm(_ p: Double = 2) -> Double {
+        return self.pnorm(p)
+    }
+
+    public func frobeniusNorm() -> Double {
+        return self.pnorm(2)
     }
 
     public func dot(_ other: Vector<T>) -> T {

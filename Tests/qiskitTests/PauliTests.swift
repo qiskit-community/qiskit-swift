@@ -22,7 +22,11 @@ import XCTest
 class PauliTests: XCTestCase {
 
     static let allTests = [
-        ("test_pauli",test_pauli)
+        ("test_pauli",test_pauli),
+        ("test_equality_equal",test_equality_equal),
+        ("test_equality_different",test_equality_different),
+        ("test_inequality_equal",test_inequality_equal),
+        ("test_inequality_different",test_inequality_different)
     ]
 
     override func setUp() {
@@ -90,42 +94,41 @@ class PauliTests: XCTestCase {
         }
     }
 
-    /*
-     func test_equality_equal() {
-         let p1 = random_pauli(5)
-         let p2 = deepcopy(p1)
-         XCTAssert(p1 == p2)
-         SDKLogger.logInfo(p2.to_label())
-         SDKLogger.logInfo(p1.to_label())
-         SDKLogger.logInfo(p1 == p2)
-     }
+    func test_equality_equal() {
+        let p1 = Pauli.random_pauli(5)
+        let p2 = p1
+        XCTAssert(p1 == p2)
+        SDKLogger.logInfo(p2.to_label())
+        SDKLogger.logInfo(p1.to_label())
+        SDKLogger.logInfo(p1 == p2)
+    }
 
-     func test_equality_different() {
-         let p1 = random_pauli(5)
-         let p2 = deepcopy(p1)
-         p2.v[0] = (p1.v[0] + 1) % 2
-         self.assertFalse(p1 == p2)
-         SDKLogger.logInfo(p2.to_label())
-         SDKLogger.logInfo(p1.to_label())
-         SDKLogger.logInfo(p1 == p2)
-     }
+    func test_equality_different() {
+        let p1 = Pauli.random_pauli(5)
+        var p2 = p1
+        p2.v[0] = (p1.v[0] + 1) % 2
+        XCTAssertFalse(p1 == p2)
+        SDKLogger.logInfo(p2.to_label())
+        SDKLogger.logInfo(p1.to_label())
+        SDKLogger.logInfo(p1 == p2)
+    }
 
-     func test_inequality_equal() {
-         let p1 = random_pauli(5)
-         let p2 = deepcopy(p1)
-         self.assertFalse(p1 != p2)
-         SDKLogger.logInfo(p2.to_label())
-         SDKLogger.logInfo(p1.to_label())
-         SDKLogger.logInfo(p1 != p2)
-     }
+    func test_inequality_equal() {
+        let p1 = Pauli.random_pauli(5)
+        let p2 = p1
+        XCTAssertFalse(p1 != p2)
+        SDKLogger.logInfo(p2.to_label())
+        SDKLogger.logInfo(p1.to_label())
+        SDKLogger.logInfo(p1 != p2)
+    }
 
-     func test_inequality_different() {
-         let p1 = random_pauli(5)
-         let p2 = deepcopy(p1)
-         p2.v[0] = (p1.v[0] + 1) % 2
-         XCTAssert(p1 != p2)
-         SDKLogger.logInfo(p2.to_label())
-         SDKLogger.logInfo(p1.to_label())
-         SDKLogger.logInfo(p1 != p2)
-     }*/
+    func test_inequality_different() {
+        let p1 = Pauli.random_pauli(5)
+        var p2 = p1
+        p2.v[0] = (p1.v[0] + 1) % 2
+        XCTAssert(p1 != p2)
+        SDKLogger.logInfo(p2.to_label())
+        SDKLogger.logInfo(p1.to_label())
+        SDKLogger.logInfo(p1 != p2)
+    }
 }
