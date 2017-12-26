@@ -21,6 +21,7 @@ import qiskit
 SDKLogger.type = .typeError
 
 XCTMain([
+    testCase(AuthenticationTests.allTests),
     testCase(DataStructureTests.allTests),
     testCase(HamiltonianTests.allTests),
     testCase(IBMQuantumExperienceTests.allTests),

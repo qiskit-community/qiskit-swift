@@ -158,7 +158,7 @@ measure q[2] -> f[0];
                 return
             }
             switch error {
-            case IBMQuantumExperienceError.missingTokenId:
+            case IBMQuantumExperienceError.invalidToken:
                 break
             default:
                 XCTFail("test_api_auth_token_fail: \(error)")
@@ -553,6 +553,102 @@ measure q[24] -> c[24];
         }
         self.waitForExpectations(timeout: 180, handler: { (error) in
             XCTAssertNil(error, "Failure in test_register_size_limit_exception")
+        })
+    }
+}
+
+class AuthenticationTests: XCTestCase {
+
+    static let allTests = [
+        ("test_url_404",test_url_404),
+        ("test_invalid_token",test_invalid_token),
+        ("test_url_unreachable",test_url_unreachable)
+    ]
+
+    private var QE_TOKEN: String? = nil
+
+    override func setUp() {
+        super.setUp()
+        let environment = ProcessInfo.processInfo.environment
+        if let token = environment["QE_TOKEN"] {
+            self.QE_TOKEN = token
+        }
+    }
+
+    func test_url_404() {
+        guard let API_TOKEN = self.QE_TOKEN else {
+            print("Set environment variable QE_TOKEN to execute this method")
+            return
+        }
+        let api = IBMQuantumExperience(API_TOKEN,["url": "https://qcwi-lsf.mybluemix.net/api404/API_TEST"])
+        let asyncExpectation = self.expectation(description: "test_url_404")
+        api.check_connection() { (e) in
+            guard let error = e else {
+                XCTFail("test_url_404 should have failed")
+                asyncExpectation.fulfill()
+                return
+            }
+            if case IBMQuantumExperienceError.httpError(let httpStatus, _, _, _) = error {
+                if httpStatus == 404 {
+                    asyncExpectation.fulfill()
+                    return
+                }
+            }
+            XCTFail("test_url_404: \(error)")
+            asyncExpectation.fulfill()
+        }
+        self.waitForExpectations(timeout: 180, handler: { (error) in
+            XCTAssertNil(error, "Failure in test_url_404")
+        })
+    }
+
+    func test_invalid_token() {
+        let api = IBMQuantumExperience("INVALID_TOKEN")
+        let asyncExpectation = self.expectation(description: "test_invalid_token")
+        api.check_connection() { (e) in
+            guard let error = e else {
+                XCTFail("test_invalid_token should have failed")
+                asyncExpectation.fulfill()
+                return
+            }
+            switch error {
+            case IBMQuantumExperienceError.invalidToken:
+                break
+            default:
+                XCTFail("test_invalid_token: \(error)")
+            }
+            asyncExpectation.fulfill()
+        }
+        self.waitForExpectations(timeout: 180, handler: { (error) in
+            XCTAssertNil(error, "Failure in test_invalid_token")
+        })
+    }
+
+    func test_url_unreachable() {
+        guard let API_TOKEN = self.QE_TOKEN else {
+            print("Set environment variable QE_TOKEN to execute this method")
+            return
+        }
+        let api = IBMQuantumExperience(API_TOKEN, ["url": "INVALID_URL"])
+        let asyncExpectation = self.expectation(description: "test_url_unreachable")
+        api.check_connection() { (e) in
+            guard let error = e else {
+                XCTFail("test_url_unreachable should have failed")
+                asyncExpectation.fulfill()
+                return
+            }
+            if case IBMQuantumExperienceError.internalError(let e) = error {
+                let nsError = e as NSError
+                if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorUnsupportedURL {
+                    asyncExpectation.fulfill()
+                    return
+                }
+            }
+            XCTFail("test_url_unreachable: \(error)")
+            asyncExpectation.fulfill()
+        }
+        self.waitForExpectations(timeout: 180, handler: { (error) in
+            XCTAssertNil(error, "Failure in test_url_unreachable")
         })
     }
 }

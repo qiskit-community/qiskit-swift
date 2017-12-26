@@ -28,7 +28,7 @@ public enum IBMQuantumExperienceError: LocalizedError, CustomStringConvertible {
     case registerSizeError(msg: String)
     case nullResponseData(url: String)
     case invalidResponseData
-    case missingTokenId
+    case invalidToken
     case missingJobId
     case missingExecutionId
     case missingStatus
@@ -42,6 +42,7 @@ public enum IBMQuantumExperienceError: LocalizedError, CustomStringConvertible {
     case invalidCredentials
     case userGroupError(user_group: String)
     case requestCancelled(error: Error)
+    case errorLogin(message: String)
     case internalError(error: Error)
 
     public var errorDescription: String? {
@@ -65,8 +66,8 @@ public enum IBMQuantumExperienceError: LocalizedError, CustomStringConvertible {
             return url
         case .invalidResponseData:
             return "Invalid response data"
-        case .missingTokenId:
-            return "Missing TokenId"
+        case .invalidToken:
+            return "Invalid Token"
         case .missingJobId:
             return "Missing JobId"
         case .missingExecutionId:
@@ -93,6 +94,8 @@ public enum IBMQuantumExperienceError: LocalizedError, CustomStringConvertible {
             return "User group doesnt exist \(user_group)"
         case .requestCancelled(let error):
             return "Request was cancelled: \(error.localizedDescription)"
+        case .errorLogin(let message):
+            return "Error during login: \(message)"
         case .internalError(let error):
             return error.localizedDescription
         }

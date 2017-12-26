@@ -140,7 +140,7 @@ final class Request {
             return RequestTask()
         }
         guard let token = self.credentials.get_token() else {
-            responseHandler(nil, IBMQuantumExperienceError.missingTokenId)
+            responseHandler(nil, IBMQuantumExperienceError.invalidToken)
             return RequestTask()
         }
         let fullPath = "\(path)\(Request.encodeURLQueryParams(token,params))"
@@ -256,7 +256,7 @@ final class Request {
             return RequestTask()
         }
         guard let token = self.credentials.get_token() else {
-            responseHandler(nil, IBMQuantumExperienceError.missingTokenId)
+            responseHandler(nil, IBMQuantumExperienceError.invalidToken)
             return RequestTask()
         }
         let fullPath = "\(path)\(Request.encodeURLQueryParams(token,params))"
@@ -374,7 +374,7 @@ final class Request {
                 access_token = token
             }
             else {
-                responseHandler(nil, IBMQuantumExperienceError.missingTokenId)
+                responseHandler(nil, IBMQuantumExperienceError.invalidToken)
                 return RequestTask()
             }
         }
@@ -474,6 +474,16 @@ final class Request {
         if contentType.hasPrefix("text/html;") {
             guard let value = String(data: data!, encoding: String.Encoding.utf8) else {
                 throw IBMQuantumExperienceError.nullResponseData(url: url.absoluteString)
+            }
+            let httpStatus = httpResponse.statusCode
+            if httpStatus != Request.HTTPSTATUSOK {
+                throw IBMQuantumExperienceError.httpError(httpStatus: httpStatus, status: 0, code: "", msg: value)
+            }
+            if value.contains("404 - Page Not Found") {
+                HTTPURLResponse.localizedString(forStatusCode: 404)
+                throw IBMQuantumExperienceError.httpError(httpStatus: 404, status: 0,
+                                                          code: "",
+                                                          msg: HTTPURLResponse.localizedString(forStatusCode: 404))
             }
             return value
         }

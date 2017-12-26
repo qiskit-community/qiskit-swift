@@ -820,11 +820,12 @@ public final class IBMQuantumExperience {
     public func run_job(qasms: [[String:Any]],
                         backend: String = "simulator",
                         shots: Int = 1,
-                        maxCredits: Int = 3,
+                        maxCredits: Int? = nil,
                         seed: Int? = nil,
                         hub: String? = nil,
                         group: String? = nil,
                         project: String? = nil,
+                        hpc: String? = nil,
                         access_token: String? = nil,
                         user_id: String? = nil,
                         responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
@@ -836,6 +837,7 @@ public final class IBMQuantumExperience {
                                     hub,
                                     group,
                                     project,
+                                    hpc,
                                     access_token,
                                     user_id) { (res,error) in
             DispatchQueue.main.async {
@@ -847,11 +849,12 @@ public final class IBMQuantumExperience {
     private func run_jobInternal(_ qasms: [[String:Any]],
                                  _ backend: String,
                                  _ shots: Int,
-                                 _ maxCredits: Int,
+                                 _ maxCredits: Int?,
                                  _ seed: Int?,
                                  _ hub: String?,
                                  _ group: String?,
                                  _ project: String?,
+                                 _ hpc: String?,
                                  _ access_token: String?,
                                  _ user_id: String?,
                                  _ responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
@@ -881,8 +884,13 @@ public final class IBMQuantumExperience {
                 qasmArray.append(dict)
             }
             data["qasms"] = qasmArray 
-            data["shots"] = shots 
-            data["maxCredits"] = maxCredits
+            data["shots"] = shots
+            if let c = maxCredits {
+                data["maxCredits"] = c
+            }
+            if let h = hpc {
+                data["hpc"] = h
+            }
             let r = self._check_backend(backend, "job") { (backend_type,error) -> Void in
                 if error != nil {
                     responseHandler([:], error)

@@ -119,7 +119,7 @@ public final class Credentials {
             }
             return request.postInternal(url: url, data: ["apiToken": token]) { (out, error) -> Void in
                 if error != nil {
-                    responseHandler(error)
+                    responseHandler(Credentials.obtain_token_error(error!))
                     return
                 }
                 guard let json = out as? [String:Any] else {
@@ -128,7 +128,7 @@ public final class Credentials {
                 }
                 self.data_credentials = json
                 if self.get_token() == nil {
-                    responseHandler(IBMQuantumExperienceError.missingTokenId)
+                    responseHandler(IBMQuantumExperienceError.invalidToken)
                     return
                 }
                 responseHandler(nil)
@@ -143,7 +143,7 @@ public final class Credentials {
             }
             return request.postInternal(url: url, data: ["email": email, "password" : password]) { (out, error) -> Void in
                 if error != nil {
-                    responseHandler(error)
+                    responseHandler(Credentials.obtain_token_error(error!))
                     return
                 }
                 guard let json = out as? [String:Any] else {
@@ -152,15 +152,32 @@ public final class Credentials {
                 }
                 self.data_credentials = json
                 if self.get_token() == nil {
-                    responseHandler(IBMQuantumExperienceError.missingTokenId)
+                    responseHandler(IBMQuantumExperienceError.invalidToken)
                     return
                 }
                 responseHandler(nil)
             }
         }
         else {
-            responseHandler(IBMQuantumExperienceError.missingTokenId)
+            responseHandler(IBMQuantumExperienceError.invalidToken)
             return RequestTask()
         }
+    }
+
+    private static func obtain_token_error(_ error: IBMQuantumExperienceError) -> IBMQuantumExperienceError {
+        if case IBMQuantumExperienceError.httpError(let httpStatus, _, _, let message) = error {
+            if httpStatus == 401 {
+                // For 401: ACCEPT_LICENSE_REQUIRED, a detailed message is
+                // present in the response and passed to the exception.
+                if !message.isEmpty {
+                    return IBMQuantumExperienceError.errorLogin(message: message)
+                }
+                return IBMQuantumExperienceError.invalidToken
+            }
+            if httpStatus == 400 {
+                return IBMQuantumExperienceError.invalidToken
+            }
+        }
+        return error
     }
 }
