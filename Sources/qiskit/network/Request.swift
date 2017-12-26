@@ -452,7 +452,11 @@ final class Request {
         return NSError(domain: NSURLErrorDomain, code: code, userInfo: [NSLocalizedDescriptionKey : msg])
     }
 
-    static private func response_good(_ requestTask: RequestTask, _ url: URL, _ data: Data?, _ response: URLResponse?, _ error: Error?) throws -> Any {
+    static private func response_good(_ requestTask: RequestTask,
+                                      _ url: URL,
+                                      _ data: Data?,
+                                      _ response: URLResponse?,
+                                      _ error: Error?) throws -> Any {
         if error != nil {
             #if os(Linux)
                 throw IBMQuantumExperienceError.internalError(error: getNSError(error!))
@@ -483,18 +487,21 @@ final class Request {
                 }
             }
         }
-        if contentType.hasPrefix("text/html;") {
-            guard let value = String(data: data!, encoding: String.Encoding.utf8) else {
+        if contentType.hasPrefix("text/html") || contentType.hasPrefix("text/xml") {
+            guard var value = String(data: data!, encoding: String.Encoding.utf8) else {
                 throw IBMQuantumExperienceError.nullResponseData(url: url.absoluteString)
             }
-            let httpStatus = httpResponse.statusCode
-            if httpStatus != Request.HTTPSTATUSOK {
-                throw IBMQuantumExperienceError.httpError(httpStatus: httpStatus, status: 0, code: "", msg: value)
+            if value.isEmpty && httpResponse.url != nil {
+                value = try String(contentsOf: httpResponse.url!, encoding: String.Encoding.utf8)
             }
             if value.contains("404 - Page Not Found") {
                 throw IBMQuantumExperienceError.httpError(httpStatus: 404, status: 0,
                                                           code: "",
                                                           msg: HTTPURLResponse.localizedString(forStatusCode: 404))
+            }
+            let httpStatus = httpResponse.statusCode
+            if httpStatus != Request.HTTPSTATUSOK {
+                throw IBMQuantumExperienceError.httpError(httpStatus: httpStatus, status: 0, code: "", msg: value)
             }
             return value
         }
