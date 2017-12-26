@@ -443,7 +443,7 @@ final class Request {
     /**
      For Linux
      */
-    private static func getNSError(_ error: Error) -> NSError? {
+    private static func getNSError(_ error: Error) -> NSError {
         var code = -1
         let msg = error.localizedDescription
         if msg == "unsupported URL" {
