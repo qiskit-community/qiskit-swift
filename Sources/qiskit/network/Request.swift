@@ -440,10 +440,22 @@ final class Request {
         return query
     }
 
+    /**
+     For Linux
+     */
+    private static func getNSError(_ error: Error) -> NSError? {
+        var code = -1
+        let msg = error.localizedDescription
+        if msg == "unsupported URL" {
+            code = NSURLErrorUnsupportedURL
+        }
+        return NSError(domain: NSURLErrorDomain, code: code, userInfo: [NSLocalizedDescriptionKey : msg])
+    }
+
     static private func response_good(_ requestTask: RequestTask, _ url: URL, _ data: Data?, _ response: URLResponse?, _ error: Error?) throws -> Any {
         if error != nil {
             #if os(Linux)
-                throw IBMQuantumExperienceError.internalError(error: error!)
+                throw IBMQuantumExperienceError.internalError(error: getNSError(error!))
             #else
                 if (error! as NSError).code == NSURLErrorCancelled {
                     throw IBMQuantumExperienceError.requestCancelled(error: error!)
@@ -480,7 +492,6 @@ final class Request {
                 throw IBMQuantumExperienceError.httpError(httpStatus: httpStatus, status: 0, code: "", msg: value)
             }
             if value.contains("404 - Page Not Found") {
-                HTTPURLResponse.localizedString(forStatusCode: 404)
                 throw IBMQuantumExperienceError.httpError(httpStatus: 404, status: 0,
                                                           code: "",
                                                           msg: HTTPURLResponse.localizedString(forStatusCode: 404))
