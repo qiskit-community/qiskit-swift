@@ -638,7 +638,11 @@ class AuthenticationTests: XCTestCase {
                 return
             }
             if case IBMQuantumExperienceError.internalError(let e) = error {
+                #if os(Linux)
+                let nsError = e as! NSError
+                #else
                 let nsError = e as NSError
+                #endif
                 if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorUnsupportedURL {
                     asyncExpectation.fulfill()
                     return
