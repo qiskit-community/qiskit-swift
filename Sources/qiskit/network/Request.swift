@@ -39,8 +39,20 @@ final class Request {
         self.timeout_interval = timeout_interval
         #if os(Linux)
             let sessionConfig = URLSessionConfiguration.default
+            let networkProxiesHTTPEnable    = "HTTPEnable"
+            let networkProxiesHTTPProxy     = "HTTPProxy"
+            let networkProxiesHTTPPort      = "HTTPPort"
+            let networkProxiesHTTPSEnable   = "HTTPSEnable"
+            let networkProxiesHTTPSProxy    = "HTTPSProxy"
+            let networkProxiesHTTPSPort     = "HTTPSPort"
         #else
             let sessionConfig = URLSessionConfiguration.ephemeral
+            let networkProxiesHTTPEnable    = kCFNetworkProxiesHTTPEnable
+            let networkProxiesHTTPProxy     = kCFNetworkProxiesHTTPProxy
+            let networkProxiesHTTPPort      = kCFNetworkProxiesHTTPPort
+            let networkProxiesHTTPSEnable   = kCFNetworkProxiesHTTPSEnable
+            let networkProxiesHTTPSProxy    = kCFNetworkProxiesHTTPSProxy
+            let networkProxiesHTTPSPort     = kCFNetworkProxiesHTTPSPort
         #endif
         sessionConfig.allowsCellularAccess = true
         sessionConfig.timeoutIntervalForRequest = Request.REACHTIMEOUT
@@ -58,17 +70,17 @@ final class Request {
                     throw IBMQuantumExperienceError.invalidURL(url: url.absoluteString)
                 }
                 if scheme.lowercased() == "http" {
-                    dict[kCFNetworkProxiesHTTPEnable] = true
-                    dict[kCFNetworkProxiesHTTPProxy] = host
+                    dict[networkProxiesHTTPEnable] = true
+                    dict[networkProxiesHTTPProxy] = host
                     if let port = url.port {
-                        dict[kCFNetworkProxiesHTTPPort] = port
+                        dict[networkProxiesHTTPPort] = port
                     }
                 }
                 else if scheme.lowercased() == "https" {
-                    dict[kCFNetworkProxiesHTTPSEnable] = true
-                    dict[kCFNetworkProxiesHTTPSProxy] = host
+                    dict[networkProxiesHTTPSEnable] = true
+                    dict[networkProxiesHTTPSProxy] = host
                     if let port = url.port {
-                        dict[kCFNetworkProxiesHTTPSPort] = port
+                        dict[networkProxiesHTTPSPort] = port
                     }
                 }
                 else {
