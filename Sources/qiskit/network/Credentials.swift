@@ -23,7 +23,8 @@ public final class Credentials {
     /**
      Configuration to connect with QX Platform
      */
-    var config: [String:Any]
+    var config: [String:Any] = Credentials.config_base
+    private(set) var proxies: [String] = []
     private let token_unique: String?
     private(set) var data_credentials: [String:Any] = [:]
 
@@ -39,9 +40,11 @@ public final class Credentials {
             if u == nil {
                 self.config["url"] = Credentials.config_base["url"]
             }
-        }
-        else {
-            self.config = Credentials.config_base
+            if let p = self.config["proxies"] as? [String:Any] {
+                if let urls = p["urls"] as? [String] {
+                    self.proxies = urls
+                }
+            }
         }
     }
 

@@ -147,10 +147,20 @@ public final class IBMQuantumExperience {
             responseHandler(req,nil)
             return RequestTask()
         }
-        let req = Request(self.credentials)
-        return req.initialize() { (request,error) -> Void in
-            self.request = request
-            responseHandler(self.request,error)
+        do {
+            let req = try Request(self.credentials)
+            return req.initialize() { (request,error) -> Void in
+                self.request = request
+                responseHandler(self.request,error)
+            }
+        } catch {
+            if let e = error as? IBMQuantumExperienceError {
+                responseHandler(nil,e)
+            }
+            else {
+                responseHandler(nil,IBMQuantumExperienceError.internalError(error: error))
+            }
+            return RequestTask()
         }
     }
 

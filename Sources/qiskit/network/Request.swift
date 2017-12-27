@@ -33,7 +33,7 @@ final class Request {
 
     init(_ credentials: Credentials,
          _ retries: UInt = 5,
-         _ timeout_interval: TimeInterval = 1.0) {
+         _ timeout_interval: TimeInterval = 1.0) throws {
         self.credentials = credentials
         self.retries = retries
         self.timeout_interval = timeout_interval
@@ -45,6 +45,40 @@ final class Request {
         sessionConfig.allowsCellularAccess = true
         sessionConfig.timeoutIntervalForRequest = Request.REACHTIMEOUT
         sessionConfig.timeoutIntervalForResource = Request.CONNTIMEOUT
+        if !self.credentials.proxies.isEmpty {
+            var dict = [AnyHashable : Any]()
+            for proxy in self.credentials.proxies {
+                guard let url = URL(string: proxy) else {
+                    throw IBMQuantumExperienceError.invalidURL(url: proxy)
+                }
+                guard let scheme = url.scheme else {
+                    throw IBMQuantumExperienceError.invalidURL(url: url.absoluteString)
+                }
+                guard let host = url.host else {
+                    throw IBMQuantumExperienceError.invalidURL(url: url.absoluteString)
+                }
+                if scheme.lowercased() == "http" {
+                    dict[kCFNetworkProxiesHTTPEnable] = true
+                    dict[kCFNetworkProxiesHTTPProxy] = host
+                    if let port = url.port {
+                        dict[kCFNetworkProxiesHTTPPort] = port
+                    }
+                }
+                else if scheme.lowercased() == "https" {
+                    dict[kCFNetworkProxiesHTTPSEnable] = true
+                    dict[kCFNetworkProxiesHTTPSProxy] = host
+                    if let port = url.port {
+                        dict[kCFNetworkProxiesHTTPSPort] = port
+                    }
+                }
+                else {
+                    throw IBMQuantumExperienceError.invalidURL(url: url.absoluteString)
+                }
+            }
+            if !dict.isEmpty {
+                sessionConfig.connectionProxyDictionary = dict
+            }
+        }
         self.urlSession = URLSession(configuration: sessionConfig)
     }
 
