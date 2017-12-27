@@ -50,9 +50,15 @@ final class Request {
             let networkProxiesHTTPEnable    = kCFNetworkProxiesHTTPEnable
             let networkProxiesHTTPProxy     = kCFNetworkProxiesHTTPProxy
             let networkProxiesHTTPPort      = kCFNetworkProxiesHTTPPort
-            let networkProxiesHTTPSEnable   = kCFNetworkProxiesHTTPSEnable
-            let networkProxiesHTTPSProxy    = kCFNetworkProxiesHTTPSProxy
-            let networkProxiesHTTPSPort     = kCFNetworkProxiesHTTPSPort
+            #if os(iOS)
+                let networkProxiesHTTPSEnable   = "HTTPSEnable"
+                let networkProxiesHTTPSProxy    = "HTTPSProxy"
+                let networkProxiesHTTPSPort     = "HTTPSPort"
+            #else
+                let networkProxiesHTTPSEnable   = kCFNetworkProxiesHTTPSEnable
+                let networkProxiesHTTPSProxy    = kCFNetworkProxiesHTTPSProxy
+                let networkProxiesHTTPSPort     = kCFNetworkProxiesHTTPSPort
+            #endif
         #endif
         sessionConfig.allowsCellularAccess = true
         sessionConfig.timeoutIntervalForRequest = Request.REACHTIMEOUT
