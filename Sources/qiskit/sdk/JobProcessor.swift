@@ -92,16 +92,22 @@ final class JobProcessor {
                 }
                 q_job._qobj = qobj
             }
-            var isTimeout = false
+            let startDate = Date()
             let r = self.backendUtils.get_backend_instance(backend_name) { (backend,error) in
                 if error != nil {
                     response(Result("0",error!,q_job.qobj))
                     return
                 }
+                let timeInterval = Int(Date().timeIntervalSince(startDate))
+                if timeInterval >= q_job.timeout {
+                    response(Result("0",QISKitError.jobTimeout(timeout: q_job.timeout),q_job.qobj))
+                    return
+                }
                 let r = backend!.run(q_job) { (r) in
                     var result = r
                     if let error = result.get_error() {
-                        if isTimeout {
+                        let timeInterval = Int(Date().timeIntervalSince(startDate))
+                        if timeInterval >= q_job.timeout {
                             switch error {
                             case QISKitError.jobTimeout(_):
                                 break
@@ -117,7 +123,6 @@ final class JobProcessor {
             reqTask.add(r)
             // cancel in case of timeout
             DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + .seconds(q_job.timeout)) {
-                isTimeout = true
                 reqTask.cancel()
             }
         } catch {
