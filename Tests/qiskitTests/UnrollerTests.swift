@@ -116,24 +116,32 @@ class UnrollerTests: XCTestCase {
         //# Set up the API and execute the program.
         //###############################################################
         qp.set_api(token:token, url:QE_URL)
-
-        let qobj = try qp.compile(["rippleadd"], backend: UnrollerTests.backend, coupling_map: UnrollerTests.coupling_map, shots: 1024)
-        qp.get_execution_list(qobj)
         let asyncExpectation = self.expectation(description: "rippleAdd")
-        qp.run_async(qobj) { (result) in
-            do {
-                if let error = result.get_error() {
+        qp.compile(["rippleadd"],
+                       backend: UnrollerTests.backend,
+                       coupling_map: UnrollerTests.coupling_map,
+                       shots: 1024) { (qobj,error) in
+            if error != nil {
+                XCTFail("Failure in rippleAdd: \(error!)")
+                asyncExpectation.fulfill()
+                return
+            }
+            qp.get_execution_list(qobj)
+            qp.run_async(qobj) { (result) in
+                do {
+                    if let error = result.get_error() {
+                        XCTFail("Failure in rippleAdd: \(error)")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    SDKLogger.logInfo(try result.get_ran_qasm("rippleadd"))
+                    SDKLogger.logInfo(try result.get_counts("rippleadd"))
+                    // Both versions should give the same distribution
+                    asyncExpectation.fulfill()
+                } catch {
                     XCTFail("Failure in rippleAdd: \(error)")
                     asyncExpectation.fulfill()
-                    return
                 }
-                SDKLogger.logInfo(try result.get_ran_qasm("rippleadd"))
-                SDKLogger.logInfo(try result.get_counts("rippleadd"))
-                // Both versions should give the same distribution
-                asyncExpectation.fulfill()
-            } catch {
-                XCTFail("Failure in rippleAdd: \(error)")
-                asyncExpectation.fulfill()
             }
         }
         self.waitForExpectations(timeout: 180, handler: { (error) in

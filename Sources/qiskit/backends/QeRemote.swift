@@ -97,6 +97,7 @@ final class QeRemote: BaseBackend {
             var backend: String = ""
             var shots: Int = 0
             var max_credits: Int = 0
+            var hpc: [String:Any]? = nil
             if let config = qobj["config"] as? [String:Any] {
                 if let b = config["backend"] as? String {
                     backend = b
@@ -107,8 +108,25 @@ final class QeRemote: BaseBackend {
                 if let m = config["max_credits"] as? Int {
                     max_credits = m
                 }
+                if backend == "ibmqx_hpc_qasm_simulator" {
+                    if let h = config["hpc"] as? [String:Any] {
+                        if let o = h["multi_shot_optimization"],
+                            let t = h["omp_num_threads"] {
+                            // Use CamelCase when passing the hpc parameters to the API.
+                            hpc = [
+                                "multiShotOptimization": o,
+                                "ompNumThreads": t
+                            ]
+                        }
+                    }
+                }
             }
-            let r = self.api!.run_job(qasms: api_jobs, backend: backend, shots: shots, maxCredits: max_credits, seed: seed0) { (output, error) -> Void in
+            let r = self.api!.run_job(qasms: api_jobs,
+                                      backend: backend,
+                                      shots: shots,
+                                      maxCredits: max_credits,
+                                      seed: seed0,
+                                      hpc: hpc) { (output, error) -> Void in
                 if error != nil {
                     response(Result("0",error!,q_job.qobj))
                     return

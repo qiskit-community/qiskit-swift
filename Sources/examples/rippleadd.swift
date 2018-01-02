@@ -98,22 +98,32 @@ public final class RippleAdd {
                     print(result)
                     print(try result.get_counts("rippleadd"))
                     print("Second version: mapped to 2x8 array coupling graph")
-                    let qobj = try qp.compile(["rippleadd"], backend: backend, coupling_map: coupling_map,shots: 1024)
-                    let r = qp.run_async(qobj) { (result) in
-                        do {
-                            if let error = result.get_error() {
-                                print(error)
-                                responseHandler?()
-                                return
-                            }
-                            print(result)
-                            print(try result.get_ran_qasm("rippleadd"))
-                            print(try result.get_counts("rippleadd"))
-                            print("Both versions should give the same distribution")
-                        } catch {
-                            print(error.localizedDescription)
+                    let r = qp.compile(["rippleadd"],
+                                      backend: backend,
+                                      coupling_map: coupling_map,
+                                      shots: 1024) { (qobj,error) in
+                        if error != nil {
+                            print(error!)
+                            responseHandler?()
+                            return
                         }
-                        responseHandler?()
+                        let r = qp.run_async(qobj) { (result) in
+                            do {
+                                if let error = result.get_error() {
+                                    print(error)
+                                    responseHandler?()
+                                    return
+                                }
+                                print(result)
+                                print(try result.get_ran_qasm("rippleadd"))
+                                print(try result.get_counts("rippleadd"))
+                                print("Both versions should give the same distribution")
+                            } catch {
+                                print(error.localizedDescription)
+                            }
+                            responseHandler?()
+                        }
+                        reqTask += r
                     }
                     reqTask += r
                 } catch {

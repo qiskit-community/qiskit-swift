@@ -101,12 +101,12 @@ public final class QuantumProgram: CustomStringConvertible {
             let s1 = first_cap_re.stringByReplacingMatches(in: name,
                                                            options: [],
                                                            range:  NSMakeRange(0, name.count),
-                                                           withTemplate: "\\1_\\2")
+                                                           withTemplate: "$1_$2")
             let all_cap_re = try NSRegularExpression(pattern:"([a-z0-9])([A-Z])")
             return all_cap_re.stringByReplacingMatches(in: s1,
                                                        options: [],
                                                        range: NSMakeRange(0, s1.count),
-                                                       withTemplate: "\\1_\\2").lowercased()
+                                                       withTemplate: "$1_$2").lowercased()
         } catch {
             throw QISKitError.internalError(error: error)
         }
@@ -615,19 +615,25 @@ public final class QuantumProgram: CustomStringConvertible {
          experience.
          hub (str): The hub used for online backend.
          group (str): The group used for online backend.
+         proxies (dict): Proxy configuration for the API, as a dict with
+            'urls' and credential keys.
          project (str): The project used for online backend.
      */
     public func set_api(token: String,
                         url: String = IBMQuantumExperience.URL_BASE,
                         hub: String? = nil,
                         group: String? = nil,
-                        project: String? = nil) {
-        let config_dict: [String:Any] = [
+                        project: String? = nil,
+                        proxies: [String:Any]? = nil) {
+        var config_dict: [String:Any] = [
             "url": url,
             "hub": hub != nil ? hub! : NSNull(),
             "group": group != nil ? group! : NSNull(),
             "project": project != nil ? project! : NSNull()
         ]
+        if let p = proxies {
+            config_dict["proxies"] = p
+        }
         self.backendUtils.api = IBMQuantumExperience(token, config_dict)
         self.__api_config["token"] = token
         self.__api_config["config"] = config_dict
@@ -1138,7 +1144,9 @@ public final class QuantumProgram: CustomStringConvertible {
                         shots: Int = 1024,
                         max_credits: Int = 10,
                         seed: Int? = nil,
-                        qobj_id: String? = nil) throws -> [String:Any] {
+                        qobj_id: String? = nil,
+                        hpc: [String:Any]? = nil,
+                        _ responseHandler: @escaping ((_:[String:Any], _:QISKitError?) -> Void)) -> RequestTask {
         // TODO: Jay: currently basis_gates, coupling_map, initial_layout, shots,
         // max_credits and seed are extra inputs but I would like them to go
         // into the config.
@@ -1147,60 +1155,133 @@ public final class QuantumProgram: CustomStringConvertible {
         let qobjId: String = (qobj_id != nil) ? qobj_id! : String.randomAlphanumeric(length: 30)
         qobj["id"] = qobjId
         qobj["config"] = ["max_credits": max_credits, "backend": backend, "shots": shots]
-        qobj["circuits"] = []
 
-        if name_of_circuits.isEmpty {
-            throw QISKitError.missingCircuits
-        }
-
-        for name in name_of_circuits {
-            guard let qCircuit = self.__quantum_program[name] else {
-                throw QISKitError.missingQuantumProgram(name: name)
-            }
-            var basis: String = "u1,u2,u3,cx,id"  // QE target basis
-            if basis_gates != nil {
-                basis = basis_gates!
-            }
-            // TODO: The circuit object has to have .qasm() method (be careful)
-            let compiledCircuit = try OpenQuantumCompiler.compile(qCircuit.qasm(),
-                                                                          basis_gates: basis,
-                                                                          coupling_map: coupling_map,
-                                                                          initial_layout: initial_layout,
-                                                                          get_layout: true)
-            // making the job to be added to qoj
-            var job: [String:Any] = [:]
-            job["name"] = name
-            // config parameters used by the runner
-            var conf: [String:Any] = config != nil ? config! : [:]
-            conf["coupling_map"] = coupling_map != nil ? Coupling.coupling_dict2list(coupling_map!) : NSNull()
-            // TODO: Jay: make config options optional for different backends
-            // Map the layout to a format that can be json encoded
-            if let layout = compiledCircuit.final_layout {
-                var list_layout: [[[String:Int]]] = []
-                for (k,v) in layout {
-                    let kDict = [k.name : k.index]
-                    let vDict = [v.name : v.index]
-                    list_layout.append([kDict,vDict])
-                }
-                conf["layout"] = layout
+        // TODO This backend needs HPC parameters to be passed in order to work
+        if backend == "ibmqx_hpc_qasm_simulator" {
+            var h: [String:Any] = [:]
+            if let v = hpc {
+                h = v
             }
             else {
-                conf["layout"] = NSNull()
+                SDKLogger.logInfo("ibmqx_hpc_qasm_simulator backend needs HPC " +
+                                    "parameter. Setting defaults to hpc.multi_shot_optimization " +
+                                    "= true and hpc.omp_num_threads = 16")
+                h = ["multi_shot_optimization": true, "omp_num_threads": 16]
             }
-            conf["basis_gates"] = basis
-            conf["seed"] = seed != nil ? seed! : NSNull()
-
-            job["config"] = conf
-
-            // the compuled circuit to be run saved as a dag
-            job["compiled_circuit"] = try OpenQuantumCompiler.dag2json(compiledCircuit.dag!,basis_gates: basis)
-            job["compiled_circuit_qasm"] = try compiledCircuit.dag!.qasm(qeflag:true)
-            // add job to the qobj
-            var circuits = qobj["circuits"] as! [Any]
-            circuits.append(job)
-            qobj["circuits"] = circuits
+            let m = h.keys.filter() { $0 != "multi_shot_optimization" && $0 != "omp_num_threads" }
+            if !m.isEmpty {
+                DispatchQueue.main.async {
+                    responseHandler([:],QISKitError.unknownHPC)
+                }
+                return RequestTask()
+            }
+            if var config = qobj["config"] as? [String:Any] {
+                config["hpc"] = h
+                qobj["config"] = config
+            }
         }
-        return qobj
+        else if hpc != nil {
+            SDKLogger.logInfo("HPC paramter is only available for " +
+                        "ibmqx_hpc_qasm_simulator. You are passing an HPC parameter " +
+                        "but you are not using ibmqx_hpc_qasm_simulator, so we will " +
+                        "ignore it.")
+        }
+
+        qobj["circuits"] = []
+        let r = self.backendUtils.get_backend_configuration(backend) { (backend_conf,error) in
+            if error != nil {
+                responseHandler([:],QISKitError.internalError(error: error!))
+                return
+            }
+            do {
+                var basis: String = ""
+                if let b = basis_gates {
+                    if b.components(separatedBy:",").count < 2 {
+                        // catches deprecated basis specification like 'SU2+CNOT'
+                        SDKLogger.logInfo("encountered deprecated basis specification: " +
+                                    "'\(b)' substituting u1,u2,u3,cx,id")
+                         basis = "u1,u2,u3,cx,id"
+                    }
+                }
+                else if let b = backend_conf["basis_gates"] as? String {
+                    basis = b
+                }
+                var cmap: [Int:[Int]]? = nil
+                if let c = coupling_map {
+                    cmap = c
+                }
+                else {
+                    if let c = backend_conf["coupling_map"] as? String {
+                        if c == "all-to-all" {
+                            cmap = nil
+                        }
+                    }
+                    else {
+                        cmap = backend_conf["coupling_map"] as? [Int:[Int]]
+                    }
+                }
+                if name_of_circuits.isEmpty {
+                    throw QISKitError.missingCircuits
+                }
+                for name in name_of_circuits {
+                    guard let qCircuit = self.__quantum_program[name] else {
+                        throw QISKitError.missingQuantumProgram(name: name)
+                    }
+                    // TODO: The circuit object has to have .qasm() method (be careful)
+                    let num_qubits = qCircuit.get_qregs().values.reduce(0, { (result, qreg) in
+                        return result + qreg.size
+                    })
+                    // TODO: A better solution is to have options to enable/disable optimizations
+                    var cm: [Int:[Int]]? = cmap
+                    if num_qubits == 1 {
+                        cm = nil
+                    }
+                    let compiledCircuit = try OpenQuantumCompiler.compile(qCircuit.qasm(),
+                                                                                  basis_gates: basis,
+                                                                                  coupling_map: cm,
+                                                                                  initial_layout: initial_layout,
+                                                                                  get_layout: true)
+                    // making the job to be added to qoj
+                    var job: [String:Any] = [:]
+                    job["name"] = name
+                    // config parameters used by the runner
+                    var conf: [String:Any] = config != nil ? config! : [:]
+                    conf["coupling_map"] = coupling_map != nil ? Coupling.coupling_dict2list(coupling_map!) : NSNull()
+                    // TODO: Jay: make config options optional for different backends
+                    // Map the layout to a format that can be json encoded
+                    if let layout = compiledCircuit.final_layout {
+                        var list_layout: [[[String:Int]]] = []
+                        for (k,v) in layout {
+                            let kDict = [k.name : k.index]
+                            let vDict = [v.name : v.index]
+                            list_layout.append([kDict,vDict])
+                        }
+                        conf["layout"] = layout
+                    }
+                    else {
+                        conf["layout"] = NSNull()
+                    }
+                    conf["basis_gates"] = basis
+                    conf["seed"] = seed != nil ? seed! : NSNull()
+
+                    job["config"] = conf
+
+                    // the compuled circuit to be run saved as a dag
+                    job["compiled_circuit"] = try OpenQuantumCompiler.dag2json(compiledCircuit.dag!,basis_gates: basis)
+                    job["compiled_circuit_qasm"] = try compiledCircuit.dag!.qasm(qeflag:true)
+                    // add job to the qobj
+                    var circuits = qobj["circuits"] as! [Any]
+                    circuits.append(job)
+                    qobj["circuits"] = circuits
+                }
+                responseHandler(qobj,nil)
+            } catch let error as QISKitError {
+                responseHandler(qobj,error)
+            } catch {
+                responseHandler(qobj,QISKitError.internalError(error: error))
+            }
+        }
+        return r
     }
 
     /**
@@ -1486,6 +1567,15 @@ public final class QuantumProgram: CustomStringConvertible {
          shots (int): the number of shots
          max_credits (int): the max credits to use 3, or 5
          seed (int): the intial seed the simulatros use
+         hpc (dict): This will setup some parameter for
+             ibmqx_hpc_qasm_simulator, using a JSON-like format like:
+             {
+             'multi_shot_optimization': Boolean,
+             'omp_num_threads': Numeric
+             }
+             This paramter MUST be used only with
+             ibmqx_hpc_qasm_simulator, otherwise the SDK will warn
+             the user via logging.
      Returns:
         status done and populates the internal __quantum_program with the
         data
@@ -1502,26 +1592,30 @@ public final class QuantumProgram: CustomStringConvertible {
                         shots: Int = 1024,
                         max_credits: Int = 3,
                         seed: Int? = nil,
+                        hpc: [String:Any]? = nil,
                         _ callback: @escaping ((_:Result) -> Void)) -> RequestTask {
-        do {
-            let qobj = try self.compile(name_of_circuits,
-                             backend: backend,
-                             config: config,
-                             basis_gates: basis_gates,
-                             coupling_map: coupling_map,
-                             initial_layout: initial_layout,
-                             shots: shots,
-                             max_credits: max_credits,
-                             seed: seed)
-            return self.run_async(qobj,
-                           wait: wait,
-                           timeout: timeout,
-                           callback)
-        } catch {
-            DispatchQueue.main.async {
-                callback(Result("0",error,[:]))
+        let reqTask = RequestTask()
+        let r = self.compile(name_of_circuits,
+                         backend: backend,
+                         config: config,
+                         basis_gates: basis_gates,
+                         coupling_map: coupling_map,
+                         initial_layout: initial_layout,
+                         shots: shots,
+                         max_credits: max_credits,
+                         seed: seed,
+                         hpc: hpc) { (qobj,error) in
+            if error != nil {
+                callback(Result("0",error!,[:]))
+                return
             }
+            let r = self.run_async(qobj,
+                                   wait: wait,
+                                   timeout: timeout,
+                                   callback)
+            reqTask.add(r)
         }
-        return RequestTask()
+        reqTask.add(r)
+        return reqTask
     }
 }

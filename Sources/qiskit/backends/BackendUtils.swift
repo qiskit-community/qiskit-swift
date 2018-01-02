@@ -100,12 +100,60 @@ final class BackendUtils {
                 return
             }
             var backend_name_list = Set<String>()
-            for var configuration in configuration_list {
-                configuration["local"] = false
-                backend_name_list.insert(self.register_remote_backend(configuration,api))
+            do {
+                for var configuration in configuration_list {
+                    var configuration_edit: [String:Any] = [:]
+                    guard let backend_name = configuration["name"] as? String else {
+                        continue
+                    }
+                    backend_name_list.insert(backend_name)
+                    configuration_edit["local"] = false
+                    for key in configuration.keys {
+                        let new_key = try BackendUtils._snake_case_to_camel_case(key)
+                        if !Set<String>(["id", "serial_number", "topology_id", "status"]).contains(new_key) {
+                            configuration_edit[new_key] = configuration[key]
+                        }
+                        if new_key == "coupling_map" {
+                            if let list = configuration[key] as? [[Int]] {
+                                let cmap = Coupling.coupling_list2dict(list)
+                                configuration_edit[new_key] = cmap
+                            }
+                        }
+                    }
+                    // online_qasm_simulator uses different name for basis_gates
+                    if let gateSet = configuration["gateSet"] {
+                        configuration_edit["basis_gates"] = gateSet
+                        configuration_edit["gate_set"] = nil
+                    }
+                    // ibmqx_qasm_simulator doesn't report coupling_map
+                    if let sim = configuration["simulator"] as? Bool {
+                        if !configuration_edit.keys.contains("coupling_map") && sim {
+                            configuration_edit["coupling_map"] = "all-to-all"
+                        }
+                    }
+                    backend_name_list.insert(self.register_remote_backend(configuration_edit,api))
+                }
+                responseHandler(backend_name_list,nil)
+            } catch {
+                responseHandler(backend_name_list,IBMQuantumExperienceError.internalError(error: error))
             }
-            responseHandler(backend_name_list,nil)
         }
+    }
+
+    /**
+     Return a snake case string from a camelcase string.
+     */
+    static private func _snake_case_to_camel_case(_ name: String) throws -> String {
+        let first_cap_re = try NSRegularExpression(pattern:"(.)([A-Z][a-z]+)")
+        let s1 = first_cap_re.stringByReplacingMatches(in: name,
+                                                       options: [],
+                                                       range:  NSMakeRange(0, name.count),
+                                                       withTemplate: "$1_$2")
+        let all_cap_re = try NSRegularExpression(pattern:"([a-z0-9])([A-Z])")
+        return all_cap_re.stringByReplacingMatches(in: s1,
+                                                   options: [],
+                                                   range: NSMakeRange(0, s1.count),
+                                                   withTemplate: "$1_$2").lowercased()
     }
 
     private func update_backends(responseHandler: @escaping ((_:Set<String>, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
@@ -177,7 +225,8 @@ final class BackendUtils {
         }
     }
 
-    func get_backend_configuration(_ backend_name: String,_ responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+    func get_backend_configuration(_ backend_name: String,
+                                   _ responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         return self.update_backends() { (backends,error) in
             if error != nil {
                 responseHandler([:],error)

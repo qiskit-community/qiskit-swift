@@ -245,33 +245,39 @@ class LocalQasmSimulatorTests: XCTestCase {
             try circuit.x(qr[2]).c_if(cr1, 1)
             try circuit.measure(qr[2], cr2[0])
             let backend = "local_qasm_simulator"
-            let qobj = try qp.compile(["teleport"], backend: backend, shots: shots, seed: self.seed)
             let asyncExpectation = self.expectation(description: "test_teleport")
-            qp.run_async(qobj) { (results) in
-                do {
-                    let data = try results.get_counts("teleport")
-                    var alice: [String:Int] = [:]
-                    var bob: [String:Int] = [:]
-                    alice["00"] = data["0 0 0"]! + data["1 0 0"]!
-                    alice["01"] = data["0 1 0"]! + data["1 1 0"]!
-                    alice["10"] = data["0 0 1"]! + data["1 0 1"]!
-                    alice["11"] = data["0 1 1"]! + data["1 1 1"]!
-                    bob["0"] = data["0 0 0"]! + data["0 1 0"]! +  data["0 0 1"]! + data["0 1 1"]!
-                    bob["1"] = data["1 0 0"]! + data["1 1 0"]! +  data["1 0 1"]! + data["1 1 1"]!
-                    SDKLogger.logInfo("test_telport: circuit:")
-                    SDKLogger.logInfo(circuit.qasm())
-                    SDKLogger.logInfo("test_teleport: data \(SDKLogger.debugString(data))")
-                    SDKLogger.logInfo("test_teleport: alice \(SDKLogger.debugString(alice))")
-                    SDKLogger.logInfo("test_teleport: bob \(SDKLogger.debugString(bob))")
-                    let alice_ratio: Double = 1.0 / pow(tan(pi/8.0),2.0)
-                    let bob_ratio: Double = Double(bob["0"]!) / Double(bob["1"]!)
-                    let error: Double = abs(alice_ratio - bob_ratio) / alice_ratio
-                    SDKLogger.logInfo("test_teleport: relative error = \(error)")
-                    XCTAssertLessThan(error, 0.05)
-                } catch {
-                    XCTFail("\(error)")
+            qp.compile(["teleport"], backend: backend, shots: shots, seed: self.seed) { (qobj,error) in
+                if error != nil {
+                    XCTFail("Failure in test_teleport: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
                 }
-                asyncExpectation.fulfill()
+                qp.run_async(qobj) { (results) in
+                    do {
+                        let data = try results.get_counts("teleport")
+                        var alice: [String:Int] = [:]
+                        var bob: [String:Int] = [:]
+                        alice["00"] = data["0 0 0"]! + data["1 0 0"]!
+                        alice["01"] = data["0 1 0"]! + data["1 1 0"]!
+                        alice["10"] = data["0 0 1"]! + data["1 0 1"]!
+                        alice["11"] = data["0 1 1"]! + data["1 1 1"]!
+                        bob["0"] = data["0 0 0"]! + data["0 1 0"]! +  data["0 0 1"]! + data["0 1 1"]!
+                        bob["1"] = data["1 0 0"]! + data["1 1 0"]! +  data["1 0 1"]! + data["1 1 1"]!
+                        SDKLogger.logInfo("test_telport: circuit:")
+                        SDKLogger.logInfo(circuit.qasm())
+                        SDKLogger.logInfo("test_teleport: data \(SDKLogger.debugString(data))")
+                        SDKLogger.logInfo("test_teleport: alice \(SDKLogger.debugString(alice))")
+                        SDKLogger.logInfo("test_teleport: bob \(SDKLogger.debugString(bob))")
+                        let alice_ratio: Double = 1.0 / pow(tan(pi/8.0),2.0)
+                        let bob_ratio: Double = Double(bob["0"]!) / Double(bob["1"]!)
+                        let error: Double = abs(alice_ratio - bob_ratio) / alice_ratio
+                        SDKLogger.logInfo("test_teleport: relative error = \(error)")
+                        XCTAssertLessThan(error, 0.05)
+                    } catch {
+                        XCTFail("\(error)")
+                    }
+                    asyncExpectation.fulfill()
+                }
             }
             self.waitForExpectations(timeout: 180, handler: { (error) in
                 XCTAssertNil(error, "Failure in test_teleport")

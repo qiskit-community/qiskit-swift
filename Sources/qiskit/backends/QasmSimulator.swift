@@ -150,7 +150,7 @@ final class QasmSimulator: BaseBackend {
     private var _quantum_state: [Complex] = []
     private var _classical_state: Int = 0
     private var _shots: Int = 0
-    private let random: Random = Random()
+    private let _local_random: Random = Random()
 
     /**
      Initialize the QasmSimulator object
@@ -222,7 +222,7 @@ final class QasmSimulator: BaseBackend {
      */
     private func _add_qasm_decision(_ qubit: Int) -> (Int,Double) {
         var probability_zero: Double = 0
-        let random_number = self.random.random()
+        let random_number = self._local_random.random()
         for ii in 0..<(1 << self._number_of_qubits) {
             if (ii & (1 << qubit)) == 0 {
                 probability_zero += pow(self._quantum_state[ii].abs(),2)
@@ -384,14 +384,14 @@ final class QasmSimulator: BaseBackend {
         }
         if let config = circuit["config"] as? [String:Any] {
             if let seed = config["seed"] as? Int {
-                self.random.seed(seed)
+                self._local_random.seed(seed)
             }
             else {
-                self.random.seed(time(nil))
+                self._local_random.seed(time(nil))
             }
         }
         var outcomes: [String] = []
-        // Do each shot
+        
         for _ in 0..<self._shots {
             if reqTask.isCancelled() {
                 throw SimulatorError.simulationCancelled

@@ -263,10 +263,24 @@ class QiskitProgramTests: XCTestCase {
             try qc.h(qname[0])
             try qc.h(qname[0])
             try qc.measure(qname[0], cname[0])
-
-            try qprogram.compile(["circuitName"])
-            let to_test = try qprogram.get_circuit("circuitName")
-            XCTAssertEqual(to_test.qasm(), "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nh qname[0];\nh qname[0];\nmeasure qname[0] -> cname[0];\n")
+            let asyncExpectation = self.expectation(description: "testCompileProgram")
+            qprogram.compile(["circuitName"]) { (qobj,error) in
+                if error != nil {
+                    XCTFail("Failure in testCompileProgram: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                do {
+                    let to_test = try qprogram.get_circuit("circuitName")
+                    XCTAssertEqual(to_test.qasm(), "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg qname[3];\ncreg cname[3];\nh qname[0];\nh qname[0];\nmeasure qname[0] -> cname[0];\n")
+                } catch {
+                    XCTFail("\(error)")
+                }
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in testCompileProgram")
+            })
         } catch {
             XCTFail("\(error)")
         }

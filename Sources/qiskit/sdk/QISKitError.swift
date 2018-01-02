@@ -51,6 +51,7 @@ public enum QISKitError: LocalizedError, CustomStringConvertible {
     case invalidResultsCombine
     case invalidFile(file: String)
     case jobTimeout(timeout: Int)
+    case unknownHPC
     case internalError(error: Error)
 
     public var errorDescription: String? {
@@ -120,6 +121,8 @@ public enum QISKitError: LocalizedError, CustomStringConvertible {
             return "Invalid file '\(file)'."
         case .jobTimeout(let timeout):
             return "Error waiting for Job results: Timeout after \(timeout) seconds."
+        case .unknownHPC:
+            return "Unknown HPC parameter format!"
         case .internalError(let error):
             return error.localizedDescription
         }

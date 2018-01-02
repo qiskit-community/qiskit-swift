@@ -835,7 +835,7 @@ public final class IBMQuantumExperience {
                         hub: String? = nil,
                         group: String? = nil,
                         project: String? = nil,
-                        hpc: String? = nil,
+                        hpc: [String:Any]? = nil,
                         access_token: String? = nil,
                         user_id: String? = nil,
                         responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
@@ -864,7 +864,7 @@ public final class IBMQuantumExperience {
                                  _ hub: String?,
                                  _ group: String?,
                                  _ project: String?,
-                                 _ hpc: String?,
+                                 _ hpc: [String:Any]?,
                                  _ access_token: String?,
                                  _ user_id: String?,
                                  _ responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {

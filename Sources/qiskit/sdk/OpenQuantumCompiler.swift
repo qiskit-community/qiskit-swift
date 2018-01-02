@@ -77,7 +77,7 @@ final class OpenQuantumCompiler {
             let coupling = try Coupling(coupling_map)
             SDKLogger.logInfo("initial layout: \(SDKLogger.debugString(initial_layout ?? OrderedDictionary<RegBit,RegBit>()))")
             var layout:OrderedDictionary<RegBit,RegBit> = OrderedDictionary<RegBit,RegBit>()
-            (compiled_dag_circuit, layout) = try Mapping.swap_mapper(compiled_dag_circuit, coupling, initial_layout, trials: 20)
+            (compiled_dag_circuit, layout) = try Mapping.swap_mapper(compiled_dag_circuit, coupling, initial_layout, trials: 20, seed: 13)
             final_layout = layout
             SDKLogger.logInfo("final layout: \(SDKLogger.debugString(final_layout!))")
             // Expand swaps

@@ -893,12 +893,25 @@ class QuantumProgramTests: XCTestCase {
             try qc.cx(qr[0], qr[1])
             try qc.measure(qr[0], cr[0])
             try qc.measure(qr[1], cr[1])
-            let backend = "test"
+            let backend = "local_qasm_simulator"
             let coupling_map: [Int:[Int]]? = nil
-            let out = try QP_program.compile(["circuitName"], backend: backend,
-                                         coupling_map: coupling_map, qobj_id: "cooljob")
-            SDKLogger.logInfo(out)
-            XCTAssertEqual(out.count, 3)
+            let asyncExpectation = self.expectation(description: "test_compile_program")
+            QP_program.compile(["circuitName"],
+                                   backend: backend,
+                                   coupling_map: coupling_map,
+                                   qobj_id: "cooljob") { (out,error) in
+                if error != nil {
+                    XCTFail("Failure in test_compile_program: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                SDKLogger.logInfo(out)
+                XCTAssertEqual(out.count, 3)
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_compile_program")
+            })
         } catch {
             XCTFail("test_compile_program: \(error)")
         }
@@ -916,11 +929,27 @@ class QuantumProgramTests: XCTestCase {
             try qc.measure(qr[1], cr[1])
             let backend = "local_qasm_simulator"
             let coupling_map: [Int:[Int]]? = nil
-            let qobj = try QP_program.compile(["circuitName"], backend: backend,
-                                          coupling_map: coupling_map)
-            let result = try QP_program.get_compiled_configuration(qobj, "circuitName")
-            SDKLogger.logInfo(result)
-            XCTAssertEqual(result.count, 4)
+            let asyncExpectation = self.expectation(description: "test_get_compiled_configuration")
+            QP_program.compile(["circuitName"],
+                               backend: backend,
+                               coupling_map: coupling_map) { (qobj,error) in
+                if error != nil {
+                    XCTFail("Failure in test_get_compiled_configuration: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                do {
+                    let result = try QP_program.get_compiled_configuration(qobj, "circuitName")
+                    SDKLogger.logInfo(result)
+                    XCTAssertEqual(result.count, 4)
+                } catch {
+                    XCTFail("test_compile_program: \(error)")
+                }
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_get_compiled_configuration")
+            })
         } catch {
             XCTFail("test_compile_program: \(error)")
         }
@@ -938,11 +967,27 @@ class QuantumProgramTests: XCTestCase {
             try qc.measure(qr[1], cr[1])
             let backend = "local_qasm_simulator"
             let coupling_map: [Int:[Int]]? = nil
-            let qobj = try QP_program.compile(["circuitName"], backend: backend,
-                                              coupling_map: coupling_map)
-            let result = try QP_program.get_compiled_qasm(qobj, "circuitName")
-            SDKLogger.logInfo(result)
-            XCTAssertEqual(result.count, 167)
+            let asyncExpectation = self.expectation(description: "test_get_compiled_qasm")
+            QP_program.compile(["circuitName"],
+                              backend: backend,
+                              coupling_map: coupling_map) { (qobj,error) in
+                if error != nil {
+                    XCTFail("Failure in test_get_compiled_qasm: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                do {
+                    let result = try QP_program.get_compiled_qasm(qobj, "circuitName")
+                    SDKLogger.logInfo(result)
+                    XCTAssertEqual(result.count, 167)
+                } catch {
+                    XCTFail("test_get_compiled_qasm: \(error)")
+                }
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_get_compiled_qasm")
+            })
         } catch {
             XCTFail("test_get_compiled_qasm: \(error)")
         }
@@ -960,11 +1005,24 @@ class QuantumProgramTests: XCTestCase {
             try qc.measure(qr[1], cr[1])
             let backend = "local_qasm_simulator"
             let coupling_map: [Int:[Int]]? = nil
-            let qobj = try QP_program.compile(["circuitName"], backend: backend,
-                                          coupling_map: coupling_map, qobj_id: "cooljob")
-            let result = QP_program.get_execution_list(qobj)
-            SDKLogger.logInfo(result)
-            XCTAssertEqual(result, ["circuitName"])
+            let asyncExpectation = self.expectation(description: "test_get_execution_list")
+            QP_program.compile(["circuitName"],
+                               backend: backend,
+                               coupling_map: coupling_map,
+                               qobj_id: "cooljob") { (qobj,error) in
+                if error != nil {
+                    XCTFail("Failure in test_get_compiled_qasm: \(error!.localizedDescription)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                let result = QP_program.get_execution_list(qobj)
+                SDKLogger.logInfo(result)
+                XCTAssertEqual(result, ["circuitName"])
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_get_execution_list")
+            })
         } catch {
             XCTFail("test_get_execution_list: \(error)")
         }
@@ -989,24 +1047,32 @@ class QuantumProgramTests: XCTestCase {
                                                                    RegBit(("q", 1)): RegBit(("q", 1)),
                                                                    RegBit(("q", 2)): RegBit(("q", 2))]
             let circuits = ["circuitName"]
-            let qobj = try QP_program.compile(circuits, backend: backend,
-                                          coupling_map: coupling_map, initial_layout: initial_layout,
-                                          shots: shots, seed: 88)
             let asyncExpectation = self.expectation(description: "test_compile_coupling_map")
-            QP_program.run_async(qobj) { (result) in
-                do {
-                    if let error = result.get_error() {
+            QP_program.compile(circuits, backend: backend,
+                                              coupling_map: coupling_map,
+                                              initial_layout: initial_layout,
+                                              shots: shots,
+                                              seed: 88) { (qobj,error) in
+                if error != nil {
+                    XCTFail("Failure in test_compile_coupling_map: \(error!)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                QP_program.run_async(qobj) { (result) in
+                    do {
+                        if let error = result.get_error() {
+                            XCTFail("Failure in test_compile_coupling_map: \(error)")
+                            asyncExpectation.fulfill()
+                            return
+                        }
+                        let to_check = try QP_program.get_qasm("circuitName")
+                        XCTAssertEqual(to_check.count, 160)
+                        XCTAssertEqual(try result.get_counts("circuitName"), ["000": 518, "111": 506])
+                        asyncExpectation.fulfill()
+                    } catch {
                         XCTFail("Failure in test_compile_coupling_map: \(error)")
                         asyncExpectation.fulfill()
-                        return
                     }
-                    let to_check = try QP_program.get_qasm("circuitName")
-                    XCTAssertEqual(to_check.count, 160)
-                    XCTAssertEqual(try result.get_counts("circuitName"), ["000": 518, "111": 506])
-                    asyncExpectation.fulfill()
-                } catch {
-                    XCTFail("Failure in test_compile_coupling_map: \(error)")
-                    asyncExpectation.fulfill()
                 }
             }
             self.waitForExpectations(timeout: 180, handler: { (error) in
@@ -1034,88 +1100,116 @@ class QuantumProgramTests: XCTestCase {
             let shots = 1024  // the number of shots in the experiment.
             let backend = "local_qasm_simulator"
             var config: [String:Any] = ["seed": 10, "shots": 1, "xvals": [1, 2, 3, 4]]
-            var qobj1 = try QP_program.compile(circuits, backend: backend, config: config,
-                                               shots:shots, seed: 88)
-            guard var qobj1Circuits = qobj1["circuits"] as? [[String:Any]] else {
-                XCTFail("test_change_circuit_qobj_after_compile")
-                return
-            }
-            guard var circuitConfig = qobj1Circuits[0]["config"] as? [String:Any] else {
-                XCTFail("test_change_circuit_qobj_after_compile")
-                return
-            }
-            circuitConfig["shots"] = 50
-            circuitConfig["xvals"] = [1,1,1]
-            qobj1Circuits[0]["config"] = circuitConfig
-            qobj1["circuits"] = qobj1Circuits
-            config["shots"] = 1000
-            guard var xvals = config["xvals"] as? [Any] else {
-                XCTFail("test_change_circuit_qobj_after_compile")
-                return
-            }
-            xvals[0] = "only for qobj2"
-            config["xvals"] = xvals
-            let qobj2 = try QP_program.compile(circuits, backend: backend, config: config,
-                                               shots: shots, seed: 88)
-            if let q1Circuits = qobj1["circuits"] as? [[String:Any]] {
-                if let config0 = q1Circuits[0]["config"] as? [String:Any],
-                    let config1 = q1Circuits[1]["config"] as? [String:Any] {
-                    XCTAssert(config0["shots"] as! Int == 50)
-                    XCTAssert(config1["shots"] as! Int == 1)
-                    XCTAssert(config0["xvals"] as! [Int] == [1,1,1])
-                    XCTAssert(config1["xvals"] as! [Int] == [1,2,3,4])
-                }
-                else {
-                    XCTFail("test_change_circuit_qobj_after_compile")
+            let asyncExpectation = self.expectation(description: "test_change_circuit_qobj_after_compile")
+            QP_program.compile(circuits,
+                               backend: backend,
+                               config: config,
+                               shots:shots,
+                               seed: 88) { (q1,error) in
+                if error != nil {
+                    XCTFail("Failure in test_change_circuit_qobj_after_compile: \(error!)")
+                    asyncExpectation.fulfill()
                     return
                 }
-            }
-            else {
-                XCTFail("test_change_circuit_qobj_after_compile")
-                return
-            }
-            if let q1Config = qobj1["config"] as? [String:Any] {
-                XCTAssert(q1Config["shots"] as! Int == 1024)
-            }
-            else {
-                XCTFail("test_change_circuit_qobj_after_compile")
-                return
-            }
-            if let q2Circuits = qobj2["circuits"] as? [[String:Any]] {
-                if let config0 = q2Circuits[0]["config"] as? [String:Any],
-                    let config1 = q2Circuits[1]["config"] as? [String:Any] {
-                    XCTAssert(config0["shots"] as! Int == 1000)
-                    XCTAssert(config1["shots"] as! Int == 1000)
-                    if let xvals = config0["xvals"]  as? [Any] {
-                        XCTAssert(xvals[0] as! String == "only for qobj2")
-                        XCTAssert(xvals[1] as! Int == 2)
-                        XCTAssert(xvals[2] as! Int == 3)
-                        XCTAssert(xvals[3] as! Int == 4)
+                var qobj1 = q1
+                guard var qobj1Circuits = qobj1["circuits"] as? [[String:Any]] else {
+                    XCTFail("test_change_circuit_qobj_after_compile")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                guard var circuitConfig = qobj1Circuits[0]["config"] as? [String:Any] else {
+                    XCTFail("test_change_circuit_qobj_after_compile")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                circuitConfig["shots"] = 50
+                circuitConfig["xvals"] = [1,1,1]
+                qobj1Circuits[0]["config"] = circuitConfig
+                qobj1["circuits"] = qobj1Circuits
+                config["shots"] = 1000
+                guard var xvals = config["xvals"] as? [Any] else {
+                    XCTFail("test_change_circuit_qobj_after_compile")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                xvals[0] = "only for qobj2"
+                config["xvals"] = xvals
+                QP_program.compile(circuits,
+                                   backend: backend,
+                                   config: config,
+                                   shots: shots,
+                                   seed: 88) { (qobj2,error) in
+                    if error != nil {
+                        XCTFail("Failure in test_change_circuit_qobj_after_compile: \(error!)")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    if let q1Circuits = qobj1["circuits"] as? [[String:Any]] {
+                        if let config0 = q1Circuits[0]["config"] as? [String:Any],
+                            let config1 = q1Circuits[1]["config"] as? [String:Any] {
+                            XCTAssert(config0["shots"] as! Int == 50)
+                            XCTAssert(config1["shots"] as! Int == 1)
+                            XCTAssert(config0["xvals"] as! [Int] == [1,1,1])
+                            XCTAssert(config1["xvals"] as! [Int] == [1,2,3,4])
+                        }
+                        else {
+                            XCTFail("test_change_circuit_qobj_after_compile")
+                            asyncExpectation.fulfill()
+                            return
+                        }
                     }
                     else {
                         XCTFail("test_change_circuit_qobj_after_compile")
+                        asyncExpectation.fulfill()
                         return
                     }
-                    if let xvals = config1["xvals"] as? [Any] {
-                        XCTAssert(xvals[0] as! String == "only for qobj2")
-                        XCTAssert(xvals[1] as! Int == 2)
-                        XCTAssert(xvals[2] as! Int == 3)
-                        XCTAssert(xvals[3] as! Int == 4)
+                    if let q1Config = qobj1["config"] as? [String:Any] {
+                        XCTAssert(q1Config["shots"] as! Int == 1024)
                     }
                     else {
                         XCTFail("test_change_circuit_qobj_after_compile")
+                        asyncExpectation.fulfill()
                         return
                     }
-                }
-                else {
-                    XCTFail("test_change_circuit_qobj_after_compile")
-                    return
+                    if let q2Circuits = qobj2["circuits"] as? [[String:Any]] {
+                        if let config0 = q2Circuits[0]["config"] as? [String:Any],
+                            let config1 = q2Circuits[1]["config"] as? [String:Any] {
+                            XCTAssert(config0["shots"] as! Int == 1000)
+                            XCTAssert(config1["shots"] as! Int == 1000)
+                            if let xvals = config0["xvals"]  as? [Any] {
+                                XCTAssert(xvals[0] as! String == "only for qobj2")
+                                XCTAssert(xvals[1] as! Int == 2)
+                                XCTAssert(xvals[2] as! Int == 3)
+                                XCTAssert(xvals[3] as! Int == 4)
+                            }
+                            else {
+                                XCTFail("test_change_circuit_qobj_after_compile")
+                                asyncExpectation.fulfill()
+                                return
+                            }
+                            if let xvals = config1["xvals"] as? [Any] {
+                                XCTAssert(xvals[0] as! String == "only for qobj2")
+                                XCTAssert(xvals[1] as! Int == 2)
+                                XCTAssert(xvals[2] as! Int == 3)
+                                XCTAssert(xvals[3] as! Int == 4)
+                            }
+                            else {
+                                XCTFail("test_change_circuit_qobj_after_compile")
+                            }
+                        }
+                        else {
+                            XCTFail("test_change_circuit_qobj_after_compile")
+                        }
+                    }
+                    else {
+                        XCTFail("test_change_circuit_qobj_after_compile")
+                    }
+                    asyncExpectation.fulfill()
                 }
             }
-            else {
-                XCTFail("test_change_circuit_qobj_after_compile")
-                return
-            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_change_circuit_qobj_after_compile")
+            })
         } catch {
             XCTFail("test_change_circuit_qobj_after_compile: \(error)")
         }
@@ -1141,25 +1235,34 @@ class QuantumProgramTests: XCTestCase {
             let circuits = ["qc2", "qc3"]
             let shots = 1024  // the number of shots in the experiment.
             let backend = "local_qasm_simulator"
-            let qobj = try QP_program.compile(circuits, backend: backend, shots: shots, seed: 88)
             let asyncExpectation = self.expectation(description: "test_run_program")
-            QP_program.run_async(qobj) { (out) in
-                do {
-                    if let error = out.get_error() {
+            QP_program.compile(circuits,
+                               backend: backend,
+                               shots: shots,
+                               seed: 88) { (qobj,error) in
+                if error != nil {
+                    XCTFail("Failure in test_run_program: \(error!)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                QP_program.run_async(qobj) { (out) in
+                    do {
+                        if let error = out.get_error() {
+                            XCTFail("Failure in test_run_program: \(error)")
+                            asyncExpectation.fulfill()
+                            return
+                        }
+                        let results2 = try out.get_counts("qc2")
+                        let results3 = try out.get_counts("qc3")
+                        XCTAssertEqual(results2, ["000": 518, "111": 506])
+                        XCTAssertEqual(results3, ["001": 119, "111": 129, "110": 134,
+                                                  "100": 117, "000": 129, "101": 126,
+                                                  "010": 145, "011": 125])
+                        asyncExpectation.fulfill()
+                    } catch {
                         XCTFail("Failure in test_run_program: \(error)")
                         asyncExpectation.fulfill()
-                        return
                     }
-                    let results2 = try out.get_counts("qc2")
-                    let results3 = try out.get_counts("qc3")
-                    XCTAssertEqual(results2, ["000": 518, "111": 506])
-                    XCTAssertEqual(results3, ["001": 119, "111": 129, "110": 134,
-                                              "100": 117, "000": 129, "101": 126,
-                                              "010": 145, "011": 125])
-                    asyncExpectation.fulfill()
-                } catch {
-                    XCTFail("Failure in test_run_program: \(error)")
-                    asyncExpectation.fulfill()
                 }
             }
             self.waitForExpectations(timeout: 180, handler: { (error) in
@@ -1186,30 +1289,37 @@ class QuantumProgramTests: XCTestCase {
             let circuits = ["qc2", "qc3"]
             let shots = 1024  // the number of shots in the experiment.
             let backend = "local_qasm_simulator"
-            let qobj_list = [ try QP_program.compile(circuits, backend: backend, shots: shots, seed: 88),
-                              try QP_program.compile(circuits, backend: backend, shots: shots, seed: 88),
-                              try QP_program.compile(circuits, backend: backend, shots: shots, seed: 88),
-                              try QP_program.compile(circuits, backend: backend, shots: shots, seed: 88) ]
             let asyncExpectation = self.expectation(description: "test_run_batch")
-            QP_program.run_batch_async(qobj_list) { (results) in
-                do {
-                    for result in results {
-                        if let error = result.get_error() {
-                            XCTFail("Failure in test_run_batch: \(error)")
-                            asyncExpectation.fulfill()
-                            return
+            QP_program.compile(circuits,
+                               backend: backend,
+                               shots: shots,
+                               seed: 88) { (qobj,error) in
+                if error != nil {
+                    XCTFail("Failure in test_run_batch: \(error!)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                let qobj_list = [ qobj, qobj, qobj, qobj ]
+                QP_program.run_batch_async(qobj_list) { (results) in
+                    do {
+                        for result in results {
+                            if let error = result.get_error() {
+                                XCTFail("Failure in test_run_batch: \(error)")
+                                asyncExpectation.fulfill()
+                                return
+                            }
+                            let counts2 = try result.get_counts("qc2")
+                            let counts3 = try result.get_counts("qc3")
+                            XCTAssertEqual(counts2, ["000": 518, "111": 506])
+                            XCTAssertEqual(counts3, ["001": 119, "111": 129, "110": 134,
+                                                     "100": 117, "000": 129, "101": 126,
+                                                     "010": 145, "011": 125])
                         }
-                        let counts2 = try result.get_counts("qc2")
-                        let counts3 = try result.get_counts("qc3")
-                        XCTAssertEqual(counts2, ["000": 518, "111": 506])
-                        XCTAssertEqual(counts3, ["001": 119, "111": 129, "110": 134,
-                                                 "100": 117, "000": 129, "101": 126,
-                                                 "010": 145, "011": 125])
+                        asyncExpectation.fulfill()
+                    } catch {
+                        XCTFail("Failure in test_run_batch: \(error)")
+                        asyncExpectation.fulfill()
                     }
-                    asyncExpectation.fulfill()
-                } catch {
-                    XCTFail("Failure in test_run_batch: \(error)")
-                    asyncExpectation.fulfill()
                 }
             }
             self.waitForExpectations(timeout: 180, handler: { (error) in
@@ -1443,27 +1553,33 @@ class QuantumProgramTests: XCTestCase {
             try PlaquetteCheck.QASM.write(toFile: self.QASM_FILE_PATH_2, atomically: true, encoding: .utf8)
             try QP_program.load_qasm_file(self.QASM_FILE_PATH_2, name: "circuit-dev")
             let circuits = ["circuit-dev"]
-            let qobj = try QP_program.compile(circuits,
-                                      backend: backend,
-                                      coupling_map: coupling_map,
-                                      initial_layout: initial_layout,
-                                      shots: shots,
-                                      max_credits: max_credits,
-                                      seed: 65)
             let asyncExpectation = self.expectation(description: "test_run_program_map")
-            QP_program.run_async(qobj) { result in
-                do {
-                    if let error = result.get_error() {
+            QP_program.compile(circuits,
+                              backend: backend,
+                              coupling_map: coupling_map,
+                              initial_layout: initial_layout,
+                              shots: shots,
+                              max_credits: max_credits,
+                              seed: 65) { (qobj,error) in
+                if error != nil {
+                    XCTFail("Failure in test_run_program_map: \(error!)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                QP_program.run_async(qobj) { result in
+                    do {
+                        if let error = result.get_error() {
+                            XCTFail("Failure in test_run_program_map: \(error)")
+                            asyncExpectation.fulfill()
+                            return
+                        }
+                        let counts = try result.get_counts("circuit-dev")
+                        XCTAssertEqual(counts, ["10010": 100])
+                        asyncExpectation.fulfill()
+                    } catch {
                         XCTFail("Failure in test_run_program_map: \(error)")
                         asyncExpectation.fulfill()
-                        return
                     }
-                    let counts = try result.get_counts("circuit-dev")
-                    XCTAssertEqual(counts, ["10010": 100])
-                    asyncExpectation.fulfill()
-                } catch {
-                    XCTFail("Failure in test_run_program_map: \(error)")
-                    asyncExpectation.fulfill()
                 }
             }
             self.waitForExpectations(timeout: 180, handler: { (error) in
@@ -2016,33 +2132,52 @@ class QuantumProgramTests: XCTestCase {
             try bell.barrier()
             try bell.measure(q[0], c[0])
             try bell.measure(q[1], c[1])
-            let bellobj = try qp.compile(["bell"], backend:"local_qasm_simulator", shots:2048, seed:10)
-            let ghzobj = try qp.compile(["ghz"], backend:"local_qasm_simulator", coupling_map: coupling_map, shots:2048, seed: 10)
             let asyncExpectation = self.expectation(description: "test_example_multiple_compile")
-            qp.run_async(bellobj) { (bellresult) in
-                if let error = bellresult.get_error() {
-                    XCTFail("Failure in test_example_multiple_compile: \(error)")
-                    asyncExpectation.fulfill()
-                    return
-                }
-                qp.run_async(ghzobj) { (ghzresult) in
-                    do {
-                        if let error = ghzresult.get_error() {
-                            XCTFail("Failure in test_example_multiple_compile: \(error)")
+            qp.compile(["bell"],
+                     backend:"local_qasm_simulator",
+                     shots:2048,
+                     seed:10) { (bellobj,error) in
+                    if error != nil {
+                        XCTFail("Failure in test_example_multiple_compile: \(error!)")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    qp.compile(["ghz"],
+                                backend:"local_qasm_simulator",
+                                coupling_map: coupling_map,
+                                shots:2048,
+                                seed: 10) { (ghzobj,error) in
+                        if error != nil {
+                            XCTFail("Failure in test_example_multiple_compile: \(error!)")
                             asyncExpectation.fulfill()
                             return
                         }
-                        let bell = try bellresult.get_counts("bell")
-                        SDKLogger.logInfo(bell)
-                        let ghz = try ghzresult.get_counts("ghz")
-                        SDKLogger.logInfo(ghz)
-                        XCTAssertEqual(bell,["00000": 1034, "00011": 1014])
-                        XCTAssertEqual(ghz,["00000": 1047, "11111": 1001])
-                        asyncExpectation.fulfill()
-                    } catch {
-                        XCTFail("Failure in test_example_multiple_compile: \(error)")
-                        asyncExpectation.fulfill()
-                    }
+                        qp.run_async(bellobj) { (bellresult) in
+                            if let error = bellresult.get_error() {
+                                XCTFail("Failure in test_example_multiple_compile: \(error)")
+                                asyncExpectation.fulfill()
+                                return
+                            }
+                            qp.run_async(ghzobj) { (ghzresult) in
+                                do {
+                                    if let error = ghzresult.get_error() {
+                                        XCTFail("Failure in test_example_multiple_compile: \(error)")
+                                        asyncExpectation.fulfill()
+                                        return
+                                    }
+                                    let bell = try bellresult.get_counts("bell")
+                                    SDKLogger.logInfo(bell)
+                                    let ghz = try ghzresult.get_counts("ghz")
+                                    SDKLogger.logInfo(ghz)
+                                    XCTAssertEqual(bell,["00000": 1034, "00011": 1014])
+                                    XCTAssertEqual(ghz,["00000": 1047, "11111": 1001])
+                                    asyncExpectation.fulfill()
+                                } catch {
+                                    XCTFail("Failure in test_example_multiple_compile: \(error)")
+                                    asyncExpectation.fulfill()
+                                }
+                            }
+                        }
                 }
             }
             self.waitForExpectations(timeout: 180, handler: { (error) in
@@ -2368,63 +2503,73 @@ class QuantumProgramTests: XCTestCase {
             let shots = 1024  // the number of shots in the experiment.
             let backend = "local_qasm_simulator"
             let test_config = ["0": 0, "1": 1]
-            var qobj = try QP_program.compile(["qc2"], backend:backend, config:test_config, shots:shots)
             let asyncExpectation = self.expectation(description: "test_reconfig")
-            QP_program.run_async(qobj) { out in
-                do {
-                    if let error = out.get_error() {
-                        XCTFail("Failure in test_reconfig: \(error)")
-                        asyncExpectation.fulfill()
-                        return
-                    }
-                    let results = try out.get_counts("qc2")
-                    // change the number of shots and re-run to test if the reconfig does not break
-                    // the ability to run the qobj
-                    qobj = QP_program.reconfig(qobj, shots: 2048)
-                    QP_program.run_async(qobj) { out2 in
-                        do {
-                            if let error = out2.get_error() {
-                                XCTFail("Failure in test_reconfig: \(error)")
-                                asyncExpectation.fulfill()
-                                return
-                            }
-                            let results2 = try out2.get_counts("qc2")
-                            XCTAssertEqual(results, ["000": 1024])
-                            XCTAssertEqual(results2, ["000": 2048])
-
-                            // change backend
-                            qobj = QP_program.reconfig(qobj, backend: "local_unitary_simulator")
-                            if let config = qobj["config"] as? [String:Any] {
-                                XCTAssertEqual(config["backend"] as? String, "local_unitary_simulator")
-                            }
-                            // change maxcredits
-                            qobj = QP_program.reconfig(qobj, max_credits: 11)
-                            if let config = qobj["config"] as? [String:Any] {
-                                XCTAssertEqual(config["max_credits"] as? Int, 11)
-                            }
-                            //change seed
-                            qobj = QP_program.reconfig(qobj, seed: 11)
-                            if let circuits = qobj["circuits"] as? [[String:Any]] {
-                                XCTAssertEqual(circuits[0]["seed"] as? Int, 11)
-                            }
-                            // change the config
-                            let test_config_2 = ["0": 2]
-                            qobj = QP_program.reconfig(qobj, config: test_config_2)
-                            if let circuits = qobj["circuits"] as? [[String:Any]] {
-                                if let config = circuits[0]["config"] as? [String:Any] {
-                                    XCTAssertEqual(config["0"] as? Int, 2)
-                                    XCTAssertEqual(config["1"] as? Int, 1)
-                                }
-                            }
-                            asyncExpectation.fulfill()
-                        } catch {
+            QP_program.compile(["qc2"],
+                               backend:backend,
+                               config:test_config,
+                               shots:shots) { (q,error) in
+                if  error != nil {
+                    XCTFail("Failure in test_reconfig: \(error!)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                var qobj = q
+                QP_program.run_async(qobj) { out in
+                    do {
+                        if let error = out.get_error() {
                             XCTFail("Failure in test_reconfig: \(error)")
                             asyncExpectation.fulfill()
+                            return
                         }
+                        let results = try out.get_counts("qc2")
+                        // change the number of shots and re-run to test if the reconfig does not break
+                        // the ability to run the qobj
+                        qobj = QP_program.reconfig(qobj, shots: 2048)
+                        QP_program.run_async(qobj) { out2 in
+                            do {
+                                if let error = out2.get_error() {
+                                    XCTFail("Failure in test_reconfig: \(error)")
+                                    asyncExpectation.fulfill()
+                                    return
+                                }
+                                let results2 = try out2.get_counts("qc2")
+                                XCTAssertEqual(results, ["000": 1024])
+                                XCTAssertEqual(results2, ["000": 2048])
+
+                                // change backend
+                                qobj = QP_program.reconfig(qobj, backend: "local_unitary_simulator")
+                                if let config = qobj["config"] as? [String:Any] {
+                                    XCTAssertEqual(config["backend"] as? String, "local_unitary_simulator")
+                                }
+                                // change maxcredits
+                                qobj = QP_program.reconfig(qobj, max_credits: 11)
+                                if let config = qobj["config"] as? [String:Any] {
+                                    XCTAssertEqual(config["max_credits"] as? Int, 11)
+                                }
+                                //change seed
+                                qobj = QP_program.reconfig(qobj, seed: 11)
+                                if let circuits = qobj["circuits"] as? [[String:Any]] {
+                                    XCTAssertEqual(circuits[0]["seed"] as? Int, 11)
+                                }
+                                // change the config
+                                let test_config_2 = ["0": 2]
+                                qobj = QP_program.reconfig(qobj, config: test_config_2)
+                                if let circuits = qobj["circuits"] as? [[String:Any]] {
+                                    if let config = circuits[0]["config"] as? [String:Any] {
+                                        XCTAssertEqual(config["0"] as? Int, 2)
+                                        XCTAssertEqual(config["1"] as? Int, 1)
+                                    }
+                                }
+                                asyncExpectation.fulfill()
+                            } catch {
+                                XCTFail("Failure in test_reconfig: \(error)")
+                                asyncExpectation.fulfill()
+                            }
+                        }
+                    } catch {
+                        XCTFail("Failure in test_reconfig: \(error)")
+                        asyncExpectation.fulfill()
                     }
-                } catch {
-                    XCTFail("Failure in test_reconfig: \(error)")
-                    asyncExpectation.fulfill()
                 }
             }
             self.waitForExpectations(timeout: 180, handler: { (error) in
@@ -2448,22 +2593,31 @@ class QuantumProgramTests: XCTestCase {
             let circuits = ["qc2"]
             let shots = 1024  // the number of shots in the experiment.
             let backend = "local_qasm_simulator"
-            let qobj = try QP_program.compile(circuits, backend: backend, shots: shots, seed: 88)
             let asyncExpectation = self.expectation(description: "test_timeout")
-            QP_program.run_async(qobj, timeout: 0) { out in
-                guard let error = out.get_error() else {
-                    XCTFail("test_timeout should have failed.")
+            QP_program.compile(circuits,
+                               backend: backend,
+                               shots: shots,
+                               seed: 88) { (qobj,error) in
+                if  error != nil {
+                    XCTFail("Failure in test_timeout: \(error!)")
                     asyncExpectation.fulfill()
                     return
                 }
-                switch error {
-                case QISKitError.jobTimeout(_):
-                    SDKLogger.logInfo(error.localizedDescription)
-                    break
-                default:
-                    XCTFail("test_offline: \(error)")
+                QP_program.run_async(qobj, timeout: 0) { out in
+                    guard let error = out.get_error() else {
+                        XCTFail("test_timeout should have failed.")
+                        asyncExpectation.fulfill()
+                        return
+                    }
+                    switch error {
+                    case QISKitError.jobTimeout(_):
+                        SDKLogger.logInfo(error.localizedDescription)
+                        break
+                    default:
+                        XCTFail("test_offline: \(error)")
+                    }
+                    asyncExpectation.fulfill()
                 }
-                asyncExpectation.fulfill()
             }
             self.waitForExpectations(timeout: 180, handler: { (error) in
                 XCTAssertNil(error, "Failure in test_timeout")

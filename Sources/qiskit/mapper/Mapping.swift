@@ -63,7 +63,9 @@ final class Mapping {
                                   _ layout: OrderedDictionary<RegBit,RegBit>,
                                   _ qubit_subset: [RegBit],
                                   _ coupling: Coupling,
-                                  _ trials: Int) throws -> (Bool, String?, Int?, OrderedDictionary<RegBit,RegBit>?, Bool) {
+                                  _ trials: Int,
+                                  _ seed: Int? = nil) throws -> (Bool, String?, Int?, OrderedDictionary<RegBit,RegBit>?, Bool) {
+        let random = Random(seed != nil ? seed! : time(nil))
         SDKLogger.logDebug("layer_permutation: ----- enter -----")
         SDKLogger.logDebug("layer_permutation: layer_partition = \(SDKLogger.debugString(layer_partition))")
         SDKLogger.logDebug("layer_permutation: layout = \(SDKLogger.debugString(layout))")
@@ -116,7 +118,7 @@ final class Mapping {
             }
             for i in coupling.get_qubits() {
                 for j in coupling.get_qubits() {
-                    let scale: Double = 1.0 + Random(time(nil)).normal(mean: 0.0, standardDeviation: 1.0 / Double(n))
+                    let scale: Double = 1.0 + random.normal(mean: 0.0, standardDeviation: 1.0 / Double(n))
                     xi[i]![j] = scale * pow(Double(try coupling.distance(i, j)),2)
                     xi[j]![i] = xi[i]![j]
                 }
@@ -348,7 +350,8 @@ final class Mapping {
                             _ coupling_graph: Coupling,
                             _ init_layout: OrderedDictionary<RegBit,RegBit>? = nil,
                             _ b: String = "cx,u1,u2,u3,id",
-                            trials: Int = 20) throws -> (DAGCircuit, OrderedDictionary<RegBit,RegBit>) {
+                            trials: Int = 20,
+                            seed: Int? = nil) throws -> (DAGCircuit, OrderedDictionary<RegBit,RegBit>) {
         if circuit_graph.width() > coupling_graph.size() {
             throw MappingError.errorQubitsCouplingGraph
         }
@@ -409,7 +412,7 @@ final class Mapping {
         for (i,layer) in layerlist.enumerated() {
             // Attempt to find a permutation for this layer
             let (success_flag, best_circ, best_d, best_layout, trivial_flag) =
-                try Mapping.layer_permutation(layer.partition, layout, qubit_subset, coupling_graph, trials)
+                try Mapping.layer_permutation(layer.partition, layout, qubit_subset, coupling_graph, trials, seed)
             SDKLogger.logDebug("swap_mapper: layer: \(i)")
             SDKLogger.logDebug("swap_mapper: success_flag=\(success_flag),best_d=\(best_d ?? 0),trivial_flag=\(trivial_flag)")
 
@@ -430,7 +433,7 @@ final class Mapping {
                 for (j,serial_layer) in serial_layerlist.enumerated() {
                     let (success_flag, best_circ, best_d, best_layout, trivial_flag) =
                             try Mapping.layer_permutation(serial_layer.partition,
-                                                          layout, qubit_subset, coupling_graph,trials)
+                                                          layout, qubit_subset, coupling_graph,trials,seed)
                     SDKLogger.logDebug("swap_mapper: layer \(i), sublayer \(j)")
                     SDKLogger.logDebug("swap_mapper: success_flag=\(success_flag),best_d=\(best_d ?? 0),trivial_flag=\(trivial_flag)")
 
@@ -683,7 +686,7 @@ final class Mapping {
      */
     static func optimize_1q_gates(_ circuit: DAGCircuit) throws -> DAGCircuit {
         let qx_basis = ["u1", "u2", "u3", "cx", "id"]
-        let urlr = try Unroller(Qasm(data: circuit.qasm(qeflag: true)).parse(), DAGBackend(qx_basis))
+        let urlr = try Unroller(Qasm(data: circuit.qasm()).parse(), DAGBackend(qx_basis))
         let unrolled = try urlr.execute() as! DAGCircuit
        
         let runs = try unrolled.collect_runs(["u1", "u2", "u3", "id"])
@@ -745,6 +748,10 @@ final class Mapping {
                     //    u3(pi - lambda1 - phi2, phi1 + pi/2, lambda2 + pi/2)
                     right_name = "u3"
                     right_parameters = (SymbolicValue.pi - left_parameters.2 - right_parameters.1, left_parameters.1 + SymbolicValue.pi / 2.0, right_parameters.2 + SymbolicValue.pi / 2)
+                }
+                else if name_tuple.1 == "nop" {
+                    right_name = left_name
+                    right_parameters = left_parameters
                 }
                 else {
                     // For composing u3's or u2's with u3's, use
