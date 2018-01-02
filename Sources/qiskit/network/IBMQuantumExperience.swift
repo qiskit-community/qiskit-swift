@@ -839,35 +839,35 @@ public final class IBMQuantumExperience {
                         access_token: String? = nil,
                         user_id: String? = nil,
                         responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
-        return self.run_jobInternal(qasms,
-                                    backend,
-                                    shots,
-                                    maxCredits,
-                                    seed,
-                                    hub,
-                                    group,
-                                    project,
-                                    hpc,
-                                    access_token,
-                                    user_id) { (res,error) in
+        return self.run_jobInternal(qasms: qasms,
+                                    backend: backend,
+                                    shots: shots,
+                                    maxCredits: maxCredits,
+                                    seed: seed,
+                                    hub: hub,
+                                    group: group,
+                                    project: project,
+                                    hpc: hpc,
+                                    access_token: access_token,
+                                    user_id: user_id) { (res,error) in
             DispatchQueue.main.async {
                 responseHandler(res,error)
             }
         }
     }
 
-    private func run_jobInternal(_ qasms: [[String:Any]],
-                                 _ backend: String,
-                                 _ shots: Int,
-                                 _ maxCredits: Int?,
-                                 _ seed: Int?,
-                                 _ hub: String?,
-                                 _ group: String?,
-                                 _ project: String?,
-                                 _ hpc: [String:Any]?,
-                                 _ access_token: String?,
-                                 _ user_id: String?,
-                                 _ responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+    func run_jobInternal(qasms: [[String:Any]],
+                         backend: String,
+                         shots: Int,
+                         maxCredits: Int?,
+                         seed: Int?,
+                         hub: String?,
+                         group: String?,
+                         project: String?,
+                         hpc: [String:Any]?,
+                         access_token: String?,
+                         user_id: String?,
+                         responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.getRequest() { (req,error) -> Void in
             if error != nil {
@@ -959,25 +959,25 @@ public final class IBMQuantumExperience {
                         access_token: String? = nil,
                         user_id: String? = nil,
                         responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
-        return self.get_jobInternal(jobId,
-                                    hub,
-                                    group,
-                                    project,
-                                    access_token,
-                                    user_id) { (res,error) in
+        return self.get_jobInternal(jobId: jobId,
+                                    hub: hub,
+                                    group: group,
+                                    project: project,
+                                    access_token: access_token,
+                                    user_id: user_id) { (res,error) in
             DispatchQueue.main.async {
                 responseHandler(res,error)
             }
         }
     }
 
-    private func get_jobInternal(_ jobId: String,
-                                 _ hub: String?,
-                                 _ group: String?,
-                                 _ project: String?,
-                                 _ access_token: String?,
-                                 _ user_id: String?,
-                                 _ responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
+    func get_jobInternal(jobId: String,
+                         hub: String?,
+                         group: String?,
+                         project: String?,
+                         access_token: String?,
+                         user_id: String?,
+                         responseHandler: @escaping ((_:[String:Any], _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
         let r = self.getRequest() { (req,error) -> Void in
             if error != nil {

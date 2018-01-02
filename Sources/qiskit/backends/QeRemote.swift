@@ -121,12 +121,17 @@ final class QeRemote: BaseBackend {
                     }
                 }
             }
-            let r = self.api!.run_job(qasms: api_jobs,
+            let r = self.api!.run_jobInternal(qasms: api_jobs,
                                       backend: backend,
                                       shots: shots,
                                       maxCredits: max_credits,
                                       seed: seed0,
-                                      hpc: hpc) { (output, error) -> Void in
+                                      hub: nil,
+                                      group: nil,
+                                      project: nil,
+                                      hpc: hpc,
+                                      access_token: nil,
+                                      user_id: nil) { (output, error) -> Void in
                 if error != nil {
                     response(Result("0",error!,q_job.qobj))
                     return
@@ -251,7 +256,12 @@ final class QeRemote: BaseBackend {
     private static func wait_for_job(_ api: IBMQuantumExperience, _ jobid: String, _ wait: Int, _ timeout: Int, _ elapsed: Int,
                                      _ responseHandler: @escaping ((_:[String:Any], _:Error?) -> Void)) -> RequestTask {
         let reqTask = RequestTask()
-        let r =  api.get_job(jobId: jobid) { (jobResult, error) -> Void in
+        let r =  api.get_jobInternal(jobId: jobid,
+                                     hub: nil,
+                                     group: nil,
+                                     project: nil,
+                                     access_token: nil,
+                                     user_id: nil) { (jobResult, error) -> Void in
             if error != nil {
                 responseHandler([:], error!)
                 return
@@ -282,7 +292,7 @@ final class QeRemote: BaseBackend {
                 responseHandler([:], QISKitError.jobTimeout(timeout: timeout))
                 return
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(wait)) {
+            DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + .seconds(wait)) {
                 SDKLogger.logInfo("status = \(status) (\(elapsed+wait) seconds)")
                 let r = wait_for_job(api,jobid, wait, timeout, elapsed + wait, responseHandler)
                 reqTask.add(r)
