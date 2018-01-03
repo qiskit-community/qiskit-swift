@@ -90,7 +90,9 @@ class QuantumProgramTests: XCTestCase {
         ("test_qubitpol",test_qubitpol),
         ("test_ccx",test_ccx),
         ("test_reconfig",test_reconfig),
-        ("test_timeout",test_timeout)
+        ("test_timeout",test_timeout),
+        ("test_hpc_parameter_is_correct",test_hpc_parameter_is_correct),
+        ("test_hpc_parameter_is_incorrect",test_hpc_parameter_is_incorrect)
     ]
 
     private var QE_TOKEN: String? = nil
@@ -2624,6 +2626,87 @@ class QuantumProgramTests: XCTestCase {
             })
         } catch {
             XCTFail("test_timeout: \(error)")
+        }
+    }
+
+    func test_hpc_parameter_is_correct() {
+        guard let token = self.QE_TOKEN else {
+            print("Set environment variable QE_TOKEN to execute this method")
+            return
+        }
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            let qr = try QP_program.get_quantum_register("qname")
+            let cr = try QP_program.get_classical_register("cname")
+            let qc2 = try QP_program.create_circuit("qc2", [qr], [cr])
+            try qc2.h(qr[0])
+            try qc2.cx(qr[0], qr[1])
+            try  qc2.cx(qr[0], qr[2])
+            try qc2.measure(qr, cr)
+            let circuits = ["qc2"]
+            let shots = 1  // the number of shots in the experiment.
+            let backend = "ibmqx_hpc_qasm_simulator"
+            QP_program.set_api(token:token, url:QE_URL)
+            let asyncExpectation = self.expectation(description: "test_hpc_parameter_is_correct")
+            QP_program.compile(circuits,
+                               backend: backend,
+                               shots: shots,
+                               seed: 88,
+                               hpc: ["multi_shot_optimization": true, "omp_num_threads": 16]) { (qobj,error) in
+                if  error != nil {
+                    XCTFail("Failure in test_hpc_parameter_is_correct: \(error!)")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                SDKLogger.logInfo(qobj.description)
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_hpc_parameter_is_correct")
+            })
+        } catch {
+            XCTFail("test_hpc_parameter_is_correct: \(error)")
+        }
+    }
+
+    func test_hpc_parameter_is_incorrect() {
+        do {
+            let QP_program = try QuantumProgram(specs: self.QPS_SPECS)
+            let qr = try QP_program.get_quantum_register("qname")
+            let cr = try QP_program.get_classical_register("cname")
+            let qc2 = try QP_program.create_circuit("qc2", [qr], [cr])
+            try qc2.h(qr[0])
+            try qc2.cx(qr[0], qr[1])
+            try qc2.cx(qr[0], qr[2])
+            try qc2.measure(qr, cr)
+            let circuits = ["qc2"]
+            let shots = 1  // the number of shots in the experiment.
+            let backend = "ibmqx_hpc_qasm_simulator"
+            let asyncExpectation = self.expectation(description: "test_hpc_parameter_is_incorrect")
+            QP_program.compile(circuits,
+                               backend: backend,
+                               shots: shots,
+                               seed: 88,
+                               hpc: ["invalid_key": NSNull()]) { (qobj,error) in
+                guard let e = error else {
+                    XCTFail("test_hpc_parameter_is_incorrect should have failed.")
+                    asyncExpectation.fulfill()
+                    return
+                }
+                switch e {
+                case QISKitError.unknownHPC:
+                    SDKLogger.logInfo(e.localizedDescription)
+                    break
+                default:
+                    XCTFail("test_hpc_parameter_is_incorrect: \(e)")
+                }
+                asyncExpectation.fulfill()
+            }
+            self.waitForExpectations(timeout: 180, handler: { (error) in
+                XCTAssertNil(error, "Failure in test_hpc_parameter_is_incorrect")
+            })
+        } catch {
+            XCTFail("test_hpc_parameter_is_incorrect: \(error)")
         }
     }
 }
