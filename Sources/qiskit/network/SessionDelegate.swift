@@ -30,21 +30,33 @@ final class SessionDelegate : NSObject, URLSessionDelegate {
         guard let username = self.credentials.ntlm_credentials["username"],
             let password = self.credentials.ntlm_credentials["password"] else {
             SDKLogger.logInfo("Challenge missing username password")
-            challenge.sender?.performDefaultHandling?(for: challenge)
+            #if os(Linux)
+                challenge.sender?.performDefaultHandling(for: challenge)
+            #else
+                challenge.sender?.performDefaultHandling?(for: challenge)
+            #endif
             completionHandler(.performDefaultHandling, nil)
             return
         }
 
         guard challenge.previousFailureCount == 0 else {
             SDKLogger.logInfo("Challeng too many failures")
-            challenge.sender?.performDefaultHandling?(for: challenge)
+            #if os(Linux)
+                challenge.sender?.performDefaultHandling(for: challenge)
+            #else
+                challenge.sender?.performDefaultHandling?(for: challenge)
+            #endif
             completionHandler(.performDefaultHandling, nil)
             return
         }
 
         guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodNTLM else {
             SDKLogger.logInfo("Unknown authentication method \(challenge.protectionSpace.authenticationMethod)")
-            challenge.sender?.performDefaultHandling?(for: challenge)
+            #if os(Linux)
+                challenge.sender?.performDefaultHandling(for: challenge)
+            #else
+                challenge.sender?.performDefaultHandling?(for: challenge)
+            #endif
             completionHandler(.performDefaultHandling, nil)
             return
         }
