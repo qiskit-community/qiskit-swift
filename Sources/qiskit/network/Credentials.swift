@@ -24,7 +24,8 @@ public final class Credentials {
      Configuration to connect with QX Platform
      */
     var config: [String:Any] = Credentials.config_base
-    private(set) var proxies: [String] = []
+    private(set) var proxy_urls: [String] = []
+    private(set) var ntlm_credentials: [String:String] = [:]
     private let token_unique: String?
     private(set) var data_credentials: [String:Any] = [:]
 
@@ -34,15 +35,38 @@ public final class Credentials {
     init(_ token: String?,
          _ config: [String:Any]? = nil) {
         self.token_unique = token
+
+        //# Set the proxy information, if present, from the configuration,
+        //# with the following format:
+        //# config = {
+        //#     'proxies': {
+        //#         # If using 'urls', assume basic auth or no auth.
+        //#         'urls': {
+        //#             'http': 'http://user:password@1.2.3.4:5678',
+        //#             'https': 'http://user:password@1.2.3.4:5678',
+        //#         }
+        //#         # If using 'ntlm', assume NTLM authentication.
+        //#         'username_ntlm': 'domain\\username',
+        //#         'password_ntlm': 'password'
+        //#     }
+        //# }
         if let c = config {
             self.config = c
             let u = self.config["url"] as? String
             if u == nil {
                 self.config["url"] = Credentials.config_base["url"]
             }
+            // Set the basic proxy settings, if present.
             if let p = self.config["proxies"] as? [String:Any] {
                 if let urls = p["urls"] as? [String] {
-                    self.proxies = urls
+                    self.proxy_urls = urls
+                }
+                if let username = p["username_ntlm"] as? String,
+                    let password = p["password_ntlm"] as? String {
+                    self.ntlm_credentials = [
+                        "username": username,
+                        "password": password
+                    ]
                 }
             }
         }

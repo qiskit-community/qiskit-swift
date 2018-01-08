@@ -16,6 +16,8 @@
 		6903E0A81FC317B3007C1C60 /* Matrix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6903E0A61FC317B3007C1C60 /* Matrix.swift */; };
 		6903E0AA1FC3213E007C1C60 /* NumericType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6903E0A91FC3213E007C1C60 /* NumericType.swift */; };
 		6903E0AB1FC3213E007C1C60 /* NumericType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6903E0A91FC3213E007C1C60 /* NumericType.swift */; };
+		690B8C0A2003C74700126A13 /* SessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 690B8C092003C74700126A13 /* SessionDelegate.swift */; };
+		690B8C0B2003C75600126A13 /* SessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 690B8C092003C74700126A13 /* SessionDelegate.swift */; };
 		690BDBF91FE2331100C44210 /* SymbolicValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C583161FE1A9A5008709E4 /* SymbolicValue.swift */; };
 		6932A9F01FB9F50400382CF7 /* BaseBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932A9E81FB9F50400382CF7 /* BaseBackend.swift */; };
 		6932A9F11FB9F50400382CF7 /* QasmCppSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6932A9E91FB9F50400382CF7 /* QasmCppSimulator.swift */; };
@@ -351,6 +353,7 @@
 		6902B60D1FECC1AD006DC52F /* Vector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Vector.swift; path = Sources/qiskit/datastructures/Vector.swift; sourceTree = SOURCE_ROOT; };
 		6903E0A61FC317B3007C1C60 /* Matrix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Matrix.swift; path = Sources/qiskit/datastructures/Matrix.swift; sourceTree = SOURCE_ROOT; };
 		6903E0A91FC3213E007C1C60 /* NumericType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NumericType.swift; path = Sources/qiskit/datastructures/NumericType.swift; sourceTree = SOURCE_ROOT; };
+		690B8C092003C74700126A13 /* SessionDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SessionDelegate.swift; path = Sources/qiskit/network/SessionDelegate.swift; sourceTree = SOURCE_ROOT; };
 		6932A9E81FB9F50400382CF7 /* BaseBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BaseBackend.swift; path = Sources/qiskit/backends/BaseBackend.swift; sourceTree = SOURCE_ROOT; };
 		6932A9E91FB9F50400382CF7 /* QasmCppSimulator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QasmCppSimulator.swift; path = Sources/qiskit/backends/QasmCppSimulator.swift; sourceTree = SOURCE_ROOT; };
 		6932A9EA1FB9F50400382CF7 /* QasmSimulator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QasmSimulator.swift; path = Sources/qiskit/backends/QasmSimulator.swift; sourceTree = SOURCE_ROOT; };
@@ -579,6 +582,7 @@
 				6932AB021FB9F88800382CF7 /* IBMQuantumExperienceError.swift */,
 				6932AB011FB9F88800382CF7 /* Request.swift */,
 				69CE4C4F1FC0816D0089A425 /* RequestTask.swift */,
+				690B8C092003C74700126A13 /* SessionDelegate.swift */,
 			);
 			name = network;
 			path = qiskit;
@@ -1160,6 +1164,7 @@
 				6932AAA61FB9F72400382CF7 /* Coupling.swift in Sources */,
 				6932AA261FB9F5C500382CF7 /* Complex.swift in Sources */,
 				6932AA2C1FB9F5D600382CF7 /* Random.swift in Sources */,
+				690B8C0B2003C75600126A13 /* SessionDelegate.swift in Sources */,
 				6932AB0B1FB9F89100382CF7 /* IBMQuantumExperienceError.swift in Sources */,
 				6932A9FE1FB9F52800382CF7 /* SimulatorTools.swift in Sources */,
 				6932AAC11FB9F78800382CF7 /* PrinterBackend.swift in Sources */,
@@ -1309,6 +1314,7 @@
 				6932AAE11FB9F7C200382CF7 /* Instruction.swift in Sources */,
 				6932AAD71FB9F7C200382CF7 /* Measure.swift in Sources */,
 				6932AAA11FB9F71700382CF7 /* MappingError.swift in Sources */,
+				690B8C0A2003C74700126A13 /* SessionDelegate.swift in Sources */,
 				6932AA7B1FB9F69300382CF7 /* U1.swift in Sources */,
 				6932AA251FB9F5B200382CF7 /* String+Random.swift in Sources */,
 				6932AB061FB9F88800382CF7 /* Request.swift in Sources */,

@@ -26,15 +26,18 @@ final class Request {
     private static let HEADER_CLIENT_APPLICATION = "x-qx-client-application"
     private static let _max_qubit_error_re = ".*registers exceed the number of qubits, it can't be greater than (\\d+).*"
 
-    let credentials: Credentials
+    private let sessionDelegate: SessionDelegate
     private var urlSession: URLSession
     private let retries: UInt
     private let timeout_interval: Double
+    var credentials: Credentials {
+        return self.sessionDelegate.credentials
+    }
 
     init(_ credentials: Credentials,
          _ retries: UInt = 5,
          _ timeout_interval: TimeInterval = 1.0) throws {
-        self.credentials = credentials
+        self.sessionDelegate = SessionDelegate(credentials)
         self.retries = retries
         self.timeout_interval = timeout_interval
         #if os(Linux)
@@ -63,9 +66,9 @@ final class Request {
         sessionConfig.allowsCellularAccess = true
         sessionConfig.timeoutIntervalForRequest = Request.REACHTIMEOUT
         sessionConfig.timeoutIntervalForResource = Request.CONNTIMEOUT
-        if !self.credentials.proxies.isEmpty {
+        if !credentials.proxy_urls.isEmpty {
             var dict = [AnyHashable : Any]()
-            for proxy in self.credentials.proxies {
+            for proxy in credentials.proxy_urls {
                 guard let url = URL(string: proxy) else {
                     throw IBMQuantumExperienceError.invalidURL(url: proxy)
                 }
@@ -97,7 +100,7 @@ final class Request {
                 sessionConfig.connectionProxyDictionary = dict
             }
         }
-        self.urlSession = URLSession(configuration: sessionConfig)
+        self.urlSession = URLSession(configuration: sessionConfig, delegate: self.sessionDelegate, delegateQueue: nil)
     }
 
     func initialize(responseHandler: @escaping ((_:Request, _:IBMQuantumExperienceError?) -> Void)) -> RequestTask {
