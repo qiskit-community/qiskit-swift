@@ -335,6 +335,38 @@
 		69F42EA91FC555B700228A90 /* ToolsError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 699CAF661FC489A200402C05 /* ToolsError.swift */; };
 		69FEEE4D1FD9E39200526B78 /* IBMQuantumExperienceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69FEEE4B1FD9E38E00526B78 /* IBMQuantumExperienceTests.swift */; };
 		DFBC4F6C1EC7384200027640 /* qiskit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFBC4F621EC7384100027640 /* qiskit.framework */; };
+		FF45EA25203E18A0002CA232 /* Matrix+ColumnRowValueArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF45EA23203E189F002CA232 /* Matrix+ColumnRowValueArray.swift */; };
+		FF45EA26203E18A0002CA232 /* String+ZFill.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF45EA24203E18A0002CA232 /* String+ZFill.swift */; };
+		FF45EA3F203E24B6002CA232 /* Matrix+ColumnRowValueArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF45EA23203E189F002CA232 /* Matrix+ColumnRowValueArray.swift */; };
+		FF45EA40203E24C7002CA232 /* String+ZFill.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF45EA24203E18A0002CA232 /* String+ZFill.swift */; };
+		FF5072952041F49500527713 /* VisualizationTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5072942041F49500527713 /* VisualizationTypes.swift */; };
+		FF5072962041F49500527713 /* VisualizationTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5072942041F49500527713 /* VisualizationTypes.swift */; };
+		FF579391206DB1330053F588 /* String+Occurrences.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF579390206DB1330053F588 /* String+Occurrences.swift */; };
+		FF579392206DB1330053F588 /* String+Occurrences.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF579390206DB1330053F588 /* String+Occurrences.swift */; };
+		FF590A9A20475BBD0027DEB8 /* String+Base64.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF590A9920475BBD0027DEB8 /* String+Base64.swift */; };
+		FF590A9B20475BBD0027DEB8 /* String+Base64.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF590A9920475BBD0027DEB8 /* String+Base64.swift */; };
+		FF63F78B204205A500805601 /* Visualization.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF63F78A204205A500805601 /* Visualization.swift */; };
+		FF63F78D2042061000805601 /* Visualization.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF63F78A204205A500805601 /* Visualization.swift */; };
+		FF98E5FD204B68540026ADEC /* BarChartConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF98E5F8204B68540026ADEC /* BarChartConfiguration.swift */; };
+		FF98E600204B68540026ADEC /* StateCityChartHtmlFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF98E5FB204B68540026ADEC /* StateCityChartHtmlFactory.swift */; };
+		FF98E601204B68540026ADEC /* BarChartHtmlFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF98E5FC204B68540026ADEC /* BarChartHtmlFactory.swift */; };
+		FF98E602204B68570026ADEC /* BarChartConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF98E5F8204B68540026ADEC /* BarChartConfiguration.swift */; };
+		FF98E603204B685A0026ADEC /* BarChartHtmlFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF98E5FC204B68540026ADEC /* BarChartHtmlFactory.swift */; };
+		FF98E605204B68610026ADEC /* StateCityChartHtmlFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF98E5FB204B68540026ADEC /* StateCityChartHtmlFactory.swift */; };
+		FF98E60A204B68FC0026ADEC /* AppleWebViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF98E608204B68FB0026ADEC /* AppleWebViewFactory.swift */; };
+		FF98E60C204B68FF0026ADEC /* AppleWebViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF98E608204B68FB0026ADEC /* AppleWebViewFactory.swift */; };
+		FF98E612204B6E4A0026ADEC /* echarts.min.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF98E60F204B6E4A0026ADEC /* echarts.min.swift */; };
+		FF98E615204B6E5F0026ADEC /* echarts.min.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF98E60F204B6E4A0026ADEC /* echarts.min.swift */; };
+		FF98E61A204B6F130026ADEC /* echarts-gl.min.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF98E617204B6F130026ADEC /* echarts-gl.min.swift */; };
+		FF98E61C204B6F4F0026ADEC /* echarts-gl.min.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF98E617204B6F130026ADEC /* echarts-gl.min.swift */; };
+		FF9A9C3E206EC385006589F2 /* StateQsphereChartValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF9A9C3D206EC385006589F2 /* StateQsphereChartValue.swift */; };
+		FF9A9C3F206EC385006589F2 /* StateQsphereChartValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF9A9C3D206EC385006589F2 /* StateQsphereChartValue.swift */; };
+		FF9A9C41206ED7AE006589F2 /* StateQsphereChartSerie.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF9A9C40206ED7AE006589F2 /* StateQsphereChartSerie.swift */; };
+		FF9A9C42206ED7AE006589F2 /* StateQsphereChartSerie.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF9A9C40206ED7AE006589F2 /* StateQsphereChartSerie.swift */; };
+		FF9A9C44206EF7D0006589F2 /* StateQsphereChartHtmlFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF9A9C43206EF7D0006589F2 /* StateQsphereChartHtmlFactory.swift */; };
+		FF9A9C45206EF7D0006589F2 /* StateQsphereChartHtmlFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF9A9C43206EF7D0006589F2 /* StateQsphereChartHtmlFactory.swift */; };
+		FFEFC66A20533CAF0073B544 /* StateBlochChartHtmlFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEFC66920533CAF0073B544 /* StateBlochChartHtmlFactory.swift */; };
+		FFEFC66B20533CAF0073B544 /* StateBlochChartHtmlFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFEFC66920533CAF0073B544 /* StateBlochChartHtmlFactory.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -536,6 +568,26 @@
 		69FEEE4B1FD9E38E00526B78 /* IBMQuantumExperienceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IBMQuantumExperienceTests.swift; path = Tests/qiskitTests/IBMQuantumExperienceTests.swift; sourceTree = "<group>"; };
 		DFBC4F621EC7384100027640 /* qiskit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = qiskit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFBC4F6B1EC7384200027640 /* qiskitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = qiskitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF45EA23203E189F002CA232 /* Matrix+ColumnRowValueArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Matrix+ColumnRowValueArray.swift"; path = "Sources/qiskit/datastructures/Matrix+ColumnRowValueArray.swift"; sourceTree = SOURCE_ROOT; };
+		FF45EA24203E18A0002CA232 /* String+ZFill.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "String+ZFill.swift"; path = "Sources/qiskit/datastructures/String+ZFill.swift"; sourceTree = SOURCE_ROOT; };
+		FF5072942041F49500527713 /* VisualizationTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VisualizationTypes.swift; path = Sources/qiskit/tools/visualization/VisualizationTypes.swift; sourceTree = SOURCE_ROOT; };
+		FF579390206DB1330053F588 /* String+Occurrences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "String+Occurrences.swift"; path = "Sources/qiskit/datastructures/String+Occurrences.swift"; sourceTree = SOURCE_ROOT; };
+		FF590A9920475BBD0027DEB8 /* String+Base64.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "String+Base64.swift"; path = "Sources/qiskit/datastructures/String+Base64.swift"; sourceTree = SOURCE_ROOT; };
+		FF63F78A204205A500805601 /* Visualization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Visualization.swift; path = Sources/qiskit/tools/visualization/Visualization.swift; sourceTree = SOURCE_ROOT; };
+		FF98E5F8204B68540026ADEC /* BarChartConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BarChartConfiguration.swift; path = Sources/qiskit/tools/visualization/charts/BarChartConfiguration.swift; sourceTree = SOURCE_ROOT; };
+		FF98E5FB204B68540026ADEC /* StateCityChartHtmlFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = StateCityChartHtmlFactory.swift; path = Sources/qiskit/tools/visualization/charts/StateCityChartHtmlFactory.swift; sourceTree = SOURCE_ROOT; };
+		FF98E5FC204B68540026ADEC /* BarChartHtmlFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BarChartHtmlFactory.swift; path = Sources/qiskit/tools/visualization/charts/BarChartHtmlFactory.swift; sourceTree = SOURCE_ROOT; };
+		FF98E608204B68FB0026ADEC /* AppleWebViewFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppleWebViewFactory.swift; path = Sources/qiskit/tools/visualization/charts/platforms/AppleWebViewFactory.swift; sourceTree = SOURCE_ROOT; };
+		FF98E60F204B6E4A0026ADEC /* echarts.min.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = echarts.min.swift; path = "Sources/qiskit/tools/visualization/resources/echarts-4.0.4/echarts.min.swift"; sourceTree = SOURCE_ROOT; };
+		FF98E610204B6E4A0026ADEC /* echarts.min.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = echarts.min.js; path = "Sources/qiskit/tools/visualization/resources/echarts-4.0.4/echarts.min.js"; sourceTree = SOURCE_ROOT; };
+		FF98E611204B6E4A0026ADEC /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE; path = "Sources/qiskit/tools/visualization/resources/echarts-4.0.4/LICENSE"; sourceTree = SOURCE_ROOT; };
+		FF98E616204B6F130026ADEC /* echarts-gl.min.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "echarts-gl.min.js"; path = "Sources/qiskit/tools/visualization/resources/echarts-gl-1.1.0/echarts-gl.min.js"; sourceTree = SOURCE_ROOT; };
+		FF98E617204B6F130026ADEC /* echarts-gl.min.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "echarts-gl.min.swift"; path = "Sources/qiskit/tools/visualization/resources/echarts-gl-1.1.0/echarts-gl.min.swift"; sourceTree = SOURCE_ROOT; };
+		FF98E618204B6F130026ADEC /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE; path = "Sources/qiskit/tools/visualization/resources/echarts-gl-1.1.0/LICENSE"; sourceTree = SOURCE_ROOT; };
+		FF9A9C3D206EC385006589F2 /* StateQsphereChartValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StateQsphereChartValue.swift; path = Sources/qiskit/tools/visualization/charts/StateQsphereChartValue.swift; sourceTree = SOURCE_ROOT; };
+		FF9A9C40206ED7AE006589F2 /* StateQsphereChartSerie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StateQsphereChartSerie.swift; path = Sources/qiskit/tools/visualization/charts/StateQsphereChartSerie.swift; sourceTree = SOURCE_ROOT; };
+		FF9A9C43206EF7D0006589F2 /* StateQsphereChartHtmlFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StateQsphereChartHtmlFactory.swift; path = Sources/qiskit/tools/visualization/charts/StateQsphereChartHtmlFactory.swift; sourceTree = SOURCE_ROOT; };
+		FFEFC66920533CAF0073B544 /* StateBlochChartHtmlFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StateBlochChartHtmlFactory.swift; path = Sources/qiskit/tools/visualization/charts/StateBlochChartHtmlFactory.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -642,6 +694,7 @@
 				693C93031ED5EFAE00EA15B0 /* graph */,
 				6932AA141FB9F5B100382CF7 /* HashableTuple.swift */,
 				6903E0A61FC317B3007C1C60 /* Matrix.swift */,
+				FF45EA23203E189F002CA232 /* Matrix+ColumnRowValueArray.swift */,
 				6901D8261FCC5C5000B39538 /* ArrayError.swift */,
 				694226F41FEBED16007A756B /* MultiDArray.swift */,
 				6903E0A91FC3213E007C1C60 /* NumericType.swift */,
@@ -651,8 +704,11 @@
 				6932AA131FB9F5B100382CF7 /* RegBit.swift */,
 				6932AA181FB9F5B100382CF7 /* SDKLogger.swift */,
 				6932AA0E1FB9F5B000382CF7 /* Stack.swift */,
+				FF590A9920475BBD0027DEB8 /* String+Base64.swift */,
+				FF579390206DB1330053F588 /* String+Occurrences.swift */,
 				69F198F91FC2144C00CE05DC /* String+Padding.swift */,
 				6932AA191FB9F5B200382CF7 /* String+Random.swift */,
+				FF45EA24203E18A0002CA232 /* String+ZFill.swift */,
 				69C583161FE1A9A5008709E4 /* SymbolicValue.swift */,
 				6902B60D1FECC1AD006DC52F /* Vector.swift */,
 			);
@@ -905,6 +961,7 @@
 				699CAF661FC489A200402C05 /* ToolsError.swift */,
 				69F1791D1FC45E9900810FC9 /* apps */,
 				69F198EF1FC1DEA600CE05DC /* qi */,
+				FF45EA27203E1BD2002CA232 /* visualization */,
 			);
 			name = tools;
 			sourceTree = "<group>";
@@ -965,6 +1022,70 @@
 				6932AB651FB9F97200382CF7 /* qelib1.swift */,
 			);
 			path = qasm;
+			sourceTree = "<group>";
+		};
+		FF4378BF203E33F40051B93D /* resources */ = {
+			isa = PBXGroup;
+			children = (
+				FF98E60D204B6E090026ADEC /* echarts-4.0.4 */,
+				FF98E60E204B6E2D0026ADEC /* echarts-gl-1.1.0 */,
+			);
+			path = resources;
+			sourceTree = "<group>";
+		};
+		FF45EA27203E1BD2002CA232 /* visualization */ = {
+			isa = PBXGroup;
+			children = (
+				FF63F78A204205A500805601 /* Visualization.swift */,
+				FF5072942041F49500527713 /* VisualizationTypes.swift */,
+				FF63F78C204205E200805601 /* charts */,
+				FF4378BF203E33F40051B93D /* resources */,
+			);
+			name = visualization;
+			path = Sources/qiskit/tools/visualization;
+			sourceTree = "<group>";
+		};
+		FF63F78C204205E200805601 /* charts */ = {
+			isa = PBXGroup;
+			children = (
+				FF98E5F8204B68540026ADEC /* BarChartConfiguration.swift */,
+				FF98E5FC204B68540026ADEC /* BarChartHtmlFactory.swift */,
+				FFEFC66920533CAF0073B544 /* StateBlochChartHtmlFactory.swift */,
+				FF98E5FB204B68540026ADEC /* StateCityChartHtmlFactory.swift */,
+				FF9A9C43206EF7D0006589F2 /* StateQsphereChartHtmlFactory.swift */,
+				FF9A9C40206ED7AE006589F2 /* StateQsphereChartSerie.swift */,
+				FF9A9C3D206EC385006589F2 /* StateQsphereChartValue.swift */,
+				FF98E607204B68770026ADEC /* platforms */,
+			);
+			path = charts;
+			sourceTree = "<group>";
+		};
+		FF98E607204B68770026ADEC /* platforms */ = {
+			isa = PBXGroup;
+			children = (
+				FF98E608204B68FB0026ADEC /* AppleWebViewFactory.swift */,
+			);
+			path = platforms;
+			sourceTree = "<group>";
+		};
+		FF98E60D204B6E090026ADEC /* echarts-4.0.4 */ = {
+			isa = PBXGroup;
+			children = (
+				FF98E610204B6E4A0026ADEC /* echarts.min.js */,
+				FF98E60F204B6E4A0026ADEC /* echarts.min.swift */,
+				FF98E611204B6E4A0026ADEC /* LICENSE */,
+			);
+			path = "echarts-4.0.4";
+			sourceTree = "<group>";
+		};
+		FF98E60E204B6E2D0026ADEC /* echarts-gl-1.1.0 */ = {
+			isa = PBXGroup;
+			children = (
+				FF98E616204B6F130026ADEC /* echarts-gl.min.js */,
+				FF98E617204B6F130026ADEC /* echarts-gl.min.swift */,
+				FF98E618204B6F130026ADEC /* LICENSE */,
+			);
+			path = "echarts-gl-1.1.0";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1130,8 +1251,10 @@
 				69F42EA91FC555B700228A90 /* ToolsError.swift in Sources */,
 				6932AB521FB9F90700382CF7 /* NodeGopList.swift in Sources */,
 				69F198F21FC1DEFD00CE05DC /* Pauli.swift in Sources */,
+				FF9A9C45206EF7D0006589F2 /* StateQsphereChartHtmlFactory.swift in Sources */,
 				6932AA801FB9F6AA00382CF7 /* CH.swift in Sources */,
 				6932AA921FB9F6DF00382CF7 /* U1.swift in Sources */,
+				FF63F78D2042061000805601 /* Visualization.swift in Sources */,
 				6932AA891FB9F6C700382CF7 /* H.swift in Sources */,
 				6932AAED1FB9F7DD00382CF7 /* InstructionSet.swift in Sources */,
 				6932A9FC1FB9F52200382CF7 /* QeRemote.swift in Sources */,
@@ -1147,6 +1270,8 @@
 				6932AA3F1FB9F63100382CF7 /* CircuitVertexData.swift in Sources */,
 				6932AA2D1FB9F5D900382CF7 /* RegBit.swift in Sources */,
 				6932AB5F1FB9F92C00382CF7 /* NodeQreg.swift in Sources */,
+				FF98E615204B6E5F0026ADEC /* echarts.min.swift in Sources */,
+				FF45EA3F203E24B6002CA232 /* Matrix+ColumnRowValueArray.swift in Sources */,
 				6932AA3E1FB9F62E00382CF7 /* CircuitEdgeData.swift in Sources */,
 				6932AB5C1FB9F92400382CF7 /* NodeOpaque.swift in Sources */,
 				6932AB6D1FB9F98500382CF7 /* qelib1.swift in Sources */,
@@ -1155,12 +1280,14 @@
 				6932AA401FB9F63600382CF7 /* DAGCircuit.swift in Sources */,
 				6932AAC21FB9F78A00382CF7 /* Unroller.swift in Sources */,
 				6932AB561FB9F91300382CF7 /* NodeInclude.swift in Sources */,
+				FFEFC66B20533CAF0073B544 /* StateBlochChartHtmlFactory.swift in Sources */,
 				6932AB5B1FB9F92100382CF7 /* NodeMeasure.swift in Sources */,
 				6932AB641FB9F93E00382CF7 /* NodeUniversalUnitary.swift in Sources */,
 				6932AA0D1FB9F58400382CF7 /* GraphVertex.swift in Sources */,
 				6932AB6B1FB9F98000382CF7 /* Qasm.swift in Sources */,
 				6932A9F81FB9F51600382CF7 /* BackendUtils.swift in Sources */,
 				6932AAA81FB9F72900382CF7 /* CouplingVertexData.swift in Sources */,
+				FF98E605204B68610026ADEC /* StateCityChartHtmlFactory.swift in Sources */,
 				6932AAA61FB9F72400382CF7 /* Coupling.swift in Sources */,
 				6932AA261FB9F5C500382CF7 /* Complex.swift in Sources */,
 				6932AA2C1FB9F5D600382CF7 /* Random.swift in Sources */,
@@ -1169,6 +1296,7 @@
 				6932A9FE1FB9F52800382CF7 /* SimulatorTools.swift in Sources */,
 				6932AAC11FB9F78800382CF7 /* PrinterBackend.swift in Sources */,
 				6932AA951FB9F6E700382CF7 /* UBase.swift in Sources */,
+				FF590A9B20475BBD0027DEB8 /* String+Base64.swift in Sources */,
 				6932A9F91FB9F51900382CF7 /* BaseBackend.swift in Sources */,
 				6932AA411FB9F63800382CF7 /* DAGCircuitError.swift in Sources */,
 				6932AAF11FB9F7E800382CF7 /* QisKitCompilerError.swift in Sources */,
@@ -1181,10 +1309,13 @@
 				6932AAEB1FB9F7D700382CF7 /* Gate.swift in Sources */,
 				6932AB601FB9F92F00382CF7 /* NodeProgram.swift in Sources */,
 				6932AAF31FB9F7EE00382CF7 /* QuantumCircuit.swift in Sources */,
+				FF98E602204B68570026ADEC /* BarChartConfiguration.swift in Sources */,
 				6932AA851FB9F6B900382CF7 /* CX.swift in Sources */,
 				6932AAF21FB9F7EB00382CF7 /* QISKitError.swift in Sources */,
+				FF9A9C3F206EC385006589F2 /* StateQsphereChartValue.swift in Sources */,
 				6932AAE91FB9F7D100382CF7 /* ClassicalRegister.swift in Sources */,
 				6932AAA91FB9F72C00382CF7 /* Mapping.swift in Sources */,
+				FF579392206DB1330053F588 /* String+Occurrences.swift in Sources */,
 				6932AB911FB9FDC500382CF7 /* parser.y in Sources */,
 				6932AAEE1FB9F7DF00382CF7 /* JobProcessor.swift in Sources */,
 				6932AB4B1FB9F8F400382CF7 /* NodeCnot.swift in Sources */,
@@ -1194,6 +1325,7 @@
 				6932AABE1FB9F78000382CF7 /* CircuitBackend.swift in Sources */,
 				6932AA881FB9F6C400382CF7 /* CZ.swift in Sources */,
 				6932AB931FB9FDCB00382CF7 /* tokenizer.l in Sources */,
+				FF98E60C204B68FF0026ADEC /* AppleWebViewFactory.swift in Sources */,
 				69468F9C1FE434BC00CB283D /* Fermion.swift in Sources */,
 				69CE4C511FC0816D0089A425 /* RequestTask.swift in Sources */,
 				6932AB0A1FB9F88E00382CF7 /* IBMQuantumExperience.swift in Sources */,
@@ -1213,6 +1345,7 @@
 				6932AA281FB9F5CA00382CF7 /* HashableTuple.swift in Sources */,
 				6903E0AB1FC3213E007C1C60 /* NumericType.swift in Sources */,
 				6932AA8D1FB9F6D100382CF7 /* RY.swift in Sources */,
+				FF45EA40203E24C7002CA232 /* String+ZFill.swift in Sources */,
 				6932AB581FB9F91800382CF7 /* NodeInt.swift in Sources */,
 				698445241FCF59BD00F600A9 /* CompositeGateComponent.swift in Sources */,
 				6932AABF1FB9F78300382CF7 /* DAGBackend.swift in Sources */,
@@ -1226,6 +1359,7 @@
 				6932AB621FB9F93700382CF7 /* NodeRealValue.swift in Sources */,
 				6932AB4A1FB9F8F100382CF7 /* NodeBinaryOp.swift in Sources */,
 				6932AA421FB9F63C00382CF7 /* GateData.swift in Sources */,
+				FF9A9C42206ED7AE006589F2 /* StateQsphereChartSerie.swift in Sources */,
 				6932AA0C1FB9F58100382CF7 /* GraphError.swift in Sources */,
 				6932AA8A1FB9F6C900382CF7 /* Header.swift in Sources */,
 				6932A9FA1FB9F51C00382CF7 /* QasmCppSimulator.swift in Sources */,
@@ -1247,8 +1381,11 @@
 				6932AB0D1FB9F89600382CF7 /* Request.swift in Sources */,
 				6932AA0A1FB9F57B00382CF7 /* Graph.swift in Sources */,
 				6932AAF51FB9F7F400382CF7 /* QuantumRegister.swift in Sources */,
+				FF98E61C204B6F4F0026ADEC /* echarts-gl.min.swift in Sources */,
 				6932AA8C1FB9F6CF00382CF7 /* RX.swift in Sources */,
+				FF5072962041F49500527713 /* VisualizationTypes.swift in Sources */,
 				6932AB631FB9F93A00382CF7 /* NodeReset.swift in Sources */,
+				FF98E603204B685A0026ADEC /* BarChartHtmlFactory.swift in Sources */,
 				6932AB481FB9F8EC00382CF7 /* Node.swift in Sources */,
 				6982482A1FBCCAA60097E8E5 /* CRandom.c in Sources */,
 				6932AA811FB9F6AD00382CF7 /* CRZ.swift in Sources */,
@@ -1280,6 +1417,7 @@
 				69F198F11FC1DEFD00CE05DC /* Pauli.swift in Sources */,
 				6932AA771FB9F69300382CF7 /* CZ.swift in Sources */,
 				6932AABB1FB9F77300382CF7 /* BackendError.swift in Sources */,
+				FF9A9C44206EF7D0006589F2 /* StateQsphereChartHtmlFactory.swift in Sources */,
 				6932AB441FB9F8CB00382CF7 /* NodeIf.swift in Sources */,
 				6932AB2E1FB9F8CB00382CF7 /* NodeIndexedId.swift in Sources */,
 				6932AB8E1FB9FDB800382CF7 /* tokenizer.l in Sources */,
@@ -1297,6 +1435,8 @@
 				6932A9F31FB9F50500382CF7 /* QeRemote.swift in Sources */,
 				6932AA071FB9F56F00382CF7 /* GraphError.swift in Sources */,
 				6932AA6D1FB9F69300382CF7 /* CU3.swift in Sources */,
+				FF45EA25203E18A0002CA232 /* Matrix+ColumnRowValueArray.swift in Sources */,
+				FF98E612204B6E4A0026ADEC /* echarts.min.swift in Sources */,
 				6932AB3B1FB9F8CB00382CF7 /* NodeInclude.swift in Sources */,
 				6932AB8D1FB9FDB800382CF7 /* parser.y in Sources */,
 				6932AB331FB9F8CB00382CF7 /* NodeUniversalUnitary.swift in Sources */,
@@ -1306,19 +1446,23 @@
 				6932AB361FB9F8CB00382CF7 /* NodeInt.swift in Sources */,
 				6932AB311FB9F8CB00382CF7 /* NodeGate.swift in Sources */,
 				6932AB391FB9F8CB00382CF7 /* NodeGopList.swift in Sources */,
+				FFEFC66A20533CAF0073B544 /* StateBlochChartHtmlFactory.swift in Sources */,
 				6932AB451FB9F8CB00382CF7 /* NodeReal.swift in Sources */,
 				6932AA241FB9F5B200382CF7 /* SDKLogger.swift in Sources */,
 				6932AAB81FB9F77300382CF7 /* UnrollerBackend.swift in Sources */,
 				6932AADF1FB9F7C200382CF7 /* Result.swift in Sources */,
 				6932AAD81FB9F7C200382CF7 /* Gate.swift in Sources */,
 				6932AAE11FB9F7C200382CF7 /* Instruction.swift in Sources */,
+				FF98E600204B68540026ADEC /* StateCityChartHtmlFactory.swift in Sources */,
 				6932AAD71FB9F7C200382CF7 /* Measure.swift in Sources */,
 				6932AAA11FB9F71700382CF7 /* MappingError.swift in Sources */,
+				FF63F78B204205A500805601 /* Visualization.swift in Sources */,
 				690B8C0A2003C74700126A13 /* SessionDelegate.swift in Sources */,
 				6932AA7B1FB9F69300382CF7 /* U1.swift in Sources */,
 				6932AA251FB9F5B200382CF7 /* String+Random.swift in Sources */,
 				6932AB061FB9F88800382CF7 /* Request.swift in Sources */,
 				6932AB681FB9F97200382CF7 /* qelib1.swift in Sources */,
+				FF590A9A20475BBD0027DEB8 /* String+Base64.swift in Sources */,
 				6932AA721FB9F69300382CF7 /* RY.swift in Sources */,
 				6932AA661FB9F69300382CF7 /* CH.swift in Sources */,
 				6932AA6A1FB9F69300382CF7 /* U3.swift in Sources */,
@@ -1331,10 +1475,13 @@
 				6932AA781FB9F69300382CF7 /* T.swift in Sources */,
 				6932AA631FB9F69300382CF7 /* Header.swift in Sources */,
 				6932AA671FB9F69300382CF7 /* Swap.swift in Sources */,
+				FF98E5FD204B68540026ADEC /* BarChartConfiguration.swift in Sources */,
 				6932AA711FB9F69300382CF7 /* CY.swift in Sources */,
 				6932AA211FB9F5B200382CF7 /* Complex.swift in Sources */,
+				FF9A9C3E206EC385006589F2 /* StateQsphereChartValue.swift in Sources */,
 				6932AA751FB9F69300382CF7 /* S.swift in Sources */,
 				6932AA6F1FB9F69300382CF7 /* CU1.swift in Sources */,
+				FF579391206DB1330053F588 /* String+Occurrences.swift in Sources */,
 				6932AB431FB9F8CB00382CF7 /* Node.swift in Sources */,
 				6932AABC1FB9F77300382CF7 /* DAGBackend.swift in Sources */,
 				6932AB081FB9F88800382CF7 /* Credentials.swift in Sources */,
@@ -1344,6 +1491,7 @@
 				6932AB6A1FB9F97200382CF7 /* QasmError.swift in Sources */,
 				6932AAA21FB9F71700382CF7 /* CouplingError.swift in Sources */,
 				69CE4C501FC0816D0089A425 /* RequestTask.swift in Sources */,
+				FF98E60A204B68FC0026ADEC /* AppleWebViewFactory.swift in Sources */,
 				69468F9B1FE434B800CB283D /* Fermion.swift in Sources */,
 				6932AB2C1FB9F8CB00382CF7 /* NodeCreg.swift in Sources */,
 				6932AA061FB9F56F00382CF7 /* GraphEdge.swift in Sources */,
@@ -1363,6 +1511,7 @@
 				6903E0AA1FC3213E007C1C60 /* NumericType.swift in Sources */,
 				6932AAE41FB9F7C200382CF7 /* Reset.swift in Sources */,
 				6932AB3F1FB9F8CB00382CF7 /* NodeId.swift in Sources */,
+				FF45EA26203E18A0002CA232 /* String+ZFill.swift in Sources */,
 				6932AB301FB9F8CB00382CF7 /* NodeCustomUnitary.swift in Sources */,
 				6932AB071FB9F88800382CF7 /* IBMQuantumExperienceError.swift in Sources */,
 				6932AABA1FB9F77300382CF7 /* JsonBackend.swift in Sources */,
@@ -1376,13 +1525,16 @@
 				6932AAE81FB9F7C200382CF7 /* QisKitCompilerError.swift in Sources */,
 				6932AB371FB9F8CB00382CF7 /* NodeReset.swift in Sources */,
 				6932AA091FB9F56F00382CF7 /* Graph.swift in Sources */,
+				FF9A9C41206ED7AE006589F2 /* StateQsphereChartSerie.swift in Sources */,
 				6932AA081FB9F56F00382CF7 /* GraphVertex.swift in Sources */,
 				6932AAB91FB9F77300382CF7 /* Unroller.swift in Sources */,
 				6932AAE21FB9F7C200382CF7 /* QuantumCircuit.swift in Sources */,
+				FF5072952041F49500527713 /* VisualizationTypes.swift in Sources */,
 				698445231FCF59B100F600A9 /* CompositeGateComponent.swift in Sources */,
 				6932AAB61FB9F77300382CF7 /* PrinterBackend.swift in Sources */,
 				6932AB3A1FB9F8CB00382CF7 /* NodeQreg.swift in Sources */,
 				6932AA391FB9F61900382CF7 /* CircuitEdgeData.swift in Sources */,
+				FF98E601204B68540026ADEC /* BarChartHtmlFactory.swift in Sources */,
 				6932A9F11FB9F50400382CF7 /* QasmCppSimulator.swift in Sources */,
 				6932AA701FB9F69300382CF7 /* Barrier.swift in Sources */,
 				6932AA6C1FB9F69300382CF7 /* Z.swift in Sources */,
@@ -1395,6 +1547,7 @@
 				6932AA9F1FB9F71700382CF7 /* Compiling.swift in Sources */,
 				6932AB2F1FB9F8CB00382CF7 /* NodeIdList.swift in Sources */,
 				6932AAE61FB9F7C200382CF7 /* QuantumRegister.swift in Sources */,
+				FF98E61A204B6F130026ADEC /* echarts-gl.min.swift in Sources */,
 				6932AB401FB9F8CB00382CF7 /* NodeMagic.swift in Sources */,
 				6932AA3B1FB9F61900382CF7 /* DAGCircuit.swift in Sources */,
 				6932AA1B1FB9F5B200382CF7 /* Double+Format.swift in Sources */,
