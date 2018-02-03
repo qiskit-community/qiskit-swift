@@ -74,6 +74,13 @@ do {
     try qc.x(qr[12])
     try qc.x(qr[13])
 
+    // the current version of the QISKit compiler assumes that all backends
+    // support re-using a qubit after measurement. Until a fix is ready for
+    // this, it is neccessary to put a barrier before the measurements to
+    // prevent the compiler from moving them to earlier in the circuit and
+    // potentially trying to reuse qubits after measurement
+    try qc.barrier(qr)
+
     // measure
     for j in 0..<16 {
         try qc.measure(qr[j], cr[j])
