@@ -416,14 +416,6 @@ final class Mapping {
             SDKLogger.logDebug("swap_mapper: layer: \(i)")
             SDKLogger.logDebug("swap_mapper: success_flag=\(success_flag),best_d=\(best_d ?? 0),trivial_flag=\(trivial_flag)")
 
-            // If this layer is only single-qubit gates,
-            // and we have yet to see multi-qubit gates,
-            // continue to the next iteration
-            if trivial_flag && first_layer {
-                SDKLogger.logDebug("swap_mapper: skip to next layer")
-                continue
-            }
-
             // If this fails, try one gate at a time in this layer
             if !success_flag {
                 SDKLogger.logDebug("swap_mapper: failed, layer \(i), retrying sequentially")

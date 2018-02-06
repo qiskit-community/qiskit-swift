@@ -1246,17 +1246,17 @@ public final class QuantumProgram: CustomStringConvertible {
                     job["name"] = name
                     // config parameters used by the runner
                     var conf: [String:Any] = config != nil ? config! : [:]
-                    conf["coupling_map"] = coupling_map != nil ? Coupling.coupling_dict2list(coupling_map!) : NSNull()
+                    conf["coupling_map"] = cm != nil ? Coupling.coupling_dict2list(cm!) : NSNull()
                     // TODO: Jay: make config options optional for different backends
                     // Map the layout to a format that can be json encoded
-                    if let layout = compiledCircuit.final_layout {
-                        var list_layout: [[[String:Int]]] = []
-                        for (k,v) in layout {
-                            let kDict = [k.name : k.index]
-                            let vDict = [v.name : v.index]
-                            list_layout.append([kDict,vDict])
+                    if let final_layout = compiledCircuit.final_layout {
+                        var list_layout: [[Any]] = []
+                        for (k,v) in final_layout {
+                            let k1: Any = [k.name , k.index]
+                            let v1: Any = [v.name , v.index]
+                            list_layout.append([k1,v1])
                         }
-                        conf["layout"] = layout
+                        conf["layout"] = list_layout
                     }
                     else {
                         conf["layout"] = NSNull()

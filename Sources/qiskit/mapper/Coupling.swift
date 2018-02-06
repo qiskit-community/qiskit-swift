@@ -37,7 +37,7 @@ final class Coupling: CustomStringConvertible {
      */
     static func coupling_dict2list(_ couplingdict: [Int:[Int]]) -> [[Int]] {
         var couplinglist: [[Int]] = []
-        for (ctl, tgtlist) in couplingdict {
+        for (ctl, tgtlist) in couplingdict.sorted(by: { $0.0 < $1.0 }) {
             for tgt in tgtlist {
                 couplinglist.append([ctl, tgt])
             }

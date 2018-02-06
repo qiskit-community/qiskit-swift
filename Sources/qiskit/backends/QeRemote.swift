@@ -65,9 +65,9 @@ final class QeRemote: BaseBackend {
                 var newCircuits: [[String:Any]] = []
                 for (index,c) in circuits.enumerated() {
                     var circuit = c
-                    var isNull = circuit["compiled_circuit"] == nil
+                    var isNull = circuit["compiled_circuit_qasm"] == nil
                     if !isNull {
-                        if let _ = circuit["compiled_circuit"] as? NSNull {
+                        if let _ = circuit["compiled_circuit_qasm"] as? NSNull {
                             isNull = true
                         }
                     }
