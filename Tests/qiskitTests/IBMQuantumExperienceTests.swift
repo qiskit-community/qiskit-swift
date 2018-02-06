@@ -612,6 +612,8 @@ class AuthenticationTests: XCTestCase {
                 return
             }
             switch error {
+            case IBMQuantumExperienceError.errorLogin:
+                break
             case IBMQuantumExperienceError.invalidToken:
                 break
             default:
