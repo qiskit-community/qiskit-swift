@@ -26,6 +26,7 @@
 /* Begin PBXFileReference section */
 		DF3EA6001ECDD14200B86267 /* qiskit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = qiskit.xcodeproj; path = ../qiskit.xcodeproj; sourceTree = "<group>"; };
 		DFE7AF761EB4C1D100D8DD72 /* QisSwiftDeveloperTutorial.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = QisSwiftDeveloperTutorial.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		FFD806A9201A8E6700ABB473 /* QuantumEmoticon.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = QuantumEmoticon.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -34,6 +35,7 @@
 			children = (
 				DF3EA6001ECDD14200B86267 /* qiskit.xcodeproj */,
 				DFE7AF761EB4C1D100D8DD72 /* QisSwiftDeveloperTutorial.playground */,
+				FFD806A9201A8E6700ABB473 /* QuantumEmoticon.playground */,
 			);
 			sourceTree = "<group>";
 		};
@@ -42,6 +44,7 @@
 			children = (
 				DF3EA6061ECDD14200B86267 /* qiskit.framework */,
 				DF3EA6081ECDD14200B86267 /* qiskitTests.xctest */,
+				FFD806AE201A8E6700ABB473 /* qiskit.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -92,6 +95,13 @@
 			fileType = wrapper.cfbundle;
 			path = qiskitTests.xctest;
 			remoteRef = DF3EA6071ECDD14200B86267 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FFD806AE201A8E6700ABB473 /* qiskit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = qiskit.framework;
+			remoteRef = FFD806AD201A8E6700ABB473 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
