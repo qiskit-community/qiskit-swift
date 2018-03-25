@@ -29,7 +29,8 @@ class DataStructureTests: XCTestCase {
         ("testLongestPath",testLongestPath),
         ("testVector",testVector),
         ("testMatrix",testMatrix),
-        ("testTrace",testTrace)
+        ("testTrace",testTrace),
+        ("testMultiDArray", testMultiDArray)
     ]
 
     override func setUp() {
@@ -258,6 +259,14 @@ class DataStructureTests: XCTestCase {
         } catch let error {
             XCTFail("testTrace: \(error)")
         }
+    }
+
+    func testMultiDArray() {
+        let value = 101
+        let count = 3
+        let a = try! MultiDArray(repeating: value, shape: [count])
+        let b = Array(repeating: value, count: count)
+        XCTAssertEqual(a.value as! [Int], b)
     }
 
     private class func formatList(_ list: [GraphVertex<EmptyGraphData>]) -> String {
