@@ -34,7 +34,7 @@ public struct MultiDArray<T: NumericType> : Hashable, CustomStringConvertible, E
         self.shape = shape
         let indexes: [[Int]] = MultiDArray<T>.getAllIndexes(self.shape)
         for index in indexes {
-            self._value[Vector<Int>(value:index)] = 0
+            self._value[Vector<Int>(value:index)] = repeating
         }
     }
 
