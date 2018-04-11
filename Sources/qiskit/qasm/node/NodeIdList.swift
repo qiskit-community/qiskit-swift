@@ -41,7 +41,7 @@ final class NodeIdList: Node {
     }
     
     func qasm(_ prec: Int) -> String {
-        let qasms: [String] = self.identifiers.flatMap({ (node: Node) -> String in
+        let qasms: [String] = self.identifiers.compactMap({ (node: Node) -> String in
             return node.qasm(prec)
         })
         return qasms.joined(separator: ",")

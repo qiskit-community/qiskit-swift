@@ -60,7 +60,7 @@ final class NodeGateBody: Node {
     func qasm(_ prec: Int) -> String {
         var qasms: [String] = []
         if let glist = goplist as? NodeGopList {
-            qasms = glist.children.flatMap({ (node: Node) -> String in
+            qasms = glist.children.compactMap({ (node: Node) -> String in
                 return node.qasm(prec)
             })
         }

@@ -40,7 +40,7 @@ final class NodeProgram: Node  {
     }
     
     func qasm(_ prec: Int) -> String {
-        let qasms: [String] = self.statements.flatMap({ (node: Node) -> String in
+        let qasms: [String] = self.statements.compactMap({ (node: Node) -> String in
             return node.qasm(prec)
         })
         return qasms.joined(separator: "\n")

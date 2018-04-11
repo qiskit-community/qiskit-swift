@@ -196,32 +196,21 @@ measure q[2] -> f[0];
             return
         }
         let asyncExpectation = self.expectation(description: "test_api_run_experiment")
-        api.available_backend_simulators() { (backends,error) in
+        let backend = "ibmqx_qasm_simulator"
+        let shots = 1
+        api.run_experiment(qasm: self.qasm, backend: backend, shots: shots) { (experiment,error) in
             if error != nil {
                 XCTFail("Failure in test_api_run_experiment: \(error!.localizedDescription)")
                 asyncExpectation.fulfill()
                 return
             }
-            guard let backend = backends.first?["name"] as? String else {
-                XCTFail("Failure in test_api_run_experiment: no backends.")
-                asyncExpectation.fulfill()
-                return
+            var check_status: String? = nil
+            if let s = experiment["status"] as? String {
+                check_status = s
+                SDKLogger.logInfo("\(s)")
             }
-            let shots = 1
-            api.run_experiment(qasm: self.qasm, backend: backend, shots: shots) { (experiment,error) in
-                if error != nil {
-                    XCTFail("Failure in test_api_run_experiment: \(error!.localizedDescription)")
-                    asyncExpectation.fulfill()
-                    return
-                }
-                var check_status: String? = nil
-                if let s = experiment["status"] as? String {
-                    check_status = s
-                    SDKLogger.logInfo("\(s)")
-                }
-                XCTAssertNotNil(check_status)
-                asyncExpectation.fulfill()
-            }
+            XCTAssertNotNil(check_status)
+            asyncExpectation.fulfill()
         }
         self.waitForExpectations(timeout: 180, handler: { (error) in
             XCTAssertNil(error, "Failure in test_api_run_experiment")
@@ -234,43 +223,32 @@ measure q[2] -> f[0];
             return
         }
         let asyncExpectation = self.expectation(description: "test_api_run_experiment_with_seed")
-        api.available_backend_simulators() { (backends,error) in
+        let backend = "ibmqx_qasm_simulator"
+        let shots = 1
+        let seed = 815
+        api.run_experiment(qasm: self.qasm, backend: backend, shots: shots, seed: seed) { (experiment,error) in
             if error != nil {
                 XCTFail("Failure in test_api_run_experiment_with_seed: \(error!.localizedDescription)")
                 asyncExpectation.fulfill()
                 return
             }
-            guard let backend = backends.first?["name"] as? String else {
-                XCTFail("Failure in test_api_run_experiment_with_seed: no backends.")
+            guard let result = experiment["result"] as? [String:Any] else {
+                XCTFail("Failure in test_api_run_experiment_with_seed: no results.")
                 asyncExpectation.fulfill()
                 return
             }
-            let shots = 1
-            let seed = 815
-            api.run_experiment(qasm: self.qasm, backend: backend, shots: shots, seed: seed) { (experiment,error) in
-                if error != nil {
-                    XCTFail("Failure in test_api_run_experiment_with_seed: \(error!.localizedDescription)")
-                    asyncExpectation.fulfill()
-                    return
-                }
-                guard let result = experiment["result"] as? [String:Any] else {
-                    XCTFail("Failure in test_api_run_experiment_with_seed: no results.")
-                    asyncExpectation.fulfill()
-                    return
-                }
-                guard let extraInfo = result["extraInfo"] as? [String:Any] else {
-                    XCTFail("Failure in test_api_run_experiment_with_seed: no extraInfo.")
-                    asyncExpectation.fulfill()
-                    return
-                }
-                guard let check_seed = extraInfo["seed"] as? Int else {
-                    XCTFail("Failure in test_api_run_experiment_with_seed: no seed.")
-                    asyncExpectation.fulfill()
-                    return
-                }
-                XCTAssertEqual(seed,check_seed)
+            guard let extraInfo = result["extraInfo"] as? [String:Any] else {
+                XCTFail("Failure in test_api_run_experiment_with_seed: no extraInfo.")
                 asyncExpectation.fulfill()
+                return
             }
+            guard let check_seed = extraInfo["seed"] as? Int else {
+                XCTFail("Failure in test_api_run_experiment_with_seed: no seed.")
+                asyncExpectation.fulfill()
+                return
+            }
+            XCTAssertEqual(seed,check_seed)
+            asyncExpectation.fulfill()
         }
         self.waitForExpectations(timeout: 180, handler: { (error) in
             XCTAssertNil(error, "Failure in test_api_run_experiment_with_seed")
