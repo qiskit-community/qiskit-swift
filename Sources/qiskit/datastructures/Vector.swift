@@ -268,6 +268,21 @@ extension Vector where T : PrimitiveNumericType {
         set = Set<T>(self.value.filter({ !set.contains($0) }))
         return Vector<T>(value:Array<T>(set).sorted())
     }
+
+    public func argmax() -> Int {
+        guard count > 0 else {
+            return NSNotFound
+        }
+
+        var maxPos = 0
+        for i in 1..<count {
+            if (self[maxPos] < self[i]) {
+                maxPos = i
+            }
+        }
+
+        return maxPos
+    }
 }
 
 extension Vector where T == Complex {

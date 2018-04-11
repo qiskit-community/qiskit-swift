@@ -21,12 +21,20 @@
 			remoteGlobalIDString = DFBC4F6B1EC7384200027640;
 			remoteInfo = qiskitTests;
 		};
+		FFD66EE920227F85002915BE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DF3EA6001ECDD14200B86267 /* qiskit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 69DAB4DF1FAB60480093C27B;
+			remoteInfo = qiskitiOS;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		DF3EA6001ECDD14200B86267 /* qiskit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = qiskit.xcodeproj; path = ../qiskit.xcodeproj; sourceTree = "<group>"; };
 		DFE7AF761EB4C1D100D8DD72 /* QisSwiftDeveloperTutorial.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = QisSwiftDeveloperTutorial.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		FFD806A9201A8E6700ABB473 /* QuantumEmoticon.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = QuantumEmoticon.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		FFD66EE520227F85002915BE /* VisualizingQuantumState.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = VisualizingQuantumState.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -36,6 +44,7 @@
 				DF3EA6001ECDD14200B86267 /* qiskit.xcodeproj */,
 				DFE7AF761EB4C1D100D8DD72 /* QisSwiftDeveloperTutorial.playground */,
 				FFD806A9201A8E6700ABB473 /* QuantumEmoticon.playground */,
+				FFD66EE520227F85002915BE /* VisualizingQuantumState.playground */,
 			);
 			sourceTree = "<group>";
 		};
@@ -45,6 +54,7 @@
 				DF3EA6061ECDD14200B86267 /* qiskit.framework */,
 				DF3EA6081ECDD14200B86267 /* qiskitTests.xctest */,
 				FFD806AE201A8E6700ABB473 /* qiskit.framework */,
+				FFD66EEA20227F85002915BE /* qiskit.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -102,6 +112,13 @@
 			fileType = wrapper.framework;
 			path = qiskit.framework;
 			remoteRef = FFD806AD201A8E6700ABB473 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FFD66EEA20227F85002915BE /* qiskit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = qiskit.framework;
+			remoteRef = FFD66EE920227F85002915BE /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */

@@ -29,6 +29,7 @@ class DataStructureTests: XCTestCase {
         ("testLongestPath",testLongestPath),
         ("testVector",testVector),
         ("testMatrix",testMatrix),
+        ("testComplexMatrix", testComplexMatrix),
         ("testTrace",testTrace),
         ("testMultiDArray", testMultiDArray)
     ]
@@ -221,6 +222,12 @@ class DataStructureTests: XCTestCase {
         XCTAssertEqual(a.dot(b).description, Complex(-13,0).description)
         let c: Vector<Int> = [5, 4, 1, 0]
         XCTAssertEqual(c.remainder(2).description, [1, 0, 1, 0].description)
+        var d: Vector<Int> = []
+        XCTAssertEqual(d.argmax(), NSNotFound)
+        d = [-10]
+        XCTAssertEqual(d.argmax(), 0)
+        d = [-10, 20, 99, -20, 10]
+        XCTAssertEqual(d.argmax(), 2)
     }
 
     func testMatrix() {
@@ -242,6 +249,39 @@ class DataStructureTests: XCTestCase {
         a = [[10,0,3, 6], [-2,-4,1, 9], [3,0,2, 11], [7,8,9, 24]]
         XCTAssertEqual(try a.slice((0,2),(0,2)).description, [[10, 0],[-2, -4]].description)
         XCTAssertEqual(try a.slice((2,4),(2,4)).description, [[2, 11], [9, 24]].description)
+    }
+
+    func testComplexMatrix() {
+        let a: Matrix<Complex> = [[Complex(2, 0), Complex(0, 1), Complex(0, 0)],
+                                  [Complex(0, 1), Complex(2, 0), Complex(0, 0)],
+                                  [Complex(0, 0), Complex(0, 0), Complex(3, 0)]]
+        var b = a
+        b[1, 0] = Complex(0, -1)
+        XCTAssertFalse(a.isHermitian)
+        XCTAssertTrue(b.isHermitian)
+
+        #if os(OSX) || os(iOS)
+
+        XCTAssertThrowsError(try a.eigh())
+        let (values, vectors) = try! b.eigh()
+        let expectedValues = Vector(value: [1.0, 3.0, 3.0])
+        let expectedVectors = [Vector(value: [Complex(-0.7071, 0), Complex(0, -0.7071), Complex(0, 0)]),
+                               Vector(value: [Complex(-0.7071, 0), Complex(0, 0.7071),  Complex(0, 0)]),
+                               Vector(value: [Complex(0, 0),       Complex(0, 0),       Complex(1, 0)])]
+        XCTAssertEqual(values, expectedValues)
+        XCTAssertEqual(vectors.count, expectedVectors.count)
+        for i in 0..<vectors.count {
+            let oneVector = vectors[i]
+            let oneExpectedVector = expectedVectors[i]
+            XCTAssertEqual(oneVector.count, oneExpectedVector.count)
+
+            for j in 0..<oneVector.count {
+                XCTAssertEqual(oneVector[j].real, oneExpectedVector[j].real, accuracy: 0.00001)
+                XCTAssertEqual(oneVector[j].imag, oneExpectedVector[j].imag, accuracy: 0.00001)
+            }
+        }
+
+        #endif
     }
 
     func testTrace() {
