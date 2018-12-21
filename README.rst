@@ -1,5 +1,5 @@
-Quantum Information Software Kit (QISKit)
-=========================================
+Quantum Information Science Kit (QISKit)
+========================================
 
 Swift software development kit (SDK) for working
 with OpenQASM and the IBM Q experience (QX).
